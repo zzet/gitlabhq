@@ -65,7 +65,14 @@ Gitlab::Application.configure do
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
-  config.action_mailer.delivery_method = :sendmail
+  #config.action_mailer.delivery_method = :sendmail
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    :address => 'mail-sandbox-web.st2.ul.home',
+    :port => 2525,
+    :user_name => 'Gitlab',
+    :password => '5b4bbf451aa13c7c284024796b131445'
+  }
   # Defaults to:
   # # config.action_mailer.sendmail_settings = {
   # #   :location => '/usr/sbin/sendmail',
