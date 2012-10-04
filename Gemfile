@@ -148,6 +148,13 @@ group :development do
 
   # thin instead webrick
   gem 'thin'
+
+  # Deploy with Capistrano
+  gem "capi"
+  gem 'capistrano'
+  gem 'rvm-capistrano'
+  gem 'capistrano-ext'
+  gem 'capistrano_colors'
 end
 
 group :development, :test do
