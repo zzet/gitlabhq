@@ -8,7 +8,7 @@ production:
   pool: 5
   username: postgres
   password:
-  # host: localhost
+  host: localhost
   # socket: /tmp/postgresql.sock
 
 #
