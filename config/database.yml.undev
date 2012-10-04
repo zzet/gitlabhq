@@ -45,3 +45,34 @@ test: &test
   username: gitlab
   password:
   # socket:
+
+legacy_production:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  pool: 5
+  username: root
+  password:
+  host: 127.0.0.1
+  port: 3308
+  database: gitorious
+
+legacy_development:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  pool: 5
+  username: root
+  password:
+  host: 127.0.0.1
+  database: gitorious
+
+legacy_test:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  pool: 5
+  username: root
+  password:
+  host: 127.0.0.1
+  database: gitlabhq_test
