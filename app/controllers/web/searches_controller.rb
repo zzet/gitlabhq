@@ -1,4 +1,4 @@
-class Web::SearchController < Web::ApplicationController
+class Web::SearchesController < Web::ApplicationController
   def show
     result = SearchContext.new(current_user.project_ids, params).execute
 
