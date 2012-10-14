@@ -1,4 +1,4 @@
-class ApplicationController < ActionController::Base
+class ApplicationController < ApplicationController
   before_filter :authenticate_user!
   before_filter :reject_blocked!
   before_filter :set_current_user_for_observers

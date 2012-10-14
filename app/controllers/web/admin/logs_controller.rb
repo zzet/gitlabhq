@@ -1,2 +1,2 @@
-class Admin::LogsController < AdminController
+class Web::Admin::LogsController < Web::Admin::ApplicationController
 end

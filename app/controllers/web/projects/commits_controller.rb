@@ -1,6 +1,6 @@
 require "base64"
 
-class CommitsController < ProjectResourceController
+class Web::Projects::CommitsController < Web::Projects::ApplicationController
   include ExtractsPath
 
   # Authorize
