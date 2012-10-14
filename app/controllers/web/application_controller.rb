@@ -1,6 +1,7 @@
-class ApplicationController < ApplicationController
+class Web::ApplicationController < ApplicationController
   before_filter :authenticate_user!
   before_filter :reject_blocked!
+
   before_filter :set_current_user_for_observers
   before_filter :dev_tools if Rails.env == 'development'
 
