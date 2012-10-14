@@ -36,9 +36,9 @@ class EventDecorator < ApplicationDecorator
 
   def feed_summary
     if self.issue?
-      h.render "events/event_issue", issue: self.issue
+      h.render "shared/events/event_issue", issue: self.issue
     elsif self.push?
-      h.render "events/event_push", event: self
+      h.render "shared/events/event_push", event: self
     end
   end
 end

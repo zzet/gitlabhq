@@ -39,7 +39,7 @@
             %li
               %p.hint
                 You can login through #{@user.provider.titleize}!
-                = link_to "click here to change", profile_account_path
+                = link_to "click here to change", account_profile_path
 
   %hr
   .row
@@ -74,9 +74,9 @@
         .ui-box-body
           %h4
             SSH public keys:
-            %strong.right= link_to current_user.keys.count, keys_path
+            %strong.right= link_to current_user.keys.count, profile_keys_path
 
-          = link_to "Add Public Key", new_key_path, class: "btn small"
+          = link_to "Add Public Key", new_profile_key_path, class: "btn small"
 
   .form-actions
     = f.submit 'Save', class: "btn save-btn"

@@ -11,7 +11,7 @@ describe "Users Security" do
     end
 
     describe "GET /keys" do
-      subject { keys_path }
+      subject { profile_keys_path }
 
       it { should be_allowed_for @u1 }
       it { should be_allowed_for :admin }

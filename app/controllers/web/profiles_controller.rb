@@ -28,7 +28,7 @@ class Web::ProfilesController < Web::ApplicationController
 
   def reset_private_token
     current_user.reset_authentication_token!
-    redirect_to profile_account_path
+    redirect_to account_profile_path
   end
 
   def history

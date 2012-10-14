@@ -15,7 +15,7 @@
     %ul.unstyled.event_commits
       - few_commits = event.commits[0...2]
       - few_commits.each do |commit|
-        = render "events/commit", commit: commit, project: project
+        = render "shared/events/commit", commit: commit, project: project
 
       - if event.commits_count > 1
         %li.commits-stat

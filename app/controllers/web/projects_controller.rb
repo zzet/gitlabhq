@@ -59,7 +59,7 @@ class Web::ProjectsController < Web::ApplicationController
            @last_push = current_user.recent_push(@project.id)
            render :show
          else
-           render "projects/empty"
+           render "web/projects/empty"
          end
       end
       format.js

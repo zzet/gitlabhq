@@ -1,6 +1,6 @@
 .projects
   .activities.span8
-    = link_to dashboard_path, class: 'btn very_small' do
+    = link_to dashboard_index_path, class: 'btn very_small' do
       &larr; To dashboard
     &nbsp;
     %span.cgray Events and projects are filtered in scope of group
@@ -12,11 +12,11 @@
       %h4.nothing_here_message Projects activity will be displayed here
     .loading.hide
   .side
-    = render "events/event_last_push", event: @last_push
+    = render "shared/events/event_last_push", event: @last_push
     = render "projects", projects: @projects
     %div
       %span.rss-icon
-        = link_to dashboard_path(:atom, { private_token: current_user.private_token }) do
+        = link_to dashboard_index_path(:atom, { private_token: current_user.private_token }) do
           = image_tag "rss_ui.png", title: "feed"
           %strong News Feed
 

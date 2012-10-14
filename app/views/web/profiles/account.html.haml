@@ -16,7 +16,7 @@
       %span.cred.right
         keep it in secret!
   .padded
-    = form_for @user, url: profile_reset_private_token_path, method: :put do |f|
+    = form_for @user, url: reset_private_token_profile_path, method: :put do |f|
       .data
         %p.slead
           Private token used to access application resources without authentication.
@@ -33,7 +33,7 @@
 %fieldset
   %legend
     %h3.page_title Password
-  = form_for @user, url: profile_password_path, method: :put do |f|
+  = form_for @user, url: password_profile_path, method: :put do |f|
     .padded
       %p.slead After successful password update you will be redirected to login page where you should login with new password
       -if @user.errors.any?
@@ -50,8 +50,3 @@
         .input= f.password_field :password_confirmation
     .actions
       = f.submit 'Save', class: "btn save-btn"
-
-
-
-
-

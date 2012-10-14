@@ -10,15 +10,15 @@ module SharedPaths
   # ----------------------------------------
 
   Given 'I visit dashboard page' do
-    visit dashboard_path
+    visit dashboard_index_path
   end
 
   Given 'I visit dashboard issues page' do
-    visit dashboard_issues_path
+    visit issues_dashboard_index_path
   end
 
   Given 'I visit dashboard merge requests page' do
-    visit dashboard_merge_requests_path
+    visit merge_requests_dashboard_index_path
   end
 
   Given 'I visit dashboard search page' do
@@ -38,23 +38,23 @@ module SharedPaths
   end
 
   Given 'I visit profile account page' do
-    visit profile_account_path
+    visit account_profile_path
   end
 
   Given 'I visit profile SSH keys page' do
-    visit keys_path
+    visit profile_keys_path
   end
 
   Given 'I visit profile design page' do
-    visit profile_design_path
+    visit design_profile_path
   end
 
   Given 'I visit profile history page' do
-    visit profile_history_path
+    visit history_profile_path
   end
 
   Given 'I visit profile token page' do
-    visit profile_token_path
+    visit token_profile_path
   end
 
   # ----------------------------------------

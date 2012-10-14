@@ -3,7 +3,7 @@
     Post receive hooks for binding events.
     %br
     Read more about system hooks
-    %strong #{link_to "here", help_system_hooks_path, class: "vlink"}
+    %strong #{link_to "here", system_hooks_help_path, class: "vlink"}
 
 = form_for @hook, as: :hook, url: admin_hooks_path, html: { class: 'form-inline' } do |f|
   -if @hook.errors.any?

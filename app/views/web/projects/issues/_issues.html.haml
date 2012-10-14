@@ -1,5 +1,5 @@
 - @issues.each do |issue|
-  = render(partial: 'issues/show', locals: {issue: issue})
+  = render(partial: 'show', locals: {issue: issue})
 
 - if @issues.present?
   %li.bottom

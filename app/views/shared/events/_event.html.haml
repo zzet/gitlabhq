@@ -4,9 +4,9 @@
     = image_tag gravatar_icon(event.author_email), class: "avatar"
 
     - if event.push?
-      = render "events/event/push", event: event
+      = render "shared/events/event/push", event: event
     - else
-      = render "events/event/common", event: event
+      = render "shared/events/event/common", event: event
 
     .clearfix
     %span.cgray.right
