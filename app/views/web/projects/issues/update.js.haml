@@ -10,5 +10,5 @@
   - else
     :plain
       $("#edit_issue_dialog").empty();
-      $("#edit_issue_dialog").append("#{escape_javascript(render('form'))}");
+      $("#edit_issue_dialog").append("#{escape_javascript(render('web/projects/issues/form'))}");
       $('select#issue_assignee_id').chosen();

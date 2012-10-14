@@ -1,4 +1,4 @@
-= render "repositories/branches_head"
+= render "web/projects/repositories/branches_head"
 - unless @branches.empty?
   %table
     %thead
@@ -9,4 +9,4 @@
 
     %tbody
       - @branches.each do |branch|
-        = render "repositories/branch", branch: branch
+        = render "web/projects/repositories/branch", branch: branch
