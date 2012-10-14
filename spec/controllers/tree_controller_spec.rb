@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TreeController do
+describe Web::Projects::TreeController do
   let(:project) { create(:project) }
   let(:user)    { create(:user) }
 

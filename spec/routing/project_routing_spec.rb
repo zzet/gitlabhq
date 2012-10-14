@@ -25,31 +25,31 @@ shared_examples "RESTful project resources" do
   let(:actions) { [:index, :create, :new, :edit, :show, :update, :destroy] }
 
   it "to #index" do
-    get("/gitlabhq/#{controller}").should route_to("#{controller}#index", project_id: 'gitlabhq') if actions.include?(:index)
+    get("/gitlabhq/#{controller}").should route_to("web/projects/#{controller}#index", project_id: 'gitlabhq') if actions.include?(:index)
   end
 
   it "to #create" do
-    post("/gitlabhq/#{controller}").should route_to("#{controller}#create", project_id: 'gitlabhq') if actions.include?(:create)
+    post("/gitlabhq/#{controller}").should route_to("web/projects/#{controller}#create", project_id: 'gitlabhq') if actions.include?(:create)
   end
 
   it "to #new" do
-    get("/gitlabhq/#{controller}/new").should route_to("#{controller}#new", project_id: 'gitlabhq') if actions.include?(:new)
+    get("/gitlabhq/#{controller}/new").should route_to("web/projects/#{controller}#new", project_id: 'gitlabhq') if actions.include?(:new)
   end
 
   it "to #edit" do
-    get("/gitlabhq/#{controller}/1/edit").should route_to("#{controller}#edit", project_id: 'gitlabhq', id: '1') if actions.include?(:edit)
+    get("/gitlabhq/#{controller}/1/edit").should route_to("web/projects/#{controller}#edit", project_id: 'gitlabhq', id: '1') if actions.include?(:edit)
   end
 
   it "to #show" do
-    get("/gitlabhq/#{controller}/1").should route_to("#{controller}#show", project_id: 'gitlabhq', id: '1') if actions.include?(:show)
+    get("/gitlabhq/#{controller}/1").should route_to("web/projects/#{controller}#show", project_id: 'gitlabhq', id: '1') if actions.include?(:show)
   end
 
   it "to #update" do
-    put("/gitlabhq/#{controller}/1").should route_to("#{controller}#update", project_id: 'gitlabhq', id: '1') if actions.include?(:update)
+    put("/gitlabhq/#{controller}/1").should route_to("web/projects/#{controller}#update", project_id: 'gitlabhq', id: '1') if actions.include?(:update)
   end
 
   it "to #destroy" do
-    delete("/gitlabhq/#{controller}/1").should route_to("#{controller}#destroy", project_id: 'gitlabhq', id: '1') if actions.include?(:destroy)
+    delete("/gitlabhq/#{controller}/1").should route_to("web/projects/#{controller}#destroy", project_id: 'gitlabhq', id: '1') if actions.include?(:destroy)
   end
 end
 
@@ -62,41 +62,41 @@ end
 #       project GET    /:id(.:format)          projects#show
 #               PUT    /:id(.:format)          projects#update
 #               DELETE /:id(.:format)          projects#destroy
-describe ProjectsController, "routing" do
+describe Web::ProjectsController, "routing" do
   it "to #create" do
-    post("/projects").should route_to('projects#create')
+    post("/projects").should route_to('web/projects#create')
   end
 
   it "to #new" do
-    get("/projects/new").should route_to('projects#new')
+    get("/projects/new").should route_to('web/projects#new')
   end
 
   it "to #wall" do
-    get("/gitlabhq/wall").should route_to('projects#wall', id: 'gitlabhq')
+    get("/gitlabhq/wall").should route_to('web/projects#wall', id: 'gitlabhq')
   end
 
   it "to #graph" do
-    get("/gitlabhq/graph").should route_to('projects#graph', id: 'gitlabhq')
+    get("/gitlabhq/graph").should route_to('web/projects#graph', id: 'gitlabhq')
   end
 
   it "to #files" do
-    get("/gitlabhq/files").should route_to('projects#files', id: 'gitlabhq')
+    get("/gitlabhq/files").should route_to('web/projects#files', id: 'gitlabhq')
   end
 
   it "to #edit" do
-    get("/gitlabhq/edit").should route_to('projects#edit', id: 'gitlabhq')
+    get("/gitlabhq/edit").should route_to('web/projects#edit', id: 'gitlabhq')
   end
 
   it "to #show" do
-    get("/gitlabhq").should route_to('projects#show', id: 'gitlabhq')
+    get("/gitlabhq").should route_to('web/projects#show', id: 'gitlabhq')
   end
 
   it "to #update" do
-    put("/gitlabhq").should route_to('projects#update', id: 'gitlabhq')
+    put("/gitlabhq").should route_to('web/projects#update', id: 'gitlabhq')
   end
 
   it "to #destroy" do
-    delete("/gitlabhq").should route_to('projects#destroy', id: 'gitlabhq')
+    delete("/gitlabhq").should route_to('web/projects#destroy', id: 'gitlabhq')
   end
 end
 
@@ -106,13 +106,13 @@ end
 #    edit_project_wiki GET    /:project_id/wikis/:id/edit(.:format)    wikis#edit
 #         project_wiki GET    /:project_id/wikis/:id(.:format)         wikis#show
 #                      DELETE /:project_id/wikis/:id(.:format)         wikis#destroy
-describe WikisController, "routing" do
+describe Web::Projects::WikisController, "routing" do
   it "to #pages" do
-    get("/gitlabhq/wikis/pages").should route_to('wikis#pages', project_id: 'gitlabhq')
+    get("/gitlabhq/wikis/pages").should route_to('web/projects/wikis#pages', project_id: 'gitlabhq')
   end
 
   it "to #history" do
-    get("/gitlabhq/wikis/1/history").should route_to('wikis#history', project_id: 'gitlabhq', id: '1')
+    get("/gitlabhq/wikis/1/history").should route_to('web/projects/wikis#history', project_id: 'gitlabhq', id: '1')
   end
 
   it_behaves_like "RESTful project resources" do
@@ -130,41 +130,41 @@ end
 #                             GET    /:project_id/repository(.:format)          repositories#show
 #                             PUT    /:project_id/repository(.:format)          repositories#update
 #                             DELETE /:project_id/repository(.:format)          repositories#destroy
-describe RepositoriesController, "routing" do
+describe Web::Projects::RepositoriesController, "routing" do
   it "to #branches" do
-    get("/gitlabhq/repository/branches").should route_to('repositories#branches', project_id: 'gitlabhq')
+    get("/gitlabhq/repository/branches").should route_to('web/projects/repositories#branches', project_id: 'gitlabhq')
   end
 
   it "to #tags" do
-    get("/gitlabhq/repository/tags").should route_to('repositories#tags', project_id: 'gitlabhq')
+    get("/gitlabhq/repository/tags").should route_to('web/projects/repositories#tags', project_id: 'gitlabhq')
   end
 
   it "to #archive" do
-    get("/gitlabhq/repository/archive").should route_to('repositories#archive', project_id: 'gitlabhq')
+    get("/gitlabhq/repository/archive").should route_to('web/projects/repositories#archive', project_id: 'gitlabhq')
   end
 
   it "to #create" do
-    post("/gitlabhq/repository").should route_to('repositories#create', project_id: 'gitlabhq')
+    post("/gitlabhq/repository").should route_to('web/projects/repositories#create', project_id: 'gitlabhq')
   end
 
   it "to #new" do
-    get("/gitlabhq/repository/new").should route_to('repositories#new', project_id: 'gitlabhq')
+    get("/gitlabhq/repository/new").should route_to('web/projects/repositories#new', project_id: 'gitlabhq')
   end
 
   it "to #edit" do
-    get("/gitlabhq/repository/edit").should route_to('repositories#edit', project_id: 'gitlabhq')
+    get("/gitlabhq/repository/edit").should route_to('web/projects/repositories#edit', project_id: 'gitlabhq')
   end
 
   it "to #show" do
-    get("/gitlabhq/repository").should route_to('repositories#show', project_id: 'gitlabhq')
+    get("/gitlabhq/repository").should route_to('web/projects/repositories#show', project_id: 'gitlabhq')
   end
 
   it "to #update" do
-    put("/gitlabhq/repository").should route_to('repositories#update', project_id: 'gitlabhq')
+    put("/gitlabhq/repository").should route_to('web/projects/repositories#update', project_id: 'gitlabhq')
   end
 
   it "to #destroy" do
-    delete("/gitlabhq/repository").should route_to('repositories#destroy', project_id: 'gitlabhq')
+    delete("/gitlabhq/repository").should route_to('web/projects/repositories#destroy', project_id: 'gitlabhq')
   end
 end
 
@@ -175,7 +175,7 @@ end
 #      project_deploy_key GET    /:project_id/deploy_keys/:id(.:format)      deploy_keys#show
 #                         PUT    /:project_id/deploy_keys/:id(.:format)      deploy_keys#update
 #                         DELETE /:project_id/deploy_keys/:id(.:format)      deploy_keys#destroy
-describe DeployKeysController, "routing" do
+describe Web::Projects::DeployKeysController, "routing" do
   it_behaves_like "RESTful project resources" do
     let(:controller) { 'deploy_keys' }
   end
@@ -184,7 +184,7 @@ end
 # project_protected_branches GET    /:project_id/protected_branches(.:format)     protected_branches#index
 #                            POST   /:project_id/protected_branches(.:format)     protected_branches#create
 #   project_protected_branch DELETE /:project_id/protected_branches/:id(.:format) protected_branches#destroy
-describe ProtectedBranchesController, "routing" do
+describe Web::Projects::ProtectedBranchesController, "routing" do
   it_behaves_like "RESTful project resources" do
     let(:actions)    { [:index, :create, :destroy] }
     let(:controller) { 'protected_branches' }
@@ -194,14 +194,14 @@ end
 #    switch_project_refs GET    /:project_id/switch(.:format)              refs#switch
 #  logs_tree_project_ref GET    /:project_id/:id/logs_tree(.:format)       refs#logs_tree
 #  logs_file_project_ref GET    /:project_id/:id/logs_tree/:path(.:format) refs#logs_tree
-describe RefsController, "routing" do
+describe Web::Projects::RefsController, "routing" do
   it "to #switch" do
-    get("/gitlabhq/switch").should route_to('refs#switch', project_id: 'gitlabhq')
+    get("/gitlabhq/switch").should route_to('web/projects/refs#switch', project_id: 'gitlabhq')
   end
 
   it "to #logs_tree" do
-    get("/gitlabhq/stable/logs_tree").should             route_to('refs#logs_tree', project_id: 'gitlabhq', id: 'stable')
-    get("/gitlabhq/stable/logs_tree/foo/bar/baz").should route_to('refs#logs_tree', project_id: 'gitlabhq', id: 'stable', path: 'foo/bar/baz')
+    get("/gitlabhq/stable/logs_tree").should             route_to('web/projects/refs#logs_tree', project_id: 'gitlabhq', id: 'stable')
+    get("/gitlabhq/stable/logs_tree/foo/bar/baz").should route_to('web/projects/refs#logs_tree', project_id: 'gitlabhq', id: 'stable', path: 'foo/bar/baz')
   end
 end
 
@@ -218,29 +218,29 @@ end
 #                 project_merge_request GET    /:project_id/merge_requests/:id(.:format)                 merge_requests#show
 #                                       PUT    /:project_id/merge_requests/:id(.:format)                 merge_requests#update
 #                                       DELETE /:project_id/merge_requests/:id(.:format)                 merge_requests#destroy
-describe MergeRequestsController, "routing" do
+describe Web::Projects::MergeRequestsController, "routing" do
   it "to #diffs" do
-    get("/gitlabhq/merge_requests/1/diffs").should route_to('merge_requests#diffs', project_id: 'gitlabhq', id: '1')
+    get("/gitlabhq/merge_requests/1/diffs").should route_to('web/projects/merge_requests#diffs', project_id: 'gitlabhq', id: '1')
   end
 
   it "to #automerge" do
-    get("/gitlabhq/merge_requests/1/automerge").should route_to('merge_requests#automerge', project_id: 'gitlabhq', id: '1')
+    get("/gitlabhq/merge_requests/1/automerge").should route_to('web/projects/merge_requests#automerge', project_id: 'gitlabhq', id: '1')
   end
 
   it "to #automerge_check" do
-    get("/gitlabhq/merge_requests/1/automerge_check").should route_to('merge_requests#automerge_check', project_id: 'gitlabhq', id: '1')
+    get("/gitlabhq/merge_requests/1/automerge_check").should route_to('web/projects/merge_requests#automerge_check', project_id: 'gitlabhq', id: '1')
   end
 
   it "to #raw" do
-    get("/gitlabhq/merge_requests/1/raw").should route_to('merge_requests#raw', project_id: 'gitlabhq', id: '1')
+    get("/gitlabhq/merge_requests/1/raw").should route_to('web/projects/merge_requests#raw', project_id: 'gitlabhq', id: '1')
   end
 
   it "to #branch_from" do
-    get("/gitlabhq/merge_requests/branch_from").should route_to('merge_requests#branch_from', project_id: 'gitlabhq')
+    get("/gitlabhq/merge_requests/branch_from").should route_to('web/projects/merge_requests#branch_from', project_id: 'gitlabhq')
   end
 
   it "to #branch_to" do
-    get("/gitlabhq/merge_requests/branch_to").should route_to('merge_requests#branch_to', project_id: 'gitlabhq')
+    get("/gitlabhq/merge_requests/branch_to").should route_to('web/projects/merge_requests#branch_to', project_id: 'gitlabhq')
   end
 
   it_behaves_like "RESTful project resources" do
@@ -256,9 +256,9 @@ end
 #      project_snippet GET    /:project_id/snippets/:id(.:format)      snippets#show
 #                      PUT    /:project_id/snippets/:id(.:format)      snippets#update
 #                      DELETE /:project_id/snippets/:id(.:format)      snippets#destroy
-describe SnippetsController, "routing" do
+describe Web::Projects::SnippetsController, "routing" do
   it "to #raw" do
-    get("/gitlabhq/snippets/1/raw").should route_to('snippets#raw', project_id: 'gitlabhq', id: '1')
+    get("/gitlabhq/snippets/1/raw").should route_to('web/projects/snippets#raw', project_id: 'gitlabhq', id: '1')
   end
 
   it_behaves_like "RESTful project resources" do
@@ -270,9 +270,9 @@ end
 #     project_hooks GET    /:project_id/hooks(.:format)          hooks#index
 #                   POST   /:project_id/hooks(.:format)          hooks#create
 #      project_hook DELETE /:project_id/hooks/:id(.:format)      hooks#destroy
-describe HooksController, "routing" do
+describe Web::Projects::HooksController, "routing" do
   it "to #test" do
-    get("/gitlabhq/hooks/1/test").should route_to('hooks#test', project_id: 'gitlabhq', id: '1')
+    get("/gitlabhq/hooks/1/test").should route_to('web/projects/hooks#test', project_id: 'gitlabhq', id: '1')
   end
 
   it_behaves_like "RESTful project resources" do
@@ -282,22 +282,28 @@ describe HooksController, "routing" do
 end
 
 # project_commit GET    /:project_id/commit/:id(.:format) commit#show {:id=>/[[:alnum:]]{6,40}/, :project_id=>/[^\/]+/}
-describe CommitController, "routing" do
-  it "to #show" do
-    get("/gitlabhq/commit/4246fb").should route_to('commit#show', project_id: 'gitlabhq', id: '4246fb')
-    get("/gitlabhq/commit/4246fb.patch").should route_to('commit#show', project_id: 'gitlabhq', id: '4246fb', format: 'patch')
-    get("/gitlabhq/commit/4246fbd13872934f72a8fd0d6fb1317b47b59cb5").should route_to('commit#show', project_id: 'gitlabhq', id: '4246fbd13872934f72a8fd0d6fb1317b47b59cb5')
-  end
-end
+#describe Web::Projects::CommitController, "routing" do
+#  it "to #show" do
+#    get("/gitlabhq/commit/4246fb").should route_to('web/projects/commit#show', project_id: 'gitlabhq', id: '4246fb')
+#    get("/gitlabhq/commit/4246fb.patch").should route_to('web/projects/commit#show', project_id: 'gitlabhq', id: '4246fb', format: 'patch')
+#    get("/gitlabhq/commit/4246fbd13872934f72a8fd0d6fb1317b47b59cb5").should route_to('web/projects/commit#show', project_id: 'gitlabhq', id: '4246fbd13872934f72a8fd0d6fb1317b47b59cb5')
+#  end
+#end
 
 #    patch_project_commit GET    /:project_id/commits/:id/patch(.:format) commits#patch
 #         project_commits GET    /:project_id/commits(.:format)           commits#index
 #                         POST   /:project_id/commits(.:format)           commits#create
 #          project_commit GET    /:project_id/commits/:id(.:format)       commits#show
-describe CommitsController, "routing" do
+describe Web::Projects::CommitsController, "routing" do
   it_behaves_like "RESTful project resources" do
-    let(:actions)    { [:show] }
+    let(:actions)    { [:index] }
     let(:controller) { 'commits' }
+  end
+
+  it "to #show" do
+    get("/gitlabhq/commit/4246fb").should route_to('web/projects/commits#show', project_id: 'gitlabhq', id: '4246fb')
+    get("/gitlabhq/commit/4246fb.patch").should route_to('web/projects/commits#show', project_id: 'gitlabhq', id: '4246fb', format: 'patch')
+    get("/gitlabhq/commit/4246fbd13872934f72a8fd0d6fb1317b47b59cb5").should route_to('web/projects/commits#show', project_id: 'gitlabhq', id: '4246fbd13872934f72a8fd0d6fb1317b47b59cb5')
   end
 end
 
@@ -308,7 +314,7 @@ end
 #      project_team_member GET    /:project_id/team_members/:id(.:format)      team_members#show
 #                          PUT    /:project_id/team_members/:id(.:format)      team_members#update
 #                          DELETE /:project_id/team_members/:id(.:format)      team_members#destroy
-describe TeamMembersController, "routing" do
+describe Web::Projects::TeamMembersController, "routing" do
   it_behaves_like "RESTful project resources" do
     let(:controller) { 'team_members' }
   end
@@ -321,16 +327,16 @@ end
 #      project_milestone GET    /:project_id/milestones/:id(.:format)      milestones#show
 #                        PUT    /:project_id/milestones/:id(.:format)      milestones#update
 #                        DELETE /:project_id/milestones/:id(.:format)      milestones#destroy
-describe MilestonesController, "routing" do
+describe Web::Projects::MilestonesController, "routing" do
   it_behaves_like "RESTful project resources" do
     let(:controller) { 'milestones' }
   end
 end
 
 # project_labels GET    /:project_id/labels(.:format) labels#index
-describe LabelsController, "routing" do
+describe Web::Projects::LabelsController, "routing" do
   it "to #index" do
-    get("/gitlabhq/labels").should route_to('labels#index', project_id: 'gitlabhq')
+    get("/gitlabhq/labels").should route_to('web/projects/labels#index', project_id: 'gitlabhq')
   end
 end
 
@@ -344,17 +350,17 @@ end
 #              project_issue GET    /:project_id/issues/:id(.:format)         issues#show
 #                            PUT    /:project_id/issues/:id(.:format)         issues#update
 #                            DELETE /:project_id/issues/:id(.:format)         issues#destroy
-describe IssuesController, "routing" do
+describe Web::Projects::IssuesController, "routing" do
   it "to #sort" do
-    post("/gitlabhq/issues/sort").should route_to('issues#sort', project_id: 'gitlabhq')
+    post("/gitlabhq/issues/sort").should route_to('web/projects/issues#sort', project_id: 'gitlabhq')
   end
 
   it "to #bulk_update" do
-    post("/gitlabhq/issues/bulk_update").should route_to('issues#bulk_update', project_id: 'gitlabhq')
+    post("/gitlabhq/issues/bulk_update").should route_to('web/projects/issues#bulk_update', project_id: 'gitlabhq')
   end
 
   it "to #search" do
-    get("/gitlabhq/issues/search").should route_to('issues#search', project_id: 'gitlabhq')
+    get("/gitlabhq/issues/search").should route_to('web/projects/issues#search', project_id: 'gitlabhq')
   end
 
   it_behaves_like "RESTful project resources" do
@@ -366,9 +372,9 @@ end
 #         project_notes GET    /:project_id/notes(.:format)         notes#index
 #                       POST   /:project_id/notes(.:format)         notes#create
 #          project_note DELETE /:project_id/notes/:id(.:format)     notes#destroy
-describe NotesController, "routing" do
+describe Web::Projects::NotesController, "routing" do
   it "to #preview" do
-    post("/gitlabhq/notes/preview").should route_to('notes#preview', project_id: 'gitlabhq')
+    post("/gitlabhq/notes/preview").should route_to('web/projects/notes#preview', project_id: 'gitlabhq')
   end
 
   it_behaves_like "RESTful project resources" do
@@ -378,40 +384,40 @@ describe NotesController, "routing" do
 end
 
 # project_blame GET    /:project_id/blame/:id(.:format) blame#show {:id=>/.+/, :project_id=>/[^\/]+/}
-describe BlameController, "routing" do
+describe Web::Projects::BlameController, "routing" do
   it "to #show" do
-    get("/gitlabhq/blame/master/app/models/project.rb").should route_to('blame#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
+    get("/gitlabhq/blame/master/app/models/project.rb").should route_to('web/projects/blame#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
   end
 end
 
 # project_blob GET    /:project_id/blob/:id(.:format) blob#show {:id=>/.+/, :project_id=>/[^\/]+/}
-describe BlobController, "routing" do
+describe Web::Projects::BlobController, "routing" do
   it "to #show" do
-    get("/gitlabhq/blob/master/app/models/project.rb").should route_to('blob#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
+    get("/gitlabhq/blob/master/app/models/project.rb").should route_to('web/projects/blob#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
   end
 end
 
 # project_tree GET    /:project_id/tree/:id(.:format) tree#show {:id=>/.+/, :project_id=>/[^\/]+/}
-describe TreeController, "routing" do
+describe Web::Projects::TreeController, "routing" do
   it "to #show" do
-    get("/gitlabhq/tree/master/app/models/project.rb").should route_to('tree#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
+    get("/gitlabhq/tree/master/app/models/project.rb").should route_to('web/projects/tree#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
   end
 end
 
 # project_compare_index GET    /:project_id/compare(.:format)             compare#index {:id=>/[^\/]+/, :project_id=>/[^\/]+/}
 #                       POST   /:project_id/compare(.:format)             compare#create {:id=>/[^\/]+/, :project_id=>/[^\/]+/}
 #       project_compare        /:project_id/compare/:from...:to(.:format) compare#show {:from=>/.+/, :to=>/.+/, :id=>/[^\/]+/, :project_id=>/[^\/]+/}
-describe CompareController, "routing" do
+describe Web::Projects::CompareController, "routing" do
   it "to #index" do
-    get("/gitlabhq/compare").should route_to('compare#index', project_id: 'gitlabhq')
+    get("/gitlabhq/compare").should route_to('web/projects/compare#index', project_id: 'gitlabhq')
   end
 
   it "to #compare" do
-    post("/gitlabhq/compare").should route_to('compare#create', project_id: 'gitlabhq')
+    post("/gitlabhq/compare").should route_to('web/projects/compare#create', project_id: 'gitlabhq')
   end
 
   it "to #show" do
-    get("/gitlabhq/compare/master...stable").should     route_to('compare#show', project_id: 'gitlabhq', from: 'master', to: 'stable')
-    get("/gitlabhq/compare/issue/1234...stable").should route_to('compare#show', project_id: 'gitlabhq', from: 'issue/1234', to: 'stable')
+    get("/gitlabhq/compare/master...stable").should     route_to('web/projects/compare#show', project_id: 'gitlabhq', from: 'master', to: 'stable')
+    get("/gitlabhq/compare/issue/1234...stable").should route_to('web/projects/compare#show', project_id: 'gitlabhq', from: 'issue/1234', to: 'stable')
   end
 end

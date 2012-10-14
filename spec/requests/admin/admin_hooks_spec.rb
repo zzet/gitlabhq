@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Admin::Hooks" do
+describe "Web::Admin::Hooks" do
   before do
     @project = Factory :project,
       name: "LeGiT",

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe CommitsController do
+describe Web::Projects::CommitsController do
   let(:project) { create(:project) }
   let(:user)    { create(:user) }
 

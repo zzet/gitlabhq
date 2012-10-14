@@ -83,26 +83,26 @@ Gitlab::Application.routes.draw do
     #
     resource :profile, :only => [:show, :update] do
       collection do
-
         get :account
         get :history
-        put :password
+        put :password, action: :password_update
         get :token
         put :reset_private_token
         get :design
-
       end
 
+      scope :module => :profiles do
+        resources :keys
+      end
     end
-    resources :keys
 
     #
     # Dashboard Area
     #
     resources :dashboard, :only => [:index] do
       collection do
-      get :issues
-      get :merge_requests
+        get :issues
+        get :merge_requests
       end
     end
 
@@ -132,97 +132,101 @@ Gitlab::Application.routes.draw do
         get "files"
       end
 
-      resources :wikis, only: [:show, :edit, :destroy, :create] do
-        collection do
-          get :pages
+      scope :module => :projects do
+
+        resources :wikis, only: [:show, :edit, :destroy, :create] do
+          collection do
+            get :pages
+          end
+
+          member do
+            get "history"
+          end
         end
 
-        member do
-          get "history"
+        resource :repository do
+          member do
+            get "branches"
+            get "tags"
+            get "archive"
+          end
+        end
+
+        resources :deploy_keys
+        resources :protected_branches, only: [:index, :create, :destroy]
+
+        resources :refs, only: [], path: "/" do
+          collection do
+            get "switch"
+          end
+
+          member do
+            # tree viewer logs
+            get "logs_tree", constraints: { id: /[a-zA-Z.\/0-9_\-]+/ }
+            get "logs_tree/:path" => "refs#logs_tree",
+              as: :logs_file,
+              constraints: {
+              id:   /[a-zA-Z.0-9\/_\-]+/,
+              path: /.*/
+            }
+          end
+        end
+
+        resources :merge_requests do
+          member do
+            get :diffs
+            get :automerge
+            get :automerge_check
+            get :raw
+          end
+
+          collection do
+            get :branch_from
+            get :branch_to
+          end
+        end
+
+        resources :snippets do
+          member do
+            get "raw"
+          end
+        end
+
+        resources :hooks, only: [:index, :create, :destroy] do
+          member do
+            get :test
+          end
+        end
+
+        resources :commit,  only: [:show], constraints: {id: /[[:alnum:]]{6,40}/}, :controller => :commits
+        resources :commits, only: [:index,:show]
+        resources :compare, only: [:index, :create]
+        resources :blame,   only: [:show], constraints: {id: /.+/}
+        resources :blob,    only: [:show], constraints: {id: /.+/}
+        resources :tree,    only: [:show], constraints: {id: /.+/}
+        match "/compare/:from...:to" => "compare#show", as: "compare",
+          :via => [:get, :post], constraints: {from: /.+/, to: /.+/}
+
+        resources :team, controller: 'team_members', only: [:index]
+        resources :team_members
+        resources :milestones
+        resources :labels, only: [:index]
+        resources :issues do
+          collection do
+            post  :sort
+            post  :bulk_update
+            get   :search
+          end
+        end
+
+        resources :notes, only: [:index, :create, :destroy] do
+          collection do
+            post :preview
+          end
         end
       end
 
-      resource :repository do
-        member do
-          get "branches"
-          get "tags"
-          get "archive"
-        end
-      end
-
-      resources :deploy_keys
-      resources :protected_branches, only: [:index, :create, :destroy]
-
-      resources :refs, only: [], path: "/" do
-        collection do
-          get "switch"
-        end
-
-        member do
-          # tree viewer logs
-          get "logs_tree", constraints: { id: /[a-zA-Z.\/0-9_\-]+/ }
-          get "logs_tree/:path" => "refs#logs_tree",
-            as: :logs_file,
-            constraints: {
-            id:   /[a-zA-Z.0-9\/_\-]+/,
-            path: /.*/
-          }
-        end
-      end
-
-      resources :merge_requests do
-        member do
-          get :diffs
-          get :automerge
-          get :automerge_check
-          get :raw
-        end
-
-        collection do
-          get :branch_from
-          get :branch_to
-        end
-      end
-
-      resources :snippets do
-        member do
-          get "raw"
-        end
-      end
-
-      resources :hooks, only: [:index, :create, :destroy] do
-        member do
-          get :test
-        end
-      end
-
-      resources :commits, only: [:index,:show]
-      resources :compare, only: [:index, :create]
-      resources :blame,   only: [:show], constraints: {id: /.+/}
-      resources :blob,    only: [:show], constraints: {id: /.+/}
-      resources :tree,    only: [:show], constraints: {id: /.+/}
-      match "/compare/:from...:to" => "compare#show", as: "compare",
-        :via => [:get, :post], constraints: {from: /.+/, to: /.+/}
-
-      resources :team, controller: 'team_members', only: [:index]
-      resources :team_members
-      resources :milestones
-      resources :labels, only: [:index]
-      resources :issues do
-        collection do
-          post  :sort
-          post  :bulk_update
-          get   :search
-        end
-      end
-
-      resources :notes, only: [:index, :create, :destroy] do
-        collection do
-          post :preview
-        end
-      end
     end
-
     root to: "dashboard#index"
   end
 end

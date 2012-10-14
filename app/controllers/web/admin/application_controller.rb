@@ -1,7 +1,7 @@
 # Provides a base class for Admin controllers to subclass
 #
 # Automatically sets the layout and ensures an administrator is logged in
-class Web::AdminController < Web::ApplicationController
+class Web::Admin::ApplicationController < Web::ApplicationController
   layout 'admin'
   before_filter :authenticate_admin!
 
