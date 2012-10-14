@@ -46,6 +46,7 @@ class Web::Admin::GroupsController < Web::Admin::ApplicationController
     end
   end
 
+  #TODO move to api
   def project_update
     project_ids = params[:project_ids]
     Project.where(id: project_ids).update_all(group_id: @group.id)
@@ -53,6 +54,7 @@ class Web::Admin::GroupsController < Web::Admin::ApplicationController
     redirect_to :back, notice: 'Group was successfully updated.'
   end
 
+  #TODO move to api
   def remove_project
     @project = Project.find(params[:project_id])
     @project.group_id = nil

@@ -8,17 +8,20 @@ class Web::Admin::HooksController < Web::Admin::ApplicationController
     @hook = SystemHook.new(params[:hook])
 
     if @hook.save
-      redirect_to admin_hooks_path, notice: 'Hook was successfully created.'
+      flash[:notice] = 'Hook was successfully created.'
     else
-      @hooks = SystemHook.all
-      render :index
+      flash[:error] = 'Some errors while hook was created.'
     end
+      redirect_to admin_hooks_path
   end
 
   def destroy
     @hook = SystemHook.find(params[:id])
-    @hook.destroy
-
+    if @hook.destroy
+      flash[:notice] = 'Hook was successfully destroyed.'
+    else
+      flash[:error] = 'Some errors while hook was destroy.'
+    end
     redirect_to admin_hooks_path
   end
 
@@ -33,6 +36,7 @@ class Web::Admin::HooksController < Web::Admin::ApplicationController
       owner_name: "Someone",
       owner_email: "example@gitlabhq.com"
     }
+
     @hook.execute(data)
 
     redirect_to :back
