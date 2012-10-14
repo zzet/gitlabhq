@@ -85,13 +85,13 @@ module ApplicationHelper
     ]
 
     help_nav = [
-      { label: "Workflow Help", url: help_workflow_path },
-      { label: "Permissions Help", url: help_permissions_path },
-      { label: "Web Hooks Help", url: help_web_hooks_path },
-      { label: "System Hooks Help", url: help_system_hooks_path },
-      { label: "API Help", url: help_api_path },
-      { label: "Markdown Help", url: help_markdown_path },
-      { label: "SSH Keys Help", url: help_ssh_path },
+      { label: "Workflow Help", url: workflow_help_path },
+      { label: "Permissions Help", url: permissions_help_path },
+      { label: "Web Hooks Help", url: web_hooks_help_path },
+      { label: "System Hooks Help", url: system_hooks_help_path },
+      { label: "API Help", url: api_help_path },
+      { label: "Markdown Help", url: markdown_help_path },
+      { label: "SSH Keys Help", url: ssh_help_path },
     ]
 
     project_nav = []
