@@ -1,4 +1,7 @@
 Gitlab::Application.routes.draw do
+
+  devise_for :users, controllers: { omniauth_callbacks: :omniauth_callbacks }
+
   # API
   require 'api'
   mount Gitlab::API => '/api'
@@ -97,9 +100,10 @@ Gitlab::Application.routes.draw do
     # Dashboard Area
     #
     resources :dashboard, :only => [:index] do
-
+      collection do
       get :issues
       get :merge_requests
+      end
     end
 
 
@@ -117,7 +121,6 @@ Gitlab::Application.routes.draw do
 
     resources :projects, constraints: { id: /[^\/]+/ }, only: [:new, :create]
 
-    devise_for :users, controllers: { omniauth_callbacks: :omniauth_callbacks }
 
     #
     # Project Area
