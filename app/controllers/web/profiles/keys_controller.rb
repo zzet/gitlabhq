@@ -1,7 +1,4 @@
-class Web::KeysController < Web::ApplicationController
-  layout "profile"
-  respond_to :js, :html
-
+class Web::Profiles::KeysController < Web::Profiles::ApplicationController
   def index
     @keys = current_user.keys.all
   end
