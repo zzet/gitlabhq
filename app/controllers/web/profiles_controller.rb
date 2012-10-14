@@ -1,4 +1,4 @@
-class Web::ProfileController < Web::ApplicationController
+class Web::ProfilesController < Web::ApplicationController
   before_filter :user
 
   def show
