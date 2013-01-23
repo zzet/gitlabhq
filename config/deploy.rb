@@ -24,7 +24,7 @@ set :application, "gitlab"
 set :rvm_type, :system
 
 set :scm, :git
-set :repository, "git@github.com:zzet/gitlabhq.git"# "git@gitlab.home:gitlabhq.git"
+set :repository, "git://github.com/Undev/gitlabhq.git"# "git@gitlab.home:gitlabhq.git"
 
 set :use_sudo, false
 set :ssh_options, :forward_agent => true
@@ -43,10 +43,10 @@ namespace :deploy do
   task :symlink_gitlab, :roles => :app do
     run "ln -nfs #{release_path}/config/gitlab.yml.undev #{release_path}/config/gitlab.yml"
   end
-  #desc "Symlinks the resque.yml"
-  #task :symlink_resque, :roles => :app do
-    #run "ln -nfs #{release_path}/config/resque.yml.undev #{release_path}/config/resque.yml"
-  #end
+  desc "Symlinks the resque.yml"
+  task :symlink_resque, :roles => :app do
+    run "ln -nfs #{release_path}/config/resque.yml.undev #{release_path}/config/resque.yml"
+  end
   desc "Symlinks the unicorn.rb"
   task :symlink_unicorn, :roles => :app do
     run "ln -nfs #{release_path}/config/unicorn.rb.undev #{release_path}/config/unicorn.rb"
