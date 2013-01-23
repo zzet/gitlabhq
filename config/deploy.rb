@@ -43,10 +43,10 @@ namespace :deploy do
   task :symlink_gitlab, :roles => :app do
     run "ln -nfs #{release_path}/config/gitlab.yml.undev #{release_path}/config/gitlab.yml"
   end
-  desc "Symlinks the resque.yml"
-  task :symlink_resque, :roles => :app do
-    run "ln -nfs #{release_path}/config/resque.yml.undev #{release_path}/config/resque.yml"
-  end
+  #desc "Symlinks the resque.yml"
+  #task :symlink_resque, :roles => :app do
+    #run "ln -nfs #{release_path}/config/resque.yml.undev #{release_path}/config/resque.yml"
+  #end
   desc "Symlinks the unicorn.rb"
   task :symlink_unicorn, :roles => :app do
     run "ln -nfs #{release_path}/config/unicorn.rb.undev #{release_path}/config/unicorn.rb"
