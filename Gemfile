@@ -155,6 +155,7 @@ group :development do
   gem 'rvm-capistrano'
   gem 'capistrano-ext'
   gem 'capistrano_colors'
+  gem 'airbrake'
 end
 
 group :development, :test do

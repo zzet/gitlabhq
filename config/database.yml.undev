@@ -4,9 +4,9 @@
 production:
   adapter: postgresql
   encoding: unicode
-  database: gitlab_staging
+  database: gitlab
   pool: 5
-  username: gitlab_staging
+  username: gitlab
   password:
   # socket:
 
@@ -16,21 +16,21 @@ production:
 development:
   adapter: postgresql
   encoding: unicode
-  database: gitlab_staging
+  database: gitlab
   pool: 5
-  username: gitlab_staging
+  username: gitlab
   password:
   # socket:
 
 #
 # Staging specific
 #
-development:
+staging:
   adapter: postgresql
   encoding: unicode
-  database: gitlab_staging
+  database: gitlab
   pool: 5
-  username: gitlab_staging
+  username: gitlab
   password:
   # socket:
 
@@ -42,6 +42,6 @@ test: &test
   encoding: unicode
   database: gitlabhq_test
   pool: 5
-  username: gitlab_staging
+  username: gitlab
   password:
   # socket:
