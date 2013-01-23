@@ -53,6 +53,11 @@ production: &base
       ##  :id                - Issue id (from commit messages)
       issues_url: "http://redmine.sample/issues/:id"
 
+  ## Available issues trackers
+  issues_tracker:
+    redmine:
+      issues_url: "http://redmine.sample/issues/:id"
+
   ## Gravatar
   gravatar:
     enabled: true                 # Use user avatar images from Gravatar.com (default: true)
