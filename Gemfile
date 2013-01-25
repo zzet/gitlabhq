@@ -147,7 +147,6 @@ group :development do
   gem 'rvm-capistrano'
   gem 'capistrano-ext'
   gem 'capistrano-maintenance'
-  gem 'airbrake'
 end
 
 gem 'rb-inotify', require: linux_only('rb-inotify')
