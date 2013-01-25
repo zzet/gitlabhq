@@ -1,5 +1,5 @@
 Gitlab::Seeder.quiet do
-  (1..300).each  do |i|
+  (1..3000).each  do |i|
     # Random Project
     project = Project.all.sample
 
