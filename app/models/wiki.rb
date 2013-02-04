@@ -12,7 +12,7 @@
 #  user_id    :integer
 #
 
-class Wiki < ActiveRecord::Base
+class Wiki < NewDb
   include Watchable
 
   attr_accessible :title, :content, :slug

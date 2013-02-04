@@ -10,7 +10,7 @@
 #  updated_at :datetime         not null
 #
 
-class UserTeam < ActiveRecord::Base
+class UserTeam < NewDb
   include Gitlab::Event::Notifications
   include Watchable
 

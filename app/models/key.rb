@@ -14,7 +14,7 @@
 
 require 'digest/md5'
 
-class Key < ActiveRecord::Base
+class Key < NewDb
   include Watchable
 
   belongs_to :user

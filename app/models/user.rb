@@ -35,7 +35,7 @@
 #  can_create_team        :boolean          default(TRUE), not null
 #
 
-class User < ActiveRecord::Base
+class User < NewDb
   include Watchable
 
   devise :database_authenticatable, :token_authenticatable, :lockable,

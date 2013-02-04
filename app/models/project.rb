@@ -21,7 +21,7 @@
 
 require "grit"
 
-class Project < ActiveRecord::Base
+class Project < NewDb
   include Watchable
   include Gitolited
   extend Enumerize

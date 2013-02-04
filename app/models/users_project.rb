@@ -10,7 +10,7 @@
 #  project_access :integer          default(0), not null
 #
 
-class UsersProject < ActiveRecord::Base
+class UsersProject < NewDb
   include Watchable
   include Gitolited
 

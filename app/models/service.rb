@@ -13,7 +13,7 @@
 #  project_url :string(255)
 #
 
-class Service < ActiveRecord::Base
+class Service < NewDb
   include Watchable
 
   attr_accessible :title, :token, :type, :active

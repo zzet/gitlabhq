@@ -10,7 +10,7 @@
 #  updated_at      :datetime         not null
 #
 
-class UserTeamProjectRelationship < ActiveRecord::Base
+class UserTeamProjectRelationship < NewDb
   include Watchable
 
   attr_accessible :greatest_access, :project_id, :user_team_id

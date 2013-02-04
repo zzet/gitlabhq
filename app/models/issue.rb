@@ -16,7 +16,7 @@
 #  milestone_id :integer
 #
 
-class Issue < ActiveRecord::Base
+class Issue < NewDb
   include Issuable
   include Watchable
 

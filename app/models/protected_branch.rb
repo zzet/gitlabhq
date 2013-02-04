@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class ProtectedBranch < ActiveRecord::Base
+class ProtectedBranch < NewDb
   include Watchable
   include Gitolited
 

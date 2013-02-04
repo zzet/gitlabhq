@@ -12,7 +12,7 @@
 #  updated_at  :datetime         not null
 #
 
-class Milestone < ActiveRecord::Base
+class Milestone < NewDb
   include Watchable
 
   attr_accessible :title, :description, :due_date, :state_event, :author_id_of_changes

@@ -21,7 +21,7 @@
 require Rails.root.join("app/models/commit")
 require Rails.root.join("lib/static_model")
 
-class MergeRequest < ActiveRecord::Base
+class MergeRequest < NewDb
   include Issuable
   include Watchable
 

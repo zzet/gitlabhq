@@ -13,7 +13,7 @@
 #  expires_at :datetime
 #
 
-class Snippet < ActiveRecord::Base
+class Snippet < NewDb
   include Watchable
   include Linguist::BlobHelper
 

@@ -11,7 +11,7 @@
 #  service_id :integer
 #
 
-class WebHook < ActiveRecord::Base
+class WebHook < NewDb
   include HTTParty
 
   attr_accessible :url

@@ -1,5 +1,25 @@
-class Event < ActiveRecord::Base
+# == Schema Information
+#
+# Table name: events
+#
+#  id          :integer          not null, primary key
+#  target_type :string(255)
+#  target_id   :integer
+#  title       :string(255)
+#  data        :text
+#  project_id  :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  action      :integer
+#  author_id   :integer
+#
+
+class Event < NewDb
   include Actionable
+  attr_accessible :project, :action, :data, :author_id, :project_id,
+                  :target_id, :target_type
+
+  default_scope where("author_id IS NOT NULL")
 
   attr_accessible :action, :data,
                   :source_id, :source_type, :source,
