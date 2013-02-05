@@ -44,28 +44,28 @@ class Legacy::Comment < LegacyDb
     } unless user.site_admin?
   }
 
-  NOTIFICATION_TARGETS = [ Legacy::MergeRequest, Legacy::MergeRequestVersion ]
+  #NOTIFICATION_TARGETS = [ Legacy::MergeRequest, Legacy::MergeRequestVersion ]
 
-  def deliver_notification_to(another_user)
-    message_body = "#{user.title} commented:\n\n#{body}"
-    if [Legacy::MergeRequest, Legacy::MergeRequestVersion].include?(target.class)
-      if state_change
-        message_body << "\n\nThe status of your merge request"
-        message_body << " is now #{state_changed_to}"
-      end
-      subject_class_name = "merge request"
-    else
-      subject_class_name = target.class.human_name.downcase
-    end
-    message = Legacy::Message.new({
-      :sender => self.user,
-      :recipient => another_user,
-      :subject => "#{user.title} commented on your #{subject_class_name}",
-      :body => message_body,
-      :notifiable => self.target,
-    })
-    message.save
-  end
+  #def deliver_notification_to(another_user)
+    #message_body = "#{user.title} commented:\n\n#{body}"
+    #if [Legacy::MergeRequest, Legacy::MergeRequestVersion].include?(target.class)
+      #if state_change
+        #message_body << "\n\nThe status of your merge request"
+        #message_body << " is now #{state_changed_to}"
+      #end
+      #subject_class_name = "merge request"
+    #else
+      #subject_class_name = target.class.human_name.downcase
+    #end
+    #message = Legacy::Message.new({
+      #:sender => self.user,
+      #:recipient => another_user,
+      #:subject => "#{user.title} commented on your #{subject_class_name}",
+      #:body => message_body,
+      #:notifiable => self.target,
+    #})
+    #message.save
+  #end
 
   def state=(new_state)
     return if new_state.blank?
