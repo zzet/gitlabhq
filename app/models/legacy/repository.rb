@@ -1,7 +1,7 @@
 #require "gitorious/reservations"
 #require "gitorious/messaging"
 
-class Legacy::Legacy::Repository < LegacyDb
+class Legacy::Repository < LegacyDb
   #include Gitorious::Messaging::Publisher
   #include RecordThrottling
   #include Watchable
