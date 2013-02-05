@@ -32,26 +32,26 @@ class Legacy::Legacy::Repository < LegacyDb
   has_many    :events, :as => :target, :dependent => :destroy
   has_many    :hooks, :dependent => :destroy
 
-  named_scope :by_users,  :conditions => { :kind => KIND_USER_REPO } do
+  scope :by_users,  :conditions => { :kind => KIND_USER_REPO } do
     def fresh(limit = 10)
       find(:all, :order => "last_pushed_at DESC", :limit => limit)
     end
   end
 
-  named_scope :by_groups, :conditions => { :kind => KIND_TEAM_REPO } do
+  scope :by_groups, :conditions => { :kind => KIND_TEAM_REPO } do
     def fresh(limit=10)
       find(:all, :order => "last_pushed_at DESC", :limit => limit)
     end
   end
 
-  named_scope :clones,    :conditions => ["kind in (?) and parent_id is not null",
+  scope :clones,    :conditions => ["kind in (?) and parent_id is not null",
                                           [KIND_TEAM_REPO, KIND_USER_REPO]]
-  named_scope :mainlines, :conditions => { :kind => KIND_PROJECT_REPO }
+  scope :mainlines, :conditions => { :kind => KIND_PROJECT_REPO }
 
-  named_scope :regular, :conditions => ["kind in (?)", [KIND_TEAM_REPO, KIND_USER_REPO,
+  scope :regular, :conditions => ["kind in (?)", [KIND_TEAM_REPO, KIND_USER_REPO,
                                                        KIND_PROJECT_REPO]]
 
-  named_scope :visible_by, Proc.new { |user|
+  scope :visible_by, Proc.new { |user|
     user = Legacy::User.new({ :id => 0, :is_admin => false }) unless user.is_a?(Legacy::User)
     { :conditions => [
       "projects.private = :private

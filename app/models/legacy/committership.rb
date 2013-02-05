@@ -16,11 +16,11 @@ class Legacy::Committership < LegacyDb
 
   has_many :messages, :as => :notifiable
 
-  named_scope :groups, :conditions => { :committer_type => "Group" }
-  named_scope :users,  :conditions => { :committer_type => "User" }
-  named_scope :reviewers, :conditions => ["(permissions & ?) != 0", CAN_REVIEW]
-  named_scope :committers, :conditions => ["(permissions & ?) != 0", CAN_COMMIT]
-  named_scope :admins, :conditions => ["(permissions & ?) != 0", CAN_ADMIN]
+  scope :groups, :conditions => { :committer_type => "Group" }
+  scope :users,  :conditions => { :committer_type => "User" }
+  scope :reviewers, :conditions => ["(permissions & ?) != 0", CAN_REVIEW]
+  scope :committers, :conditions => ["(permissions & ?) != 0", CAN_COMMIT]
+  scope :admins, :conditions => ["(permissions & ?) != 0", CAN_ADMIN]
 
   def permission_mask_for(*perms)
     perms.inject(0) do |memo, perm_symbol|

@@ -8,11 +8,11 @@ class Legacy::Comment < LegacyDb
 
   serialize :state_change, Array
 
-  named_scope :with_shas, proc{|*shas|
+  scope :with_shas, proc{|*shas|
     {:conditions => { :sha1 => shas.flatten }, :include => :user}
   }
 
-  named_scope :visible_by, proc{|user|
+  scope :visible_by, proc{|user|
     user = Legacy::User.new({ :is_admin => false }) unless user.is_a?(Legacy::User)
     { :conditions => [
       "projects.private = :private

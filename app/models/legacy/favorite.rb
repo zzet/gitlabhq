@@ -2,7 +2,7 @@ class Legacy::Favorite < LegacyDb
   belongs_to :user
   belongs_to :watchable, :polymorphic => true
 
-  named_scope :visible_by, Proc.new { |user|
+  scope :visible_by, Proc.new { |user|
     user = Legacy::User.new({ :id => 0, :is_admin => false }) unless user.is_a?(Legacy::User)
     {
       :conditions => [

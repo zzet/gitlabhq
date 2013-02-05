@@ -16,18 +16,18 @@ class Legacy::Event < LegacyDb
   end
   has_many :feed_items, :dependent => :destroy
 
-  named_scope :top, {
+  scope :top, {
     :conditions => ['target_type != ?', 'Event'],
     :order => "events.created_at desc",
     :include => [:user, :project]
   }
 
-  named_scope :excluding_commits, {:conditions => ["action != ?", Action::COMMIT]}
+  scope :excluding_commits, {:conditions => ["action != ?", Legacy::Action::COMMIT]}
 
   # So, it's apic fail... who even invent polymorphic associations.
   # but, it work's well
-  named_scope :visible_by, Proc.new { |user|
-    user = User.new({ :id => 0, :is_admin => false }) unless user.is_a?(User)
+  scope :visible_by, Proc.new { |user|
+    user = Legacy::User.new({ :id => 0, :is_admin => false }) unless user.is_a?(Legacy::User)
     {
       :conditions => [
         "events.target_type = :project and exists (

@@ -34,10 +34,10 @@ class Legacy::Project < LegacyDb
 
   default_scope :conditions => ["projects.suspended_at is null"]
 
-  named_scope :private, { :conditions => ["private = ?", true] }
+  scope :private, { :conditions => ["private = ?", true] }
 
   # Poor little mysql =(
-  named_scope :visible_by, Proc.new { |user|
+  scope :visible_by, Proc.new { |user|
     user = Legacy::User.new({ :id => 0, :is_admin => false }) unless user.is_a?(Legacy::User)
     { :conditions => [
       "projects.private = :private
