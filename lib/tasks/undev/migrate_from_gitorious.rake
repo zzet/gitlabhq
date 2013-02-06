@@ -162,7 +162,7 @@ namespace :undev do
 
       root = Gitlab.config.gitolite.repos_path
 
-      Legacy::Repository.actual.limit(5).each do |repo|
+      Legacy::Repository.actual.each do |repo|
 
         unless Project.find_by_name(repo.name)
 
@@ -203,16 +203,16 @@ namespace :undev do
                   cmds = [
                     "cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
                     "sudo ln -s ./lib/hooks/post-receive #{project_path}/hooks/post-receive",
-                    "sudo chown git:git -R #{project_path}",
-                    "sudo chmod 770 -R #{project_path}",
+                      "sudo chown git:git -R #{project_path}",
+                      "sudo chmod 770 -R #{project_path}",
                   ]
 
-                  cmds.each do |cmd|
-                    puts cmd.yellow
-                    `#{cmd}`
-                  end
+                    cmds.each do |cmd|
+                      puts cmd.yellow
+                      `#{cmd}`
+                    end
 
-                  puts "OK".green
+                    puts "OK".green
                 else
                   puts "Repo already exist!".red
                 end
@@ -222,77 +222,97 @@ namespace :undev do
                 master_users = repo.committerships.admins.users
 
                 develop_users = repo.committerships.committers.users
-                develop_users =- master_users
+                develop_users = develop_users - master_users
 
                 report_users = repo.committerships.reviewers.users
-                report_users =- [master_users + develop_users]
+                report_users = report_users - [master_users + develop_users]
 
                 master_teams = repo.committerships.admins.groups
 
                 develop_teams = repo.committerships.committers.groups
-                develop_teams =- master_teams
+                develop_teams =  develop_teams - master_teams
 
                 report_teams = repo.committerships.reviewers.groups
-                report_teams =- [master_teams + develop_teams]
+                report_teams = report_teams - [master_teams + develop_teams]
 
 
                 puts "Add masters to project"
                 master_users.each do |mu|
                   user_ids = []
-                  user_ids << User.find_by_username(Legacy::User.find_by_id(mu.committer_id)).id
+                  user = User.find_by_username(Legacy::User.find_by_id(mu.committer_id).login)
+                  user_ids << user.id if user
                   permission = UsersProject.access_roles["Master"]
                   unless user_ids.blank?
                     project.team.add_users_ids(user_ids, permission)
-                    print ".".green
+                    if project.save
+                      print ".".green
+                    else
+                      print ".".red
+                    end
                   end
                 end
 
                 puts "Add developers to project"
                 develop_users.each do |du|
                   user_ids = []
-                  user_ids << User.find_by_username(Legacy::User.find_by_id(du.committer_id)).id
+                  user = User.find_by_username(Legacy::User.find_by_id(du.committer_id).login)
+                  user_ids << user.id if user
                   permission = UsersProject.access_roles["Developer"]
                   unless user_ids.blank?
                     project.team.add_users_ids(user_ids, permission)
-                    print ".".green
+                    if project.save
+                      print ".".green
+                    else
+                      print ".".red
+                    end
                   end
                 end
 
                 puts "Add reporters to project"
                 report_users.each do |ru|
                   user_ids = []
-                  user_ids << User.find_by_username(Legacy::User.find_by_id(ru.committer_id)).id
+                  user = User.find_by_username(Legacy::User.find_by_id(ru.committer_id).login)
+                  user_ids << user.id if user
                   permission = UsersProject.access_roles["Reporter"]
                   unless user_ids.blank?
                     project.team.add_users_ids(user_ids, permission)
-                    print ".".green
+                    if project.save
+                      print ".".green
+                    else
+                      print ".".red
+                    end
                   end
                 end
 
                 puts "Delegate to team with MAX master role"
                 master_teams.each do |mt|
-                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(mt.committer_id))
-                  permission = UsersProject.access_roles["Master"]
-                  team.assign_to_project(project, permission)
+                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(mt.committer_id).name)
+                  if team
+                    permission = UsersProject.access_roles["Master"]
+                    team.assign_to_project(project, permission)
+                  end
                   print ".".green
                 end
 
                 puts "Delegate to team with MAX developer role"
                 develop_teams.each do |dt|
-                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(dt.committer_id))
-                  permission = UsersProject.access_roles["Developer"]
-                  team.assign_to_project(project, permission)
+                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(dt.committer_id).name)
+                  if team
+                    permission = UsersProject.access_roles["Developer"]
+                    team.assign_to_project(project, permission)
+                  end
                   print ".".green
                 end
 
                 puts "Delegate to team with MAX reporter role"
                 report_teams.each do |rt|
-                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(rt.committer_id))
-                  permission = UsersProject.access_roles["Reporter"]
-                  team.assign_to_project(project, permission)
+                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(rt.committer_id).name)
+                  if team
+                    permission = UsersProject.access_roles["Reporter"]
+                    team.assign_to_project(project, permission)
+                  end
                   print ".".green
                 end
-
 
               else
                 puts "Repository #{repo.name} - #{repo.id} fail"
