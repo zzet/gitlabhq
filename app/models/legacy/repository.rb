@@ -51,6 +51,11 @@ class Legacy::Repository < LegacyDb
   scope :regular, :conditions => ["kind in (?)", [KIND_TEAM_REPO, KIND_USER_REPO,
                                                        KIND_PROJECT_REPO]]
 
+  scope :not_empty, where("disk_usage is not null")
+  scope :original, where(parent_id: nil)
+
+  scope :actual, regular.not_empty.original
+
   scope :visible_by, Proc.new { |user|
     user = Legacy::User.new({ :id => 0, :is_admin => false }) unless user.is_a?(Legacy::User)
     { :conditions => [
@@ -137,6 +142,12 @@ class Legacy::Repository < LegacyDb
     if project_repo?
       File.join(project.to_param_with_prefix, name)
     else
+      owner = case owner_type
+                  when 'Group'
+                    Legacy::Group.find_by_id(owner_id)
+                  when 'User'
+                    Legacy::User.find_by_id(owner_id)
+                  end
       File.join(owner.to_param_with_prefix, project.slug, name)
     end
   end
@@ -184,7 +195,7 @@ class Legacy::Repository < LegacyDb
   end
 
   def push_url
-    "#{GitoriousConfig['gitorious_user']}@#{GitoriousConfig['gitorious_host']}:#{gitdir}"
+    "gitorious@git.undev.cc:#{gitdir}"
   end
 
   def display_ssh_url?(user)
@@ -568,7 +579,7 @@ class Legacy::Repository < LegacyDb
       if project_repo?
         #(action_id, target, user, data = nil, body = nil, date = Time.now.utc)
         self.project.create_event(Action::ADD_PROJECT_REPOSITORY, self, self.user,
-              nil, nil, date = created_at)
+              nil, nil, created_at)
       end
     end
 
