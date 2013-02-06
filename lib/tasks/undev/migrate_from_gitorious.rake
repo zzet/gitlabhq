@@ -152,5 +152,161 @@ namespace :undev do
         end
       end
     end
+
+    desc "Migrate Repositories from gitorious to gitlab"
+    task :repositories => :environment do
+
+      repo_count = Legacy::Repository.count
+      puts "Start migrate repositories from gitorius to gitlab"
+      puts "Repository count: #{repo_count}"
+
+      root = Gitlab.config.gitolite.repos_path
+
+      Legacy::Repository.actual.limit(5).each do |repo|
+
+        unless Project.find_by_name(repo.name)
+
+          project = Project.new
+
+          project.name = repo.name
+          project.description = repo.description
+
+          project.created_at = repo.created_at
+          project.updated_at = repo.updated_at
+
+          creator = User.find_by_username(repo.user.login)
+
+          if creator
+            project.creator = creator
+
+            owner = case repo.owner_type
+                    when 'Group'
+                      owner_group = Legacy::Group.find_by_id(repo.owner_id)
+                      User.find_by_username(owner_group.creator.login)
+                    when 'User'
+                      User.find_by_username(repo.user.login)
+                    end
+
+            project.group = Group.find_by_path(repo.project.slug)
+
+            project.path = repo.name.dup.parameterize
+
+            begin
+              if project.save
+                puts "Repository #{project.name} processed succesfull"
+                puts "Clone repo from gitorious: "
+
+                project_path = File.join(root, "#{project.path_with_namespace}.git")
+
+                unless File.exists?(project_path)
+
+                  cmds = [
+                    "cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
+                    "sudo ln -s ./lib/hooks/post-receive #{project_path}/hooks/post-receive",
+                    "sudo chown git:git -R #{project_path}",
+                    "sudo chmod 770 -R #{project_path}",
+                  ]
+
+                  cmds.each do |cmd|
+                    puts cmd.yellow
+                    `#{cmd}`
+                  end
+
+                  puts "OK".green
+                else
+                  puts "Repo already exist!".red
+                end
+
+                puts "Migrate committerships:"
+
+                master_users = repo.committerships.admins.users
+
+                develop_users = repo.committerships.committers.users
+                develop_users =- master_users
+
+                report_users = repo.committerships.reviewers.users
+                report_users =- [master_users + develop_users]
+
+                master_teams = repo.committerships.admins.groups
+
+                develop_teams = repo.committerships.committers.groups
+                develop_teams =- master_teams
+
+                report_teams = repo.committerships.reviewers.groups
+                report_teams =- [master_teams + develop_teams]
+
+
+                puts "Add masters to project"
+                master_users.each do |mu|
+                  user_ids = []
+                  user_ids << User.find_by_username(Legacy::User.find_by_id(mu.committer_id)).id
+                  permission = UsersProject.access_roles["Master"]
+                  unless user_ids.blank?
+                    project.team.add_users_ids(user_ids, permission)
+                    print ".".green
+                  end
+                end
+
+                puts "Add developers to project"
+                develop_users.each do |du|
+                  user_ids = []
+                  user_ids << User.find_by_username(Legacy::User.find_by_id(du.committer_id)).id
+                  permission = UsersProject.access_roles["Developer"]
+                  unless user_ids.blank?
+                    project.team.add_users_ids(user_ids, permission)
+                    print ".".green
+                  end
+                end
+
+                puts "Add reporters to project"
+                report_users.each do |ru|
+                  user_ids = []
+                  user_ids << User.find_by_username(Legacy::User.find_by_id(ru.committer_id)).id
+                  permission = UsersProject.access_roles["Reporter"]
+                  unless user_ids.blank?
+                    project.team.add_users_ids(user_ids, permission)
+                    print ".".green
+                  end
+                end
+
+                puts "Delegate to team with MAX master role"
+                master_teams.each do |mt|
+                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(mt.committer_id))
+                  permission = UsersProject.access_roles["Master"]
+                  team.assign_to_project(project, permission)
+                  print ".".green
+                end
+
+                puts "Delegate to team with MAX developer role"
+                develop_teams.each do |dt|
+                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(dt.committer_id))
+                  permission = UsersProject.access_roles["Developer"]
+                  team.assign_to_project(project, permission)
+                  print ".".green
+                end
+
+                puts "Delegate to team with MAX reporter role"
+                report_teams.each do |rt|
+                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(rt.committer_id))
+                  permission = UsersProject.access_roles["Reporter"]
+                  team.assign_to_project(project, permission)
+                  print ".".green
+                end
+
+
+              else
+                puts "Repository #{repo.name} - #{repo.id} fail"
+                puts "Errors: #{project.errors.inspect}"
+              end
+
+            rescue Exception => e
+              puts "Migrate project: #{repo.name} - #{repo.id} FUCK!".red
+              puts "Errors: #{e.inspect}"
+            end
+
+          end
+        end
+      end
+    end
   end
 end
