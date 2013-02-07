@@ -29,6 +29,7 @@ class UserTeam < ActiveRecord::Base
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
+  validates :description, length: { within: 0..255 }
   validates :name, presence: true, uniqueness: true
   validates :owner, presence: true
   validates :description, length: { within: 0..255 }
