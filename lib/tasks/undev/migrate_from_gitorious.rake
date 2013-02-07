@@ -66,7 +66,7 @@ namespace :undev do
 
           team.name = group.name
           team.path = group.name
-          #team.description = group.description
+          team.description = group.description
 
           team.created_at = group.created_at
           team.updated_at = group.updated_at
@@ -129,7 +129,7 @@ namespace :undev do
           if owner
             group.name = project.title
             group.path = project.slug
-            #group.description = project.description
+            group.description = project.description
 
             group.owner = owner
 
