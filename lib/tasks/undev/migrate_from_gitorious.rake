@@ -170,6 +170,7 @@ namespace :undev do
 
           project.name = repo.name
           project.description = repo.description
+          #project.issues_tracker = "redmine"
 
           project.created_at = repo.created_at
           project.updated_at = repo.updated_at
@@ -190,6 +191,7 @@ namespace :undev do
             project.group = Group.find_by_path(repo.project.slug)
 
             project.path = repo.name.dup.parameterize
+            project.public = (repo.project.private == false)
 
             begin
               if project.save
