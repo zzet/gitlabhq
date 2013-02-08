@@ -330,5 +330,119 @@ namespace :undev do
         end
       end
     end
+
+    desc "Migrate Events"
+    task :events => :environment do
+      Rake::Task["undev:migrate:events:committers"].invoke
+      Rake::Task["undev:migrate:events:repositories"].invoke
+    end
+
+    namespace :events do
+      desc "Migrate project events"
+      task :repositories => :environment do
+
+        puts "Start import information about repository activity".green
+        puts "Events count: #{Legacy::Event.push_events.repository_events.count}"
+        Legacy::Event.push_events.repository_events.each do |event|
+
+          project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
+          user = nil
+          user = User.find_by_username(event.user.login) if event.user
+          if project && user
+            case event.action
+            when Legacy::Action::COMMIT
+              print "c".green
+            when Legacy::Action::CREATE_BRANCH
+              print "b".green
+            when Legacy::Action::DELETE_BRANCH
+              print "b".red
+            when Legacy::Action::CREATE_TAG
+              print "t".green
+            when Legacy::Action::DELETE_TAG
+              print "t".red
+            when Legacy::Action::PUSH
+              tmp = event.body.split " "
+              data = project.post_receive_data(tmp[3], tmp[5], event.data, user)
+
+              Event.create(
+                project: project,
+                action: Event::Pushed,
+                data: data,
+                author_id: data[:user_id],
+                created_at: event.created_at,
+                updated_at: event.updated_at
+              )
+
+              print "p".green
+
+            when Legacy::Action::PUSH_SUMMARY
+              oldrev, newrev, ref, commits = event.data.split "$"
+              data = project.post_receive_data(oldrev, newrev, ref, user)
+
+              Event.create(
+                project: project,
+                action: Event::Pushed,
+                data: data,
+                author_id: data[:user_id],
+                created_at: event.created_at,
+                updated_at: event.updated_at
+              )
+
+              print "P".green
+
+            end
+          end
+        end
+        puts
+        puts "OK"
+        puts
+      end
+
+      desc "Commiters information"
+      task :committers => :environment do
+
+        puts "Start import information about repository committers".green
+        puts "Committers count: #{Legacy::Event.committers_events.repository_events(13).count}"
+        Legacy::Event.committers_events.repository_events(13).each do |event|
+
+          project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
+          luser = Legacy::User.find_by_fullname(event.data)
+          user = User.find_by_username(luser.login) if luser
+
+          if project && user
+            case event.action
+            when Legacy::Action::ADD_COMMITTER
+
+              Event.create(
+                project_id: project.id,
+                action: Event::Joined,
+                author_id: user.id,
+                created_at: event.created_at,
+                updated_at: event.updated_at
+              )
+
+              print "+".green
+
+            when Legacy::Action::REMOVE_COMMITTER
+              Event.create(
+                project_id: project.id,
+                action: Event::Left,
+                author_id: user.id,
+                created_at: event.created_at,
+                updated_at: event.updated_at
+              )
+
+              print "-".green
+
+            end
+
+          end
+
+        end
+
+        puts ""
+        puts "OK".green
+      end
+    end
   end
 end

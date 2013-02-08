@@ -107,7 +107,7 @@ class Project < NewDb
 
   actions_to_watch [:created, :updated, :deleted, :transfer]
 
-  enumerize :issues_tracker, :in => (Settings[:issues_tracker].keys).append(:gitlab), :default => :gitlab
+  #enumerize :issues_tracker, :in => (Settings[:issues_tracker].keys).append(:gitlab), :default => :gitlab
 
   class << self
     def abandoned

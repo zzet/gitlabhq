@@ -26,6 +26,23 @@ class Legacy::Event < LegacyDb
 
   # So, it's apic fail... who even invent polymorphic associations.
   # but, it work's well
+
+  scope :committers_events, where(action: [Legacy::Action::ADD_COMMITTER, Legacy::Action::REMOVE_COMMITTER])
+
+  scope :code_events, where(action: [Legacy::Action::COMMIT,
+                                     Legacy::Action::CREATE_BRANCH,
+                                     Legacy::Action::DELETE_BRANCH,
+                                     Legacy::Action::CREATE_TAG,
+                                     Legacy::Action::DELETE_TAG,
+                                     Legacy::Action::PUSH,
+                                     Legacy::Action::PUSH_SUMMARY
+                                    ])
+  scope :commit_events, where(action: Legacy::Action::COMMIT)
+  scope :branch_events, where(action: [Legacy::Action::CREATE_BRANCH, Legacy::Action::DELETE_BRANCH])
+  scope :tag_events, where(action: [Legacy::Action::CREATE_TAG, Legacy::Action::DELETE_TAG])
+  scope :push_events, where(action: [Legacy::Action::PUSH, Legacy::Action::PUSH_SUMMARY])
+  scope :repository_events, ->(repo) { repo.present? ? where(target_type: 'Repository', target_id: repo) : where(target_type: 'Repository') }
+
   scope :visible_by, Proc.new { |user|
     user = Legacy::User.new({ :id => 0, :is_admin => false }) unless user.is_a?(Legacy::User)
     {
