@@ -343,11 +343,12 @@ namespace :undev do
 
         puts "Start import information about repository activity".green
         puts "Events count: #{Legacy::Event.push_events.repository_events.count}"
-        Legacy::Event.push_events.repository_events.each do |event|
+        Legacy::Event.push_events.repository_events.find_each do |event|
 
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
           user = nil
           user = User.find_by_username(event.user.login) if event.user
+
           if project && user
             case event.action
             when Legacy::Action::COMMIT
@@ -361,6 +362,7 @@ namespace :undev do
             when Legacy::Action::DELETE_TAG
               print "t".red
             when Legacy::Action::PUSH
+
               tmp = event.body.split " "
               data = project.post_receive_data(tmp[3], tmp[5], event.data, user)
 
@@ -376,6 +378,7 @@ namespace :undev do
               print "p".green
 
             when Legacy::Action::PUSH_SUMMARY
+
               oldrev, newrev, ref, commits = event.data.split "$"
               data = project.post_receive_data(oldrev, newrev, ref, user)
 
@@ -394,7 +397,7 @@ namespace :undev do
           end
         end
         puts
-        puts "OK"
+        puts "OK".green
         puts
       end
 
@@ -402,8 +405,8 @@ namespace :undev do
       task :committers => :environment do
 
         puts "Start import information about repository committers".green
-        puts "Committers count: #{Legacy::Event.committers_events.repository_events(13).count}"
-        Legacy::Event.committers_events.repository_events(13).each do |event|
+        puts "Committers count: #{Legacy::Event.committers_events.repository_events.count}"
+        Legacy::Event.committers_events.repository_events.find_each do |event|
 
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
           luser = Legacy::User.find_by_fullname(event.data)
@@ -442,6 +445,7 @@ namespace :undev do
 
         puts ""
         puts "OK".green
+        puts ""
       end
     end
   end
