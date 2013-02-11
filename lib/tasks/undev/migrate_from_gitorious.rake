@@ -164,168 +164,171 @@ namespace :undev do
 
       Legacy::Repository.actual.each do |repo|
 
-        unless Project.find_by_name(repo.name)
+        group = Group.find_by_name(repo.project.slug)
+        if group
+          unless group.projects.find_by_name(repo.name)
 
-          project = Project.new
+            project = group.projects.build
 
-          project.name = repo.name
-          project.description = repo.description
-          #project.issues_tracker = "redmine"
+            project.name = repo.name
+            project.description = repo.description
+            #project.issues_tracker = "redmine"
 
-          project.created_at = repo.created_at
-          project.updated_at = repo.updated_at
+            project.created_at = repo.created_at
+            project.updated_at = repo.updated_at
 
-          creator = User.find_by_username(repo.user.login)
+            creator = User.find_by_username(repo.user.login)
 
-          if creator
-            project.creator = creator
+            if creator
+              project.creator = creator
 
-            owner = case repo.owner_type
-                    when 'Group'
-                      owner_group = Legacy::Group.find_by_id(repo.owner_id)
-                      User.find_by_username(owner_group.creator.login)
-                    when 'User'
-                      User.find_by_username(repo.user.login)
-                    end
+              owner = case repo.owner_type
+                      when 'Group'
+                        owner_group = Legacy::Group.find_by_id(repo.owner_id)
+                        User.find_by_username(owner_group.creator.login)
+                      when 'User'
+                        User.find_by_username(repo.user.login)
+                      end
 
-            project.group = Group.find_by_path(repo.project.slug)
+              #project.group = Group.find_by_path(repo.project.slug)
 
-            project.path = repo.name.dup.parameterize
-            project.public = (repo.project.private == false)
+              project.path = repo.name.dup.parameterize
+              project.public = (repo.project.private == false)
 
-            begin
-              if project.save
-                puts "Repository #{project.name} processed succesfull"
-                puts "Clone repo from gitorious: "
+              begin
+                if project.save
+                  puts "Repository #{project.name} processed succesfull"
+                  puts "Clone repo from gitorious: "
 
-                project_path = File.join(root, "#{project.path_with_namespace}.git")
+                  project_path = File.join(root, "#{project.path_with_namespace}.git")
 
-                unless File.exists?(project_path)
+                  unless File.exists?(project_path)
 
-                  cmds = [
-                    "cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
-                    "sudo ln -s ./lib/hooks/post-receive #{project_path}/hooks/post-receive",
-                      "sudo chown git:git -R #{project_path}",
-                      "sudo chmod 770 -R #{project_path}",
-                  ]
+                    cmds = [
+                      "cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
+                      "sudo ln -s ./lib/hooks/post-receive #{project_path}/hooks/post-receive",
+                        "sudo chown git:git -R #{project_path}",
+                        "sudo chmod 770 -R #{project_path}",
+                    ]
 
-                    cmds.each do |cmd|
-                      puts cmd.yellow
-                      `#{cmd}`
-                    end
+                      cmds.each do |cmd|
+                        puts cmd.yellow
+                        `#{cmd}`
+                      end
 
-                    puts "OK".green
-                else
-                  puts "Repo already exist!".red
-                end
-
-                puts "Migrate committerships:"
-
-                master_users = repo.committerships.admins.users
-
-                develop_users = repo.committerships.committers.users
-                develop_users = develop_users - master_users
-
-                report_users = repo.committerships.reviewers.users
-                report_users = report_users - [master_users + develop_users]
-
-                master_teams = repo.committerships.admins.groups
-
-                develop_teams = repo.committerships.committers.groups
-                develop_teams =  develop_teams - master_teams
-
-                report_teams = repo.committerships.reviewers.groups
-                report_teams = report_teams - [master_teams + develop_teams]
-
-
-                puts "Add masters to project"
-                master_users.each do |mu|
-                  user_ids = []
-                  user = User.find_by_username(Legacy::User.find_by_id(mu.committer_id).login)
-                  user_ids << user.id if user
-                  permission = UsersProject.access_roles["Master"]
-                  unless user_ids.blank?
-                    project.team.add_users_ids(user_ids, permission)
-                    if project.save
-                      print ".".green
-                    else
-                      print ".".red
-                    end
+                      puts "OK".green
+                  else
+                    puts "Repo already exist!".red
                   end
-                end
 
-                puts "Add developers to project"
-                develop_users.each do |du|
-                  user_ids = []
-                  user = User.find_by_username(Legacy::User.find_by_id(du.committer_id).login)
-                  user_ids << user.id if user
-                  permission = UsersProject.access_roles["Developer"]
-                  unless user_ids.blank?
-                    project.team.add_users_ids(user_ids, permission)
-                    if project.save
-                      print ".".green
-                    else
-                      print ".".red
-                    end
-                  end
-                end
+                  puts "Migrate committerships:"
 
-                puts "Add reporters to project"
-                report_users.each do |ru|
-                  user_ids = []
-                  user = User.find_by_username(Legacy::User.find_by_id(ru.committer_id).login)
-                  user_ids << user.id if user
-                  permission = UsersProject.access_roles["Reporter"]
-                  unless user_ids.blank?
-                    project.team.add_users_ids(user_ids, permission)
-                    if project.save
-                      print ".".green
-                    else
-                      print ".".red
-                    end
-                  end
-                end
+                  master_users = repo.committerships.admins.users
 
-                puts "Delegate to team with MAX master role"
-                master_teams.each do |mt|
-                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(mt.committer_id).name)
-                  if team
+                  develop_users = repo.committerships.committers.users
+                  develop_users = develop_users - master_users
+
+                  report_users = repo.committerships.reviewers.users
+                  report_users = report_users - [master_users + develop_users]
+
+                  master_teams = repo.committerships.admins.groups
+
+                  develop_teams = repo.committerships.committers.groups
+                  develop_teams =  develop_teams - master_teams
+
+                  report_teams = repo.committerships.reviewers.groups
+                  report_teams = report_teams - [master_teams + develop_teams]
+
+
+                  puts "Add masters to project"
+                  master_users.each do |mu|
+                    user_ids = []
+                    user = User.find_by_username(Legacy::User.find_by_id(mu.committer_id).login)
+                    user_ids << user.id if user
                     permission = UsersProject.access_roles["Master"]
-                    team.assign_to_project(project, permission)
+                    unless user_ids.blank?
+                      project.team.add_users_ids(user_ids, permission)
+                      if project.save
+                        print ".".green
+                      else
+                        print ".".red
+                      end
+                    end
                   end
-                  print ".".green
-                end
 
-                puts "Delegate to team with MAX developer role"
-                develop_teams.each do |dt|
-                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(dt.committer_id).name)
-                  if team
+                  puts "Add developers to project"
+                  develop_users.each do |du|
+                    user_ids = []
+                    user = User.find_by_username(Legacy::User.find_by_id(du.committer_id).login)
+                    user_ids << user.id if user
                     permission = UsersProject.access_roles["Developer"]
-                    team.assign_to_project(project, permission)
+                    unless user_ids.blank?
+                      project.team.add_users_ids(user_ids, permission)
+                      if project.save
+                        print ".".green
+                      else
+                        print ".".red
+                      end
+                    end
                   end
-                  print ".".green
-                end
 
-                puts "Delegate to team with MAX reporter role"
-                report_teams.each do |rt|
-                  team = UserTeam.find_by_path(Legacy::Group.find_by_id(rt.committer_id).name)
-                  if team
+                  puts "Add reporters to project"
+                  report_users.each do |ru|
+                    user_ids = []
+                    user = User.find_by_username(Legacy::User.find_by_id(ru.committer_id).login)
+                    user_ids << user.id if user
                     permission = UsersProject.access_roles["Reporter"]
-                    team.assign_to_project(project, permission)
+                    unless user_ids.blank?
+                      project.team.add_users_ids(user_ids, permission)
+                      if project.save
+                        print ".".green
+                      else
+                        print ".".red
+                      end
+                    end
                   end
-                  print ".".green
+
+                  puts "Delegate to team with MAX master role"
+                  master_teams.each do |mt|
+                    team = UserTeam.find_by_path(Legacy::Group.find_by_id(mt.committer_id).name)
+                    if team
+                      permission = UsersProject.access_roles["Master"]
+                      team.assign_to_project(project, permission)
+                    end
+                    print ".".green
+                  end
+
+                  puts "Delegate to team with MAX developer role"
+                  develop_teams.each do |dt|
+                    team = UserTeam.find_by_path(Legacy::Group.find_by_id(dt.committer_id).name)
+                    if team
+                      permission = UsersProject.access_roles["Developer"]
+                      team.assign_to_project(project, permission)
+                    end
+                    print ".".green
+                  end
+
+                  puts "Delegate to team with MAX reporter role"
+                  report_teams.each do |rt|
+                    team = UserTeam.find_by_path(Legacy::Group.find_by_id(rt.committer_id).name)
+                    if team
+                      permission = UsersProject.access_roles["Reporter"]
+                      team.assign_to_project(project, permission)
+                    end
+                    print ".".green
+                  end
+
+                else
+                  puts "Repository #{repo.name} - #{repo.id} fail"
+                  puts "Errors: #{project.errors.inspect}"
                 end
 
-              else
-                puts "Repository #{repo.name} - #{repo.id} fail"
-                puts "Errors: #{project.errors.inspect}"
+              rescue Exception => e
+                puts "Migrate project: #{repo.name} - #{repo.id} FUCK!".red
+                puts "Errors: #{e.inspect}"
               end
 
-            rescue Exception => e
-              puts "Migrate project: #{repo.name} - #{repo.id} FUCK!".red
-              puts "Errors: #{e.inspect}"
             end
-
           end
         end
       end
