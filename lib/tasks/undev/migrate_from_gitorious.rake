@@ -1,11 +1,22 @@
 namespace :undev do
+
+  desc "Migrate All data from gitorious to gitolite"
+  task :migrate => :environment do
+    Rake::Task["undev:migrate:users"].invoke
+    Rake::Task["undev:migrate:teams"].invoke
+    Rake::Task["undev:migrate:projects"].invoke
+    Rake::Task["undev:migrate:repositories"].invoke
+    Rake::Task["undev:migrate:events"].invoke
+  end
+
+
   namespace :migrate do
 
     desc "Migrate users from gitorious to gitlab"
     task :users => :environment do
 
       user_count = Legacy::User.count
-      puts "Start migrate users"
+      puts "Start migrate users".yellow
       puts "Users count: #{user_count}"
       puts ""
 
@@ -42,11 +53,12 @@ namespace :undev do
             puts "Errors: #{e.inspect}"
           end
 
-          step =+ 1
+          step += 1
           puts "#{user_count - step} is left"
           puts ""
         end
       end
+      puts "Funish import users".green
     end
 
 
@@ -82,7 +94,7 @@ namespace :undev do
               puts "Errors: #{team.errors.inspect}"
             end
             # Members
-            puts "Add members to team "
+            puts "Add members to team"
             group.memberships.each do |group_member|
               user = User.find_by_username(group_member.user.login)
               if user
@@ -90,7 +102,7 @@ namespace :undev do
                 permission = is_admin ? UsersProject.access_roles["Master"] : UsersProject.access_roles["Developer"]
 
                 team.add_member(user, permission, is_admin)
-                print ". "
+                print ".".green
               end
             end
           rescue Exception => e
@@ -99,11 +111,12 @@ namespace :undev do
           end
         end
 
-        step =+ 1
+        step += 1
         puts "#{teams_count - step} is left"
         puts ""
 
       end
+      puts "Finish import user teams".green
     end
 
     desc "Migrate Projects from gitorius to gitlab"
@@ -151,13 +164,14 @@ namespace :undev do
           end
         end
       end
+      puts "Finish import project groups".green
     end
 
     desc "Migrate Repositories from gitorious to gitlab"
     task :repositories => :environment do
 
       repo_count = Legacy::Repository.count
-      puts "Start migrate repositories from gitorius to gitlab"
+      puts "Start migrate repositories from gitorius to gitlab".yellow
       puts "Repository count: #{repo_count}"
 
       root = Gitlab.config.gitolite.repos_path
@@ -234,7 +248,7 @@ namespace :undev do
                   master_teams = repo.committerships.admins.groups
 
                   develop_teams = repo.committerships.committers.groups
-                  develop_teams =  develop_teams - master_teams
+                  develop_teams = develop_teams - master_teams
 
                   report_teams = repo.committerships.reviewers.groups
                   report_teams = report_teams - [master_teams + develop_teams]
@@ -336,6 +350,10 @@ namespace :undev do
 
     desc "Migrate Events"
     task :events => :environment do
+      puts "Remove all old events".yellow
+      Event.destroy_all
+      puts "Events removed.".green
+
       Rake::Task["undev:migrate:events:committers"].invoke
       Rake::Task["undev:migrate:events:repositories"].invoke
     end
