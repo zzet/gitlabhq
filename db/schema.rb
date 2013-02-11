@@ -154,6 +154,7 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
     t.integer  "namespace_id"
     t.boolean  "public",                 :default => false,    :null => false
     t.string   "issues_tracker",         :default => "gitlab", :null => false
+    t.string   "issues_tracker_id"
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
