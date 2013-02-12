@@ -363,8 +363,8 @@ namespace :undev do
       task :repositories => :environment do
 
         puts "Start import information about repository activity".green
-        puts "Events count: #{Legacy::Event.push_events.repository_events.count}"
-        Legacy::Event.push_events.repository_events.find_each do |event|
+        puts "Events count: #{Legacy::Event.push_events.repository_events(nil).count}"
+        Legacy::Event.push_events.repository_events(nil).find_each do |event|
 
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
           user = nil
@@ -426,8 +426,8 @@ namespace :undev do
       task :committers => :environment do
 
         puts "Start import information about repository committers".green
-        puts "Committers count: #{Legacy::Event.committers_events.repository_events.count}"
-        Legacy::Event.committers_events.repository_events.find_each do |event|
+        puts "Committers count: #{Legacy::Event.committers_events.repository_events(nil).count}"
+        Legacy::Event.committers_events.repository_events(nil).find_each do |event|
 
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
           luser = Legacy::User.find_by_fullname(event.data)
