@@ -69,6 +69,10 @@ class User < ActiveRecord::Base
   has_many :user_team_project_relationships, through: :user_teams
   has_many :team_projects,                   through: :user_team_project_relationships
 
+  has_many :events,                   dependent: :destroy, foreign_key: :author_id
+  has_many :subscriprions,            dependent: :destroy
+  has_many :notifications,            dependent: :destroy, through: :subscriprions
+
   validates :name, presence: true
   validates :bio, length: { within: 0..255 }
   validates :extern_uid, allow_blank: true, uniqueness: {scope: :provider}
