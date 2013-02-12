@@ -10,7 +10,7 @@ class TeamsController < ApplicationController
 
   def show
     projects
-    @events = Event.in_projects(user_team.project_ids).limit(20).offset(params[:offset] || 0)
+    @events = OldEvent.in_projects(user_team.project_ids).limit(20).offset(params[:offset] || 0)
   end
 
   def edit
