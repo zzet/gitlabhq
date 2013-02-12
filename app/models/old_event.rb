@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: events
+# Table name: old_events
 #
 #  id          :integer          not null, primary key
 #  target_type :string(255)

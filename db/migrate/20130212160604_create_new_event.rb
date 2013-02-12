@@ -1,6 +1,6 @@
-class CreateEventBases < ActiveRecord::Migration
+class CreateNewEvent < ActiveRecord::Migration
   def change
-    create_table :event_bases do |t|
+    create_table :events do |t|
       t.integer :author_id
       t.string :action
       t.integer :target_id
