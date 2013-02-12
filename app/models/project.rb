@@ -44,6 +44,12 @@ class Project < ActiveRecord::Base
   has_one :gitlab_ci_service, dependent: :destroy
 
   has_many :old_events,         dependent: :destroy, class_name: OldEvent
+
+  has_many :events,         as: :target,    dependent: :destroy
+  has_many :subscriptions,  condition: { action: "some_action" }
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
   has_many :merge_requests,     dependent: :destroy
   has_many :issues,             dependent: :destroy, order: "state, created_at DESC"
   has_many :milestones,         dependent: :destroy
