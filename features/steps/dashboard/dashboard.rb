@@ -30,10 +30,10 @@ class Dashboard < Spinach::FeatureSteps
   Given 'user with name "John Doe" joined project "Shop"' do
     user = create(:user, {name: "John Doe"})
     project = Project.find_by_name "Shop"
-    Event.create(
+    OldEvent.create(
       project: project,
       author_id: user.id,
-      action: Event::JOINED
+      action: OldEvent::JOINED
     )
   end
 
@@ -44,10 +44,10 @@ class Dashboard < Spinach::FeatureSteps
   And 'user with name "John Doe" left project "Shop"' do
     user = User.find_by_name "John Doe"
     project = Project.find_by_name "Shop"
-    Event.create(
+    OldEvent.create(
       project: project,
       author_id: user.id,
-      action: Event::LEFT
+      action: OldEvent::LEFT
     )
   end
 
