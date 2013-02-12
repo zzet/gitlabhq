@@ -16,6 +16,11 @@ class UserTeamProjectRelationship < ActiveRecord::Base
   belongs_to :user_team
   belongs_to :project
 
+  has_many :events,         as: :target,    dependent: :destroy
+  has_many :subscriptions,  condition: { action: "some_action" }
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
   validates :project,   presence: true
   validates :user_team, presence: true
   validate :check_greatest_access
