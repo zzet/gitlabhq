@@ -1,5 +1,5 @@
-class EventDecorator < ApplicationDecorator
-  decorates :event
+class OldEventDecorator < ApplicationDecorator
+  decorates :old_event
 
   def feed_title
     if self.issue?

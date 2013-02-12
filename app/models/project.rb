@@ -38,7 +38,7 @@ class Project < ActiveRecord::Base
   belongs_to :group,        foreign_key: "namespace_id", conditions: "type = 'Group'"
   belongs_to :namespace
 
-  has_one :last_event, class_name: 'Event', order: 'events.created_at DESC', foreign_key: 'project_id'
+  has_one :last_event, class_name: OldEvent, order: 'events.created_at DESC', foreign_key: 'project_id'
   has_one :gitlab_ci_service, dependent: :destroy
 
   has_many :events,             dependent: :destroy
@@ -95,7 +95,7 @@ class Project < ActiveRecord::Base
 
   class << self
     def abandoned
-      project_ids = Event.select('max(created_at) as latest_date, project_id').
+      project_ids = OldEvent.select('max(created_at) as latest_date, project_id').
         group('project_id').
         having('latest_date < ?', 6.months.ago).map(&:project_id)
 
@@ -103,7 +103,7 @@ class Project < ActiveRecord::Base
     end
 
     def with_push
-      includes(:events).where('events.action = ?', Event::PUSHED)
+      includes(:events).where('events.action = ?', OldEvent::PUSHED)
     end
 
     def active
