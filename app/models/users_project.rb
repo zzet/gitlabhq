@@ -23,6 +23,11 @@ class UsersProject < ActiveRecord::Base
   belongs_to :user
   belongs_to :project
 
+  has_many :events,         as: :target,    dependent: :destroy
+  has_many :subscriptions,  condition: { action: "some_action" }
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
   attr_accessor :skip_git
 
   validates :user, presence: true
