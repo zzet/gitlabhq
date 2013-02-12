@@ -43,10 +43,10 @@ class Project < ActiveRecord::Base
   belongs_to :group,        foreign_key: "namespace_id", conditions: "type = 'Group'"
   belongs_to :namespace
 
-  has_one :last_event, class_name: OldEvent, order: 'events.created_at DESC', foreign_key: 'project_id'
+  has_one :last_event, class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
   has_one :gitlab_ci_service, dependent: :destroy
 
-  has_many :events,             dependent: :destroy
+  has_many :old_events,         dependent: :destroy, class_name: OldEvent
   has_many :merge_requests,     dependent: :destroy
   has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
   has_many :milestones,         dependent: :destroy
@@ -111,7 +111,7 @@ class Project < ActiveRecord::Base
     end
 
     def with_push
-      includes(:events).where('events.action = ?', OldEvent::PUSHED)
+      includes(:old_events).where('old_events.action = ?', OldEvent::PUSHED)
     end
 
     def active
