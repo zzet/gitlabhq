@@ -40,10 +40,10 @@ class Project < ActiveRecord::Base
   belongs_to :group,        foreign_key: "namespace_id", conditions: "type = 'Group'"
   belongs_to :namespace
 
-  has_one :last_event, class_name: OldEvent, order: 'events.created_at DESC', foreign_key: 'project_id'
+  has_one :last_event, class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
   has_one :gitlab_ci_service, dependent: :destroy
 
-  has_many :events,             dependent: :destroy
+  has_many :old_events,         dependent: :destroy, class_name: OldEvent
   has_many :merge_requests,     dependent: :destroy
   has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
   has_many :milestones,         dependent: :destroy
@@ -91,7 +91,7 @@ class Project < ActiveRecord::Base
   scope :without_team, ->(team) { team.projects.present? ? where("id NOT IN (:ids)", ids: team.projects.map(&:id)) : scoped  }
   scope :in_team, ->(team) { where("id IN (:ids)", ids: team.projects.map(&:id)) }
   scope :in_namespace, ->(namespace) { where(namespace_id: namespace.id) }
-  scope :sorted_by_activity, ->() { order("(SELECT max(events.created_at) FROM events WHERE events.project_id = projects.id) DESC") }
+  scope :sorted_by_activity, ->() { order("(SELECT max(old_events.created_at) FROM old_events WHERE old_events.project_id = projects.id) DESC") }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
   scope :public_only, -> { where(public: true) }
@@ -108,7 +108,7 @@ class Project < ActiveRecord::Base
     end
 
     def with_push
-      includes(:events).where('events.action = ?', OldEvent::PUSHED)
+      includes(:old_events).where('old_events.action = ?', OldEvent::PUSHED)
     end
 
     def active
