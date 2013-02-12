@@ -14,7 +14,7 @@
 #  author_id   :integer
 #
 
-class Event < ActiveRecord::Base
+class OldEvent < ActiveRecord::Base
   attr_accessible :project, :action, :data, :author_id, :project_id,
                   :target_id, :target_type
 
@@ -49,9 +49,9 @@ class Event < ActiveRecord::Base
   class << self
     def determine_action(record)
       if [Issue, MergeRequest].include? record.class
-        Event::CREATED
+        CREATED
       elsif record.kind_of? Note
-        Event::COMMENTED
+        COMMENTED
       end
     end
   end
