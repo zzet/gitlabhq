@@ -97,6 +97,9 @@ gem "colored"
 # GitLab settings
 gem 'settingslogic'
 
+# State machine
+gem 'state_machine'
+
 # Misc
 gem "foreman"
 gem "git"
