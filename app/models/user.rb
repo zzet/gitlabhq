@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
   has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
-  has_many :events,                   dependent: :destroy, foreign_key: :author_id,   class_name: OldEvent
+  has_many :old_events,               dependent: :destroy, foreign_key: :author_id,   class_name: OldEvent
   has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: "Issue"
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
 
@@ -288,12 +288,12 @@ class User < ActiveRecord::Base
   end
 
   def recent_push project_id = nil
-    # Get push events not earlier than 2 hours ago
-    events = recent_events.code_push.where("created_at > ?", Time.now - 2.hours)
-    events = events.where(project_id: project_id) if project_id
+    # Get push old_events not earlier than 2 hours ago
+    old_events = recent_events.code_push.where("created_at > ?", Time.now - 2.hours)
+    old_events = old_events.where(project_id: project_id) if project_id
 
     # Take only latest one
-    events = events.recent.limit(1).first
+    old_events = old_events.recent.limit(1).first
   end
 
   def projects_sorted_by_activity
