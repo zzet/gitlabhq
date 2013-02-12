@@ -25,7 +25,7 @@ class MergeRequest < ActiveRecord::Base
   include Issuable
 
   attr_accessible :title, :assignee_id, :target_branch, :source_branch, :milestone_id,
-                  :author_id_of_changes, :state_event
+    :author_id_of_changes, :state_event
 
   attr_accessor :should_remove_source_branch
 
@@ -83,15 +83,15 @@ class MergeRequest < ActiveRecord::Base
   scope :cared, ->(user) { where('assignee_id = :user OR author_id = :user', user: user.id) }
   scope :by_milestone, ->(milestone) { where(milestone_id: milestone) }
 
-  # Closed scope for merge request should return
-  # both merged and closed mr's
-  scope :closed, -> { with_states(:closed, :merged) }
-
   def validate_branches
     if target_branch == source_branch
       errors.add :branch_conflict, "You can not use same branch for source and target branches"
     end
   end
+
+  # Closed scope for merge request should return
+  # both merged and closed mr's
+  scope :closed, -> { with_states(:closed, :merged) }
 
   def reload_code
     self.reloaded_commits
@@ -134,11 +134,11 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def merge_event
-    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: Event::MERGED).last
+    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::MERGED).last
   end
 
   def closed_event
-    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: Event::CLOSED).last
+    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::CLOSED).last
   end
 
   def commits
