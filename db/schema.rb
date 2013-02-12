@@ -14,23 +14,14 @@
 ActiveRecord::Schema.define(:version => 20130220133245) do
 
   create_table "events", :force => true do |t|
-    t.string   "target_type"
+    t.integer  "author_id"
+    t.string   "action"
     t.integer  "target_id"
-    t.string   "title"
+    t.string   "target_type"
     t.text     "data"
-    t.integer  "project_id"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
-    t.integer  "action"
-    t.integer  "author_id"
   end
-
-  add_index "events", ["action"], :name => "index_events_on_action"
-  add_index "events", ["author_id"], :name => "index_events_on_author_id"
-  add_index "events", ["created_at"], :name => "index_events_on_created_at"
-  add_index "events", ["project_id"], :name => "index_events_on_project_id"
-  add_index "events", ["target_id"], :name => "index_events_on_target_id"
-  add_index "events", ["target_type"], :name => "index_events_on_target_type"
 
   create_table "issues", :force => true do |t|
     t.string   "title"
@@ -138,6 +129,34 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
   add_index "notes", ["project_id", "noteable_type"], :name => "index_notes_on_project_id_and_noteable_type"
   add_index "notes", ["project_id"], :name => "index_notes_on_project_id"
 
+  create_table "notifications", :force => true do |t|
+    t.integer  "event_id"
+    t.integer  "subscription_id"
+    t.string   "notification_state"
+    t.datetime "notified_at"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  create_table "old_events", :force => true do |t|
+    t.string   "target_type"
+    t.integer  "target_id"
+    t.string   "title"
+    t.text     "data"
+    t.integer  "project_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.integer  "action"
+    t.integer  "author_id"
+  end
+
+  add_index "old_events", ["action"], :name => "index_events_on_action"
+  add_index "old_events", ["author_id"], :name => "index_events_on_author_id"
+  add_index "old_events", ["created_at"], :name => "index_events_on_created_at"
+  add_index "old_events", ["project_id"], :name => "index_events_on_project_id"
+  add_index "old_events", ["target_id"], :name => "index_events_on_target_id"
+  add_index "old_events", ["target_type"], :name => "index_events_on_target_type"
+
   create_table "projects", :force => true do |t|
     t.string   "name"
     t.string   "path"
@@ -191,6 +210,17 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
   add_index "snippets", ["created_at"], :name => "index_snippets_on_created_at"
   add_index "snippets", ["expires_at"], :name => "index_snippets_on_expires_at"
   add_index "snippets", ["project_id"], :name => "index_snippets_on_project_id"
+
+  create_table "subscriptions", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "action"
+    t.integer  "target_id"
+    t.string   "target_type"
+    t.integer  "notification_interval"
+    t.datetime "last_notified_at"
+    t.datetime "created_at",            :null => false
+    t.datetime "updated_at",            :null => false
+  end
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"
