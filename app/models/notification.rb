@@ -3,7 +3,7 @@ class Notification < ActiveRecord::Base
 
   belongs_to :event
   belongs_to :subscription
-  belongs_to :user, throuth: :subscription
+  belongs_to :subscriber, through: :subscription, class_name: User
 
   state_machine :notification_state, initial: :new do
     state :new

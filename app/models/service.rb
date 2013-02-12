@@ -19,6 +19,11 @@ class Service < ActiveRecord::Base
   belongs_to :project
   has_one :service_hook
 
+  has_many :events,         as: :target,    dependent: :destroy
+  has_many :subscriptions,  condition: { action: "some_action" }
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
   validates :project_id, presence: true
 
   def activated?
