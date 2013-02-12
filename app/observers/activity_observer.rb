@@ -10,32 +10,32 @@ class ActivityObserver < ActiveRecord::Observer
     end
 
     if event_author_id
-      Event.create(
+      OldEvent.create(
         project: record.project,
         target_id: record.id,
         target_type: record.class.name,
-        action: Event.determine_action(record),
+        action: OldEvent.determine_action(record),
         author_id: event_author_id
       )
     end
   end
 
   def after_close(record, transition)
-    Event.create(
+    OldEvent.create(
       project: record.project,
       target_id: record.id,
       target_type: record.class.name,
-      action: Event::CLOSED,
+      action: OldEvent::CLOSED,
       author_id: record.author_id_of_changes
     )
   end
 
   def after_reopen(record, transition)
-    Event.create(
+    OldEvent.create(
       project: record.project,
       target_id: record.id,
       target_type: record.class.name,
-      action: Event::REOPENED,
+      action: OldEvent::REOPENED,
       author_id: record.author_id_of_changes
     )
   end
