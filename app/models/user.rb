@@ -102,6 +102,10 @@ class User < ActiveRecord::Base
   has_many :user_team_project_relationships, through: :user_teams
   has_many :team_projects,                   through: :user_team_project_relationships
 
+  has_many :events,                   dependent: :destroy, foreign_key: :author_id
+  has_many :subscriprions,            dependent: :destroy
+  has_many :notifications,            dependent: :destroy, through: :subscriprions
+
   #
   # Validations
   #
@@ -113,8 +117,6 @@ class User < ActiveRecord::Base
   validates :username, presence: true, uniqueness: true,
             format: { with: Gitlab::Regex.username_regex,
                       message: "only letters, digits & '_' '-' '.' allowed. Letter should be first" }
-
-
   validate :namespace_uniq, if: ->(user) { user.username_changed? }
 
   before_validation :generate_password, on: :create
