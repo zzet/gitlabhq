@@ -3,9 +3,10 @@ class Event < ActiveRecord::Base
 
   belongs_to :author
   belongs_to :target, polymorphic: true
-  has_many :notifications, dependent: :destroy
-  has_many :subscriptions, through: :notifications
-  has_many :subscribers, through: :subscriptions, class_name: User
+
+  has_many :notifications,  dependent: :destroy
+  has_many :subscriptions,  through: :notifications
+  has_many :subscribers,    through: :subscriptions, class_name: User
 
   validates :author,  presence: true
   validates :target,  presence: true
