@@ -18,6 +18,10 @@ class Key < ActiveRecord::Base
   belongs_to :user
   belongs_to :project
 
+  has_many :events, as: :target
+  has_many :subscriptions, through: :user
+  has_many :notifications, through: :subscriptions
+
   attr_accessible :key, :title
 
   before_validation :strip_white_space
