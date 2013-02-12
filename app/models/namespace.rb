@@ -15,8 +15,10 @@
 class Namespace < ActiveRecord::Base
   attr_accessible :name, :description, :path
 
+  belongs_to :owner,  class_name: "User"
+
   has_many :projects, dependent: :destroy
-  belongs_to :owner, class_name: "User"
+  has_many :events,   dependent: :destroy, as: :target
 
   validates :owner, presence: true
   validates :name, presence: true, uniqueness: true,

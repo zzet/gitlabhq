@@ -9,14 +9,15 @@ module Issuable
 
   included do
     belongs_to :project
-    belongs_to :author, class_name: "User"
-    belongs_to :assignee, class_name: "User"
+    belongs_to :author,   class_name: User
+    belongs_to :assignee, class_name: User
     belongs_to :milestone
-    has_many :notes, as: :noteable, dependent: :destroy
 
-    validates :project, presence: true
-    validates :author, presence: true
-    validates :title, presence: true, length: { within: 0..255 }
+    has_many :notes,          as: :noteable,  dependent: :destroy
+    has_many :events,         as: :target,    dependent: :destroy
+    has_many :subscriptions,  condition: { action: "some_action" }
+    has_many :notifications,  through: :subscriptions
+    has_many :subscribers,    through: :subscriptions
 
     scope :opened, -> { with_state(:opened) }
     scope :closed, -> { with_state(:closed) }

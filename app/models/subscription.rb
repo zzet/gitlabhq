@@ -3,6 +3,7 @@ class Subscription < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :target, polymorphic: true
+  has_many :notifications, dependent: :destroy
 
   validates :user, presence: true
   validates :target, presence: true
