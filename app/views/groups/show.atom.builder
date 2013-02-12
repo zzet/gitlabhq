@@ -8,7 +8,7 @@ xml.feed "xmlns" => "http://www.w3.org/2005/Atom", "xmlns:media" => "http://sear
 
   @events.each do |event|
     if event.proper?
-      event = EventDecorator.decorate(event)
+      event = OldEventDecorator.decorate(event)
       xml.entry do
         event_link = event.feed_url
         event_title = event.feed_title

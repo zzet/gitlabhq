@@ -29,7 +29,7 @@ class GroupsController < ApplicationController
   end
 
   def show
-    @events = Event.in_projects(project_ids).limit(20).offset(params[:offset] || 0)
+    @events = OldEvent.in_projects(project_ids).limit(20).offset(params[:offset] || 0)
     @last_push = current_user.recent_push
 
     respond_to do |format|
