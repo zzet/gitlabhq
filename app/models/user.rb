@@ -54,12 +54,12 @@ class User < ActiveRecord::Base
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
   has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
-  has_many :events,                   dependent: :destroy, foreign_key: :author_id,   class_name: "Event"
+  has_many :events,                   dependent: :destroy, foreign_key: :author_id,   class_name: OldEvent
   has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: "Issue"
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
 
   has_many :groups,         class_name: "Group", foreign_key: :owner_id
-  has_many :recent_events,  class_name: "Event", foreign_key: :author_id, order: "id DESC"
+  has_many :recent_events,  class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
 
   has_many :projects,       through: :users_projects
 
