@@ -43,9 +43,9 @@ class EventFilters < Spinach::FeatureSteps
       }
     }
 
-    @event = Event.create(
+    @event = OldEvent.create(
       project: @project,
-      action: Event::PUSHED,
+      action: OldEvent::PUSHED,
       data: data,
       author_id: @user.id
     )
@@ -53,22 +53,22 @@ class EventFilters < Spinach::FeatureSteps
 
   And 'this project has new member event' do
     user = create(:user, {name: "John Doe"})
-    Event.create(
+    OldEvent.create(
       project: @project,
       author_id: user.id,
-      action: Event::JOINED
+      action: OldEvent::JOINED
     )
   end
 
   And 'this project has merge request event' do
     merge_request = create :merge_request, author: @user, project: @project
-    Event.create(
+    OldEvent.create(
       project: @project,
-      action: Event::MERGED,
+      action: OldEvent::MERGED,
       target_id: merge_request.id,
       target_type: "MergeRequest",
       author_id: @user.id
-    )    
+    )
   end
 
   When 'I click "push" event filter' do
