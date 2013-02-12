@@ -31,9 +31,9 @@ module SharedProject
       }
     }
 
-    @event = Event.create(
+    @event = OldEvent.create(
       project: @project,
-      action: Event::PUSHED,
+      action: OldEvent::PUSHED,
       data: data,
       author_id: @user.id
     )
