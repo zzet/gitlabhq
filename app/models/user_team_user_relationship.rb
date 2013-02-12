@@ -17,6 +17,11 @@ class UserTeamUserRelationship < ActiveRecord::Base
   belongs_to :user_team
   belongs_to :user
 
+  has_many :events,         as: :target,    dependent: :destroy
+  has_many :subscriptions,  condition: { action: "some_action" }
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
   validates :user_team, presence: true
   validates :user,      presence: true
 
