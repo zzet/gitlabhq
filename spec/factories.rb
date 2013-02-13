@@ -135,10 +135,10 @@ FactoryGirl.define do
     end
   end
 
-  factory :event do
+  factory :old_event do
     factory :closed_issue_event do
       project
-      action { Event::CLOSED }
+      action { OldEvent::CLOSED }
       target factory: :closed_issue
       author factory: :user
     end
