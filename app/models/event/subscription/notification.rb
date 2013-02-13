@@ -1,8 +1,8 @@
-class Notification < ActiveRecord::Base
+class Event::Subscription::Notification < ActiveRecord::Base
   attr_accessible :event_id, :notification_state, :notified_at, :subscription_id
 
   belongs_to :event
-  belongs_to :subscription
+  belongs_to :subscription, class_name: Event::Subscription
 
   def subscriber
     subscription.user
