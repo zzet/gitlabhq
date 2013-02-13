@@ -1,4 +1,6 @@
 class Event < ActiveRecord::Base
+  include Actionable
+
   attr_accessible :action, :data, :target_id, :target_type, :author_id
 
   belongs_to :author
