@@ -1,6 +1,6 @@
 class CreateNotifications < ActiveRecord::Migration
   def change
-    create_table :notifications do |t|
+    create_table :event_subscription_notifications do |t|
       t.integer :event_id
       t.integer :subscription_id
       t.string :notification_state
