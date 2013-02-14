@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::Project do
   it "should respond that can build this data into action" do
+
     pending "implement can_build?"
   end
 
