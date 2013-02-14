@@ -2,10 +2,12 @@ module Gitlab
   module Event
     module Builder
       class UsersProject < Gitlab::Event::Builder::Base
-        def can_build?(data)
-        end
+        class << self
+          def can_build?(data)
+          end
 
-        def build(data)
+          def build(data)
+          end
         end
       end
     end
