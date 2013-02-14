@@ -1,5 +1,5 @@
 class NotificationService
-  class <<self
+  class << self
     def create_notifications(event)
 
     end
