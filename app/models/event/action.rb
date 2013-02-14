@@ -18,7 +18,7 @@ class Event::Action
   REOPENED  = 12
   MERGED    = 13
 
-  def self.available_actions 
-    Action.constants  
+  def self.available_actions
+    self.constants
   end
 end
