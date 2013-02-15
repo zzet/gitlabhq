@@ -14,6 +14,7 @@
 
 class Namespace < ActiveRecord::Base
   include Gitlab::ShellAdapter
+  include Gitlab::Event::Notifications
 
   attr_accessible :name, :description, :path
 
