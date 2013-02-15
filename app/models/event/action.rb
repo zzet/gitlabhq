@@ -20,12 +20,18 @@ class Event::Action
   ASSIGNED   = 14
   REASSIGNED = 15
 
-  def self.available_actions
-    self.constants
-  end
+  class << self
+    def available_actions
+      constants
+    end
 
-  def self.action_to_s(action)
-    const = self.constants.find { |name| const_get(name) == action }
-    const.to_s.downcase!
+    def action_to_s(action)
+      const = constants.find { |name| const_get(name) == action }
+      const.to_s.downcase!
+    end
+
+    def action_by_name(action)
+      constants.find { |name| name.to_sym == action }
+    end
   end
 end
