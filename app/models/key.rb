@@ -21,7 +21,7 @@ class Key < ActiveRecord::Base
   belongs_to :project
 
   has_many :events, as: :target
-  has_many :subscriptions, through: :user
+  has_many :subscriptions, through: :user, source: :subscriprions
   has_many :notifications, through: :subscriptions
 
   attr_accessible :key, :title
