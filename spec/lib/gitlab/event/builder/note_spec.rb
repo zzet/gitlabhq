@@ -17,4 +17,5 @@ describe Gitlab::Event::Builder::Note do
   it "should build events from hash" do
     @events = Gitlab::Event::Builder::Note.build(@action, @data[:source], @data[:user], @data[:data])
   end
+
 end

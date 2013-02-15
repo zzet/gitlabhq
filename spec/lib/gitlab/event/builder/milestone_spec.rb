@@ -17,4 +17,6 @@ describe Gitlab::Event::Builder::Milestone do
   it "should build events from hash" do
     @events = Gitlab::Event::Builder::Milestone.build(@action, @data[:source], @data[:user], @data[:data])
   end
+
+
 end
