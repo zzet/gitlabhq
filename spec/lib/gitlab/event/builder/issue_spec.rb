@@ -1,12 +1,18 @@
 require 'spec_helper'
 
-describe Gitlab::Event::Builder::Project do
-  it "should respond that can build this data into action" do
-
-    pending "implement can_build?"
+describe Gitlab::Event::Builder::Issue do
+  before do
+    @issue = create :issue
+    @user = create :user
+    @data = {target: @issue, user: @user, data: @issue}
+    @action = "gitlab.created.issue"
   end
 
-  it "should build action from hash" do
-    pending "implement initialize"
+  it "should respond that can build this data into action" do
+    Gitlab::Event::Builder::Issue.can_build?(@action, @data).should be_true
+  end
+
+  it "should build events from hash" do
+    @events = Gitlab::Event::Builder::Issue.build(@action, @data[:target], @data[:user], @data[:data])
   end
 end

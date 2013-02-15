@@ -1,6 +1,6 @@
 module Gitlab
   module Event
-    module Notifications
+    class Notifications
       cattr_accessor :current_user
 
       def self.trigger(action, target, user = nil, data = nil, detailed_event = "")

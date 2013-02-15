@@ -18,7 +18,7 @@ module Gitlab
             known_action = known_action? @avaliable_action, action
             # TODO Issue can be assigned to Milestone
             # TODO Issue can be refference to Issue
-            known_target = data.is_a? ::Issue
+            known_target = data[:target].is_a? ::Issue
             known_target && known_action
           end
 
@@ -42,7 +42,7 @@ module Gitlab
 
             events = []
             actions.each do |act|
-              events << Event.build(action: action_by_name(act), target: target, data: data.to_json, author: user)
+              events << ::Event.new(action: ::Event::Action.action_by_name(act), target: target, data: data.to_json, author: user)
             end
           end
         end
