@@ -26,7 +26,6 @@ require "grit"
 
 class Project < ActiveRecord::Base
   include Gitlab::ShellAdapter
-  include Gitlab::Event::Notifications
 
   extend Enumerize
 
