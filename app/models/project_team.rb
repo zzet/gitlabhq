@@ -1,6 +1,4 @@
 class ProjectTeam
-  include Gitlab::Event::Notifications
-
   attr_accessor :project
 
   def initialize(project)
