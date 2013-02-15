@@ -15,6 +15,4 @@ describe Gitlab::Event::Builder::Namespace do
   it "should build events from hash" do
     @events = Gitlab::Event::Builder::Namespace.build(@action, @data[:target], @data[:user], @data[:data])
   end
-
-
 end

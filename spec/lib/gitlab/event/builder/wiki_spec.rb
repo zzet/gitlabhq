@@ -15,5 +15,4 @@ describe Gitlab::Event::Builder::Wiki do
   it "should build events from hash" do
     @events = Gitlab::Event::Builder::Wiki.build(@action, @data[:target], @data[:user], @data[:data])
   end
-
 end
