@@ -1,18 +1,18 @@
 module Gitlab
   class Event::Factory
     class << self
-      def build(data)
+      def build(action, data)
         events = []
 
         Gitlab::Event::Builder::Base.descendants.each do |descendant|
-          events << descendant.build(data) if descendant.can_build?(data)
+          events << descendant.build(action, data) if descendant.can_build?(action, data)
         end
 
         events
       end
 
-      def create_events(data)
-        events = self.build(data)
+      def create_events(action, data)
+        events = self.build(action, data)
 
         events.each do |event|
           event.save
