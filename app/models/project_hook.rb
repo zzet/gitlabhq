@@ -12,7 +12,7 @@
 #
 
 class ProjectHook < WebHook
-  include Watchable
+  include Gitlab::Event::Notifications
 
   belongs_to :project
 

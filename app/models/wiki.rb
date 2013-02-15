@@ -13,7 +13,7 @@
 #
 
 class Wiki < ActiveRecord::Base
-  include Watchable
+  include Gitlab::Event::Notifications
 
   attr_accessible :title, :content, :slug
 
