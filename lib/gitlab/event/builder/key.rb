@@ -11,11 +11,15 @@ module Gitlab
         class << self
           def can_build?(action, data)
             known_action = known_action? @avaliable_action, action
-            known_target = data.is_a? ::Key
+            known_target = data[:target].is_a? ::Key
             known_target && known_action
           end
 
-          def build(data)
+          def build(action, target, user, data)
+            meta = parse_action(action)
+            meta[:action]
+
+            ::Event.new(action: ::Event::Action.action_by_name(meta[:action]), target: target, data: data.to_json, author: user)
           end
         end
       end
