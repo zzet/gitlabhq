@@ -13,6 +13,8 @@
 #
 
 class Namespace < ActiveRecord::Base
+  include Gitlab::Event::Notifications
+
   attr_accessible :name, :description, :path
 
   belongs_to :owner,  class_name: "User"
