@@ -14,8 +14,6 @@
 #
 
 class Service < ActiveRecord::Base
-  include Gitlab::Event::Notifications
-
   attr_accessible :title, :token, :type, :active
 
   belongs_to :project
