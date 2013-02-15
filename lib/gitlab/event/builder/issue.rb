@@ -3,14 +3,14 @@ module Gitlab
     module Builder
       class Issue < Gitlab::Event::Builder::Base
 
-        @avaliable_action = [:created,
-                             :closed,
-                             :reopened,
-                             :deleted,
-                             :updated,
-                             :assigned,
-                             :reassigned,
-                             :commented
+        @avaliable_action = [:created,    # +
+                             :closed,     # +
+                             :reopened,   # +
+                             :deleted,    # +
+                             :updated,    # +
+                             :assigned,   # +
+                             :reassigned, # +
+                             :commented   # -
                             ]
 
         class << self
@@ -22,7 +22,28 @@ module Gitlab
             known_target && known_action
           end
 
-          def build(data)
+          def build(action, target, user, data)
+            meta = parse_action(action)
+            actions = []
+            actions << meta[:action]
+            case meta[:action]
+            when :created
+              actions << :assigned if target.assignee_changed?
+            when :updated
+              changes = target.changes
+
+              actions << :assigned if target.assignee_changed? && changes['assignee'].first.nil?
+              actions << :reassigned if target.assignee_changed? && changes['assignee'].first.present?
+
+              actions << :closed if target.is_being_closed?
+              actions << :reopened if target.is_being_reopened?
+            when :deleted
+            end
+
+            events = []
+            actions.each do |act|
+              events << Event.build(action: action_by_name(act), target: target, data: data.to_json, author: user)
+            end
           end
         end
       end
