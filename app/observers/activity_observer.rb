@@ -5,14 +5,14 @@ class ActivityObserver < ActiveRecord::Observer
     :user_team_user_relationship, :users_project, :web_hook, :wiki
 
   def after_create(model)
-    # trigger action
+    Gitlab::Event::Notifications.trigger :created, model
   end
 
   def after_update(model)
-    # trigger action
+    Gitlab::Event::Notifications.trigger :updated, model
   end
 
   def after_destroy(model)
-    # trigger action
+    Gitlab::Event::Notifications.trigger :deleted, model
   end
 end
