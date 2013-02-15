@@ -12,7 +12,6 @@
 #
 
 class WebHook < ActiveRecord::Base
-  include Gitlab::Event::Notifications
   include HTTParty
 
   attr_accessible :url
