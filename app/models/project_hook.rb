@@ -12,5 +12,7 @@
 #
 
 class ProjectHook < WebHook
+  include Gitlab::Event::Notifications
+
   belongs_to :project
 end
