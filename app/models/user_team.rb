@@ -12,8 +12,6 @@
 #
 
 class UserTeam < ActiveRecord::Base
-  include Gitlab::Event::Notifications
-
   attr_accessible :name, :description, :owner_id, :path
 
   belongs_to :owner, class_name: User

@@ -13,7 +13,6 @@
 #
 
 class Namespace < ActiveRecord::Base
-  include Gitlab::Event::Notifications
 
   attr_accessible :name, :description, :path
 
