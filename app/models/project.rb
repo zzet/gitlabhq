@@ -25,6 +25,8 @@ require "grit"
 
 class Project < ActiveRecord::Base
   include Gitlab::ShellAdapter
+  include Gitlab::Event::Notifications
+
   extend Enumerize
 
   attr_accessible :name, :path, :description, :default_branch, :issues_tracker,
