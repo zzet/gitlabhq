@@ -14,7 +14,7 @@
 #
 
 class Service < ActiveRecord::Base
-  include Watchable
+  include Gitlab::Event::Notifications
 
   attr_accessible :title, :token, :type, :active
 
