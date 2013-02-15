@@ -22,9 +22,7 @@ require Rails.root.join("app/models/commit")
 require Rails.root.join("lib/static_model")
 
 class MergeRequest < ActiveRecord::Base
-  include Gitlab::Event::Notifications
   include Issuable
-  include Watchable
 
   BROKEN_DIFF = "--broken-diff"
 

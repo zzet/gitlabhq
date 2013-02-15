@@ -12,8 +12,6 @@
 #
 
 class ProjectHook < WebHook
-  include Gitlab::Event::Notifications
-
   belongs_to :project
 
   actions_to_watch [:created, :updated, :deleted]
