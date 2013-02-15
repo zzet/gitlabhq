@@ -1,8 +1,14 @@
 module Gitlab
   module Event
     module Notifications
-      def trigger(action, user, data = self, target = self, detailed_event = "")
+      cattr_accessor :current_user
+
+      def self.trigger(action, target, user = nil, data = nil, detailed_event = "")
+        data = target if data.blank?
         target = target.class.name unless target.is_a? String
+        action = action.to_s unless action.is_a? String
+        user = current_user if user.blank?
+
         event = "gitlab.#{action}.#{target}".downcase
         event << ".#{detailed_event}" unless detailed_event.blank?
 

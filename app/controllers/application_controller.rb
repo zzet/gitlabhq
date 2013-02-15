@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
   def set_current_user_for_observers
     MergeRequestObserver.current_user = current_user
     IssueObserver.current_user = current_user
+    Gitlab::Event::Notifications.current_user = current_user
   end
 
   def abilities
