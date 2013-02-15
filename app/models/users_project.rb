@@ -11,6 +11,7 @@
 #
 
 class UsersProject < ActiveRecord::Base
+  include Gitlab::Event::Notifications
   include Gitolited
 
   GUEST     = 10
