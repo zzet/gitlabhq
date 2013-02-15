@@ -12,5 +12,7 @@
 #
 
 class ServiceHook < WebHook
+  include Gitlab::Event::Notifications
+
   belongs_to :service
 end
