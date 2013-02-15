@@ -21,8 +21,6 @@
 require "grit"
 
 class Project < ActiveRecord::Base
-  include Gitlab::Event::Notifications
-
   include Gitolited
 
   class TransferError < StandardError; end

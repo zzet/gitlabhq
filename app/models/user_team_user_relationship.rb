@@ -12,8 +12,6 @@
 #
 
 class UserTeamUserRelationship < ActiveRecord::Base
-  include Gitlab::Event::Notifications
-
   attr_accessible :group_admin, :permission, :user_id, :user_team_id
 
   belongs_to :user_team

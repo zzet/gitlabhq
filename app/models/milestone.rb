@@ -13,7 +13,6 @@
 #
 
 class Milestone < ActiveRecord::Base
-  include Gitlab::Event::Notifications
 
   attr_accessible :title, :description, :due_date, :state_event, :author_id_of_changes
 
