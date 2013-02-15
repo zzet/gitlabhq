@@ -36,8 +36,6 @@
 #
 
 class User < ActiveRecord::Base
-  include Gitlab::Event::Notifications
-
   devise :database_authenticatable, :token_authenticatable, :lockable,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :registerable
 
