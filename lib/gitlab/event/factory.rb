@@ -5,7 +5,7 @@ module Gitlab
         events = []
 
         Gitlab::Event::Builder::Base.descendants.each do |descendant|
-          events << descendant.build(action, data) if descendant.can_build?(action, data)
+          events << descendant.build(action, data[:target], data[:user], data[:data]) if descendant.can_build?(action, data)
         end
 
         events
