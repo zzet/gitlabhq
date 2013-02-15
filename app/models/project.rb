@@ -23,7 +23,8 @@
 require "grit"
 
 class Project < ActiveRecord::Base
-  include Watchable
+  include Gitlab::Event::Notifications
+
   include Gitolited
   extend Enumerize
 
