@@ -14,7 +14,6 @@
 class UsersProject < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
-  include Gitlab::Event::Notifications
 
   GUEST     = 10
   REPORTER  = 20
