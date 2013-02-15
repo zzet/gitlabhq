@@ -22,6 +22,7 @@ require Rails.root.join("app/models/commit")
 require Rails.root.join("lib/static_model")
 
 class MergeRequest < ActiveRecord::Base
+  include Gitlab::Event::Notifications
   include Issuable
 
   attr_accessible :title, :assignee_id, :target_branch, :source_branch, :milestone_id,
