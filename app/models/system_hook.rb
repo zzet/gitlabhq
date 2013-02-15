@@ -12,4 +12,5 @@
 #
 
 class SystemHook < WebHook
+  include Gitlab::Event::Notifications
 end
