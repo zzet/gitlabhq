@@ -13,8 +13,6 @@
 #
 
 class Wiki < ActiveRecord::Base
-  include Gitlab::Event::Notifications
-
   attr_accessible :title, :content, :slug
 
   belongs_to :project
