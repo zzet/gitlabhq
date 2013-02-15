@@ -1,5 +1,6 @@
 class Event < ActiveRecord::Base
   include Actionable
+  include Gitlab::Event::Notifications
 
   attr_accessible :action, :data,
                   :source_id, :source_type, :source,
