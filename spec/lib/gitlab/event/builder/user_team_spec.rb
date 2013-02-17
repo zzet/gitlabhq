@@ -9,7 +9,7 @@ describe Gitlab::Event::Builder::UserTeam do
   end
 
   it "should respond that can build this data into action" do
-    Gitlab::Event::Builder::UserTeam.can_build?(@action, @data).should be_true
+    Gitlab::Event::Builder::UserTeam.can_build?(@action, @data[:target]).should be_true
   end
 
   it "should build events from hash" do
