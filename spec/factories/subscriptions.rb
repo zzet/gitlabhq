@@ -1,7 +1,7 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
-  factory :subscription do
+  factory :subscription, class: Event::Subscription do
     user
     action "MyString"
     target_id 1
