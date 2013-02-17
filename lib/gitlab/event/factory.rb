@@ -8,11 +8,11 @@ module Gitlab
           events << descendant.build(action, data[:target], data[:user], data[:data]) if descendant.can_build?(action, data[:data])
         end
 
-        events
+        events.flatten
       end
 
       def create_events(action, data)
-        events = self.build(action, data).flatten
+        events = self.build(action, data)
 
         events.each do |event|
           event.save
