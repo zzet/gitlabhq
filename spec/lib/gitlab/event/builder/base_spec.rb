@@ -6,7 +6,7 @@ describe Gitlab::Event::Builder::Base do
   end
 
   it "should build action from hash" do
-    -> { Gitlab::Event::Builder::Base.can_build?("action", {}) }.should raise_error(NotImplementedError)
+    -> { Gitlab::Event::Builder::Base.build("action", nil, nil, nil) }.should raise_error(NotImplementedError)
   end
 
   it "should respond that know action with false" do
