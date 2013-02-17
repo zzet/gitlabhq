@@ -11,7 +11,7 @@ module Gitlab
         class << self
           def can_build?(action, data)
             known_action = known_action? @avaliable_action, action
-            known_target = data[:target].is_a? ::Project
+            known_target = data.is_a? ::Project
             known_target && known_action
           end
 
@@ -25,7 +25,7 @@ module Gitlab
               changes = target.changes
 
               # TODO puts here transfer action ckeck
-              actions << :transfer if target.creator != changes[:creator].first
+              actions << :transfer if target.creator_id_changed? && target.creator_id != changes[:creator_id].first
             when :deleted
             end
 
@@ -33,6 +33,7 @@ module Gitlab
             actions.each do |act|
               events << ::Event.new(action: ::Event::Action.action_by_name(act), target: target, data: data.to_json, author: user)
             end
+            events
           end
         end
       end
