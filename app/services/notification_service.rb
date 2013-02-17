@@ -28,6 +28,8 @@ class NotificationService
           EventNotificationMailer.dafault_email(notification)
         end
       end
+
+      # TODO Add Delayed mailing
     end
   end
 end
