@@ -10,7 +10,7 @@ module Gitlab
         class << self
           def can_build?(action, data)
             known_action = known_action? @avaliable_action, action
-            known_target = data[:target].is_a? ::Service
+            known_target = data.is_a? ::Service
             known_target && known_action
           end
 
