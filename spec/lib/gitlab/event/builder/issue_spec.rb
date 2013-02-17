@@ -2,8 +2,10 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::Issue do
   before do
-    @issue = create :issue
     @user = create :user
+    @project = create :project, creator: @user
+    @issue = create :issue, project: @project
+
     @data = {target: @issue, user: @user, data: @issue}
     @action = "gitlab.created.issue"
   end
