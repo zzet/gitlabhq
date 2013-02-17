@@ -24,7 +24,7 @@ module Gitlab
             case meta[:action]
             when :created
             when :updated
-              changes = target.changes
+              #changes = target.changes
 
               # TODO puts here closed/reopened action ckeck
               #actions << :closed if target.is_being_closed?
