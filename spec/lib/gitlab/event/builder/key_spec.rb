@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::Key do
   before do
-    @key = create :key, user: @user
     @user = create :user
+    @key = create :key, user: @user
     @data = {target: @key, user: @user, data: @key}
     @action = "gitlab.created.key"
   end
