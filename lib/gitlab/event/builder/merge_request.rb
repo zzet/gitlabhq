@@ -18,7 +18,7 @@ module Gitlab
           def can_build?(action, data)
             known_action = known_action? @avaliable_action, action
             # TODO Issue can be refference to MergeRequest
-            known_target = data[:target].is_a? ::MergeRequest
+            known_target = data.is_a? ::MergeRequest
             known_target && known_action
           end
 
@@ -28,12 +28,12 @@ module Gitlab
             actions << meta[:action]
             case meta[:action]
             when :created
-              actions << :assigned if target.assignee_changed?
+              actions << :assigned if target.assignee_id_changed?
             when :updated
               changes = target.changes
 
-              actions << :assigned if target.assignee_changed? && changes['assignee'].first.nil?
-              actions << :reassigned if target.assignee_changed? && changes['assignee'].first.present?
+              actions << :assigned if target.assignee_id_changed? && changes['assignee_id'].first.nil?
+              actions << :reassigned if target.assignee_id_changed? && changes['assignee_id'].first.present?
 
               actions << :closed if target.is_being_closed?
               actions << :reopened if target.is_being_reopened?
@@ -44,6 +44,7 @@ module Gitlab
             actions.each do |act|
               events << ::Event.new(action: ::Event::Action.action_by_name(act), target: target, data: data.to_json, author: user)
             end
+            events
           end
         end
       end
