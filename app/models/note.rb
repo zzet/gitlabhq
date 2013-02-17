@@ -28,7 +28,7 @@ class Note < ActiveRecord::Base
 
   belongs_to :project
   belongs_to :noteable, polymorphic: true
-  belongs_to :author, class_name: "User"
+  belongs_to :author,   class_name: User
 
   has_many :events,         as: :target,    dependent: :destroy
   has_many :subscriptions,  conditions: { action: "some_action" }
