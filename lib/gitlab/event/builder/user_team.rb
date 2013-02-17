@@ -13,7 +13,7 @@ module Gitlab
         class << self
           def can_build?(action, data)
             known_action = known_action? @avaliable_action, action
-            known_target = data[:target].is_a? ::UserTeam
+            known_target = data.is_a? ::UserTeam
             known_target && known_action
           end
 
@@ -31,6 +31,7 @@ module Gitlab
             actions.each do |act|
               events << ::Event.new(action: ::Event::Action.action_by_name(act), target: target, data: data.to_json, author: user)
             end
+            events
           end
         end
       end
