@@ -22,7 +22,7 @@ class Event::Action
 
   class << self
     def available_actions
-      constants
+      constants.map {|const| const_get(const)}
     end
 
     def action_to_s(action)
@@ -31,7 +31,8 @@ class Event::Action
     end
 
     def action_by_name(action)
-      constants.find { |name| name.to_sym == action }
+      const = constants.find { |name| name.downcase == action }
+      const_get(const)
     end
   end
 end
