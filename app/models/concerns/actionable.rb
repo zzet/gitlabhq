@@ -6,6 +6,6 @@ module Actionable
 
     enumerize :action, :in => Event::Action.available_actions
 
-    validates :action, presence: true
+    validates :action, presence: true, numericality: {greater_than: 0}
   end
 end
