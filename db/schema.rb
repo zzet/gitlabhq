@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
 
   create_table "event_subscriptions", :force => true do |t|
     t.integer  "user_id"
-    t.string   "action"
+    t.integer  "action"
     t.integer  "target_id"
     t.string   "target_type"
     t.integer  "notification_interval"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
 
   create_table "events", :force => true do |t|
     t.integer  "author_id"
-    t.string   "action"
+    t.integer  "action"
     t.integer  "target_id"
     t.string   "target_type"
     t.text     "data"
