@@ -16,7 +16,7 @@
 
 require 'spec_helper'
 
-describe Event do
+describe OldEvent do
   describe "Associations" do
     it { should belong_to(:project) }
     it { should belong_to(:target) }
@@ -50,9 +50,9 @@ describe Event do
         }
       }
 
-      @event = Event.create(
+      @event = OldEvent.create(
         project: project,
-        action: Event::Pushed,
+        action: OldEvent::PUSHED,
         data: data,
         author_id: @user.id
       )
@@ -71,7 +71,7 @@ describe Event do
     let(:observer) { UsersProjectObserver.instance }
 
     before {
-      Event.should_receive :create
+      OldEvent.should_receive :create
     }
 
     describe "Joined project team" do
