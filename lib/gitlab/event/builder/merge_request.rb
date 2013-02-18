@@ -2,21 +2,11 @@ module Gitlab
   module Event
     module Builder
       class MergeRequest < Gitlab::Event::Builder::Base
-
-        @avaliable_action = [:created,    # +
-                             :closed,     # +
-                             :reopened,   # +
-                             :deleted,    # +
-                             :updated,    # +
-                             :assigned,   # +
-                             :reassigned, # +
-                             :commented,  # -
-                             :merged      # -
-                            ]
+        include Gitlab::Event::Action::MergeRequest
 
         class << self
           def can_build?(action, data)
-            known_action = known_action? @avaliable_action, action
+            known_action = known_action? action
             # TODO Issue can be refference to MergeRequest
             known_source = data.is_a? ::MergeRequest
             known_source && known_action
