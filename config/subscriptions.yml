@@ -1,0 +1,49 @@
+# Project                                Created       Updated     Deleted
+#   - Global                             UT O A U      UT O A U    UT O A U      | UT = ProjectTeam  O = ProjetOwner  A = Admin  U = AnyUser (if PublicProject)
+#     - Issue                            +  + + -      +  + + +    +  + + -      |
+#       - Note                           +  + + +      +  + + +    +  + + -      |
+#     - Milestone                        +  + + -      +  + + -    +  + + -      |
+#     - Note                             +  + + -      +  + + -    +  + + -      |
+#       - Note                           +  + + -      +  + + -    +  + + -      |
+#     - Project                          -  - + -      +  + + -    -  + + -      |
+#     - MergeRequest                     +  + + -      +  + + +    +  + + -      |
+#       - Note                           +  + + -      +  + + +    -  + + -      |
+#     - Snippet                          +  + + -      +  + + +    +  + + -      |
+#       - Note                           +  + + -      +  + + +    +  + + -      |
+#   - System                                                                     |
+#     - ProjectHook                      -  + + -      -  + + -    -  + + -      |
+#     - ProtectedBranch                  -  + + -      -  + + -    -  + + -      |
+#     - Service                          -  + + -      -  + + -    -  + + -      |
+#   - Team                                                                       |
+#     - UserTeamProjectRelationship      -  + + -      -  + + -    -  + + -      |
+#     - UserTeamUserRelationship         -  + + -      -  + + -    -  + + -      |
+#     - UsersProject                     -  + + -      -  + + -    -  + + -      |
+#
+# TODO: Add PushEvents
+#
+# User
+#   - Private                            U A           U A         U A           | U = CurrentUser  A = Admin
+#     - Key                              + +           + +         + +           |
+#     - User                             + -           + -         + -           |
+#   - Membership                                                                 |
+#     - UserTeamUserRelationship         + +           + +         + +           |
+#     - UsersProject                     + +           + +         + +           |
+#
+# UserTeam                               TM O A        TM O A      TM O A        | TM = TeamMember  O = TeamOwner  A = Admin
+#   - UserTeam                           -  + +        -  + +      -  + +        |
+#   - UserTeamProjectRelationship        +  + +        -  + +      +  + +        |
+#   - UserTeamUserRelationship           -  + +        -  + +      -  + +        |
+#
+# Issue                                  O U A         O U A       O U A         | O = IssueOwner  U = AnyUser (if PublicProject) A = Admin
+#   - Issue                              - - +         + + +       + + +         |
+#   - Note                               + + +         + + +       + + +         |
+#
+# MergeRequest                           O U A         O U A       O U A         | O = MROwner  U = AnyUser (if PublicProject)  A = Admin
+#   - MergeRequest                       - - +         + + +       + + +         |
+#   - Note                               + + +         + + +       + + +         |
+#
+# Commit                                 O U A         O U A       O U A         | O = Commiter  U = AnyUser (id PublicProject)  A = Admin
+#   - Note                               + + +         + + +       + + +         |
+#
+# Group                                  O U A         O U A       O U A         | O = GroupOwner  U = AnyUser (if PublicProject)  A = Admin
+#   - Group                              + - +         + - +       + - +         |
