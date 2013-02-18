@@ -2,15 +2,11 @@ module Gitlab
   module Event
     module Builder
       class Project < Gitlab::Event::Builder::Base
-        @avaliable_action = [:created,
-                             :deleted,
-                             :updated,
-                             :transfer
-                            ]
+        include Gitlab::Event::Action::Project
 
         class << self
           def can_build?(action, data)
-            known_action = known_action? @avaliable_action, action
+            known_action = known_action? action
             known_source = data.is_a? ::Project
             known_source && known_action
           end
