@@ -15,23 +15,22 @@ module Gitlab
             known_target && known_action
           end
 
-          def build(action, target, user, data)
+          def build(action, source, user, data)
             meta = parse_action(action)
             actions = []
             actions << meta[:action]
             case meta[:action]
             when :created
             when :updated
-              changes = target.changes
+              changes = source.changes
 
-              # TODO puts here transfer action ckeck
-              actions << :transfer if target.owner_id_changed? && target.owner_id != changes[:owner_id].first
+              actions << :transfer if source.owner_id_changed? && source.owner_id != changes[:owner_id].first
             when :deleted
             end
 
             events = []
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act), target: target, data: data.to_json, author: user)
+              events << ::Event.new(action: ::Event::Action.action_by_name(act), source: source, data: data.to_json, author: user)
             end
             events
           end
