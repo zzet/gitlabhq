@@ -92,7 +92,8 @@ class User < ActiveRecord::Base
   has_many :own_projects,             foreign_key: :creator_id
   has_many :owned_projects,           through: :namespaces, source: :projects
 
-  has_many :events,                   dependent: :destroy, foreign_key: :author_id
+  has_many :personal_events,          dependent: :destroy, class_name: Event, foreign_key: :author_id
+  has_many :events,                   dependent: :destroy, as: :source
   has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, through: :subscriprions
 

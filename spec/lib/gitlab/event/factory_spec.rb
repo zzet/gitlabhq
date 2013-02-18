@@ -28,7 +28,7 @@ describe Gitlab::Event::Factory do
       @issue = create(:issue, project: @project)
 
       @action = 'gitlab.created.issue'
-      @data = {target: @issue, user: @user, data: @issue}
+      @data = {source: @issue, user: @user, data: @issue}
       @events = Gitlab::Event::Factory.build(@action, @data)
 
       @events.should be_kind_of Array
@@ -41,16 +41,16 @@ describe Gitlab::Event::Factory do
 
     it "should build events from hash" do
       @issue = create(:issue, project: @project)
-      #@old_events = Event.with_target(@issue)
-      Event.with_target(@issue).destroy_all
+      #@old_events = Event.with_source(@issue)
+      Event.with_source(@issue).destroy_all
 
       @action = 'gitlab.created.issue'
-      @data = {target: @issue, user: @user, data: @issue}
+      @data = {source: @issue, user: @user, data: @issue}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
       Gitlab::Event::Factory.create_events(@action, @data)
 
-      @current_events = Event.with_target(@issue)
+      @current_events = Event.with_source(@issue)
 
       @current_events.count.should be > 0
       @current_events.count.should == @events.count
@@ -61,15 +61,15 @@ describe Gitlab::Event::Factory do
       @issue.title = "#{@issue.title}_updated"
       @issue.save
 
-      Event.with_target(@issue).destroy_all
+      Event.with_source(@issue).destroy_all
 
       @action = 'gitlab.updated.issue'
-      @data = {target: @issue, user: @user, data: @issue}
+      @data = {source: @issue, user: @user, data: @issue}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
       Gitlab::Event::Factory.create_events(@action, @data)
 
-      @current_events = Event.with_target(@issue)
+      @current_events = Event.with_source(@issue)
 
       @current_events.count.should be > 0
       @current_events.count.should == @events.count
