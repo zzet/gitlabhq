@@ -2,15 +2,11 @@ module Gitlab
   module Event
     module Builder
       class UserTeamUserRelationship < Gitlab::Event::Builder::Base
-        # Review
-        @avaliable_action = [:created,
-                             :deleted,
-                             :updated
-                            ]
+        include Gitlab::Event::Action::UserTeamUserRelationship
 
         class << self
           def can_build?(action, data)
-            known_action = known_action? @avaliable_action, action
+            known_action = known_action? action
             known_source = data.is_a? ::UserTeamUserRelationship
             known_source && known_action
           end
