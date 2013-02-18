@@ -3,9 +3,7 @@
 FactoryGirl.define do
   factory :event, :class => 'Event' do
     author
-    action "Action"
-    target_id 1
-    target_type "MyString"
+    action Event::Action.available_actions.first
     data "MyText"
   end
 end
