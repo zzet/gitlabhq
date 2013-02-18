@@ -2,14 +2,11 @@ module Gitlab
   module Event
     module Builder
       class Snippet < Gitlab::Event::Builder::Base
-        @avaliable_action = [:created,
-                             :deleted,
-                             :updated
-                            ]
+        include Gitlab::Event::Action::Snippet
 
         class << self
           def can_build?(action, data)
-            known_action = known_action? @avaliable_action, action
+            known_action = known_action? action
             known_source = data.is_a? ::Snippet
             known_source && known_action
           end

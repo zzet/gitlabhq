@@ -2,16 +2,11 @@ module Gitlab
   module Event
     module Builder
       class Wiki < Gitlab::Event::Builder::Base
-        @avaliable_action = [:created,
-                             :closed,
-                             :reopened,
-                             :deleted,
-                             :updated
-                            ]
+        include Gitlab::Event::Action::Wiki
 
         class << self
           def can_build?(action, data)
-            known_action = known_action? @avaliable_action, action
+            known_action = known_action? action
             known_source = data.is_a? ::Wiki
             known_source && known_action
           end
