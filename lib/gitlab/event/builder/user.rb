@@ -2,18 +2,11 @@ module Gitlab
   module Event
     module Builder
       class User < Gitlab::Event::Builder::Base
-        @avaliable_action = [:created,  # +
-                             :deleted,  # +
-                             :updated,  # +
-                             :joined,   # - # Join to ptoject or team
-                             :left,     # - # Left from project or team
-                             :transfer, # - # Change permission on team or project
-                             :added     # - # Add admin permission
-                            ]
+        include Gitlab::Event::Action::User
 
         class << self
           def can_build?(action, data)
-            known_action = known_action? @avaliable_action, action
+            known_action = known_action? action
             # TODO Add support to UsersProject models and UserTeam*Relationships
             known_source = data.is_a? ::User
             known_source && known_action
