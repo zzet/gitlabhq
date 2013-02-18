@@ -2,20 +2,11 @@ module Gitlab
   module Event
     module Builder
       class Issue < Gitlab::Event::Builder::Base
-
-        @avaliable_action = [:created,    # +
-                             :closed,     # +
-                             :reopened,   # +
-                             :deleted,    # +
-                             :updated,    # +
-                             :assigned,   # +
-                             :reassigned, # +
-                             :commented   # -
-                            ]
+        include Gitlab::Event::Action::Issue
 
         class << self
           def can_build?(action, data)
-            known_action = known_action? @avaliable_action, action
+            known_action = known_action? action
             # TODO Issue can be assigned to Milestone
             # TODO Issue can be refference to Issue
             known_source = data.is_a? ::Issue
