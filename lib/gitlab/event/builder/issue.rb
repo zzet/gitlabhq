@@ -18,31 +18,31 @@ module Gitlab
             known_action = known_action? @avaliable_action, action
             # TODO Issue can be assigned to Milestone
             # TODO Issue can be refference to Issue
-            known_target = data.is_a? ::Issue
-            known_target && known_action
+            known_source = data.is_a? ::Issue
+            known_source && known_action
           end
 
-          def build(action, target, user, data)
+          def build(action, source, user, data)
             meta = parse_action(action)
             actions = []
             actions << meta[:action]
             case meta[:action]
             when :created
-              actions << :assigned if target.assignee_id_changed?
+              actions << :assigned if source.assignee_id_changed?
             when :updated
-              changes = target.changes
+              changes = source.changes
 
-              actions << :assigned if target.assignee_id_changed? && changes['assignee_id'].first.nil?
-              actions << :reassigned if target.assignee_id_changed? && changes['assignee_id'].first.present?
+              actions << :assigned if source.assignee_id_changed? && changes['assignee_id'].first.nil?
+              actions << :reassigned if source.assignee_id_changed? && changes['assignee_id'].first.present?
 
-              actions << :closed if target.is_being_closed?
-              actions << :reopened if target.is_being_reopened?
+              actions << :closed if source.is_being_closed?
+              actions << :reopened if source.is_being_reopened?
             when :deleted
             end
 
             events = []
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act), target: target, data: data.to_json, author: user)
+              events << ::Event.new(action: ::Event::Action.action_by_name(act), source: source, data: data.to_json, author: user)
             end
             events
           end
