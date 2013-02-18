@@ -39,7 +39,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Key
+      data[:data][:source].should be_kind_of ::Key
     end
 
     it "Should generate :updated event" do
@@ -51,7 +51,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Key
+      data[:data][:source].should be_kind_of ::Key
     end
 
     it "Should generate :deleted event" do
@@ -62,7 +62,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Key
+      data[:data][:source].should be_kind_of ::Key
     end
 
   end
@@ -89,7 +89,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Issue
+      data[:data][:source].should be_kind_of ::Issue
     end
 
     it "Should generate :updated event" do
@@ -101,7 +101,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Issue
+      data[:data][:source].should be_kind_of ::Issue
     end
 
     it "Should generate :deleted event" do
@@ -112,7 +112,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Issue
+      data[:data][:source].should be_kind_of ::Issue
     end
 
   end
@@ -140,7 +140,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::MergeRequest
+      data[:data][:source].should be_kind_of ::MergeRequest
     end
 
     it "Should generate :updated event" do
@@ -152,7 +152,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::MergeRequest
+      data[:data][:source].should be_kind_of ::MergeRequest
     end
 
     it "Should generate :deleted event" do
@@ -163,7 +163,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::MergeRequest
+      data[:data][:source].should be_kind_of ::MergeRequest
     end
 
   end
@@ -191,7 +191,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Milestone
+      data[:data][:source].should be_kind_of ::Milestone
     end
 
     it "Should generate :updated event" do
@@ -203,7 +203,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Milestone
+      data[:data][:source].should be_kind_of ::Milestone
     end
 
     it "Should generate :deleted event" do
@@ -214,7 +214,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Milestone
+      data[:data][:source].should be_kind_of ::Milestone
     end
 
   end
@@ -242,7 +242,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Group
+      data[:data][:source].should be_kind_of ::Group
     end
 
     it "Should generate :updated event" do
@@ -254,7 +254,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Group
+      data[:data][:source].should be_kind_of ::Group
     end
 
     it "Should generate :deleted event" do
@@ -265,7 +265,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Group
+      data[:data][:source].should be_kind_of ::Group
     end
 
   end
@@ -292,7 +292,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Note
+      data[:data][:source].should be_kind_of ::Note
     end
 
     it "Should generate :updated event" do
@@ -304,7 +304,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Note
+      data[:data][:source].should be_kind_of ::Note
     end
 
     it "Should generate :deleted event" do
@@ -315,7 +315,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Note
+      data[:data][:source].should be_kind_of ::Note
     end
   end
 
@@ -341,7 +341,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Project
+      data[:data][:source].should be_kind_of ::Project
     end
 
     it "Should generate :updated event" do
@@ -353,7 +353,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Project
+      data[:data][:source].should be_kind_of ::Project
     end
 
     it "Should generate :deleted event" do
@@ -364,7 +364,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Project
+      data[:data][:source].should be_kind_of ::Project
     end
 
   end
@@ -392,7 +392,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::ProtectedBranch
+      data[:data][:source].should be_kind_of ::ProtectedBranch
     end
 
     it "Should generate :updated event" do
@@ -404,7 +404,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::ProtectedBranch
+      data[:data][:source].should be_kind_of ::ProtectedBranch
     end
 
     it "Should generate :deleted event" do
@@ -415,7 +415,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::ProtectedBranch
+      data[:data][:source].should be_kind_of ::ProtectedBranch
     end
 
   end
@@ -443,7 +443,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Service
+      data[:data][:source].should be_kind_of ::Service
     end
 
     it "Should generate :updated event" do
@@ -455,7 +455,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Service
+      data[:data][:source].should be_kind_of ::Service
     end
 
     it "Should generate :deleted event" do
@@ -466,7 +466,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Service
+      data[:data][:source].should be_kind_of ::Service
     end
 
   end
@@ -494,7 +494,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Snippet
+      data[:data][:source].should be_kind_of ::Snippet
     end
 
     it "Should generate :updated event" do
@@ -506,7 +506,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Snippet
+      data[:data][:source].should be_kind_of ::Snippet
     end
 
     it "Should generate :deleted event" do
@@ -517,7 +517,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Snippet
+      data[:data][:source].should be_kind_of ::Snippet
     end
 
   end
@@ -545,7 +545,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::User
+      data[:data][:source].should be_kind_of ::User
     end
 
     it "Should generate :updated event" do
@@ -557,7 +557,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::User
+      data[:data][:source].should be_kind_of ::User
     end
 
     it "Should generate :deleted event" do
@@ -568,7 +568,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::User
+      data[:data][:source].should be_kind_of ::User
     end
 
   end
@@ -596,7 +596,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::UserTeam
+      data[:data][:source].should be_kind_of ::UserTeam
     end
 
     it "Should generate :updated event" do
@@ -608,7 +608,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::UserTeam
+      data[:data][:source].should be_kind_of ::UserTeam
     end
 
     it "Should generate :deleted event" do
@@ -619,7 +619,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::UserTeam
+      data[:data][:source].should be_kind_of ::UserTeam
     end
 
   end
@@ -647,7 +647,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::UserTeamProjectRelationship
+      data[:data][:source].should be_kind_of ::UserTeamProjectRelationship
     end
 
     it "Should generate :updated event" do
@@ -659,7 +659,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::UserTeamProjectRelationship
+      data[:data][:source].should be_kind_of ::UserTeamProjectRelationship
     end
 
     it "Should generate :deleted event" do
@@ -670,7 +670,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::UserTeamProjectRelationship
+      data[:data][:source].should be_kind_of ::UserTeamProjectRelationship
     end
 
   end
@@ -698,7 +698,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::UserTeamUserRelationship
+      data[:data][:source].should be_kind_of ::UserTeamUserRelationship
     end
 
     it "Should generate :updated event" do
@@ -710,7 +710,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::UserTeamUserRelationship
+      data[:data][:source].should be_kind_of ::UserTeamUserRelationship
     end
 
     it "Should generate :deleted event" do
@@ -721,7 +721,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::UserTeamUserRelationship
+      data[:data][:source].should be_kind_of ::UserTeamUserRelationship
     end
 
   end
@@ -748,7 +748,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::UsersProject
+      data[:data][:source].should be_kind_of ::UsersProject
     end
 
     it "Should generate :updated event" do
@@ -760,7 +760,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::UsersProject
+      data[:data][:source].should be_kind_of ::UsersProject
     end
 
     it "Should generate :deleted event" do
@@ -771,7 +771,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::UsersProject
+      data[:data][:source].should be_kind_of ::UsersProject
     end
 
   end
@@ -799,7 +799,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::ProjectHook
+      data[:data][:source].should be_kind_of ::ProjectHook
     end
 
     it "Should generate :updated event" do
@@ -811,7 +811,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::ProjectHook
+      data[:data][:source].should be_kind_of ::ProjectHook
     end
 
     it "Should generate :deleted event" do
@@ -822,7 +822,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::ProjectHook
+      data[:data][:source].should be_kind_of ::ProjectHook
     end
 
   end
@@ -849,7 +849,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::SystemHook
+      data[:data][:source].should be_kind_of ::SystemHook
     end
 
     it "Should generate :updated event" do
@@ -861,7 +861,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::SystemHook
+      data[:data][:source].should be_kind_of ::SystemHook
     end
 
     it "Should generate :deleted event" do
@@ -872,7 +872,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::SystemHook
+      data[:data][:source].should be_kind_of ::SystemHook
     end
 
   end
@@ -900,7 +900,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/created/)
-      data[:data][:target].should be_kind_of ::Wiki
+      data[:data][:source].should be_kind_of ::Wiki
     end
 
     it "Should generate :updated event" do
@@ -912,7 +912,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/updated/)
-      data[:data][:target].should be_kind_of ::Wiki
+      data[:data][:source].should be_kind_of ::Wiki
     end
 
     it "Should generate :deleted event" do
@@ -923,7 +923,7 @@ describe ActivityObserver do
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:target].should be_kind_of ::Wiki
+      data[:data][:source].should be_kind_of ::Wiki
     end
 
   end

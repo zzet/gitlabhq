@@ -18,7 +18,7 @@ class Key < ActiveRecord::Base
   belongs_to :user
   belongs_to :project
 
-  has_many :events, as: :target
+  has_many :events, as: :source
   has_many :subscriptions, through: :user, source: :subscriprions
   has_many :notifications, through: :subscriptions
 

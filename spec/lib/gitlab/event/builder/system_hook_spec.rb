@@ -7,15 +7,15 @@ describe Gitlab::Event::Builder::SystemHook do
 
     @system_hook = create :system_hook
     @user = create :user
-    @data = {target: @system_hook, user: @user, data: @system_hook}
+    @data = {source: @system_hook, user: @user, data: @system_hook}
     @action = "gitlab.created.system_hook"
   end
 
   it "should respond that can build this data into action" do
-    Gitlab::Event::Builder::SystemHook.can_build?(@action, @data[:target]).should be_true
+    Gitlab::Event::Builder::SystemHook.can_build?(@action, @data[:source]).should be_true
   end
 
   it "should build events from hash" do
-    @events = Gitlab::Event::Builder::SystemHook.build(@action, @data[:target], @data[:user], @data[:data])
+    @events = Gitlab::Event::Builder::SystemHook.build(@action, @data[:source], @data[:user], @data[:data])
   end
 end

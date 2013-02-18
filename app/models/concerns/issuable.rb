@@ -14,7 +14,7 @@ module Issuable
     belongs_to :milestone
 
     has_many :notes,          as: :noteable,  dependent: :destroy
-    has_many :events,         as: :target,    dependent: :destroy
+    has_many :events,         as: :source,    dependent: :destroy
     has_many :subscriptions,  conditions: { action: "some_action" }
     has_many :notifications,  through: :subscriptions
     has_many :subscribers,    through: :subscriptions

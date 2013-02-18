@@ -22,15 +22,16 @@ class Milestone < ActiveRecord::Base
   has_many :issues
   has_many :merge_requests
 
-  scope :active, -> { with_state(:active) }
-  scope :closed, -> { with_state(:closed) }
-  has_many :events,         as: :target,    dependent: :destroy
-  has_many :subscriptions,  conditions: { action: "some_action" }
+  has_many :events,         as: :source,    dependent: :destroy
+  has_many :subscriptions,  conditions: { target_id: self, target_type: self }
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
   validates :title, presence: true
   validates :project, presence: true
+
+  scope :active, -> { with_state(:active) }
+  scope :closed, -> { with_state(:closed) }
 
   state_machine :state, initial: :active do
     event :close do
