@@ -2,11 +2,7 @@ module Gitlab
   module Event
     module Builder
       class Key < Gitlab::Event::Builder::Base
-
-        @avaliable_action = [:created,
-                             :deleted,
-                             :updated
-                            ]
+        include Gitlab::Event::Action::Key
 
         class << self
           def can_build?(action, data)
