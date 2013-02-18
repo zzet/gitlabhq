@@ -15,11 +15,11 @@ module Gitlab
           def can_build?(action, data)
             known_action = known_action? @avaliable_action, action
             # TODO Add support to UsersProject models and UserTeam*Relationships
-            known_target = data.is_a? ::User
-            known_target && known_action
+            known_source = data.is_a? ::User
+            known_source && known_action
           end
 
-          def build(action, target, user, data)
+          def build(action, source, user, data)
             meta = parse_action(action)
             actions = []
             actions << meta[:action]
@@ -31,7 +31,7 @@ module Gitlab
 
             events = []
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act), target: target, data: data.to_json, author: user)
+              events << ::Event.new(action: ::Event::Action.action_by_name(act), source: source, data: data.to_json, author: user)
             end
             events
           end

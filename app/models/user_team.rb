@@ -23,7 +23,7 @@ class UserTeam < ActiveRecord::Base
   has_many :projects, through: :user_team_project_relationships
   has_many :members,  through: :user_team_user_relationships, source: :user
 
-  has_many :events,         as: :target,    dependent: :destroy
+  has_many :events,         as: :source,    dependent: :destroy
   has_many :subscriptions,  conditions: { action: "some_action" }
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
