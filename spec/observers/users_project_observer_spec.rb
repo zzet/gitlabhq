@@ -13,13 +13,13 @@ describe UsersProjectObserver do
 
     it "should send email to user" do
       Notify.should_receive(:project_access_granted_email).and_return(double(deliver: true))
-      Event.stub(:create => true)
+      OldEvent.stub(:create => true)
 
       create(:users_project)
     end
 
     it "should create new event" do
-      Event.should_receive(:create)
+      OldEvent.should_receive(:create)
 
       create(:users_project)
     end
@@ -57,7 +57,7 @@ describe UsersProjectObserver do
     end
 
     it "should create new event" do
-      Event.should_receive(:create)
+      OldEvent.should_receive(:create)
       @users_project.destroy
     end
   end
