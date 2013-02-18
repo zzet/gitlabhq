@@ -1,0 +1,13 @@
+module Gitlab
+  module Event
+    module Notification
+      class SystemHook < Gitlab::Event::Notification::Base
+        include Gitlab::Event::Action::SystemHook
+
+        class << self
+        end
+
+      end
+    end
+  end
+end
