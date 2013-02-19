@@ -19,9 +19,8 @@ module Gitlab
             case meta[:action]
             when :created
             when :updated
-              # TODO Check
-              #actions << :closed if source.is_being_closed?
-              #actions << :reopened if source.is_being_reopened?
+            when :closed
+            when :reopened
             when :deleted
             end
 
