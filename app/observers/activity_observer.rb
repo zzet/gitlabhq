@@ -22,6 +22,14 @@ class ActivityObserver < ActiveRecord::Observer
     Gitlab::Event::Notifications.trigger :created, model
   end
 
+  def after_close(moled, transition)
+    Gitlab::Event::Notifications.trigger :closed, model
+  end
+
+  def after_reopen(model, transition)
+    Gitlab::Event::Notifications.trigger :reopened, model
+  end
+
   def after_update(model)
     Gitlab::Event::Notifications.trigger :updated, model
   end
