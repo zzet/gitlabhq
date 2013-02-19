@@ -25,8 +25,9 @@ module Gitlab
               actions << :assigned if source.assignee_id_changed? && changes['assignee_id'].first.nil?
               actions << :reassigned if source.assignee_id_changed? && changes['assignee_id'].first.present?
 
-              actions << :closed if source.is_being_closed?
-              actions << :reopened if source.is_being_reopened?
+              #TODO. Check, if Only closed/reopened - not make :updated event
+            when :closed
+            when :reopened
             when :deleted
             end
 
