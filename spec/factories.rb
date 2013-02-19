@@ -80,6 +80,7 @@ FactoryGirl.define do
     project factory: :project_with_code
     source_branch "master"
     target_branch "stable"
+    state :opened
 
     # pick 3 commits "at random" (from bcf03b5d~3 to bcf03b5d)
     trait :with_diffs do
