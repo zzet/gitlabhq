@@ -41,6 +41,8 @@ ActiveRecord::Schema.define(:version => 20130318212250) do
     t.integer  "action"
     t.integer  "source_id"
     t.string   "source_type"
+    t.integer  "target_id"
+    t.string   "target_type"
     t.text     "data"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
