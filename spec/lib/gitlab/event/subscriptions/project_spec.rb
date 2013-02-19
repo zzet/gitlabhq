@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Event::Subscriptions::issue do
+describe Gitlab::Event::Subscriptions::Project do
   it "should respond to :subscribe method" do
     Gitlab::Event::Subscriptions::Project.should respond_to :subscribe
   end
@@ -15,7 +15,7 @@ describe Gitlab::Event::Subscriptions::issue do
       target = source
       action = :updated
 
-      Gitlab::Event::Subscriptions::issue.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscriptions::Project.subscribe(@user, action, source, target)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -27,7 +27,7 @@ describe Gitlab::Event::Subscriptions::issue do
       target = Project
       action = :created
 
-      Gitlab::Event::Subscriptions::issue.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscriptions::Project.subscribe(@user, action, source, target)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -39,7 +39,7 @@ describe Gitlab::Event::Subscriptions::issue do
       target = Project
       action = :created
 
-      Gitlab::Event::Subscriptions::issue.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscriptions::Project.subscribe(@user, action, source, target)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -51,7 +51,7 @@ describe Gitlab::Event::Subscriptions::issue do
       source = :issue
       action = :created
 
-      Gitlab::Event::Subscriptions::issue.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscriptions::Project.subscribe(@user, action, source, target)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
