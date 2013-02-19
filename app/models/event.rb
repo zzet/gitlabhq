@@ -18,6 +18,10 @@ class Event < ActiveRecord::Base
   validates :author,  presence: true
   validates :source,  presence: true, unless: -> { action.to_i == Event::Action.action_by_name(:deleted) }
 
+  # For Hash only
+  serialize :data
+
+  # Scopes
   scope :with_source, ->(source) { where(source_id: source, source_type: source.class.name) }
   scope :recent, -> { order("created_at DESC") }
   scope :with_target, ->(target) { where(target_id: target, target_type: target.class.name) }
