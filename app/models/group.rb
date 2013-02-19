@@ -14,6 +14,11 @@
 
 class Group < Namespace
 
+  has_many :events,         as: :source,    dependent: :destroy
+  has_many :subscriptions,  conditions: { action: "some_action" }
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
   def add_users_to_project_teams(user_ids, project_access)
     UsersProject.add_users_into_projects(
       projects.map(&:id),
