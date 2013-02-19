@@ -15,7 +15,10 @@ module Gitlab
             meta = parse_action(action)
             meta[:action]
 
-            ::Event.new(action: ::Event::Action.action_by_name(meta[:action]), source: source, data: data.to_json, author: user)
+            target = source
+
+            ::Event.new(action: ::Event::Action.action_by_name(meta[:action]),
+                        source: source, data: data.to_json, author: user, target: target)
           end
         end
       end
