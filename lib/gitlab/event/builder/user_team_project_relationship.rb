@@ -14,6 +14,7 @@ module Gitlab
           def build(action, source, user, data)
             meta = parse_action(action)
             actions = []
+            target = source
             actions << meta[:action]
             case meta[:action]
             when :created
@@ -21,7 +22,7 @@ module Gitlab
             when :deleted
             end
 
-            ::Event.new(action: ::Event::Action.action_by_name(meta[:action]), source: source, data: data.to_json, author: user)
+            ::Event.new(action: ::Event::Action.action_by_name(meta[:action]), source: source, data: data.to_json, author: user, target: target)
           end
         end
       end
