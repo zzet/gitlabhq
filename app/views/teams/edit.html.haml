@@ -12,6 +12,11 @@
         .input
           = f.text_field :name, placeholder: "Ex. OpenSource", class: "xlarge left"
 
+      .clearfix.team_description_holder
+        = f.label :description, "Details"
+        .input
+          = f.text_area :description, maxlength: 250, class: "xxlarge js-gfm-input", rows: 4
+
       .clearfix
         = f.label :path do
           Team path is
@@ -26,4 +31,3 @@
         %p
           Removed team can not be restored!
         = link_to 'Remove team', team_path(@team), method: :delete, confirm: "You are sure?", class: "btn btn-remove btn-small"
-
