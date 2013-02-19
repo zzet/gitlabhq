@@ -18,7 +18,6 @@ class Namespace < ActiveRecord::Base
   belongs_to :owner,  class_name: "User"
 
   has_many :projects, dependent: :destroy
-  has_many :events,   dependent: :destroy, as: :source
 
   validates :owner, presence: true
   validates :name, presence: true, uniqueness: true,
