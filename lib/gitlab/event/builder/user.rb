@@ -7,25 +7,70 @@ module Gitlab
         class << self
           def can_build?(action, data)
             known_action = known_action? action
-            # TODO Add support to UsersProject models and UserTeam*Relationships
-            known_source = data.is_a? ::User
+            known_sources = [::User, ::UserTeamUserRelationship, ::UsersProject, ::Key]
+            known_source = known_sources.include? data.class
             known_source && known_action
           end
 
           def build(action, source, user, data)
             meta = parse_action(action)
+
             actions = []
-            actions << meta[:action]
-            case meta[:action]
-            when :created
-            when :updated
-            when :deleted
+
+            case source
+            when ::User
+              target = source
+
+              actions << meta[:action]
+
+              case meta[:action]
+              when :created
+              when :updated
+              when :deleted
+              end
+
+            when ::Key
+              target = source.user
+
+              case meta[:action]
+              when :created
+                actions << :added
+              when :updated
+                actions << :updated
+              when :deleted
+                actions << :deleted
+              end
+            when ::UsersProject
+              target = source.user
+
+              case meta[:action]
+              when :created
+                actions << :joined
+              when :updated
+                actions << :updated
+              when :deleted
+                actions << :left
+              end
+            when ::UserTeamUserRelationship
+              target = source.user
+
+              case meta[:action]
+              when :created
+                actions << :joined
+              when :updated
+                actions << :updated
+              when :deleted
+                actions << :left
+              end
             end
 
             events = []
+
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act), source: source, data: data.to_json, author: user)
+              events << ::Event.new(action: ::Event::Action.action_by_name(act),
+                                    source: source, data: data.to_json, author: user, target: target)
             end
+
             events
           end
         end
