@@ -19,11 +19,9 @@ module Gitlab
             case meta[:action]
             when :created
             when :updated
-              #changes = source.changes
-
-              # TODO puts here closed/reopened action ckeck
-              #actions << :closed if source.is_being_closed?
-              #actions << :reopened if source.is_being_reopened?
+              #TODO. Check, if Only closed/reopened - not make :updated event
+            when :closed
+            when :reopened
             when :deleted
             end
 
