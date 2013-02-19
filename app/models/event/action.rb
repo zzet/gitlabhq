@@ -1,24 +1,28 @@
 class Event::Action
   # General actions
-  CREATED    = 1
-  UPDATED    = 2
-  COMMENTED  = 3
-  DELETED    = 4
-  ADDED      = 5
-  JOINED     = 6
-  LEFT       = 7
-  TRANSFER   = 8
+  CREATED           = 1
+  UPDATED           = 2
+  COMMENTED         = 3
+  DELETED           = 4
+  ADDED             = 5
+  JOINED            = 6
+  LEFT              = 7
+  TRANSFER          = 8
+
+  # Project specific
+  COMMENTED_RELATED = 9
 
   # Git specific
-  PUSHED     = 9
-  CLONED     = 10
+  PUSHED            = 10
+  CLONED            = 11
 
   # Issuable
-  CLOSED     = 11
-  REOPENED   = 12
-  MERGED     = 13
-  ASSIGNED   = 14
-  REASSIGNED = 15
+  OPENED            = 12
+  CLOSED            = 13
+  REOPENED          = 14
+  MERGED            = 15
+  ASSIGNED          = 16
+  REASSIGNED        = 17
 
   class << self
     def available_actions
@@ -32,7 +36,7 @@ class Event::Action
 
     def action_by_name(action)
       const = constants.find { |name| name.downcase == action }
-      const_get(const)
+      const_get(const).to_i
     end
   end
 end
