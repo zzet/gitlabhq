@@ -16,7 +16,7 @@ class Event < ActiveRecord::Base
   has_many :subscribers,    through: :subscriptions, class_name: User
 
   validates :author,  presence: true
-  validates :source,  presence: true
+  validates :source,  presence: true, unless: -> { action.to_i == Event::Action.action_by_name(:deleted) }
 
   scope :with_source, ->(source) { where(source_id: source, source_type: source.class.name) }
   scope :recent, -> { order("created_at DESC") }
