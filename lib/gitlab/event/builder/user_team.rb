@@ -7,23 +7,55 @@ module Gitlab
         class << self
           def can_build?(action, data)
             known_action = known_action? action
-            known_source = data.is_a? ::UserTeam
+            known_sources = [::UserTeam, ::UserTeamProjectRelationship, ::UserTeamUserRelationship]
+            known_source = known_sources.include? data.class
             known_source && known_action
           end
 
           def build(action, source, user, data)
             meta = parse_action(action)
             actions = []
-            actions << meta[:action]
-            case meta[:action]
-            when :created
-            when :updated
-            when :deleted
-            end
 
+            case source
+            when ::UserTeam
+              target = source
+              actions << meta[:action]
+
+              case meta[:action]
+              when :created
+              when :updated
+              when :deleted
+              end
+
+            when ::UserTeamUserRelationship
+              target = source.user_team
+
+              case meta[:action]
+              when :created
+                actions << :joined
+              when :updated
+                actions << :updated
+              when :deleted
+                actions << :left
+              end
+
+            when ::UserTeamProjectRelationship
+              target = source.user_team
+
+              case meta[:action]
+              when :created
+                actions << :assigned
+              when :updated
+                actions << :updated
+              when :deleted
+                actions << :reassigned
+              end
+
+            end
             events = []
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act), source: source, data: data.to_json, author: user)
+              events << ::Event.new(action: ::Event::Action.action_by_name(act),
+                                    source: source, data: data.to_json, author: user, target: target)
             end
             events
           end
