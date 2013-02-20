@@ -43,7 +43,7 @@ module Gitlab
 
               if target.is_a? ::MergeRequest
                 case meta[:action]
-                when :commented
+                when :created
                   actions << :added
                 when :updated
                 when :deleted
