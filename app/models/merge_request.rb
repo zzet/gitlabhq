@@ -176,7 +176,6 @@ class MergeRequest < ActiveRecord::Base
     self.merge
 
     OldEvent.create(
-    self.mark_as_merged!
       project: self.project,
       action: OldEvent::MERGED,
       target_id: self.id,
