@@ -134,7 +134,6 @@ describe Gitlab::Event::Factory do
       Issue.observers.enable :activity_observer
     end
 
-
     it "should build User events with create" do
       @user = create(:user)
 
@@ -220,7 +219,7 @@ describe Gitlab::Event::Factory do
       @current_events.count.should be > 0
       @current_events.count.should == @events.count
 
-      @self_targeted_events = @current_events.with_target(@user)
+      @self_targeted_events = @current_events.with_target(@users_project)
       @self_targeted_events.should_not be_blank
 
       @user_targeted_events = @current_events.with_target(@user)
@@ -249,7 +248,7 @@ describe Gitlab::Event::Factory do
       @self_targeted_events = @current_events.with_target(@users_project)
       @self_targeted_events.should_not be_blank
 
-      @user_targeted_events = @current_events.with_target(@users_project)
+      @user_targeted_events = @current_events.with_target(@user)
       @user_targeted_events.should_not be_blank
     end
 
@@ -299,7 +298,7 @@ describe Gitlab::Event::Factory do
       @current_events.count.should be > 0
       @current_events.count.should == @events.count
 
-      @self_targeted_events = @current_events.with_target(@user)
+      @self_targeted_events = @current_events.with_target(@user_team_user_relationship)
       @self_targeted_events.should_not be_blank
 
       @user_targeted_events = @current_events.with_target(@user)
@@ -329,7 +328,7 @@ describe Gitlab::Event::Factory do
       @self_targeted_events = @current_events.with_target(@user_team_user_relationship)
       @self_targeted_events.should_not be_blank
 
-      @user_targeted_events = @current_events.with_target(@user_team_user_relationship)
+      @user_targeted_events = @current_events.with_target(@user)
       @user_targeted_events.should_not be_blank
     end
 
@@ -405,7 +404,6 @@ describe Gitlab::Event::Factory do
       @user_targeted_events.should_not be_blank
     end
 
- 
     it "should build User events with destroy" do
       @user.destroy
 
@@ -425,6 +423,9 @@ describe Gitlab::Event::Factory do
       @self_targeted_events = @current_events.with_target(@user)
       @self_targeted_events.should_not be_blank
     end
+    # TODO.
+    # Add tests with Issue, MergeRequest, Milestone, Note, ProjectHook, ProtectedBranch, Service, Snippet
+    # All models, which contain User
   end
 
   describe "Group events" do
@@ -569,4 +570,582 @@ describe Gitlab::Event::Factory do
       @self_targeted_events.should_not be_blank
     end
   end
+
+  #
+  # MergeRequest events
+  #
+
+  describe "MergeRequest events" do
+    before do
+      @user = create :user
+
+      Gitlab::Event::Notifications.current_user = @user
+      ActiveRecord::Base.observers.disable :all
+      MergeRequest.observers.enable :activity_observer
+
+      @project = create :project, creator: @user
+    end
+
+    it "should build MergeRequest events for :create" do
+      @merge_request = create(:merge_request, project: @project)
+      Event.with_source(@merge_request).destroy_all
+
+      @action = 'gitlab.created.merge_request'
+      @data = {source: @merge_request, user: @user, data: @merge_request}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@merge_request)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@merge_request)
+      @self_targeted_events.should_not be_blank
+
+      @targeted_events = @current_events.with_target(@project)
+      @targeted_events.should_not be_blank
+    end
+
+    it "should build MergeRequest events for Update" do
+      @merge_request = create(:merge_request, project: @project)
+
+      @merge_request.title = "#{@merge_request.title}_updated"
+      @merge_request.save
+
+      Event.with_source(@merge_request).destroy_all
+
+      @action = 'gitlab.updated.merge_request'
+      @data = {source: @merge_request, user: @user, data: @merge_request}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@merge_request)
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+      @current_events.count.should == 1 # Only update MergeRequest.
+
+      @self_targeted_events = @current_events.with_target(@merge_request)
+      @self_targeted_events.should_not be_blank
+
+      @targeted_events = @current_events.with_target(@project)
+      @targeted_events.should be_blank
+    end
+
+    it "should build events from new merge_request note" do
+      @merge_request = create(:merge_request, project: @project)
+      @note = create(:note, noteable: @merge_request, project: @project)
+
+      Event.with_source(@note).destroy_all
+
+      @action = 'gitlab.created.note'
+      @data = {source: @note, user: @user, data: @note}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@note)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@note)
+      @self_targeted_events.should_not be_blank
+
+      @merge_request_targeted_events = @current_events.with_target(@merge_request)
+      @merge_request_targeted_events.should_not be_blank
+
+      @project_targeted_events = @current_events.with_target(@project)
+      @project_targeted_events.should_not be_blank
+      @project_targeted_events.count.should == 1
+      @project_targeted_events.first.action.to_i.should == ::Event::Action.action_by_name(:commented_related)
+    end
+  end
+
+  #
+  # UserTeam Events
+  #
+
+  describe "UsserTeam Events" do
+    before do
+      @user = create :user
+
+      Gitlab::Event::Notifications.current_user = @user
+      ActiveRecord::Base.observers.disable :all
+      UserTeam.observers.enable :activity_observer
+
+      @project = create :project, creator: @user
+      @user_team = create(:user_team, owner: @user)
+    end
+
+    it "should build UserTeam events for :create" do
+      @user_team = create(:user_team, owner: @user)
+      Event.with_source(@user_team).destroy_all
+
+      @action = 'gitlab.created.user_team'
+      @data = {source: @user_team, user: @user, data: @user_team}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team)
+      @self_targeted_events.should_not be_blank
+    end
+
+    it "should build UserTeam events for Update" do
+      @user_team = create(:user_team, owner: @user)
+
+      @user_team.name = "#{@user_team.name}_updated"
+      @user_team.save
+
+      Event.with_source(@user_team).destroy_all
+
+      @action = 'gitlab.updated.user_team'
+      @data = {source: @user_team, user: @user, data: @user_team}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team)
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+      @current_events.count.should == 1 # Only update UserTeam.
+
+      @self_targeted_events = @current_events.with_target(@user_team)
+      @self_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with create user_team_user_relationship" do
+      @user_team.add_member @user, UsersProject::MASTER, false
+
+      @user_team_user_relationship = UserTeamUserRelationship.find_by_user_id_and_user_team_id(@user, @user_team)
+
+      Event.with_source(@user_team_user_relationship).destroy_all
+
+      @action = 'gitlab.created.user_team_user_relationship'
+      @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_user_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_user_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @user_team_targeted_events = @current_events.with_target(@user_team)
+      @user_team_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with update user_team_user_relationship" do
+      @user_team.add_member @user, UsersProject::MASTER, false
+
+      @user_team_user_relationship = UserTeamUserRelationship.find_by_user_id_and_user_team_id(@user, @user_team)
+
+      @user_team_user_relationship.permission = UsersProject::DEVELOPER
+      @user_team_user_relationship.save
+
+      Event.with_source(@user_team_user_relationship).destroy_all
+
+      @action = 'gitlab.updated.user_team_user_relationship'
+      @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_user_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_user_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @user_team_targeted_events = @current_events.with_target(@user_team)
+      @user_team_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with remove user_team_user_relationship" do
+      @user_team.add_member @user, UsersProject::MASTER, false
+
+      @user_team_user_relationship = UserTeamUserRelationship.find_by_user_id_and_user_team_id(@user, @user_team)
+
+      @user_team_user_relationship.destroy
+
+      Event.with_source(@user_team_user_relationship).destroy_all
+
+      @action = 'gitlab.deleted.user_team_user_relationship'
+      @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_user_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_user_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @user_team_targeted_events = @current_events.with_target(@user_team)
+      @user_team_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with create user_team_project_relationship" do
+      @user_team.assign_to_project @project, UsersProject::MASTER
+
+      @user_team_project_relationship = UserTeamProjectRelationship.find_by_project_id_and_user_team_id(@project, @user_team)
+
+      Event.with_source(@user_team_project_relationship).destroy_all
+
+      @action = 'gitlab.created.user_team_project_relationship'
+      @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_project_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_project_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @user_team_targeted_events = @current_events.with_target(@user_team)
+      @user_team_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with update user_team_project_relationship" do
+      @user_team.assign_to_project @project, UsersProject::MASTER
+
+      @user_team_project_relationship = UserTeamProjectRelationship.find_by_project_id_and_user_team_id(@project, @user_team)
+
+      @user_team_project_relationship.greatest_access = UsersProject::DEVELOPER
+      @user_team_project_relationship.save
+
+      Event.with_source(@user_team_project_relationship).destroy_all
+
+      @action = 'gitlab.updated.user_team_project_relationship'
+      @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_project_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_project_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @user_team_targeted_events = @current_events.with_target(@user_team)
+      @user_team_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with remove user_team_project_relationship" do
+      @user_team.assign_to_project @project, UsersProject::MASTER
+
+      @user_team_project_relationship = UserTeamProjectRelationship.find_by_project_id_and_user_team_id(@project, @user_team)
+
+      @user_team_project_relationship.destroy
+
+      Event.with_source(@user_team_project_relationship).destroy_all
+
+      @action = 'gitlab.deleted.user_team_project_relationship'
+      @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_project_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_project_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @user_team_targeted_events = @current_events.with_target(@user_team)
+      @user_team_targeted_events.should_not be_blank
+    end
+
+    it "should build UserTeam events for Deleted" do
+      @user_team = create(:user_team, owner: @user)
+      @user_team.destroy
+
+      Event.with_source(@user_team).destroy_all
+
+      @action = 'gitlab.updated.user_team'
+      @data = {source: @user_team, user: @user, data: @user_team}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team)
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+      @current_events.count.should == 1 # Only update UserTeam.
+
+      @self_targeted_events = @current_events.with_target(@user_team)
+      @self_targeted_events.should_not be_blank
+    end
+  end
+
+
+
+
+
+
+
+  #
+  # Project Events
+  #
+
+  describe "Project Events" do
+    before do
+      @user = create :user
+
+      Gitlab::Event::Notifications.current_user = @user
+      ActiveRecord::Base.observers.disable :all
+      Project.observers.enable :activity_observer
+
+      @project = create :project, creator: @user
+      @user_team = create(:user_team, owner: @user)
+    end
+
+    it "should build Project events for :create" do
+      @project = create(:project, creator: @user)
+      Event.with_source(@project).destroy_all
+
+      @action = 'gitlab.created.project'
+      @data = {source: @project, user: @user, data: @project}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@project)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@project)
+      @self_targeted_events.should_not be_blank
+    end
+
+    it "should build Project events for Update" do
+      @project.name = "#{@project.name}_updated"
+      @project.save
+
+      Event.with_source(@project).destroy_all
+
+      @action = 'gitlab.updated.project'
+      @data = {source: @project, user: @user, data: @project}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@project)
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+      @current_events.count.should == 1 # Only update Project.
+
+      @self_targeted_events = @current_events.with_target(@project)
+      @self_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with create user_team_project_relationship" do
+      @user_team.assign_to_project @project, UsersProject::MASTER
+
+      @user_team_project_relationship = UserTeamProjectRelationship.find_by_project_id_and_user_team_id(@project, @user_team)
+
+      Event.with_source(@user_team_project_relationship).destroy_all
+
+      @action = 'gitlab.created.user_team_project_relationship'
+      @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_project_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_project_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @project_targeted_events = @current_events.with_target(@project)
+      @project_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with update user_team_project_relationship" do
+      @user_team.assign_to_project @project, UsersProject::MASTER
+
+      @user_team_project_relationship = UserTeamProjectRelationship.find_by_project_id_and_user_team_id(@project, @user_team)
+
+      @user_team_project_relationship.greatest_access = UsersProject::DEVELOPER
+      @user_team_project_relationship.save
+
+      Event.with_source(@user_team_project_relationship).destroy_all
+
+      @action = 'gitlab.updated.user_team_project_relationship'
+      @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_project_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_project_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @project_targeted_events = @current_events.with_target(@project)
+      @project_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with remove user_team_project_relationship" do
+      @user_team.assign_to_project @project, UsersProject::MASTER
+
+      @user_team_project_relationship = UserTeamProjectRelationship.find_by_project_id_and_user_team_id(@project, @user_team)
+
+      @user_team_project_relationship.destroy
+
+      Event.with_source(@user_team_project_relationship).destroy_all
+
+      @action = 'gitlab.deleted.user_team_project_relationship'
+      @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@user_team_project_relationship)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user_team_project_relationship)
+      @self_targeted_events.should_not be_blank
+
+      @project_targeted_events = @current_events.with_target(@project)
+      @project_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with create users_project" do
+      @project.team << [@user, :master]
+      @users_project = UsersProject.find_by_user_id_and_project_id(@user, @project)
+
+      Event.with_source(@users_project).destroy_all
+
+      @action = 'gitlab.created.users_project'
+      @data = {source: @users_project, user: @user, data: @users_project}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@users_project)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@users_project)
+      @self_targeted_events.should_not be_blank
+
+      @project_targeted_events = @current_events.with_target(@project)
+      @project_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with update users_project" do
+      @project.team << [@user, :master]
+      @users_project = UsersProject.find_by_user_id_and_project_id(@user, @project)
+
+      @users_project.project_access = UsersProject::DEVELOPER
+      @users_project.save
+
+      Event.with_source(@users_project).destroy_all
+
+      @action = 'gitlab.updated.users_project'
+      @data = {source: @users_project, user: @user, data: @users_project}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@users_project)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@user)
+      @self_targeted_events.should_not be_blank
+
+      @project_targeted_events = @current_events.with_target(@project)
+      @project_targeted_events.should_not be_blank
+    end
+
+    it "should build User events with remove users_project" do
+      @project.team << [@user, :master]
+      @users_project = UsersProject.find_by_user_id_and_project_id(@user, @project)
+
+      @users_project.destroy
+
+      Event.with_source(@users_project).destroy_all
+
+      @action = 'gitlab.deleted.users_project'
+      @data = {source: @users_project, user: @user, data: @users_project}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@users_project)
+
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+
+      @self_targeted_events = @current_events.with_target(@users_project)
+      @self_targeted_events.should_not be_blank
+
+      @project_targeted_events = @current_events.with_target(@project)
+      @project_targeted_events.should_not be_blank
+    end
+
+    it "should build Project events for Deleted" do
+      @project = create(:project, creator: @user)
+      @project.destroy
+
+      Event.with_source(@project).destroy_all
+
+      @action = 'gitlab.updated.project'
+      @data = {source: @project, user: @user, data: @project}
+
+      @events = Gitlab::Event::Factory.build(@action, @data)
+      Gitlab::Event::Factory.create_events(@action, @data)
+
+      @current_events = Event.with_source(@project)
+      @current_events.count.should be > 0
+      @current_events.count.should == @events.count
+      @current_events.count.should == 1 # Only update Project.
+
+      @self_targeted_events = @current_events.with_target(@project)
+      @self_targeted_events.should_not be_blank
+    end
+
+    # TODO.
+    # Add tests with Issue, MergeRequest, Milestone, Note, ProjectHook, ProtectedBranch, Service, Snippet
+  end
+
 end
