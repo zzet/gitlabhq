@@ -4,6 +4,10 @@ class SubscriptionService
       Gitlab::Event::Subscription.subscribe(user, action, target, subtarget)
     end
 
+    def unsubscribe(user, action, target, subtarget = nil)
+      Gitlab::Event::Subscription.unsubscribe(user, action, target, subtarget)
+    end
+
     def available_subscriptions(user, target = nil)
       Gitlab::Event::Subscription.available(user, target)
     end
