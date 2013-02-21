@@ -126,5 +126,21 @@ describe Gitlab::Event::Subscription do
       @subscriptions.should_not be_blank
     end
 
+   it "should subscribe user on all self changes by object" do
+      ::Event::Subscription.destroy_all
+      Gitlab::Event::Subscription.subscribe(@user, :all, @user, :key)
+      @subscriptions = ::Event::Subscription.by_user(@user)
+      @subscriptions.should_not be_blank
+
+      Gitlab::Event::Subscription.subscribe(@user, :updated, @user, @user)
+      @new_subsriprtions = ::Event::Subscription.by_user(@user)
+      @new_subsriprtions.count.should == 2
+
+      Gitlab::Event::Subscription.unsubscribe(@user, :all, @user, :key)
+      @subscriptions_after_unsubscribe = ::Event::Subscription.by_user(@user)
+      @subscriptions_after_unsubscribe.should_not be_blank
+      @subscriptions_after_unsubscribe.count.should == 1
+      @subscriptions_after_unsubscribe.first.action == ::Event::Action.action_by_name(:updated)
+    end
   end
 end
