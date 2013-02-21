@@ -16,6 +16,14 @@ module Gitlab
           subscribe!(user, action, target, source) if can_subscribe?(user, action, target, source)
         end
 
+        def unsubscribe(user, action, target, source)
+          new_source = source.to_s.camelize.constantize if source.is_a? Symbol
+          target = new_source if target.blank?
+
+          subscribe!(user, action, target, source) if can_subscribe?(user, action, target, source)
+        end
+
+
         def can_subscribe?(user, action, target, source)
           action = ::Event::Action.action_by_name(action) if action.is_a? Symbol
 
@@ -58,6 +66,10 @@ module Gitlab
             subscription.save unless exist_similar_subscription?(subscription)
             p subscription.errors unless subscription.errors.blank?
           end
+        end
+
+        def unsubscribe!(user, action, target, source)
+          
         end
 
         def exist_similar_subscription?(subscription)
