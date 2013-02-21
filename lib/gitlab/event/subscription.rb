@@ -10,14 +10,14 @@ module Gitlab
         # - Event category (Source by type) changes which associated with target
         #
         def subscribe(user, action, target, source)
-          new_source = source.to_s.camelize.constantize if source.is_a? Symbol
+          new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && source != :all
           target = new_source if target.blank?
 
           subscribe!(user, action, target, source) if can_subscribe?(user, action, target, source)
         end
 
         def unsubscribe(user, action, target, source)
-          new_source = source.to_s.camelize.constantize if source.is_a? Symbol
+          new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && source != :all
           target = new_source if target.blank?
 
           unsubscribe!(user, action, target, source)
