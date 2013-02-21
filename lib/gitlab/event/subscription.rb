@@ -69,7 +69,12 @@ module Gitlab
         end
 
         def unsubscribe!(user, action, target, source)
-          
+          subscription = ::Event::Subscription.by_user(user).by_target(target).by_source_type(source).by_action(action)
+          if subscription.any?
+            subscription.each do |sbs|
+              sbs.destroy
+            end
+          end
         end
 
         def exist_similar_subscription?(subscription)
