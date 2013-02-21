@@ -5,6 +5,9 @@ module Gitlab
         include Gitlab::Event::Action::Issue
 
         class << self
+          def can_subscribe?(user, action, target, source)
+            return true
+          end
         end
 
       end
