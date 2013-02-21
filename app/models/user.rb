@@ -58,11 +58,11 @@ class User < ActiveRecord::Base
   # Relations
   #
 
-  # Namespace for personal projects
-  has_one :namespace, dependent: :destroy, foreign_key: :owner_id, class_name: "Namespace", conditions: 'type IS NULL'
-
   # Namespaces (owned groups and own namespace)
-  has_many :namespaces, foreign_key: :owner_id
+  has_many :namespaces,               foreign_key: :owner_id
+
+  # Namespace for personal projects
+  has_one :namespace,                 dependent: :destroy, foreign_key: :owner_id,    class_name: Namespace, conditions: 'type IS NULL'
 
   # Profile
   has_many :keys, dependent: :destroy
