@@ -59,11 +59,7 @@ class User < ActiveRecord::Base
   #
 
   # Namespace for personal projects
-  has_one :namespace,
-    dependent: :destroy,
-    foreign_key: :owner_id,
-    class_name: "Namespace",
-    conditions: 'type IS NULL'
+  has_one :namespace,                 dependent: :destroy, foreign_key: :owner_id,    class_name: Namespace, conditions: 'type IS NULL'
 
   # Profile
   has_many :keys, dependent: :destroy
@@ -92,7 +88,7 @@ class User < ActiveRecord::Base
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
   has_many :projects, through: :users_projects
 
-  has_many :groups,         class_name: "Group", foreign_key: :owner_id
+  has_many :groups,         class_name: Group, foreign_key: :owner_id
   has_many :recent_events,  class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
 
   has_many :projects,       through: :users_projects
