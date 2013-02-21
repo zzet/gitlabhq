@@ -1,5 +1,6 @@
 class Event::Action
   # General actions
+  ALL               = 0
   CREATED           = 1
   UPDATED           = 2
   COMMENTED         = 3
@@ -32,6 +33,10 @@ class Event::Action
     def action_to_s(action)
       const = constants.find { |name| const_get(name) == action }
       const.to_s.downcase!
+    end
+
+    def action_to_sym(action)
+      action_to_s.to_sym
     end
 
     def action_by_name(action)
