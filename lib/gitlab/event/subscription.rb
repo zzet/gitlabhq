@@ -20,7 +20,7 @@ module Gitlab
           new_source = source.to_s.camelize.constantize if source.is_a? Symbol
           target = new_source if target.blank?
 
-          subscribe!(user, action, target, source) if can_subscribe?(user, action, target, source)
+          unsubscribe!(user, action, target, source)
         end
 
 
