@@ -45,7 +45,7 @@ class Event::Subscription < ActiveRecord::Base
   scope :by_source, ->(source) { where(source_id: source.id, source_type: source.class.name) }
   scope :by_target, ->(target) { where(target_id: target.id, target_type: target.class.name) }
   scope :by_action, ->(action) { action = (action.is_a?(Symbol) ? Event::Action.action_by_name(action) : (action.is_a?(Fixnum) ? action : (raise InvalidArgumentError))); where(action: action) }
-  scope :by_source_type, ->(source_type) { source_type = source_type.is_a?(Symbol) ? source_type.to_s.camelize : source_type.to_s; est = self.arel_table; where(est[:source_type].eq(source_type).or(est[:source_category].eql(source_type)))}
+  scope :by_source_type, ->(source_type) { source_type = source_type.is_a?(Symbol) ? source_type.to_s.camelize : source_type.to_s; est = self.arel_table; where(est[:source_type].eq(source_type).or(est[:source_category].eq(source_type)))}
   scope :with_source, -> { where("source_id IS NOT NULL") }
   scope :without_source, -> { where(source_id: nil) }
 end
