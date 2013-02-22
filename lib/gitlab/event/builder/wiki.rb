@@ -2,11 +2,9 @@ module Gitlab
   module Event
     module Builder
       class Wiki < Gitlab::Event::Builder::Base
-        include Gitlab::Event::Action::Wiki
-
         class << self
           def can_build?(action, data)
-            known_action = known_action? action
+            known_action = known_action? action, ::Wiki.available_actions
             known_source = data.is_a? ::Wiki
             known_source && known_action
           end
@@ -27,7 +25,7 @@ module Gitlab
 
             events = []
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act), source: source, data: data.to_json, author: user, target: target)
+              events << ::Event.new(action: act, source: source, data: data.to_json, author: user, target: target)
             end
             events
           end

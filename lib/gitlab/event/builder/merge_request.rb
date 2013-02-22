@@ -2,11 +2,10 @@ module Gitlab
   module Event
     module Builder
       class MergeRequest < Gitlab::Event::Builder::Base
-        include Gitlab::Event::Action::MergeRequest
-
         class << self
+
           def can_build?(action, data)
-            known_action = known_action? action
+            known_action = known_action? action, ::MergeRequest.available_actions
             # TODO Issue can be refference to MergeRequest
             known_sources = [::MergeRequest, ::Note]
             known_source = known_sources.include? data.class
@@ -55,7 +54,7 @@ module Gitlab
             events = []
 
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act),
+              events << ::Event.new(action: act,
                                     source: source, data: data.to_json, author: user, target: target)
             end
 
