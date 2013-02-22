@@ -137,7 +137,17 @@ group :development do
 
   # thin instead webrick
   gem 'thin'
+
+  # Deploy with Capistrano
+  gem "capi"
+  gem 'capistrano'
+  gem 'rvm-capistrano'
+  gem 'capistrano-ext'
+  gem 'capistrano-maintenance'
 end
+
+gem 'rb-inotify', require: linux_only('rb-inotify')
+gem 'airbrake'
 
 group :development, :test do
   gem 'rails-dev-tweaks'
@@ -157,7 +167,6 @@ group :development, :test do
   # Notification
   gem 'rb-fsevent', require: darwin_only('rb-fsevent')
   gem 'growl',      require: darwin_only('growl')
-  gem 'rb-inotify', require: linux_only('rb-inotify')
 
   # PhantomJS driver for Capybara
   gem 'poltergeist', '1.1.0'
