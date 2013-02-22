@@ -2,11 +2,9 @@ module Gitlab
   module Event
     module Builder
       class Issue < Gitlab::Event::Builder::Base
-        include Gitlab::Event::Action::Issue
-
         class << self
           def can_build?(action, data)
-            known_action = known_action? action
+            known_action = known_action? action, ::Issue.available_actions
             # TODO Issue can be assigned to Milestone
             # TODO Issue can be refference to Issue
             known_sources = [::Issue, ::Note]
@@ -55,7 +53,7 @@ module Gitlab
             events = []
 
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act),
+              events << ::Event.new(action: act,
                                     source: source, data: data.to_json, author: user, target: target)
             end
 
