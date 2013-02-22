@@ -12,4 +12,7 @@
 #
 
 class SystemHook < WebHook
+  include Watchable
+
+  actions_to_watch [:created, :updated, :deleted]
 end

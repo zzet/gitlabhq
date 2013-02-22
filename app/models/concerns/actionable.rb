@@ -4,8 +4,8 @@ module Actionable
   included do
     extend Enumerize
 
-    enumerize :action, :in => Event::Action.available_actions
+    enumerize :action, :in => Event::Action.available_actions, scope: :by_action
 
-    validates :action, presence: true, numericality: {greater_than_or_equal_to: 0}
+    validates :action, presence: true
   end
 end
