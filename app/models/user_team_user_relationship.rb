@@ -12,6 +12,8 @@
 #
 
 class UserTeamUserRelationship < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :group_admin, :permission, :user_id, :user_team_id
 
   belongs_to :user_team
@@ -26,6 +28,8 @@ class UserTeamUserRelationship < ActiveRecord::Base
   validates :user,      presence: true
 
   scope :with_user, ->(user) { where(user_id: user.id) }
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def user_name
     user.name
