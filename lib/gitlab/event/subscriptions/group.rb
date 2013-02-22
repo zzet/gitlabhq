@@ -2,8 +2,6 @@ module Gitlab
   module Event
     module Subscriptions
       class Group < Gitlab::Event::Subscriptions::Base
-        include Gitlab::Event::Action::Group
-
         class << self
           def can_subscribe?(user, action, target, source)
             if target.is_a? ::Group
