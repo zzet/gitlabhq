@@ -13,6 +13,8 @@
 #
 
 class Wiki < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :title, :content, :slug
 
   belongs_to :project
@@ -31,6 +33,8 @@ class Wiki < ActiveRecord::Base
   before_update :set_slug
 
   scope :ordered, order("created_at DESC")
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def to_param
     slug
