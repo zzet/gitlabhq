@@ -23,6 +23,7 @@ require Rails.root.join("lib/static_model")
 
 class MergeRequest < ActiveRecord::Base
   include Issuable
+  include Watchable
 
 BROKEN_DIFF = "--broken-diff"
 
@@ -88,12 +89,13 @@ scope :by_milestone, ->(milestone) { where(milestone_id: milestone) }
 # Closed scope for merge request should return
 # both merged and closed mr's
 scope :closed, -> { with_states(:closed, :merged) }
+  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
 
-def validate_branches
-  if target_branch == source_branch
-    errors.add :base, "You can not use same branch for source and target branches"
+  def validate_branches
+    if target_branch == source_branch
+      errors.add :base, "You can not use same branch for source and target branches"
+    end
   end
-end
 
 def reload_code
   self.reloaded_commits

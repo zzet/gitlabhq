@@ -14,6 +14,7 @@
 #
 
 class Snippet < ActiveRecord::Base
+  include Watchable
   include Linguist::BlobHelper
 
   attr_accessible :title, :content, :file_name, :expires_at
@@ -39,6 +40,8 @@ class Snippet < ActiveRecord::Base
   scope :fresh, -> { order("created_at DESC") }
   scope :non_expired, -> { where(["expires_at IS NULL OR expires_at > ?", Time.current]) }
   scope :expired, -> { where(["expires_at IS NOT NULL AND expires_at < ?", Time.current]) }
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def self.content_types
     [
