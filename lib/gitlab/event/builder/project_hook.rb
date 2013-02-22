@@ -2,11 +2,9 @@ module Gitlab
   module Event
     module Builder
       class ProjectHook < Gitlab::Event::Builder::Base
-        include Gitlab::Event::Action::ProjectHook
-
         class << self
           def can_build?(action, data)
-            known_action = known_action? action
+            known_action = known_action? action, ::ProjectHook.available_actions
             known_source = data.is_a? ::ProjectHook
             known_source && known_action
           end
@@ -16,7 +14,7 @@ module Gitlab
             meta[:action]
             target = source
 
-            ::Event.new(action: ::Event::Action.action_by_name(meta[:action]),
+            ::Event.new(action: meta[:action],
                         source: source, data: data.to_json, author: user, target: target)
           end
         end
