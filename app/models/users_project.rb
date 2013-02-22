@@ -12,6 +12,7 @@
 #
 
 class UsersProject < ActiveRecord::Base
+  include Watchable
   include Gitlab::ShellAdapter
 
   GUEST     = 10
@@ -47,6 +48,8 @@ class UsersProject < ActiveRecord::Base
   scope :in_project, ->(project) { where(project_id: project.id) }
   scope :in_projects, ->(projects) { where(project_id: projects.map { |p| p.id }) }
   scope :with_user, ->(user) { where(user_id: user.id) }
+
+  actions_to_watch [:created, :updated, :deleted]
 
   class << self
 

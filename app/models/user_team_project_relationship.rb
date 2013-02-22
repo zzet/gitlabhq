@@ -11,6 +11,8 @@
 #
 
 class UserTeamProjectRelationship < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :greatest_access, :project_id, :user_team_id
 
   belongs_to :user_team
@@ -26,6 +28,8 @@ class UserTeamProjectRelationship < ActiveRecord::Base
   validate :check_greatest_access
 
   scope :with_project, ->(project){ where(project_id: project.id) }
+
+  actions_to_watch [:created, :deleted, :updated]
 
   def team_name
     user_team.name

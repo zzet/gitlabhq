@@ -37,6 +37,8 @@
 #
 
 class User < ActiveRecord::Base
+  include Watchable
+
   devise :database_authenticatable, :token_authenticatable, :lockable,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :registerable
 
@@ -144,6 +146,8 @@ class User < ActiveRecord::Base
   scope :without_projects, -> { where('id NOT IN (SELECT DISTINCT(user_id) FROM users_projects)') }
 
   scope :potential_team_members, ->(team) { team.members.any? ? active.not_in_team(team) : active  }
+
+  actions_to_watch [:created, :deleted, :updated, :joined, :left, :transfer, :added]
 
   #
   # Class methods
