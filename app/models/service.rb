@@ -14,6 +14,8 @@
 #
 
 class Service < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :title, :token, :type, :active
 
   belongs_to :project
@@ -25,6 +27,8 @@ class Service < ActiveRecord::Base
   has_many :subscribers,    through: :subscriptions
 
   validates :project_id, presence: true
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def activated?
     active

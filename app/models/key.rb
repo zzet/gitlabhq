@@ -15,6 +15,8 @@
 require 'digest/md5'
 
 class Key < ActiveRecord::Base
+  include Watchable
+
   belongs_to :user
   belongs_to :project
 
@@ -32,6 +34,8 @@ class Key < ActiveRecord::Base
   validate :fingerprintable_key
 
   delegate :name, :email, to: :user, prefix: true
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def strip_white_space
     self.key = self.key.strip unless self.key.blank?
