@@ -13,6 +13,7 @@
 #
 
 class Milestone < ActiveRecord::Base
+  include Watchable
 
   attr_accessible :title, :description, :due_date, :state_event, :author_id_of_changes
 
@@ -46,6 +47,8 @@ class Milestone < ActiveRecord::Base
 
     state :active
   end
+
+  actions_to_watch [:created, :closed, :reopend, :deleted, :updated]
 
   def expired?
     if due_date
