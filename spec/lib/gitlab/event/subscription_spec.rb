@@ -140,7 +140,7 @@ describe Gitlab::Event::Subscription do
       @subscriptions_after_unsubscribe = ::Event::Subscription.by_user(@user)
       @subscriptions_after_unsubscribe.should_not be_blank
       @subscriptions_after_unsubscribe.count.should == 1
-      @subscriptions_after_unsubscribe.first.action == ::Event::Action.action_by_name(:updated)
+      @subscriptions_after_unsubscribe.first.action == :updated
     end
   end
 end

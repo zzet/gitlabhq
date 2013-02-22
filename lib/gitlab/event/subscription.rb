@@ -25,8 +25,6 @@ module Gitlab
 
 
         def can_subscribe?(user, action, target, source)
-          action = ::Event::Action.action_by_name(action) if action.is_a? Symbol
-
           subscriptions = []
 
           Gitlab::Event::Subscriptions::Base.descendants.each do |descendant|
@@ -37,7 +35,6 @@ module Gitlab
         end
 
         def subscribe!(user, action, target, source)
-          action = ::Event::Action.action_by_name(action)
           subscription = nil
 
           if target && target.persisted?
