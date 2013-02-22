@@ -2,11 +2,9 @@ module Gitlab
   module Event
     module Builder
       class Project < Gitlab::Event::Builder::Base
-        include Gitlab::Event::Action::Project
-
         class << self
           def can_build?(action, data)
-            known_action = known_action? action
+            known_action = known_action? action, ::Project.available_actions
             known_sources = [::Project,
                              ::Issue, ::Milestone, ::Note, ::MergeRequest, ::Snippet,
                              ::ProjectHook, ::ProtectedBranch, ::Service,
@@ -163,7 +161,7 @@ module Gitlab
             events = []
 
             actions.each do |act|
-              events << ::Event.new(action: ::Event::Action.action_by_name(act),
+              events << ::Event.new(action: act,
                                     source: source, data: data.to_json, author: user, target: target)
             end
 
