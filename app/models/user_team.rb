@@ -11,6 +11,8 @@
 #
 
 class UserTeam < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :name, :owner_id, :path
 
   belongs_to :owner, class_name: User

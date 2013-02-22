@@ -14,6 +14,8 @@
 #
 
 class Service < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :title, :token, :type, :active
 
   belongs_to :project
