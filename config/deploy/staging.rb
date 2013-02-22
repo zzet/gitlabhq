@@ -1,5 +1,5 @@
 set :rails_env, "production"
-set :branch, 'staging'
+set :branch, 'new_staging'
 set :user, 'gitlab'
 set :keep_releases, 5
 set :deploy_to, '/rest/u/apps/gitlab'
