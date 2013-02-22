@@ -24,6 +24,7 @@
 require "grit"
 
 class Project < ActiveRecord::Base
+  include Watchable
   include Gitlab::ShellAdapter
 
   extend Enumerize
@@ -104,6 +105,7 @@ class Project < ActiveRecord::Base
   scope :public_only, -> { where(public: true) }
 
   enumerize :issues_tracker, :in => (Gitlab.config.issues_tracker.keys).append(:gitlab), :default => :gitlab
+  actions_to_watch [:created, :updated, :deleted, :transfer]
 
   class << self
     def abandoned
