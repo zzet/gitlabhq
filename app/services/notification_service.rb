@@ -16,7 +16,7 @@ class NotificationService
     def process_instantaneous_noifications
       notifications = Event::Subscription::Notification.instantaneous
       notifications.each do |notification|
-        action = Event::Action.action_to_s(notification.event.action)
+        action = notification.event.action.to_s
         target = notification.event.target.class_name.to_s
 
         mail_method = "#{action}_#{target}_email"
