@@ -5,7 +5,7 @@ describe Event::Action do
     action_types = Event::Action.available_actions
     action_types.should be_kind_of Array
     action_types.each do |action|
-      action.should be_kind_of Fixnum
+      action.should be_kind_of Symbol
     end
   end
 end

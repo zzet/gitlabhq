@@ -3,7 +3,7 @@
 FactoryGirl.define do
   factory :event, :class => 'Event' do
     author
-    action Event::Action.available_actions.first
+    action Event.action.values.first
     data "MyText"
   end
 end

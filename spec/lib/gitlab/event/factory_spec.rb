@@ -114,7 +114,7 @@ describe Gitlab::Event::Factory do
       @project_targeted_events = @current_events.with_target(@project)
       @project_targeted_events.should_not be_blank
       @project_targeted_events.count.should == 1
-      @project_targeted_events.first.action.to_i.should == ::Event::Action.action_by_name(:commented_related)
+      @project_targeted_events.first.action.to_sym.should == :commented_related
     end
   end
 
@@ -660,7 +660,7 @@ describe Gitlab::Event::Factory do
       @project_targeted_events = @current_events.with_target(@project)
       @project_targeted_events.should_not be_blank
       @project_targeted_events.count.should == 1
-      @project_targeted_events.first.action.to_i.should == ::Event::Action.action_by_name(:commented_related)
+      @project_targeted_events.first.action.to_sym.should == :commented_related
     end
   end
 
