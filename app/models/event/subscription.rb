@@ -41,11 +41,15 @@ class Event::Subscription < ActiveRecord::Base
   # All subscriptions by related target
   scope :on_related_event, ->(event) { base(event).where(target_type: event.target_type, target_id: event.target_id) }
 
+  scope :by_action, ->(action) { where(action: action.to_sym) }
   scope :by_user, ->(subscriber) { where(user_id: subscriber.id) }
   scope :by_source, ->(source) { where(source_id: source.id, source_type: source.class.name) }
   scope :by_target, ->(target) { where(target_id: target.id, target_type: target.class.name) }
-  scope :by_action, ->(action) { action = (action.is_a?(Symbol) ? Event::Action.action_by_name(action) : (action.is_a?(Fixnum) ? action : (raise InvalidArgumentError))); where(action: action) }
-  scope :by_source_type, ->(source_type) { source_type = source_type.is_a?(Symbol) ? source_type.to_s.camelize : source_type.to_s; est = self.arel_table; where(est[:source_type].eq(source_type).or(est[:source_category].in([source_type, :all])))}
+  scope :by_source_type, ->(source_type) do
+    source_type = source_type.to_s.camelize
+    est = self.arel_table
+    where(est[:source_type].eq(source_type).or(est[:source_category].in([source_type, :all])))
+  end
   scope :with_source, -> { where("source_id IS NOT NULL") }
   scope :without_source, -> { where(source_id: nil) }
 end

@@ -21,6 +21,7 @@
 require "grit"
 
 class Project < ActiveRecord::Base
+  include Watchable
   include Gitolited
 
   class TransferError < StandardError; end
@@ -98,6 +99,8 @@ class Project < ActiveRecord::Base
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
   scope :public_only, -> { where(public: true) }
+
+  actions_to_watch [:created, :updated, :deleted, :transfer]
 
   class << self
     def abandoned

@@ -11,6 +11,8 @@
 #
 
 class UserTeam < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :name, :owner_id, :path
 
   belongs_to :owner, class_name: User
@@ -40,6 +42,8 @@ class UserTeam < ActiveRecord::Base
   scope :with_project, ->(project){ joins(:user_team_project_relationships).where(user_team_project_relationships: {project_id: project})}
   scope :without_project, ->(project){ where("user_teams.id NOT IN (:ids)", ids: (a = with_project(project); a.blank? ? 0 : a))}
   scope :created_by, ->(user){ where(owner_id: user) }
+
+  actions_to_watch [:created, :updated, :assigned, :reassigned, :deleted, :transfer]
 
   class << self
     def search query
