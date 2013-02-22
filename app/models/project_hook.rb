@@ -12,6 +12,8 @@
 #
 
 class ProjectHook < WebHook
+  include Watchable
+
   belongs_to :project
 
   actions_to_watch [:created, :updated, :deleted]
