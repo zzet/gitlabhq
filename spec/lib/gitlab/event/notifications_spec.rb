@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "Gitlab::Event::Notifications" do
   it "should trigger action" do
-    Gitlab::Event::Notifications.should respont_to :trigger
+    Gitlab::Event::Notifications.should respond_to :trigger
   end
 
   describe "User subscriptions" do
