@@ -18,11 +18,14 @@
 
 class Issue < ActiveRecord::Base
   include Issuable
+  include Watchable
 
   attr_accessible :title, :assignee_id, :position, :description,
                   :milestone_id, :label_list, :author_id_of_changes,
                   :state_event
 
+  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented]
+ 
   acts_as_taggable_on :labels
 
   class << self
