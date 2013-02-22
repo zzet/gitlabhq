@@ -11,6 +11,8 @@
 #
 
 class UserTeamProjectRelationship < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :greatest_access, :project_id, :user_team_id
 
   belongs_to :user_team

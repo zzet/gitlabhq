@@ -15,7 +15,7 @@
 require 'digest/md5'
 
 class Key < ActiveRecord::Base
-  include Gitlab::Event::Notifications
+  include Watchable
 
   belongs_to :user
   belongs_to :project

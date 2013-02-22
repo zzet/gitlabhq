@@ -18,6 +18,7 @@
 
 class Issue < ActiveRecord::Base
   include Issuable
+  include Watchable
 
   attr_accessible :title, :assignee_id, :position, :description,
                   :milestone_id, :label_list, :author_id_of_changes,

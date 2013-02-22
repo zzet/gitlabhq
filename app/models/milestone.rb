@@ -13,6 +13,7 @@
 #
 
 class Milestone < ActiveRecord::Base
+  include Watchable
 
   attr_accessible :title, :description, :due_date, :state_event, :author_id_of_changes
 
