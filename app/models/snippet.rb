@@ -14,6 +14,7 @@
 #
 
 class Snippet < ActiveRecord::Base
+  include Watchable
   include Linguist::BlobHelper
 
   attr_accessible :title, :content, :file_name, :expires_at

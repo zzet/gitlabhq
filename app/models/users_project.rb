@@ -11,6 +11,7 @@
 #
 
 class UsersProject < ActiveRecord::Base
+  include Watchable
   include Gitolited
 
   GUEST     = 10

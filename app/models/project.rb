@@ -21,6 +21,7 @@
 require "grit"
 
 class Project < ActiveRecord::Base
+  include Watchable
   include Gitolited
 
   class TransferError < StandardError; end

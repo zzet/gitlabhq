@@ -23,6 +23,7 @@ require Rails.root.join("lib/static_model")
 
 class MergeRequest < ActiveRecord::Base
   include Issuable
+  include Watchable
 
   BROKEN_DIFF = "--broken-diff"
 
