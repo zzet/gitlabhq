@@ -10,6 +10,7 @@
 #
 
 class ProtectedBranch < ActiveRecord::Base
+  include Watchable
   include Gitolited
 
   attr_accessible :name
@@ -22,6 +23,8 @@ class ProtectedBranch < ActiveRecord::Base
   has_many :subscriptions,  conditions: { action: "some_action" }
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def commit
     project.repository.commit(self.name)
