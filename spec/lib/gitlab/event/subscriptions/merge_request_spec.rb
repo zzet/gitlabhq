@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Event::Subscriptions::MergeRequest do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::MergeRequest.should respond_to :subscribe
+    Gitlab::Event::Subscriptions::MergeRequest.should respond_to :can_subscribe?
   end
 
   describe "MergeRequest subscribe" do
@@ -15,7 +15,7 @@ describe Gitlab::Event::Subscriptions::MergeRequest do
       target = source
       action = :updated
 
-      Gitlab::Event::Subscriptions::MergeRequest.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -24,10 +24,10 @@ describe Gitlab::Event::Subscriptions::MergeRequest do
 
     it "should subscribe user on all merge_requests changes by subscribe with symbol" do
       source = :merge_request
-      target = MergeRequest
+      target = create :project, creator: @user
       action = :created
 
-      Gitlab::Event::Subscriptions::MergeRequest.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -36,10 +36,10 @@ describe Gitlab::Event::Subscriptions::MergeRequest do
 
     it "should subscribe user on all merge_requests changes by subscribe with Class name" do
       source = MergeRequest
-      target = MergeRequest
+      target = create :project, creator: @user
       action = :created
 
-      Gitlab::Event::Subscriptions::MergeRequest.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -51,7 +51,7 @@ describe Gitlab::Event::Subscriptions::MergeRequest do
       source = :note
       action = :created
 
-      Gitlab::Event::Subscriptions::MergeRequest.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil

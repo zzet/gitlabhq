@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Event::Subscriptions::Issue do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::Issue.should respond_to :subscribe
+    Gitlab::Event::Subscriptions::Issue.should respond_to :can_subscribe?
   end
 
   describe "Issue subscribe" do
@@ -15,7 +15,7 @@ describe Gitlab::Event::Subscriptions::Issue do
       target = source
       action = :updated
 
-      Gitlab::Event::Subscriptions::Issue.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -24,10 +24,10 @@ describe Gitlab::Event::Subscriptions::Issue do
 
     it "should subscribe user on all issues changes by subscribe with symbol" do
       source = :issue
-      target = Issue
+      target = create :project, creator: @user
       action = :created
 
-      Gitlab::Event::Subscriptions::Issue.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -36,10 +36,10 @@ describe Gitlab::Event::Subscriptions::Issue do
 
     it "should subscribe user on all issues changes by subscribe with Class name" do
       source = Issue
-      target = Issue
+      target = create :project, creator: @user
       action = :created
 
-      Gitlab::Event::Subscriptions::Issue.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -51,7 +51,7 @@ describe Gitlab::Event::Subscriptions::Issue do
       source = :note
       action = :created
 
-      Gitlab::Event::Subscriptions::Issue.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
