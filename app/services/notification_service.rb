@@ -1,35 +1,13 @@
 class NotificationService
   class << self
+
     def create_notifications(event)
-      subscriptions = Event::Subscription.on_event(event)
-      subscriptions.each do |subscription|
-        subscription.notifications.create(event: event)
-      end
+      Gitlab::Event::Notifications.create_notifications(event)
     end
 
-    def process_noifications
-      process_instantaneous_noifications
+    def process_noification(notification)
+      Gitlab::Event::Notifications.process_noification(notification)
     end
 
-    private
-
-    def process_instantaneous_noifications
-      notifications = Event::Subscription::Notification.instantaneous
-      notifications.each do |notification|
-        action = notification.event.action.to_s
-        target = notification.event.target.class_name.to_s
-
-        mail_method = "#{action}_#{target}_email"
-
-        if EventNotificationMailer.respond_to?(mail_method)
-          EventNotificationMailer.send(mail_method, notification)
-        else
-          Rails.logger.info "undefined #{mail_method}"
-          EventNotificationMailer.dafault_email(notification)
-        end
-      end
-
-      # TODO Add Delayed mailing
-    end
   end
 end
