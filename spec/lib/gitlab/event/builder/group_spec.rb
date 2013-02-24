@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::Group do
   before do
+    ActiveRecord::Base.observers.disable :all
     @group = create :group
     @user = create :user
     @data = {source: @group, user: @user, data: @group}

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Event::Subscriptions::Note do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::Note.should respond_to :subscribe
+    Gitlab::Event::Subscriptions::Note.should respond_to :can_subscribe?
   end
 
   describe "Note subscribe" do
@@ -15,7 +15,7 @@ describe Gitlab::Event::Subscriptions::Note do
       target = source
       action = :updated
 
-      Gitlab::Event::Subscriptions::Note.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -24,10 +24,10 @@ describe Gitlab::Event::Subscriptions::Note do
 
     it "should subscribe user on all notes changes by subscribe with symbol" do
       source = :note
-      target = Note
+      target = create :issue
       action = :created
 
-      Gitlab::Event::Subscriptions::Note.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -36,10 +36,10 @@ describe Gitlab::Event::Subscriptions::Note do
 
     it "should subscribe user on all notes changes by subscribe with Class name" do
       source = Note
-      target = Note
+      target = create :issue
       action = :created
 
-      Gitlab::Event::Subscriptions::Note.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -51,7 +51,7 @@ describe Gitlab::Event::Subscriptions::Note do
       source = :note
       action = :created
 
-      Gitlab::Event::Subscriptions::Note.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil

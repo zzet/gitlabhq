@@ -19,7 +19,7 @@ describe Gitlab::Event::Factory do
 
       Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
-      Issue.observers.enable :activity_observer
+      #Issue.observers.enable :activity_observer
 
       @project = create :project, creator: @user
     end
@@ -131,7 +131,7 @@ describe Gitlab::Event::Factory do
 
       Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
-      Issue.observers.enable :activity_observer
+      #User.observers.enable :activity_observer
     end
 
     it "should build User events with create" do
@@ -435,7 +435,7 @@ describe Gitlab::Event::Factory do
 
       Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
-      Issue.observers.enable :activity_observer
+      #Group.observers.enable :activity_observer
     end
 
     it "should build Group events with create" do
@@ -581,7 +581,7 @@ describe Gitlab::Event::Factory do
 
       Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
-      MergeRequest.observers.enable :activity_observer
+      #MergeRequest.observers.enable :activity_observer
 
       @project = create :project, creator: @user
     end
@@ -674,7 +674,7 @@ describe Gitlab::Event::Factory do
 
       Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
-      UserTeam.observers.enable :activity_observer
+      #UserTeam.observers.enable :activity_observer
 
       @project = create :project, creator: @user
       @user_team = create(:user_team, owner: @user)
@@ -904,12 +904,6 @@ describe Gitlab::Event::Factory do
     end
   end
 
-
-
-
-
-
-
   #
   # Project Events
   #
@@ -920,7 +914,7 @@ describe Gitlab::Event::Factory do
 
       Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
-      Project.observers.enable :activity_observer
+      #Project.observers.enable :activity_observer
 
       @project = create :project, creator: @user
       @user_team = create(:user_team, owner: @user)
