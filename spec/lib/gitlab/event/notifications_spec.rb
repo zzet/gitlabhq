@@ -1,15 +1,11 @@
 require 'spec_helper'
 
 describe "Gitlab::Event::Notifications" do
-  it "should trigger action" do
-    Gitlab::Event::Notifications.should respond_to :trigger
-  end
-
-  describe "User subscriptions" do
+    describe "User subscriptions" do
     before do
       @user = create :user
 
-      Gitlab::Event::Notifications.current_user = @user
+      Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
       #User.observers.enable :activity_observer
     end
