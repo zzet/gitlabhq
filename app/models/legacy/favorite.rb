@@ -1,6 +1,11 @@
 class Legacy::Favorite < LegacyDb
-  belongs_to :user
-  belongs_to :watchable, :polymorphic => true
+  belongs_to :user, class_name: Legacy::User
+  belongs_to :watchable, :polymorphic => true, class_name: Legacy::Watchable
+
+  scope :by_email, where(notify_by_email: true)
+  scope :on_repository, where(watchable_type: "Repository")
+  scope :on_project, where(watchable_type: "Project")
+  scope :on_merge_requesr, where(watchable_type: "Mergerequest")
 
   scope :visible_by, Proc.new { |user|
     user = Legacy::User.new({ :id => 0, :is_admin => false }) unless user.is_a?(Legacy::User)

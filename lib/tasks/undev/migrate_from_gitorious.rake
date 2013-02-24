@@ -1,4 +1,9 @@
+require 'logger'
+
 namespace :undev do
+
+  @import_log = Logger.new('import.log')
+  @logger = Logger.new('path_changes.txt')
 
   desc "Migrate All data from gitorious to gitolite"
   task :migrate => :environment do
@@ -9,16 +14,16 @@ namespace :undev do
     Rake::Task["undev:migrate:events"].invoke
   end
 
-
   namespace :migrate do
 
     desc "Migrate users from gitorious to gitlab"
     task :users => :environment do
 
       user_count = Legacy::User.count
-      puts "Start migrate users".yellow
-      puts "Users count: #{user_count}"
-      puts ""
+
+      @import_log.info "Start migrate users".yellow
+      @import_log.info "Users count: #{user_count}"
+      @import_log.info ""
 
       step = 0
 
@@ -46,22 +51,22 @@ namespace :undev do
 
           begin
             if new_user.save
-              puts "Migrate user: #{user.login} (#{user.fullname}) with email #{user.email} succesfull"
+              @import_log.info "Migrate user: #{user.login} (#{user.fullname}) with email #{user.email} succesfull"
             else
-              puts "Migrate user: #{user.login} - #{user.id} failed"
-              puts "Errors: #{new_user.errors.inspect}"
+              @import_log.info "Migrate user: #{user.login} - #{user.id} failed"
+              @import_log.info "Errors: #{new_user.errors.inspect}"
             end
           rescue Exception => e
-            puts "Migrate user: #{user.login} - #{user.id} FUCK!"
-            puts "Errors: #{e.inspect}"
+            @import_log.info "Migrate user: #{user.login} - #{user.id} FUCK!"
+            @import_log.info "Errors: #{e.inspect}"
           end
 
           step += 1
-          puts "#{user_count - step} is left"
-          puts ""
+          @import_log.info "#{user_count - step} is left"
+          @import_log.info ""
         end
       end
-      puts "Funish import users".green
+      @import_log.info "Funish import users".green
     end
 
 
@@ -69,9 +74,10 @@ namespace :undev do
     task :teams => :environment do
 
       teams_count = Legacy::Group.count
-      puts "Start Teams of users"
-      puts "Teams count: #{teams_count}"
-      puts ""
+
+      @import_log.info "Start Teams of users"
+      @import_log.info "Teams count: #{teams_count}"
+      @import_log.info ""
 
       step = 0
 
@@ -91,13 +97,14 @@ namespace :undev do
 
           begin
             if team.save
-              puts "Migrate Team of users: #{team.name} succesfull"
+              @import_log.info "Migrate Team of users: #{team.name} succesfull"
             else
-              puts "Migrate Team of users: #{group.name} - #{group.id} failed"
-              puts "Errors: #{team.errors.inspect}"
+              @import_log.info "Migrate Team of users: #{group.name} - #{group.id} failed"
+              @import_log.info "Errors: #{team.errors.inspect}"
             end
+
             # Members
-            puts "Add members to team"
+            @import_log.info "Add members to team".yellow
             group.memberships.each do |group_member|
               user = User.find_by_username(group_member.user.login)
               if user
@@ -109,25 +116,25 @@ namespace :undev do
               end
             end
           rescue Exception => e
-            puts "Migrate Team of users: #{group.name} - #{group.id} FUCK!"
-            puts "Errors: #{e.inspect}"
+            @import_log.info "Migrate Team of users: #{group.name} - #{group.id} FUCK!"
+            @import_log.info "Errors: #{e.inspect}"
           end
         end
 
         step += 1
-        puts "#{teams_count - step} is left"
-        puts ""
+        @import_log.info "#{teams_count - step} is left"
+        @import_log.info ""
 
       end
-      puts "Finish import user teams".green
+      @import_log.info "Finish import user teams".green
     end
 
     desc "Migrate Projects from gitorius to gitlab"
     task :projects => :environment do
 
       projects_count = Legacy::Project.count
-      puts "Start migrate projects"
-      puts "Projects count: #{projects_count}"
+      @import_log.info "Start migrate projects"
+      @import_log.info "Projects count: #{projects_count}"
 
       Legacy::Project.find_each do |project|
 
@@ -154,28 +161,28 @@ namespace :undev do
 
             begin
               if group.save
-                puts "Project #{group.name} processed succesfull"
+                @import_log.info "Project #{group.name} processed succesfull"
               else
-                puts "Project #{project.title} - #{project.id} fail"
-                puts "Errors: #{group.errors.inspect}"
+                @import_log.info "Project #{project.title} - #{project.id} fail"
+                @import_log.info "Errors: #{group.errors.inspect}"
               end
 
             rescue Exception => e
-              puts "Migrate project: #{project.title} - #{project.id} FUCK!"
-              puts "Errors: #{e.inspect}"
+              @import_log.info "Migrate project: #{project.title} - #{project.id} FUCK!"
+              @import_log.info "Errors: #{e.inspect}"
             end
           end
         end
       end
-      puts "Finish import project groups".green
+      @import_log.info "Finish import project groups".green
     end
 
     desc "Migrate Repositories from gitorious to gitlab"
     task :repositories => :environment do
 
       repo_count = Legacy::Repository.count
-      puts "Start migrate repositories from gitorius to gitlab".yellow
-      puts "Repository count: #{repo_count}"
+      @import_log.info "Start migrate repositories from gitorius to gitlab".yellow
+      @import_log.info "Repository count: #{repo_count}"
 
       root = Gitlab.config.gitolite.repos_path
 
@@ -189,7 +196,7 @@ namespace :undev do
 
             project.name = repo.name
             project.description = repo.description
-            #project.issues_tracker = "redmine"
+            project.issues_tracker = "redmine"
 
             project.created_at = repo.created_at
             project.updated_at = repo.updated_at
@@ -214,31 +221,34 @@ namespace :undev do
 
               begin
                 if project.save
-                  puts "Repository #{project.name} processed succesfull"
-                  puts "Clone repo from gitorious: "
+                  @import_log.info "Repository #{project.name} processed succesfull"
+                  @import_log.info "Clone repo from gitorious: "
 
                   project_path = File.join(root, "#{project.path_with_namespace}.git")
 
                   unless File.exists?(project_path)
+                    Gitlab::Shell.import_repository(project.path_with_namespace, repo.git_clone_url)
 
-                    cmds = [
-                      "cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
-                      "sudo ln -s ./lib/hooks/post-receive #{project_path}/hooks/post-receive",
-                        "sudo chown git:git -R #{project_path}",
-                        "sudo chmod 770 -R #{project_path}",
-                    ]
+                    #cmds = [
+                      #"cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
+                      #"sudo ln -s /rest/u/apps/gitlab/current/lib/hooks/post-receive #{project_path}/hooks/post-receive",
+                        #"sudo chown git:git -R #{project_path}",
+                        #"sudo chmod 770 -R #{project_path}",
+                    #]
 
-                      cmds.each do |cmd|
-                        puts cmd.yellow
-                        `#{cmd}`
-                      end
+                      #cmds.each do |cmd|
+                        #@import_log.info cmd.yellow
+                        #`#{cmd}`
+                      #end
 
-                      puts "OK".green
+                      @logger.info "#{repo.path};#{project_path}"
+
+                      @import_log.info "OK".green
                   else
-                    puts "Repo already exist!".red
+                    @import_log.info "Repo already exist!".red
                   end
 
-                  puts "Migrate committerships:"
+                  @import_log.info "Migrate committerships:"
 
                   master_users = repo.committerships.admins.users
 
@@ -257,7 +267,7 @@ namespace :undev do
                   report_teams = report_teams - [master_teams + develop_teams]
 
 
-                  puts "Add masters to project"
+                  @import_log.info "Add masters to project"
                   master_users.each do |mu|
                     user_ids = []
                     user = User.find_by_username(Legacy::User.find_by_id(mu.committer_id).login)
@@ -273,7 +283,7 @@ namespace :undev do
                     end
                   end
 
-                  puts "Add developers to project"
+                  @import_log.info "Add developers to project"
                   develop_users.each do |du|
                     user_ids = []
                     user = User.find_by_username(Legacy::User.find_by_id(du.committer_id).login)
@@ -289,7 +299,7 @@ namespace :undev do
                     end
                   end
 
-                  puts "Add reporters to project"
+                  @import_log.info "Add reporters to project"
                   report_users.each do |ru|
                     user_ids = []
                     user = User.find_by_username(Legacy::User.find_by_id(ru.committer_id).login)
@@ -305,7 +315,7 @@ namespace :undev do
                     end
                   end
 
-                  puts "Delegate to team with MAX master role"
+                  @import_log.info "Delegate to team with MAX master role"
                   master_teams.each do |mt|
                     team = UserTeam.find_by_path(Legacy::Group.find_by_id(mt.committer_id).name)
                     if team
@@ -315,7 +325,7 @@ namespace :undev do
                     print ".".green
                   end
 
-                  puts "Delegate to team with MAX developer role"
+                  @import_log.info "Delegate to team with MAX developer role"
                   develop_teams.each do |dt|
                     team = UserTeam.find_by_path(Legacy::Group.find_by_id(dt.committer_id).name)
                     if team
@@ -325,7 +335,7 @@ namespace :undev do
                     print ".".green
                   end
 
-                  puts "Delegate to team with MAX reporter role"
+                  @import_log.info "Delegate to team with MAX reporter role"
                   report_teams.each do |rt|
                     team = UserTeam.find_by_path(Legacy::Group.find_by_id(rt.committer_id).name)
                     if team
@@ -336,13 +346,13 @@ namespace :undev do
                   end
 
                 else
-                  puts "Repository #{repo.name} - #{repo.id} fail"
-                  puts "Errors: #{project.errors.inspect}"
+                  @import_log.info "Repository #{repo.name} - #{repo.id} fail"
+                  @import_log.info "Errors: #{project.errors.inspect}"
                 end
 
               rescue Exception => e
-                puts "Migrate project: #{repo.name} - #{repo.id} FUCK!".red
-                puts "Errors: #{e.inspect}"
+                @import_log.info "Migrate project: #{repo.name} - #{repo.id} FUCK!".red
+                @import_log.info "Errors: #{e.inspect}"
               end
 
             end
@@ -353,20 +363,54 @@ namespace :undev do
 
     desc "Migrate Events"
     task :events => :environment do
-      puts "Remove all old events".yellow
+      @import_log.info "Remove all old events".yellow
       Event.destroy_all
-      puts "Events removed.".green
+      @import_log.info "Events removed.".green
 
       Rake::Task["undev:migrate:events:committers"].invoke
       Rake::Task["undev:migrate:events:repositories"].invoke
+    end
+
+    namespace :subscriptions do
+      desc "Migrate Favorites from Gitorius to Gitlab"
+      task favorites: :environment do
+
+        @import_log.info "Start import favorite subscriptions".green
+        @import_log.info "Favorites count: #{Legacy::Favorite.by_email.count}"
+        Legacy::Favorite.by_email.find_each do |favorite|
+          case favorite.watchable_type
+          when "Repository"
+            project = Project.find_by_path(Legacy::Repository.find(favorite.watchable_id).name)
+            user = User.find_by_username(favorite.user.login) if favorite.user
+            if project && user
+              Gitlab::Event::Subscription.subscribe(user, :all, project, :all)
+              @import_log.info "Import subscription to #{project.name} for #{user.name} successfull".green
+            else
+              @import_log.info "Import subscription #{favorite.id} failed".red
+            end
+          when "Project"
+            group = Group.find_by_path(Legacy::Project.find(favorite.watchable_id).slug)
+            user = User.find_by_username(favorite.user.login) if favorite.user
+            if group && user
+              Gitlab::Event::Subscription.subscribe(user, :all, group, :all)
+              @import_log.info "Import subscription to #{group.name} for #{user.name} successfull".green
+            else
+              @import_log.info "Import subscription #{favorite.id} failed".red
+            end
+          when "MergeRequest"
+          else
+
+          end
+        end
+      end
     end
 
     namespace :events do
       desc "Migrate project events"
       task :repositories => :environment do
 
-        puts "Start import information about repository activity".green
-        puts "Events count: #{Legacy::Event.push_events.repository_events(nil).count}"
+        @import_log.info "Start import information about repository activity".green
+        @import_log.info "Events count: #{Legacy::Event.push_events.repository_events(nil).count}"
         Legacy::Event.push_events.repository_events(nil).find_each do |event|
 
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
@@ -390,9 +434,9 @@ namespace :undev do
               tmp = event.body.split " "
               data = project.post_receive_data(tmp[3], tmp[5], event.data, user)
 
-              Event.create(
+              OldEvent.create(
                 project: project,
-                action: Event::Pushed,
+                action: Event::PUSHED,
                 data: data,
                 author_id: data[:user_id],
                 created_at: event.created_at,
@@ -406,9 +450,9 @@ namespace :undev do
               oldrev, newrev, ref, commits = event.data.split "$"
               data = project.post_receive_data(oldrev, newrev, ref, user)
 
-              Event.create(
+              OldEvent.create(
                 project: project,
-                action: Event::Pushed,
+                action: Event::PUSHED,
                 data: data,
                 author_id: data[:user_id],
                 created_at: event.created_at,
@@ -420,16 +464,16 @@ namespace :undev do
             end
           end
         end
-        puts
-        puts "OK".green
-        puts
+        @import_log.info
+        @import_log.info "OK".green
+        @import_log.info
       end
 
       desc "Commiters information"
       task :committers => :environment do
 
-        puts "Start import information about repository committers".green
-        puts "Committers count: #{Legacy::Event.committers_events.repository_events(nil).count}"
+        @import_log.info "Start import information about repository committers".green
+        @import_log.info "Committers count: #{Legacy::Event.committers_events.repository_events(nil).count}"
         Legacy::Event.committers_events.repository_events(nil).find_each do |event|
 
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
@@ -440,9 +484,9 @@ namespace :undev do
             case event.action
             when Legacy::Action::ADD_COMMITTER
 
-              Event.create(
+              OldEvent.create(
                 project_id: project.id,
-                action: Event::Joined,
+                action: Event::JOINED,
                 author_id: user.id,
                 created_at: event.created_at,
                 updated_at: event.updated_at
@@ -451,9 +495,9 @@ namespace :undev do
               print "+".green
 
             when Legacy::Action::REMOVE_COMMITTER
-              Event.create(
+              OldEvent.create(
                 project_id: project.id,
-                action: Event::Left,
+                action: Event::LEFT,
                 author_id: user.id,
                 created_at: event.created_at,
                 updated_at: event.updated_at
@@ -467,9 +511,9 @@ namespace :undev do
 
         end
 
-        puts ""
-        puts "OK".green
-        puts ""
+        @import_log.info ""
+        @import_log.info "OK".green
+        @import_log.info ""
       end
     end
   end
