@@ -45,23 +45,19 @@ module Gitlab
               # User subscribe on source type by target
             when Symbol
               subscription_params[:source_category] = source.downcase
+            when Class
+              # Subscribe by class name?
+              source_category = source.name.downcase.to_sym
+              subscription_params[:source_category] = source_category
             else
-              if source.persisted?
-                # subscribe on current source updation
-                # For example if user commented Issue
-                subscription_params[:source] = source
-              else
-                # Subscribe by class name?
-                source_category = source.name.downcase.to_sym
-                subscription_params[:source_category] = source_category
-              end
+              # subscribe on current source updation
+              # For example if user commented Issue
+              subscription_params[:source] = source if source.persisted?
             end
 
             # Check, if user have some similar subscription
             subscription = ::Event::Subscription.new(subscription_params)
-            p exist_similar_subscription?(subscription)
             subscription.save unless exist_similar_subscription?(subscription)
-            p subscription.errors unless subscription.errors.blank?
           end
         end
 

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Event::Subscriptions::Group do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::Group.should respond_to :subscribe
+    Gitlab::Event::Subscriptions::Group.should respond_to :can_subscribe?
   end
 
   describe "Group subscribe" do
@@ -15,7 +15,7 @@ describe Gitlab::Event::Subscriptions::Group do
       target = source
       action = :updated
 
-      Gitlab::Event::Subscriptions::Group.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -24,10 +24,10 @@ describe Gitlab::Event::Subscriptions::Group do
 
     it "should subscribe user on all groups changes by subscribe with symbol" do
       source = :group
-      target = Group
+      target = create :group
       action = :created
 
-      Gitlab::Event::Subscriptions::Group.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -36,10 +36,10 @@ describe Gitlab::Event::Subscriptions::Group do
 
     it "should subscribe user on all groups changes by subscribe with Class name" do
       source = Group
-      target = Group
+      target = create :group
       action = :created
 
-      Gitlab::Event::Subscriptions::Group.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -51,7 +51,7 @@ describe Gitlab::Event::Subscriptions::Group do
       source = :project
       action = :created
 
-      Gitlab::Event::Subscriptions::Group.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
