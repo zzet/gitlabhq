@@ -128,6 +128,7 @@ ActiveRecord::Schema.define(:version => 20130410175022) do
     t.datetime "created_at",                  :null => false
     t.datetime "updated_at",                  :null => false
     t.string   "type"
+    t.string   "description", :default => "", :null => false
   end
 
   add_index "namespaces", ["name"], :name => "index_namespaces_on_name"
@@ -181,10 +182,10 @@ ActiveRecord::Schema.define(:version => 20130410175022) do
     t.datetime "updated_at"
     t.integer  "creator_id"
     t.string   "default_branch"
-    t.boolean  "issues_enabled",         :default => true,  :null => false
-    t.boolean  "wall_enabled",           :default => true,  :null => false
-    t.boolean  "merge_requests_enabled", :default => true,  :null => false
-    t.boolean  "wiki_enabled",           :default => true,  :null => false
+    t.boolean  "issues_enabled",         :default => true,     :null => false
+    t.boolean  "wall_enabled",           :default => true,     :null => false
+    t.boolean  "merge_requests_enabled", :default => true,     :null => false
+    t.boolean  "wiki_enabled",           :default => true,     :null => false
     t.integer  "namespace_id"
     t.boolean  "public",                 :default => false,    :null => false
     t.string   "issues_tracker",         :default => "gitlab", :null => false
