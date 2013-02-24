@@ -5,8 +5,8 @@ class NotificationService
       Gitlab::Event::Notifications.create_notifications(event)
     end
 
-    def process_noification(notification)
-      Gitlab::Event::Notifications.process_noification(notification)
+    def process_notification(notification)
+      Gitlab::Event::Notifications.process_notification(notification)
     end
 
   end
