@@ -11,6 +11,12 @@ class EventNotificationMailer < ActionMailer::Base
   #
 
   def default_email(notification)
+    @notification = notification
+    @event = notification.event
+    @user = @event.user
+    @source = @event.source
+    @target = @event.target
+
     mail(to: "test@email.com", subject: "Undefined mail")
   end
 end

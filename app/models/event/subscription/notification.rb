@@ -21,7 +21,7 @@ class Event::Subscription::Notification < ActiveRecord::Base
     state :failed
 
     event :process do
-      transition [:new] => :processing
+      transition [:new, :failed] => :processing
     end
 
     event :deliver do
