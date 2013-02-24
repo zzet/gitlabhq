@@ -1,0 +1,15 @@
+- if old_event.proper?
+  %div.event-item
+    %span.cgray.pull-right
+      #{time_ago_in_words(old_event.created_at)} ago.
+
+    = image_tag gravatar_icon(old_event.author_email), class: "avatar s24"
+
+    - if old_event.push?
+      = render "events/event/push", event: old_event
+      .clearfix
+    - elsif old_event.note?
+      = render "events/event/note", event: old_event
+    - else
+      = render "events/event/common", event: old_event
+
