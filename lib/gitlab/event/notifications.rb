@@ -11,18 +11,39 @@ module Gitlab
           end
         end
 
-        def process_notification(notificaton)
-          action = Event::Action.action_to_s(notification.event.action)
-          target = notification.event.target.class_name.to_s
-          source = notification.event.source.class_name.to_s
+        def process_notification(notification)
+          stored_notification = ::Event::Subscription::Notification.find_by_id(notification["id"])
 
-          mail_method = "#{action}_#{target}_#{source}email"
+          if stored_notification && stored_notification.event
+            action = stored_notification.event.action
+            target = stored_notification.event.target_type.downcase
+            source = stored_notification.event.source_type.downcase
 
-          if EventNotificationMailer.respond_to?(mail_method)
-            EventNotificationMailer.send(mail_method, notification)
+            mail_method = "#{action}_#{target}_#{source}_email"
+
+            ::Event::Subscription::Notification.transaction do
+
+              stored_notification.process
+              stored_notification.save
+
+              begin
+
+                if EventNotificationMailer.respond_to?(mail_method)
+                  EventNotificationMailer.send(mail_method, stored_notification)
+                else
+                  Rails.logger.info "Undefined mail_method in notifications: #{mail_method}"
+                  EventNotificationMailer.default_email(stored_notification)
+                end
+
+                stored_notification.deliver
+              rescue
+                stored_notification.failing
+              end
+              stored_notification.save
+            end
+
           else
-            Rails.logger.info "undefined #{mail_method}"
-            EventNotificationMailer.dafault_email(notification)
+            Rails.logger.warn("Can't send email to notification ##{notification["id"]}. Event is deleted.")
           end
         end
 

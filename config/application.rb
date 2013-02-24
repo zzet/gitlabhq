@@ -26,6 +26,7 @@ module Gitlab
     config.active_record.observers = :old_activity_observer,
                                      :activity_observer,
                                      :event_observer,
+                                     :notification_observer,
                                      :issue_observer,
                                      :key_observer,
                                      :merge_request_observer,
