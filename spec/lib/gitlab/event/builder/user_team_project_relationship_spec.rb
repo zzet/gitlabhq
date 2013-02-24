@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::UserTeamProjectRelationship do
   before do
+    ActiveRecord::Base.observers.disable :all
+
     @user_team_project_relationship = create :user_team_project_relationship
     @user = create :user
     @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}

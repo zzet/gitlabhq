@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::Wiki do
   before do
+    ActiveRecord::Base.observers.disable :all
+
     @wiki = create :wiki
     @user = create :user
     @data = {source: @wiki, user: @user, data: @wiki}
