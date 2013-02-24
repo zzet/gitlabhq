@@ -22,6 +22,3 @@ module Gitlab
     end
   end
 end
-
-
-ActiveSupport::Notifications.subscribe(/gitlab/, EventNotificationWorker.new)
