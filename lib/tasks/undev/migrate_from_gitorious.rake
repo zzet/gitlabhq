@@ -6,18 +6,19 @@ namespace :undev do
   @logger = Logger.new('path_changes.txt')
 
   desc "Migrate All data from gitorious to gitolite"
-  task :migrate => :environment do
+  task migrate: :environment do
     Rake::Task["undev:migrate:users"].invoke
     Rake::Task["undev:migrate:teams"].invoke
     Rake::Task["undev:migrate:projects"].invoke
     Rake::Task["undev:migrate:repositories"].invoke
+    Rake::Task["undev:subscriptions:favorite"].invoke
     Rake::Task["undev:migrate:events"].invoke
   end
 
   namespace :migrate do
 
     desc "Migrate users from gitorious to gitlab"
-    task :users => :environment do
+    task users: :environment do
 
       user_count = Legacy::User.count
 
@@ -71,7 +72,7 @@ namespace :undev do
 
 
     desc "Migrate user teams from gitorious ti gitlab"
-    task :teams => :environment do
+    task teams: :environment do
 
       teams_count = Legacy::Group.count
 
@@ -130,7 +131,7 @@ namespace :undev do
     end
 
     desc "Migrate Projects from gitorius to gitlab"
-    task :projects => :environment do
+    task projects: :environment do
 
       projects_count = Legacy::Project.count
       @import_log.info "Start migrate projects"
@@ -178,7 +179,7 @@ namespace :undev do
     end
 
     desc "Migrate Repositories from gitorious to gitlab"
-    task :repositories => :environment do
+    task repositories: :environment do
 
       repo_count = Legacy::Repository.count
       @import_log.info "Start migrate repositories from gitorius to gitlab".yellow
@@ -362,7 +363,7 @@ namespace :undev do
     end
 
     desc "Migrate Events"
-    task :events => :environment do
+    task events: :environment do
       @import_log.info "Remove all old events".yellow
       Event.destroy_all
       @import_log.info "Events removed.".green
@@ -407,7 +408,7 @@ namespace :undev do
 
     namespace :events do
       desc "Migrate project events"
-      task :repositories => :environment do
+      task repositories: :environment do
 
         @import_log.info "Start import information about repository activity".green
         @import_log.info "Events count: #{Legacy::Event.push_events.repository_events(nil).count}"
@@ -470,7 +471,7 @@ namespace :undev do
       end
 
       desc "Commiters information"
-      task :committers => :environment do
+      task committers: :environment do
 
         @import_log.info "Start import information about repository committers".green
         @import_log.info "Committers count: #{Legacy::Event.committers_events.repository_events(nil).count}"
