@@ -3,7 +3,7 @@ module Gitlab
     extend self
 
     def username_regex
-      default_regex
+      name_regex
     end
 
     def project_name_regex

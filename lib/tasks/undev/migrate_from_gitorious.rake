@@ -36,8 +36,11 @@ namespace :undev do
           new_user.created_at = user.created_at
           new_user.updated_at = user.updated_at
 
-          key = Legacy::SshKey.find_by_user_id(user.id)
-          new_user.keys.new(key: key.key, title: "#{user.login} #{user.email} key") if key
+          keys = Legacy::SshKey.where(user_id: user.id)
+
+          keys.each do |key|
+            new_user.keys.new(key: key.key, title: "#{user.login} #{user.email} key")
+          end
 
           new_user.force_random_password = true
 
