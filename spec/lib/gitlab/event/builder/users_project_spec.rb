@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::UsersProject do
   before do
+    ActiveRecord::Base.observers.disable :all
+
     @users_project = create :users_project
     @user = create :user
     @data = {source: @users_project, user: @user, data: @users_project}
