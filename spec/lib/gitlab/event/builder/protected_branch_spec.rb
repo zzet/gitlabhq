@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::ProtectedBranch do
   before do
+    ActiveRecord::Base.observers.disable :all
+
     @protected_branch = create :protected_branch
     @user = create :user
     @data = {source: @protected_branch, user: @user, data: @protected_branch}

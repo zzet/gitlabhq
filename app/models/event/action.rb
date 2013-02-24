@@ -31,6 +31,7 @@ class Event::Action
     end
 
     def action_exists?(action)
+      action = action.to_sym if action.is_a? String
       available_actions.include? action
     end
   end

@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::Issue do
   before do
+    ActiveRecord::Base.observers.disable :all
+
     @user = create :user
     @project = create :project, creator: @user
     @issue = create :issue, project: @project

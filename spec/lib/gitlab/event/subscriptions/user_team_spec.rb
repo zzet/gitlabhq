@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Event::Subscriptions::UserTeam do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::UserTeam.should respond_to :subscribe
+    Gitlab::Event::Subscriptions::UserTeam.should respond_to :can_subscribe?
   end
 
   describe "UserTeam subscribe" do
@@ -15,7 +15,7 @@ describe Gitlab::Event::Subscriptions::UserTeam do
       target = source
       action = :updated
 
-      Gitlab::Event::Subscriptions::UserTeam.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -24,10 +24,10 @@ describe Gitlab::Event::Subscriptions::UserTeam do
 
     it "should subscribe user on all user_teams changes by subscribe with symbol" do
       source = :user_team
-      target = UserTeam
+      target = create :user_team
       action = :created
 
-      Gitlab::Event::Subscriptions::UserTeam.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -36,10 +36,10 @@ describe Gitlab::Event::Subscriptions::UserTeam do
 
     it "should subscribe user on all user_teams changes by subscribe with Class name" do
       source = UserTeam
-      target = UserTeam
+      target = create :user_team
       action = :created
 
-      Gitlab::Event::Subscriptions::UserTeam.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -51,7 +51,7 @@ describe Gitlab::Event::Subscriptions::UserTeam do
       source = :users_project
       action = :created
 
-      Gitlab::Event::Subscriptions::UserTeam.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil

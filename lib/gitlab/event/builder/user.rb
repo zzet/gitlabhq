@@ -60,6 +60,9 @@ module Gitlab
               when :deleted
                 actions << :left
               end
+              # TODO.
+              # Add support with Issue, MergeRequest, Milestone, Note, ProjectHook, ProtectedBranch, Service, Snippet
+              # All models, which contain User
             end
 
             events = []

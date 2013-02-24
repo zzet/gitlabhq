@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Gitlab::Event::Builder::SystemHook do
   before do
     ActiveRecord::Base.observers.disable :all
-    SystemHook.observers.enable :activity_observer
+    #SystemHook.observers.enable :activity_observer
 
     @system_hook = create :system_hook
     @user = create :user
