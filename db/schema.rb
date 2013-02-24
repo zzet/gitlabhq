@@ -122,12 +122,13 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
   add_index "milestones", ["project_id"], :name => "index_milestones_on_project_id"
 
   create_table "namespaces", :force => true do |t|
-    t.string   "name",       :null => false
-    t.string   "path",       :null => false
-    t.integer  "owner_id",   :null => false
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.string   "name",                        :null => false
+    t.string   "path",                        :null => false
+    t.integer  "owner_id",                    :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
     t.string   "type"
+    t.string   "description", :default => "", :null => false
   end
 
   add_index "namespaces", ["name"], :name => "index_namespaces_on_name"
@@ -177,16 +178,17 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
     t.string   "name"
     t.string   "path"
     t.text     "description"
-    t.datetime "created_at",                                :null => false
-    t.datetime "updated_at",                                :null => false
+    t.datetime "created_at",                                   :null => false
+    t.datetime "updated_at",                                   :null => false
     t.integer  "creator_id"
     t.string   "default_branch"
-    t.boolean  "issues_enabled",         :default => true,  :null => false
-    t.boolean  "wall_enabled",           :default => true,  :null => false
-    t.boolean  "merge_requests_enabled", :default => true,  :null => false
-    t.boolean  "wiki_enabled",           :default => true,  :null => false
+    t.boolean  "issues_enabled",         :default => true,     :null => false
+    t.boolean  "wall_enabled",           :default => true,     :null => false
+    t.boolean  "merge_requests_enabled", :default => true,     :null => false
+    t.boolean  "wiki_enabled",           :default => true,     :null => false
     t.integer  "namespace_id"
-    t.boolean  "public",                 :default => false, :null => false
+    t.string   "issues_tracker",         :default => "gitlab", :null => false
+    t.boolean  "public",                 :default => false,    :null => false
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
