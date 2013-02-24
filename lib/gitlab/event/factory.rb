@@ -1,5 +1,6 @@
 module Gitlab
   class Event::Factory
+
     class << self
       def build(action, data)
         events = []
@@ -8,7 +9,6 @@ module Gitlab
           events << descendant.build(action, data[:source], data[:user], data[:data]) if descendant.can_build?(action, data[:data])
         end
 
-        #p events
         events.flatten
       end
 
@@ -17,8 +17,6 @@ module Gitlab
 
         events.each do |event|
           event.save
-          # TODO. Remove debug
-          p event.errors if event.errors.present? && !event.source.is_a?(::User)
         end
       end
     end
