@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Gitlab::Event::Subscriptions::Project do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::Project.should respond_to :subscribe
+    Gitlab::Event::Subscriptions::Project.should respond_to :can_subscribe?
   end
 
   describe "Project subscribe" do
@@ -15,7 +15,7 @@ describe Gitlab::Event::Subscriptions::Project do
       target = source
       action = :updated
 
-      Gitlab::Event::Subscriptions::Project.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -24,10 +24,10 @@ describe Gitlab::Event::Subscriptions::Project do
 
     it "should subscribe user on all projects changes by subscribe with symbol" do
       source = :project
-      target = Project
+      target = create :project
       action = :created
 
-      Gitlab::Event::Subscriptions::Project.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -36,10 +36,10 @@ describe Gitlab::Event::Subscriptions::Project do
 
     it "should subscribe user on all projects changes by subscribe with Class name" do
       source = Project
-      target = Project
+      target = create :project
       action = :created
 
-      Gitlab::Event::Subscriptions::Project.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil
@@ -51,7 +51,7 @@ describe Gitlab::Event::Subscriptions::Project do
       source = :issue
       action = :created
 
-      Gitlab::Event::Subscriptions::Project.subscribe(@user, action, source, target)
+      Gitlab::Event::Subscription.subscribe(@user, action, target, source)
 
       subscription = ::Event::Subscription.last
       subscription.should_not be_nil

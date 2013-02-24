@@ -5,5 +5,7 @@ FactoryGirl.define do
     author
     action Event.action.values.first
     data "MyText"
+    source_id 1
+    source_type "Issue"
   end
 end

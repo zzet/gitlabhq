@@ -16,7 +16,7 @@ class Event < ActiveRecord::Base
   has_many :subscribers,    through: :subscriptions, class_name: User
 
   validates :author,  presence: true
-  validates :source,  presence: true, unless: -> { action.to_sym == :deleted }
+  validates :source,  presence: true, unless: -> { action && action.to_sym == :deleted }
 
   # For Hash only
   serialize :data

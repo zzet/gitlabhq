@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::MergeRequest do
   before do
+    ActiveRecord::Base.observers.disable :all
+
     @merge_request = create :merge_request
     @user = create :user
     @data = {source: @merge_request, user: @user, data: @merge_request}
