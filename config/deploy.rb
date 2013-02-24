@@ -24,7 +24,7 @@ set :application, "gitlab"
 set :rvm_type, :system
 
 set :scm, :git
-set :repository, "git://github.com/Undev/gitlabhq.git"# "git@gitlab.home:gitlabhq.git"
+set :repository, "git://github.com/zzet/gitlabhq.git"# "git@gitlab.home:gitlabhq.git"
 
 set :use_sudo, false
 set :ssh_options, :forward_agent => true
