@@ -1,6 +1,6 @@
 module Gitlab
   module Event
-    class Acion
+    class Action
       cattr_accessor :current_user
 
       class << self
