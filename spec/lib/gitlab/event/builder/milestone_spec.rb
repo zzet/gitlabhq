@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::Milestone do
   before do
+    ActiveRecord::Base.observers.disable :all
+
     @milestone = create :milestone
     @user = create :user
     @data = {source: @milestone, user: @user, data: @milestone}
