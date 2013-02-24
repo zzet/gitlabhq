@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Gitlab::Event::Builder::Snippet do
   before do
+    ActiveRecord::Base.observers.disable :all
+
     @snippet = create :snippet
     @user = create :user
     @data = {source: @snippet, user: @user, data: @snippet}
