@@ -2,7 +2,15 @@ module Gitlab
   module Event
     module Builder
       class Base
+
         class << self
+          def descendants
+            # In production class cache :)
+            Dir[File.dirname(__FILE__) << "/**/*.rb"].each {|f| load f} if super.blank?
+
+            super
+          end
+
           def can_build?(action, data)
             raise NotImplementedError
           end
@@ -31,5 +39,3 @@ module Gitlab
     end
   end
 end
-
-Dir[File.dirname(__FILE__) << "/**/*.rb"].each {|f| require f}

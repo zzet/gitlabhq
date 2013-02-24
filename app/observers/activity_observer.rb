@@ -22,7 +22,7 @@ class ActivityObserver < ActiveRecord::Observer
     Gitlab::Event::Action.trigger :created, model
   end
 
-  def after_close(moled, transition)
+  def after_close(model, transition)
     Gitlab::Event::Action.trigger :closed, model
   end
 
