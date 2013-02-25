@@ -39,7 +39,7 @@ module Gitlab
 
           if target && target.persisted?
 
-            subscription_params = { user: user, action: action, target: target }
+            subscription_params = { user: user, action: action, target_id: target.id, target_type: target.class.name }
 
             case source
               # User subscribe on source type by target
@@ -52,7 +52,10 @@ module Gitlab
             else
               # subscribe on current source updation
               # For example if user commented Issue
-              subscription_params[:source] = source if source.persisted?
+              if source.persisted?
+                subscription_params[:source_id] = source.id
+                subscription_params[:source_type] = source.class.name
+              end
             end
 
             # Check, if user have some similar subscription
