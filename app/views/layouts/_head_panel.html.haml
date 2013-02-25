@@ -8,6 +8,8 @@
         %span.separator
       %h1.project_name= title
       %ul.nav
+        - if defined?(current_entity) && current_entity.kind_of?(Watchable)
+          = render "shared/watch_button", current_entity: current_entity
         - if current_user.is_admin?
           %li
             = link_to admin_root_path, title: "Admin area", class: 'has_bottom_tooltip', 'data-original-title' => 'Admin area' do
