@@ -13,6 +13,10 @@ module Watchable
     end
   end
 
+  def watched_by?(user)
+
+  end
+
   def watch_status?(user)
 
   end
