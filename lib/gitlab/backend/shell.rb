@@ -41,7 +41,7 @@ module Gitlab
     #   add_key("key-42", "sha-rsa ...")
     #
     def add_key(key_id, key_content)
-      system("#{gitlab_shell_user_home}/gitlab-shell/bin/gitlab-keys add-key #{key_id} \"#{key_content}\"")
+      system("#{gitlab_shell_user_home}/gitlab-shell/bin/gitlab-keys add-key #{key_id} \'#{key_content}\'")
     end
 
     # Remove ssh key from gitlab shell
@@ -50,13 +50,13 @@ module Gitlab
     #   remove_key("key-342", "sha-rsa ...")
     #
     def remove_key(key_id, key_content)
-      system("#{gitlab_shell_user_home}/gitlab-shell/bin/gitlab-keys rm-key #{key_id} \"#{key_content}\"")
+      system("#{gitlab_shell_user_home}/gitlab-shell/bin/gitlab-keys rm-key #{key_id} \'#{key_content}\'")
     end
 
     def url_to_repo path
       Gitlab.config.gitlab_shell.ssh_path_prefix + "#{path}.git"
     end
-   
+
     def gitlab_shell_user_home
       File.expand_path("~#{Gitlab.config.gitlab_shell.ssh_user}")
     end
