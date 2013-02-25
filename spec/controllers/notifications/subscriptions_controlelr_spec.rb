@@ -50,7 +50,7 @@ describe Notifications::SubscriptionsController do
     it "should unregister subscription on team" do
       SubscriptionService.subscribe(user, :all, user_team, :all)
 
-      delete :destroy :entity => { id: user_team.id,  type: :user_team}, format: :html
+      delete :destroy, :entity => { id: user_team.id,  type: :user_team}, format: :html
 
       user_team.watched_by?(user).should be_false 
     end
