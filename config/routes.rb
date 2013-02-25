@@ -96,6 +96,10 @@ Gitlab::Application.routes.draw do
 
   get "errors/githost"
 
+  namespace :notifications do
+    resource :subscription, only: [:create, :destroy]
+  end
+
   #
   # Profile Area
   #
@@ -114,8 +118,6 @@ Gitlab::Application.routes.draw do
 
   resources :keys
   match "/u/:username" => "users#show", as: :user, constraints: { username: /.*/ }
-
-
 
   #
   # Dashboard Area
