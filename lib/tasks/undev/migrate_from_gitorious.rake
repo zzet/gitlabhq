@@ -109,41 +109,43 @@ namespace :undev do
 
       Legacy::Group.find_each do |group|
         unless UserTeam.find_by_path(group.name)
-          team = UserTeam.new
+          unless Legacy::User.find_by_login(group.name)
+            team = UserTeam.new
 
-          team.name = group.name
-          team.path = group.name
-          team.description = group.description
+            team.name = group.name
+            team.path = group.name
+            team.description = group.description
 
-          team.created_at = group.created_at
-          team.updated_at = group.updated_at
+            team.created_at = group.created_at
+            team.updated_at = group.updated_at
 
-          group_owner = Legacy::User.find_by_id(group.user_id)
-          team.owner = User.find_by_username(group_owner.login)
+            group_owner = Legacy::User.find_by_id(group.user_id)
+            team.owner = User.find_by_username(group_owner.login)
 
-          begin
-            if team.save
-              @import_log.info "Migrate Team of users: #{team.name} succesfull"
-            else
-              @import_log.info "Migrate Team of users: #{group.name} - #{group.id} failed"
-              @import_log.info "Errors: #{team.errors.inspect}"
-            end
-
-            # Members
-            @import_log.info "Add members to team".yellow
-            group.memberships.each do |group_member|
-              user = User.find_by_username(group_member.user.login)
-              if user
-                is_admin = group_member.role.kind == 0 ? true : false
-                permission = is_admin ? UsersProject.access_roles["Master"] : UsersProject.access_roles["Developer"]
-
-                team.add_member(user, permission, is_admin)
-                print ".".green
+            begin
+              if team.save
+                @import_log.info "Migrate Team of users: #{team.name} succesfull"
+              else
+                @import_log.info "Migrate Team of users: #{group.name} - #{group.id} failed"
+                @import_log.info "Errors: #{team.errors.inspect}"
               end
+
+              # Members
+              @import_log.info "Add members to team".yellow
+              group.memberships.each do |group_member|
+                user = User.find_by_username(group_member.user.login)
+                if user
+                  is_admin = group_member.role.kind == 0 ? true : false
+                  permission = is_admin ? UsersProject.access_roles["Master"] : UsersProject.access_roles["Developer"]
+
+                  team.add_member(user, permission, is_admin)
+                  print ".".green
+                end
+              end
+            rescue Exception => e
+              @import_log.info "Migrate Team of users: #{group.name} - #{group.id} FUCK!"
+              @import_log.info "Errors: #{e.inspect}"
             end
-          rescue Exception => e
-            @import_log.info "Migrate Team of users: #{group.name} - #{group.id} FUCK!"
-            @import_log.info "Errors: #{e.inspect}"
           end
         end
 
@@ -258,20 +260,10 @@ namespace :undev do
 
                   project_path = File.join(root, "#{project.path_with_namespace}.git")
 
+                  system("rm -rf #{project_path}") if File.exists?(project_path)
+
                   unless File.exists?(project_path)
                     @shell.import_repository(project.path_with_namespace, repo.git_clone_url)
-
-                    #cmds = [
-                    #"cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
-                    #"sudo ln -s /rest/u/apps/gitlab/current/lib/hooks/post-receive #{project_path}/hooks/post-receive",
-                    #"sudo chown git:git -R #{project_path}",
-                    #"sudo chmod 770 -R #{project_path}",
-                    #]
-
-                    #cmds.each do |cmd|
-                    #@import_log.info cmd.yellow
-                    #`#{cmd}`
-                    #end
 
                     @logger.info "#{repo.hashed_path}.git;#{project_path}"
 
