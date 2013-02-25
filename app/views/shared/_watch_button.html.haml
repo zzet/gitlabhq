@@ -1,5 +1,5 @@
 %li
-  %a.watch-button.has_bottom_tooltip{class: ("watched" if current_entity.watched_by?(@current_user)), role: 'button', 'data-original-title' => 'Watch', 'data-entity-id' => current_entity.id, 'data-entity-type' => current_entity.class.model_name.downcase }
+  %a.watch-button.has_bottom_tooltip{class: watched_class(@current_user, current_entity), role: 'button', 'data-original-title' => watched_title(@current_user, current_entity), 'data-entity-id' => current_entity.id, 'data-entity-type' => current_entity.class.model_name.downcase }
     - if current_entity.watched_by? @current_user
       %i.icon-eye-open
     - else
