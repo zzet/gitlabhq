@@ -1,3 +1,6 @@
 %li
-  %a.watch-button.has_bottom_tooltip{role: 'button', 'data-original-title' => 'Watch' }
-    %i.icon-eye-open
+  %a.watch-button.has_bottom_tooltip{class: ("watched" if current_entity.watched_by?(@current_user)), role: 'button', 'data-original-title' => 'Watch', 'data-entity-id' => current_entity.id, 'data-entity-type' => current_entity.class.model_name.downcase }
+    - if current_entity.watched_by? @current_user
+      %i.icon-eye-open
+    - else
+      %i.icon-eye-close
