@@ -10,6 +10,7 @@ $ ->
         (data) -> 
           $watch_button.removeClass('watched')
           $watch_button.find('i').removeClass('icon-eye-open').addClass('icon-eye-close')
+          $watch_button.attr('data-original-title', 'Watch')
     else
       $.post Routes.notifications_subscription_path(),
         entity:
@@ -18,4 +19,5 @@ $ ->
         (data) -> 
           $watch_button.addClass('watched')
           $watch_button.find('i').removeClass('icon-eye-close').addClass('icon-eye-open')
+          $watch_button.attr('data-original-title', 'Unwatch')
 
