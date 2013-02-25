@@ -37,11 +37,6 @@ class Note < NewDb
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
-  has_many :events,         as: :target,    dependent: :destroy
-  has_many :subscriptions,  condition: { action: "some_action" }
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
-
   delegate :name, to: :project, prefix: true
   delegate :name, :email, to: :author, prefix: true
 
