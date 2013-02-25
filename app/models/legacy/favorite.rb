@@ -1,6 +1,6 @@
 class Legacy::Favorite < LegacyDb
   belongs_to :user, class_name: Legacy::User
-  belongs_to :watchable, :polymorphic => true, class_name: Legacy::Watchable
+  belongs_to :watchable, :polymorphic => true
 
   scope :by_email, where(notify_by_email: true)
   scope :on_repository, where(watchable_type: "Repository")

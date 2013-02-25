@@ -5,8 +5,19 @@ namespace :undev do
   @import_log = Logger.new('import.log')
   @logger = Logger.new('path_changes.txt')
 
+  ActiveRecord::Base.observers.disable :all
+
   desc "Migrate All data from gitorious to gitolite"
   task migrate: :environment do
+    @import_log.info "create default admin"
+    @admin = User.new
+    @admin.username = "admin"
+    @admin.name = "Admin"
+    @admin.email = "admin@undev.cc"
+    @admin.blocked = false
+    @admin.admin = true
+    @admin.save
+
     Rake::Task["undev:migrate:users"].invoke
     Rake::Task["undev:migrate:teams"].invoke
     Rake::Task["undev:migrate:projects"].invoke
@@ -27,6 +38,8 @@ namespace :undev do
       @import_log.info ""
 
       step = 0
+
+      Gitlab::Event::Action.current_user = User.first
 
       Legacy::User.find_each do |user|
         unless User.find_by_username(user.login)
@@ -60,6 +73,10 @@ namespace :undev do
           rescue Exception => e
             @import_log.info "Migrate user: #{user.login} - #{user.id} FUCK!"
             @import_log.info "Errors: #{e.inspect}"
+            puts e.backtrace
+            puts ""
+            puts ""
+            puts ""
           end
 
           step += 1
@@ -81,6 +98,8 @@ namespace :undev do
       @import_log.info ""
 
       step = 0
+
+      Gitlab::Event::Action.current_user = User.first
 
       Legacy::Group.find_each do |group|
         unless UserTeam.find_by_path(group.name)
@@ -137,6 +156,8 @@ namespace :undev do
       @import_log.info "Start migrate projects"
       @import_log.info "Projects count: #{projects_count}"
 
+      Gitlab::Event::Action.current_user = User.first
+
       Legacy::Project.find_each do |project|
 
         unless Group.find_by_path(project.slug)
@@ -187,6 +208,8 @@ namespace :undev do
 
       root = Gitlab.config.gitolite.repos_path
 
+      Gitlab::Event::Action.current_user = User.first
+
       Legacy::Repository.actual.each do |repo|
 
         group = Group.find_by_name(repo.project.slug)
@@ -231,20 +254,20 @@ namespace :undev do
                     Gitlab::Shell.import_repository(project.path_with_namespace, repo.git_clone_url)
 
                     #cmds = [
-                      #"cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
-                      #"sudo ln -s /rest/u/apps/gitlab/current/lib/hooks/post-receive #{project_path}/hooks/post-receive",
-                        #"sudo chown git:git -R #{project_path}",
-                        #"sudo chmod 770 -R #{project_path}",
+                    #"cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
+                    #"sudo ln -s /rest/u/apps/gitlab/current/lib/hooks/post-receive #{project_path}/hooks/post-receive",
+                    #"sudo chown git:git -R #{project_path}",
+                    #"sudo chmod 770 -R #{project_path}",
                     #]
 
-                      #cmds.each do |cmd|
-                        #@import_log.info cmd.yellow
-                        #`#{cmd}`
-                      #end
+                    #cmds.each do |cmd|
+                    #@import_log.info cmd.yellow
+                    #`#{cmd}`
+                    #end
 
-                      @logger.info "#{repo.path};#{project_path}"
+                    @logger.info "#{repo.path};#{project_path}"
 
-                      @import_log.info "OK".green
+                    @import_log.info "OK".green
                   else
                     @import_log.info "Repo already exist!".red
                   end
@@ -378,6 +401,9 @@ namespace :undev do
 
         @import_log.info "Start import favorite subscriptions".green
         @import_log.info "Favorites count: #{Legacy::Favorite.by_email.count}"
+
+        Gitlab::Event::Action.current_user = User.first
+
         Legacy::Favorite.by_email.find_each do |favorite|
           case favorite.watchable_type
           when "Repository"
@@ -412,6 +438,9 @@ namespace :undev do
 
         @import_log.info "Start import information about repository activity".green
         @import_log.info "Events count: #{Legacy::Event.push_events.repository_events(nil).count}"
+
+        Gitlab::Event::Action.current_user = User.first
+
         Legacy::Event.push_events.repository_events(nil).find_each do |event|
 
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
@@ -475,6 +504,9 @@ namespace :undev do
 
         @import_log.info "Start import information about repository committers".green
         @import_log.info "Committers count: #{Legacy::Event.committers_events.repository_events(nil).count}"
+
+        Gitlab::Event::Action.current_user = User.first
+
         Legacy::Event.committers_events.repository_events(nil).find_each do |event|
 
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
