@@ -42,7 +42,7 @@ module Gitlab
 
                 # TODO. refactor
                 actions << :added if source.namespace_id_changed? && source.namespace_id != changes[:namespace_id].first && source.namespace == target
-                actions << :transfer if source.namespace_id_changed? && source.namespace_id != changes[:namespace_id].first && Group.find_by_id(changes["namespace_id"]).present?
+                actions << :transfer if source.namespace_id_changed? && source.namespace_id != changes[:namespace_id].first && ::Group.find_by_id(changes["namespace_id"]).present?
               when :deleted
                 actions << :deleted
               end
