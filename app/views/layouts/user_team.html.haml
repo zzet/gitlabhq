@@ -2,7 +2,7 @@
 %html{ lang: "en"}
   = render "layouts/head", title: "#{@team.name}"
   %body{class: "#{app_theme} application"}
-    = render "layouts/head_panel", title: "team: #{@team.name}"
+    = render "layouts/head_panel", title: "team: #{@team.name}", current_entity: @team
     = render "layouts/flash"
     .container
       %ul.main_menu
