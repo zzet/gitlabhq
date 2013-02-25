@@ -120,6 +120,7 @@ group :assets do
   gem "font-awesome-sass-rails", "~> 3.0.0"
   gem "gemoji", "~> 1.2.1", require: 'emoji/railtie'
   gem "gon"
+  gem "js-routes"
 end
 
 group :development do
