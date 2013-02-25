@@ -5,14 +5,20 @@ namespace :undev do
   @import_log = Logger.new('import.log')
   @logger = Logger.new('path_changes.txt')
 
-  ActiveRecord::Base.observers.disable :all
+  #  ActiveRecord::Base.observers.disable :all
 
   desc "Migrate All data from gitorious to gitolite"
   task migrate: :environment do
+    Project.destroy_all
+    Group.destroy_all
+    UserTeam.destroy_all
+    User.destroy_all
+
     @import_log.info "create default admin"
     @admin = User.new
     @admin.username = "admin"
     @admin.name = "Admin"
+    @admin.password = "123456"
     @admin.email = "admin@undev.cc"
     @admin.blocked = false
     @admin.admin = true
@@ -22,7 +28,7 @@ namespace :undev do
     Rake::Task["undev:migrate:teams"].invoke
     Rake::Task["undev:migrate:projects"].invoke
     Rake::Task["undev:migrate:repositories"].invoke
-    Rake::Task["undev:subscriptions:favorite"].invoke
+    Rake::Task["undev:migrate:subscriptions:favorites"].invoke
     Rake::Task["undev:migrate:events"].invoke
   end
 
@@ -206,9 +212,11 @@ namespace :undev do
       @import_log.info "Start migrate repositories from gitorius to gitlab".yellow
       @import_log.info "Repository count: #{repo_count}"
 
-      root = Gitlab.config.gitolite.repos_path
+      root = Gitlab.config.gitlab_shell.repos_path
 
       Gitlab::Event::Action.current_user = User.first
+
+      @shell = Gitlab::Shell.new
 
       Legacy::Repository.actual.each do |repo|
 
@@ -251,7 +259,7 @@ namespace :undev do
                   project_path = File.join(root, "#{project.path_with_namespace}.git")
 
                   unless File.exists?(project_path)
-                    Gitlab::Shell.import_repository(project.path_with_namespace, repo.git_clone_url)
+                    @shell.import_repository(project.path_with_namespace, repo.git_clone_url)
 
                     #cmds = [
                     #"cd #{root} && sudo -u git -H git clone --bare #{repo.git_clone_url} ./#{project.path_with_namespace}.git",
@@ -265,7 +273,7 @@ namespace :undev do
                     #`#{cmd}`
                     #end
 
-                    @logger.info "#{repo.path};#{project_path}"
+                    @logger.info "#{repo.hashed_path}.git;#{project_path}"
 
                     @import_log.info "OK".green
                   else
@@ -405,28 +413,31 @@ namespace :undev do
         Gitlab::Event::Action.current_user = User.first
 
         Legacy::Favorite.by_email.find_each do |favorite|
-          case favorite.watchable_type
-          when "Repository"
-            project = Project.find_by_path(Legacy::Repository.find(favorite.watchable_id).name)
-            user = User.find_by_username(favorite.user.login) if favorite.user
-            if project && user
-              Gitlab::Event::Subscription.subscribe(user, :all, project, :all)
-              @import_log.info "Import subscription to #{project.name} for #{user.name} successfull".green
+          begin
+            case favorite.watchable_type
+            when "Repository"
+              project = Project.find_by_path(Legacy::Repository.find(favorite.watchable_id).name)
+              user = User.find_by_username(favorite.user.login) if favorite.user
+              if project && user
+                Gitlab::Event::Subscription.subscribe(user, :all, project, :all)
+                @import_log.info "Import subscription to #{project.name} for #{user.name} successfull".green
+              else
+                @import_log.info "Import subscription #{favorite.id} failed".red
+              end
+            when "Project"
+              group = Group.find_by_path(Legacy::Project.find(favorite.watchable_id).slug)
+              user = User.find_by_username(favorite.user.login) if favorite.user
+              if group && user
+                Gitlab::Event::Subscription.subscribe(user, :all, group, :all)
+                @import_log.info "Import subscription to #{group.name} for #{user.name} successfull".green
+              else
+                @import_log.info "Import subscription #{favorite.id} failed".red
+              end
+            when "MergeRequest"
             else
-              @import_log.info "Import subscription #{favorite.id} failed".red
-            end
-          when "Project"
-            group = Group.find_by_path(Legacy::Project.find(favorite.watchable_id).slug)
-            user = User.find_by_username(favorite.user.login) if favorite.user
-            if group && user
-              Gitlab::Event::Subscription.subscribe(user, :all, group, :all)
-              @import_log.info "Import subscription to #{group.name} for #{user.name} successfull".green
-            else
-              @import_log.info "Import subscription #{favorite.id} failed".red
-            end
-          when "MergeRequest"
-          else
 
+            end
+          rescue
           end
         end
       end
@@ -466,7 +477,7 @@ namespace :undev do
 
               OldEvent.create(
                 project: project,
-                action: Event::PUSHED,
+                action: OldEvent::PUSHED,
                 data: data,
                 author_id: data[:user_id],
                 created_at: event.created_at,
@@ -482,7 +493,7 @@ namespace :undev do
 
               OldEvent.create(
                 project: project,
-                action: Event::PUSHED,
+                action: OldEvent::PUSHED,
                 data: data,
                 author_id: data[:user_id],
                 created_at: event.created_at,
@@ -519,7 +530,7 @@ namespace :undev do
 
               OldEvent.create(
                 project_id: project.id,
-                action: Event::JOINED,
+                action: OldEvent::JOINED,
                 author_id: user.id,
                 created_at: event.created_at,
                 updated_at: event.updated_at
@@ -530,7 +541,7 @@ namespace :undev do
             when Legacy::Action::REMOVE_COMMITTER
               OldEvent.create(
                 project_id: project.id,
-                action: Event::LEFT,
+                action: OldEvent::LEFT,
                 author_id: user.id,
                 created_at: event.created_at,
                 updated_at: event.updated_at
