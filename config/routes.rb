@@ -117,6 +117,9 @@ Gitlab::Application.routes.draw do
       put :reset_private_token
       put :update_username
     end
+    scope module: :profiles do
+      resources :subscriptions
+    end
   end
 
   resources :keys
@@ -180,8 +183,7 @@ Gitlab::Application.routes.draw do
     resources :compare, only: [:index, :create]
     resources :blame,   only: [:show], constraints: {id: /.+/}
     resources :graph,   only: [:show], constraints: {id: /.+/}
-    match "/compare/:from...:to" => "compare#show", as: "compare",
-                    :via => [:get, :post], constraints: {from: /.+/, to: /.+/}
+    match "/compare/:from...:to" => "compare#show", as: "compare", via: [:get, :post], constraints: {from: /.+/, to: /.+/}
 
     resources :wikis, only: [:show, :edit, :destroy, :create] do
       collection do

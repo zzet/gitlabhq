@@ -1,0 +1,17 @@
+.span8
+  - @subscriptions.each do |type, subscriptions|
+    = render 'subscription_group', type: type, subscriptions: subscriptions
+
+.span3
+  %fieldset.tips
+    %legend Notified on new
+    %table
+      %tr
+        %th Name
+        %th Control
+        - @subscriptions_by_target_type.each do |subscription|
+          %tr
+            -# TODO. Write available subscriptions type
+            %td= link_to subscription.target_type
+            %td Unsubscribe
+
