@@ -19,6 +19,7 @@ namespace :undev do
     @admin.username = "admin"
     @admin.name = "Admin"
     @admin.password = "123456"
+    @admin.projects_limit = 100
     @admin.email = "admin@undev.cc"
     @admin.blocked = false
     @admin.admin = true
@@ -57,6 +58,7 @@ namespace :undev do
           new_user.blocked = (user.aasm_state != "terms_accepted")
 
           new_user.admin = user.is_admin
+          new_user.projects_limit = 100
 
           new_user.created_at = user.created_at
           new_user.updated_at = user.updated_at
@@ -109,43 +111,41 @@ namespace :undev do
 
       Legacy::Group.find_each do |group|
         unless UserTeam.find_by_path(group.name)
-          unless Legacy::User.find_by_login(group.name)
-            team = UserTeam.new
+          team = UserTeam.new
 
-            team.name = group.name
-            team.path = group.name
-            team.description = group.description
+          team.name = group.name
+          team.path = group.name
+          team.description = group.description
 
-            team.created_at = group.created_at
-            team.updated_at = group.updated_at
+          team.created_at = group.created_at
+          team.updated_at = group.updated_at
 
-            group_owner = Legacy::User.find_by_id(group.user_id)
-            team.owner = User.find_by_username(group_owner.login)
+          group_owner = Legacy::User.find_by_id(group.user_id)
+          team.owner = User.find_by_username(group_owner.login)
 
-            begin
-              if team.save
-                @import_log.info "Migrate Team of users: #{team.name} succesfull"
-              else
-                @import_log.info "Migrate Team of users: #{group.name} - #{group.id} failed"
-                @import_log.info "Errors: #{team.errors.inspect}"
-              end
-
-              # Members
-              @import_log.info "Add members to team".yellow
-              group.memberships.each do |group_member|
-                user = User.find_by_username(group_member.user.login)
-                if user
-                  is_admin = group_member.role.kind == 0 ? true : false
-                  permission = is_admin ? UsersProject.access_roles["Master"] : UsersProject.access_roles["Developer"]
-
-                  team.add_member(user, permission, is_admin)
-                  print ".".green
-                end
-              end
-            rescue Exception => e
-              @import_log.info "Migrate Team of users: #{group.name} - #{group.id} FUCK!"
-              @import_log.info "Errors: #{e.inspect}"
+          begin
+            if team.save
+              @import_log.info "Migrate Team of users: #{team.name} succesfull"
+            else
+              @import_log.info "Migrate Team of users: #{group.name} - #{group.id} failed"
+              @import_log.info "Errors: #{team.errors.inspect}"
             end
+
+            # Members
+            @import_log.info "Add members to team".yellow
+            group.memberships.each do |group_member|
+              user = User.find_by_username(group_member.user.login)
+              if user
+                is_admin = group_member.role.kind == 0 ? true : false
+                permission = is_admin ? UsersProject.access_roles["Master"] : UsersProject.access_roles["Developer"]
+
+                team.add_member(user, permission, is_admin)
+                print ".".green
+              end
+            end
+          rescue Exception => e
+            @import_log.info "Migrate Team of users: #{group.name} - #{group.id} FUCK!"
+            @import_log.info "Errors: #{e.inspect}"
           end
         end
 
@@ -169,37 +169,39 @@ namespace :undev do
       Legacy::Project.find_each do |project|
 
         unless Group.find_by_path(project.slug)
-          group = Group.new
+          unless Legacy::User.find_by_login(group.name)
+            group = Group.new
 
-          owner_type = project.owner_type
-          owner = case owner_type
-                  when 'Group'
-                    owner_group = Legacy::Group.find_by_id(project.owner_id)
-                    User.find_by_username(owner_group.creator.login)
-                  when 'User'
-                    User.find_by_username(Legacy::User.find_by_id(project.owner_id).login)
-                  end
-          if owner
-            group.name = project.title
-            group.path = project.slug
-            group.description = project.description
+            owner_type = project.owner_type
+            owner = case owner_type
+                    when 'Group'
+                      owner_group = Legacy::Group.find_by_id(project.owner_id)
+                      User.find_by_username(owner_group.creator.login)
+                    when 'User'
+                      User.find_by_username(Legacy::User.find_by_id(project.owner_id).login)
+                    end
+            if owner
+              group.name = project.title
+              group.path = project.slug
+              group.description = project.description
 
-            group.owner = owner
+              group.owner = owner
 
-            group.created_at = project.created_at
-            group.updated_at = project.updated_at
+              group.created_at = project.created_at
+              group.updated_at = project.updated_at
 
-            begin
-              if group.save
-                @import_log.info "Project #{group.name} processed succesfull"
-              else
-                @import_log.info "Project #{project.title} - #{project.id} fail"
-                @import_log.info "Errors: #{group.errors.inspect}"
+              begin
+                if group.save
+                  @import_log.info "Project #{group.name} processed succesfull"
+                else
+                  @import_log.info "Project #{project.title} - #{project.id} fail"
+                  @import_log.info "Errors: #{group.errors.inspect}"
+                end
+
+              rescue Exception => e
+                @import_log.info "Migrate project: #{project.title} - #{project.id} FUCK!"
+                @import_log.info "Errors: #{e.inspect}"
               end
-
-            rescue Exception => e
-              @import_log.info "Migrate project: #{project.title} - #{project.id} FUCK!"
-              @import_log.info "Errors: #{e.inspect}"
             end
           end
         end
@@ -223,164 +225,167 @@ namespace :undev do
       Legacy::Repository.actual.each do |repo|
 
         group = Group.find_by_name(repo.project.slug)
+        user = User.find_by_username(repo.project.slug)
+
+        project = Project.new
+
         if group
-          unless group.projects.find_by_name(repo.name)
+          project.group = group # unless group.projects.find_by_name(repo.name)
+        else
+          project.namespace_id = user.namespace_id
+        end
 
-            project = group.projects.build
+        project.name = repo.name
+        project.description = repo.description
+        project.issues_tracker = "redmine"
 
-            project.name = repo.name
-            project.description = repo.description
-            project.issues_tracker = "redmine"
+        project.created_at = repo.created_at
+        project.updated_at = repo.updated_at
 
-            project.created_at = repo.created_at
-            project.updated_at = repo.updated_at
+        creator = User.find_by_username(repo.user.login)
 
-            creator = User.find_by_username(repo.user.login)
+        if creator
+          project.creator = creator
 
-            if creator
-              project.creator = creator
-
-              owner = case repo.owner_type
-                      when 'Group'
-                        owner_group = Legacy::Group.find_by_id(repo.owner_id)
-                        User.find_by_username(owner_group.creator.login)
-                      when 'User'
-                        User.find_by_username(repo.user.login)
-                      end
-
-              #project.group = Group.find_by_path(repo.project.slug)
-
-              project.path = repo.name.dup.parameterize
-              project.public = (repo.project.private == false)
-
-              begin
-                if project.save
-                  @import_log.info "Repository #{project.name} processed succesfull"
-                  @import_log.info "Clone repo from gitorious: "
-
-                  project_path = File.join(root, "#{project.path_with_namespace}.git")
-
-                  system("rm -rf #{project_path}") if File.exists?(project_path)
-
-                  unless File.exists?(project_path)
-                    @shell.import_repository(project.path_with_namespace, repo.git_clone_url)
-
-                    @logger.info "#{repo.hashed_path}.git;#{project_path}"
-
-                    @import_log.info "OK".green
-                  else
-                    @import_log.info "Repo already exist!".red
+          owner = case repo.owner_type
+                  when 'Group'
+                    owner_group = Legacy::Group.find_by_id(repo.owner_id)
+                    User.find_by_username(owner_group.creator.login)
+                  when 'User'
+                    User.find_by_username(repo.user.login)
                   end
 
-                  @import_log.info "Migrate committerships:"
+          #project.group = Group.find_by_path(repo.project.slug)
 
-                  master_users = repo.committerships.admins.users
+          project.path = repo.name.dup.parameterize
+          project.public = (repo.project.private == false)
 
-                  develop_users = repo.committerships.committers.users
-                  develop_users = develop_users - master_users
+          begin
+            if project.save
+              @import_log.info "Repository #{project.name} processed succesfull"
+              @import_log.info "Clone repo from gitorious: "
 
-                  report_users = repo.committerships.reviewers.users
-                  report_users = report_users - [master_users + develop_users]
+              project_path = File.join(root, "#{project.path_with_namespace}.git")
 
-                  master_teams = repo.committerships.admins.groups
+              system("rm -rf #{project_path}") if File.exists?(project_path)
 
-                  develop_teams = repo.committerships.committers.groups
-                  develop_teams = develop_teams - master_teams
+              unless File.exists?(project_path)
+                @shell.import_repository(project.path_with_namespace, repo.git_clone_url)
 
-                  report_teams = repo.committerships.reviewers.groups
-                  report_teams = report_teams - [master_teams + develop_teams]
+                @logger.info "#{repo.hashed_path}.git;#{project_path}"
 
-
-                  @import_log.info "Add masters to project"
-                  master_users.each do |mu|
-                    user_ids = []
-                    user = User.find_by_username(Legacy::User.find_by_id(mu.committer_id).login)
-                    user_ids << user.id if user
-                    permission = UsersProject.access_roles["Master"]
-                    unless user_ids.blank?
-                      project.team.add_users_ids(user_ids, permission)
-                      if project.save
-                        print ".".green
-                      else
-                        print ".".red
-                      end
-                    end
-                  end
-
-                  @import_log.info "Add developers to project"
-                  develop_users.each do |du|
-                    user_ids = []
-                    user = User.find_by_username(Legacy::User.find_by_id(du.committer_id).login)
-                    user_ids << user.id if user
-                    permission = UsersProject.access_roles["Developer"]
-                    unless user_ids.blank?
-                      project.team.add_users_ids(user_ids, permission)
-                      if project.save
-                        print ".".green
-                      else
-                        print ".".red
-                      end
-                    end
-                  end
-
-                  @import_log.info "Add reporters to project"
-                  report_users.each do |ru|
-                    user_ids = []
-                    user = User.find_by_username(Legacy::User.find_by_id(ru.committer_id).login)
-                    user_ids << user.id if user
-                    permission = UsersProject.access_roles["Reporter"]
-                    unless user_ids.blank?
-                      project.team.add_users_ids(user_ids, permission)
-                      if project.save
-                        print ".".green
-                      else
-                        print ".".red
-                      end
-                    end
-                  end
-
-                  @import_log.info "Delegate to team with MAX master role"
-                  master_teams.each do |mt|
-                    team = UserTeam.find_by_path(Legacy::Group.find_by_id(mt.committer_id).name)
-                    if team
-                      permission = UsersProject.access_roles["Master"]
-                      team.assign_to_project(project, permission)
-                    end
-                    print ".".green
-                  end
-
-                  @import_log.info "Delegate to team with MAX developer role"
-                  develop_teams.each do |dt|
-                    team = UserTeam.find_by_path(Legacy::Group.find_by_id(dt.committer_id).name)
-                    if team
-                      permission = UsersProject.access_roles["Developer"]
-                      team.assign_to_project(project, permission)
-                    end
-                    print ".".green
-                  end
-
-                  @import_log.info "Delegate to team with MAX reporter role"
-                  report_teams.each do |rt|
-                    team = UserTeam.find_by_path(Legacy::Group.find_by_id(rt.committer_id).name)
-                    if team
-                      permission = UsersProject.access_roles["Reporter"]
-                      team.assign_to_project(project, permission)
-                    end
-                    print ".".green
-                  end
-
-                else
-                  @import_log.info "Repository #{repo.name} - #{repo.id} fail"
-                  @import_log.info "Errors: #{project.errors.inspect}"
-                end
-
-              rescue Exception => e
-                @import_log.info "Migrate project: #{repo.name} - #{repo.id} FUCK!".red
-                @import_log.info "Errors: #{e.inspect}"
+                @import_log.info "OK".green
+              else
+                @import_log.info "Repo already exist!".red
               end
 
+              @import_log.info "Migrate committerships:"
+
+              master_users = repo.committerships.admins.users
+
+              develop_users = repo.committerships.committers.users
+              develop_users = develop_users - master_users
+
+              report_users = repo.committerships.reviewers.users
+              report_users = report_users - [master_users + develop_users]
+
+              master_teams = repo.committerships.admins.groups
+
+              develop_teams = repo.committerships.committers.groups
+              develop_teams = develop_teams - master_teams
+
+              report_teams = repo.committerships.reviewers.groups
+              report_teams = report_teams - [master_teams + develop_teams]
+
+
+              @import_log.info "Add masters to project"
+              master_users.each do |mu|
+                user_ids = []
+                user = User.find_by_username(Legacy::User.find_by_id(mu.committer_id).login)
+                user_ids << user.id if user
+                permission = UsersProject.access_roles["Master"]
+                unless user_ids.blank?
+                  project.team.add_users_ids(user_ids, permission)
+                  if project.save
+                    print ".".green
+                  else
+                    print ".".red
+                  end
+                end
+              end
+
+              @import_log.info "Add developers to project"
+              develop_users.each do |du|
+                user_ids = []
+                user = User.find_by_username(Legacy::User.find_by_id(du.committer_id).login)
+                user_ids << user.id if user
+                permission = UsersProject.access_roles["Developer"]
+                unless user_ids.blank?
+                  project.team.add_users_ids(user_ids, permission)
+                  if project.save
+                    print ".".green
+                  else
+                    print ".".red
+                  end
+                end
+              end
+
+              @import_log.info "Add reporters to project"
+              report_users.each do |ru|
+                user_ids = []
+                user = User.find_by_username(Legacy::User.find_by_id(ru.committer_id).login)
+                user_ids << user.id if user
+                permission = UsersProject.access_roles["Reporter"]
+                unless user_ids.blank?
+                  project.team.add_users_ids(user_ids, permission)
+                  if project.save
+                    print ".".green
+                  else
+                    print ".".red
+                  end
+                end
+              end
+
+              @import_log.info "Delegate to team with MAX master role"
+              master_teams.each do |mt|
+                team = UserTeam.find_by_path(Legacy::Group.find_by_id(mt.committer_id).name)
+                if team
+                  permission = UsersProject.access_roles["Master"]
+                  team.assign_to_project(project, permission)
+                end
+                print ".".green
+              end
+
+              @import_log.info "Delegate to team with MAX developer role"
+              develop_teams.each do |dt|
+                team = UserTeam.find_by_path(Legacy::Group.find_by_id(dt.committer_id).name)
+                if team
+                  permission = UsersProject.access_roles["Developer"]
+                  team.assign_to_project(project, permission)
+                end
+                print ".".green
+              end
+
+              @import_log.info "Delegate to team with MAX reporter role"
+              report_teams.each do |rt|
+                team = UserTeam.find_by_path(Legacy::Group.find_by_id(rt.committer_id).name)
+                if team
+                  permission = UsersProject.access_roles["Reporter"]
+                  team.assign_to_project(project, permission)
+                end
+                print ".".green
+              end
+
+            else
+              @import_log.info "Repository #{repo.name} - #{repo.id} fail"
+              @import_log.info "Errors: #{project.errors.inspect}"
             end
+
+          rescue Exception => e
+            @import_log.info "Migrate project: #{repo.name} - #{repo.id} FUCK!".red
+            @import_log.info "Errors: #{e.inspect}"
           end
+
         end
       end
     end

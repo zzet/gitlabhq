@@ -34,9 +34,9 @@ class GitPushService
   protected
 
   def create_push_event
-    Event.create(
+    OldEvent.create(
       project: project,
-      action: Event::PUSHED,
+      action: OldEvent::PUSHED,
       data: push_data,
       author_id: push_data[:user_id]
     )
