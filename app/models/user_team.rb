@@ -11,7 +11,6 @@
 #
 
 class UserTeam < ActiveRecord::Base
-  include Gitlab::Event::Notifications
   include Watchable
 
   attr_accessible :name, :description, :owner_id, :path

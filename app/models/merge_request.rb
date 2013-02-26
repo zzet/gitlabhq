@@ -92,6 +92,8 @@ class MergeRequest < ActiveRecord::Base
   # both merged and closed mr's
   scope :closed, -> { with_states(:closed, :merged) }
 
+  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
+
   def validate_branches
     if target_branch == source_branch
       errors.add :base, "You can not use same branch for source and target branches"
