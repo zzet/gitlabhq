@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(:version => 20130325173941) do
     t.datetime "last_notified_at"
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
+    t.string   "target_category"
   end
 
   create_table "events", :force => true do |t|
@@ -269,8 +270,9 @@ ActiveRecord::Schema.define(:version => 20130325173941) do
     t.string   "name"
     t.string   "path"
     t.integer  "owner_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+    t.string   "description", :default => "", :null => false
   end
 
   create_table "users", :force => true do |t|
