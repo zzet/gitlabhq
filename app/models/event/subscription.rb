@@ -4,7 +4,7 @@ class Event::Subscription < ActiveRecord::Base
   attr_accessible :action,
                   :last_notified_at,
                   :notification_interval,
-                  :target_id, :target_type, :target,
+                  :target_id, :target_type, :target, :target_category,
                   :source_id, :source_type, :source, :source_category,
                   :user_id, :user
 
@@ -19,6 +19,7 @@ class Event::Subscription < ActiveRecord::Base
   validates :source, presence: true, if: :check_presence_of_target_and_source_category
   validates :target, presence: true, if: :check_presence_of_source_and_source_category
   validates :source_category, presence: true, if: :check_presence_of_target_and_source
+  validates :target_category, presence: true, if: :check_presence_of_target_and_source_category
 
   # Custom validations
   def check_presence_of_target_and_source
@@ -45,6 +46,7 @@ class Event::Subscription < ActiveRecord::Base
   scope :by_user, ->(subscriber) { where(user_id: subscriber.id) }
   scope :by_source, ->(source) { where(source_id: source.id, source_type: source.class.name) }
   scope :by_target, ->(target) { where(target_id: target.id, target_type: target.class.name) }
+  scope :by_target_type, ->(target) { where(target_category: target) }
   scope :by_source_type, ->(source_type) do
     source_type = source_type.to_s.camelize
     est = self.arel_table
