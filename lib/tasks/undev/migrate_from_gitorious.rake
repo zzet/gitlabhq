@@ -169,7 +169,7 @@ namespace :undev do
       Legacy::Project.find_each do |project|
 
         unless Group.find_by_path(project.slug)
-          unless Legacy::User.find_by_login(group.name)
+          unless Legacy::User.find_by_login(project.slug)
             group = Group.new
 
             owner_type = project.owner_type
