@@ -54,4 +54,5 @@ class Event::Subscription < ActiveRecord::Base
   end
   scope :with_source, -> { where("source_id IS NOT NULL") }
   scope :without_source, -> { where(source_id: nil) }
+  scope :with_target_type, -> { where("target_category IS NOT NULL") }
 end
