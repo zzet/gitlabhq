@@ -8,6 +8,7 @@ class CreateSubscriptions < ActiveRecord::Migration
       t.integer :source_id
       t.string :source_type
       t.string :source_category
+      #t.string :target_category
       t.integer :notification_interval
       t.datetime :last_notified_at
 
