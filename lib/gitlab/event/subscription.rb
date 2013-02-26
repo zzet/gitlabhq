@@ -69,7 +69,7 @@ module Gitlab
           subscription_params = { user: user, action: action }
           if target
             if target.is_a? Symbol
-                subscription_params[:target_category] = target
+              subscription_params[:target_category] = target
             else
               if target.persisted?
                 subscription_params[:target_id] = target.id
@@ -97,7 +97,6 @@ module Gitlab
             # Check, if user have some similar subscription
             subscription = ::Event::Subscription.new(subscription_params)
             subscription.save unless exist_similar_subscription?(subscription)
-            p subscription.errors if subscription.errors.present?
           end
         end
 

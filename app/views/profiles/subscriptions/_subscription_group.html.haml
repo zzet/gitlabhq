@@ -1,0 +1,12 @@
+.span3.pull-left
+  %fieldset.tips
+    %legend= type
+    %table
+      %tr
+        %th Name
+        %th Control
+      - subscriptions.each do |subscription|
+        %tr
+          -# TODO. Write correct table data
+          %td= link_to subscription.target.name
+          %td Unsubscribe
