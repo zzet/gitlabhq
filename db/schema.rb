@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130220133245) do
+ActiveRecord::Schema.define(:version => 20130226102513) do
 
   create_table "event_subscription_notifications", :force => true do |t|
     t.integer  "event_id"
@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
     t.datetime "last_notified_at"
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
+    t.string   "target_category"
   end
 
   create_table "events", :force => true do |t|
@@ -187,8 +188,9 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
     t.boolean  "merge_requests_enabled", :default => true,     :null => false
     t.boolean  "wiki_enabled",           :default => true,     :null => false
     t.integer  "namespace_id"
-    t.string   "issues_tracker",         :default => "gitlab", :null => false
     t.boolean  "public",                 :default => false,    :null => false
+    t.string   "issues_tracker",         :default => "gitlab", :null => false
+    t.string   "issues_tracker_id"
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
@@ -267,8 +269,9 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
     t.string   "name"
     t.string   "path"
     t.integer  "owner_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+    t.string   "description", :default => "", :null => false
   end
 
   create_table "users", :force => true do |t|
