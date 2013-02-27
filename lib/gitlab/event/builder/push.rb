@@ -30,7 +30,7 @@ module Gitlab
             events = []
 
             actions.each do |act|
-              events << ::Event.new(action: act, source_type: "Push", data: push_data.to_json, author: user, target: target)
+              events << ::Event.new(action: act, source_type: "Push_summary", data: push_data.to_json, author: user, target: target)
             end
 
             events
