@@ -12,9 +12,9 @@ module Gitlab
         end
 
         def process_notification(notification)
-          stored_notification = ::Event::Subscription::Notification.find_by_id(notification["id"])
+          stored_notification = ::Event::Subscription::Notification.find(notification["id"])
 
-          if stored_notification && stored_notification.event
+          if stored_notification.event
             action = stored_notification.event.action
             target = stored_notification.event.target_type.downcase
             source = stored_notification.event.source_type.downcase
@@ -29,7 +29,7 @@ module Gitlab
               begin
 
                 if EventNotificationMailer.respond_to?(mail_method)
-                  EventNotificationMailer.send(mail_method, stored_notification)
+                  EventNotificationMailer.send(mail_method, stored_notification).deliver!
                 else
                   Rails.logger.info "Undefined mail_method in notifications: #{mail_method}"
                   EventNotificationMailer.default_email(stored_notification)
