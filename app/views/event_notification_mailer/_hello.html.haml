@@ -1,0 +1,25 @@
+%h1= "Hello, #{@user.name}!"
+%br
+%h2 On Gitlab was some event:
+%table
+  %tr
+    %th
+    %th
+  %tr
+    %td You watch
+    %td= @target.name
+  %tr
+    %td Was action
+    %td= @event.action
+  %tr
+    %td Source of action
+    %td= @source.name
+  %tr
+    %td Event author
+    %td= link_to @user.name, user_url(@user.name)
+  %tr
+    %td Date
+    %td= @event.created_at
+%br
+%h3 More details:
+%br
