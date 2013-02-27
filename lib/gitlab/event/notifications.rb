@@ -5,8 +5,8 @@ module Gitlab
       class << self
 
         def create_notifications(event)
-          if event.target && event.source
-            subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source)
+          if event.target && ((event.action == "pushed") || event.source)
+            subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
             subscriptions.each do |subscription|
               subscription.notifications.create(event: event)
             end
@@ -38,9 +38,11 @@ module Gitlab
                 end
 
                 stored_notification.deliver
+                stored_notification.notified_at = Time.zone.now
               rescue
                 stored_notification.failing
               end
+
               stored_notification.save
             end
 
