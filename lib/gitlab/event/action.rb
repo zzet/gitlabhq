@@ -7,7 +7,8 @@ module Gitlab
 
         def trigger(action, source, user = nil, data = nil, detailed_event = "")
           data = source if data.blank?
-          source_name = source.class.name.underscore.to_sym unless source.is_a? String
+          source_name = source
+          source_name = source.class.name.underscore unless source.is_a? String
           action = action.to_s unless action.is_a? String
           user = current_user if user.blank?
 
