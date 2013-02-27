@@ -1,3 +1,11 @@
 = render "hello", user: @user
-= p @notification
+- if @commits.present?
+  %div.ui-box
+    %h5.title
+      Commits (#{@commits.count})
+    %ul.well-list= render @commits
+
+  - unless @diffs.empty?
+    %h4 Diff
+    = render "commits/diffs", diffs: @diffs
 = render "footer", user: @user

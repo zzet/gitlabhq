@@ -13,7 +13,7 @@
     %td= @event.action
   %tr
     %td Source of action
-    %td= @source.name
+    %td= @source.respond_to?(:name) ? @source.name : @source
   %tr
     %td Event author
     %td= link_to @user.name, user_url(@user.name)
