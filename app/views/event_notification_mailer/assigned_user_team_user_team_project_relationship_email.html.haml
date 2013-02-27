@@ -1,2 +1,3 @@
 = render "hello", user: @user
+= "Team #{ link_to @team.name, team_url(@team.path) } was assigned to #{ link_to @project.name_with_namespace, project_url(@project.name_with_namespace) } project by #{ link_to @user.name, user_url(@user.username)}."
 = render "footer", user: @user
