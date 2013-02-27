@@ -4,6 +4,13 @@ module Gitlab
       class Base
 
         class << self
+          def descendants
+            # In production class cache :)
+            Dir[File.dirname(__FILE__) << "/**/*.rb"].each {|f| load f} if super.blank?
+
+            super
+          end
+
           def test(action, data)
             raise NotImplementedError
           end
@@ -16,5 +23,3 @@ module Gitlab
     end
   end
 end
-
-Dir[File.dirname(__FILE__) << "/**/*.rb"].each {|f| require f}

@@ -7,7 +7,4 @@ class MailNotificationWorker
     NotificationService.process_notification(notification)
   end
 
-  #def self.perform(notification)
-    #NotificationService.process_notification(notification)
-  #end
 end
