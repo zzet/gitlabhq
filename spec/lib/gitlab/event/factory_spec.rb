@@ -1142,4 +1142,35 @@ describe Gitlab::Event::Factory do
     # Add tests with Issue, MergeRequest, Milestone, Note, ProjectHook, ProtectedBranch, Service, Snippet
   end
 
+  describe "Push actions" do
+
+    before do
+      @user = create :user
+      @project = create :project, creator: @user
+      @service = GitPushService.new
+      @oldrev = 'b98a310def241a6fd9c9a9a3e7934c48e498fe81'
+      @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
+      @ref = 'refs/heads/master'
+    end
+
+    describe "Push Events" do
+      before do
+        @service.execute(@project, @user, @oldrev, @newrev, @ref)
+        @push_data = @service.push_data
+
+        Event.with_target(@project).with_push.destroy_all
+
+        @action = 'gitlab.pushed.push_summary'
+        @data = { source: "Push_summary", user: @user, data: { project_id: @project.id, push_data: @push_data } }
+
+        @events = Gitlab::Event::Factory.build(@action, @data)
+        Gitlab::Event::Factory.create_events(@action, @data)
+
+        @current_events = Event.with_target(@project).with_push
+      end
+
+      it { @current_events.should_not be_nil }
+    end
+
+  end
 end
