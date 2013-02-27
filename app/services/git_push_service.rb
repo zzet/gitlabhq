@@ -28,18 +28,21 @@ class GitPushService
       project.execute_services(@push_data.dup)
     end
 
+    Gitlab::Event::Action.trigger :pushed, "Push_summary", user, { project_id: project.id, push_data: @push_data, source: :repository }
+
     create_push_event
   end
 
   protected
 
   def create_push_event
-    Event.create(
+    OldEvent.create(
       project: project,
-      action: Event::PUSHED,
+      action: OldEvent::PUSHED,
       data: push_data,
       author_id: push_data[:user_id]
     )
+
   end
 
   # Produce a hash of post-receive data

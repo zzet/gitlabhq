@@ -989,4 +989,18 @@ class EventNotificationMailer < ActionMailer::Base
     mail(to: @notification.subscriber.email, subject: "[Gitlab] Merge request #{@source.name} was reassigned to #{@target.name} user by #{@user.name} [reassigned]")
   end
 
+  #
+  # Push action
+  #
+
+  def pushed_project_push_summary_email(notification)
+    @notification = notification
+    @event = notification.event
+    @user = @event.author
+    @source = @event.source
+    @target = @event.target
+
+    mail(to: @notification.subscriber.email, subject: "[Gitlab] #{@user.name} pushed to #{@target.name} commits [pushed]")
+  end
+
 end
