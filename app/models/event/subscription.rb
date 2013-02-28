@@ -46,13 +46,22 @@ class Event::Subscription < ActiveRecord::Base
   scope :by_user, ->(subscriber) { where(user_id: subscriber.id) }
   scope :by_source, ->(source) { where(source_id: source.id, source_type: source.class.name) }
   scope :by_target, ->(target) { where(target_id: target.id, target_type: target.class.name) }
-  scope :by_target_type, ->(target) { where(target_category: target) }
+  scope :by_target_category, ->(target) { where(target_category: target) }
+
   scope :by_source_type, ->(source_type) do
     source_type = source_type.to_s.camelize
     est = self.arel_table
     where(est[:source_type].eq(source_type).or(est[:source_category].in([source_type, :all])))
   end
+
   scope :with_source, -> { where("source_id IS NOT NULL") }
   scope :without_source, -> { where(source_id: nil) }
-  scope :with_target_type, -> { where("target_category IS NOT NULL") }
+  scope :with_target, -> { where("target_type IS NOT NULL") }
+  scope :with_target_category, -> { where("target_category IS NOT NULL") }
+
+  class << self
+    def global_entity_to_subscription
+      [:project, :group, :user_team, :user]
+    end
+  end
 end
