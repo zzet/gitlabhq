@@ -2,8 +2,12 @@ class Profiles::SubscriptionsController < Profiles::ApplicationController
   before_filter :load_entity
 
   def index
-    @subscriptions_by_target_type = Event::Subscription.by_user(@user).with_target_type
-    @subscriptions = Event::Subscription.by_user(@user).group_by(&:target_type)
+    @subscriptions_by_target_type = Event::Subscription.by_user(@user).with_target_category.group_by(&:target_category)
+    @available_subscription_types = Event::Subscription.global_entity_to_subscription
+
+    @subscriptions_by_target_type.keep_if { |t, v| @available_subscription_types.include?(t.to_sym) }
+
+    @subscriptions = Event::Subscription.by_user(@user).with_target.group_by(&:target_type)
   end
 
   def create
