@@ -10,6 +10,8 @@ module Gitlab
         # - Event category (Source by type) changes which associated with target
         #
         def subscribe(user, action, target, source)
+          target = target.to_sym if target.is_a? String
+
           if target && (target.is_a?(Symbol) || target.is_a?(Class))
             subscribe_on_target_category(user, target, action, source)
           else
@@ -24,12 +26,12 @@ module Gitlab
         # Subscribe on target
         # TODO. If user removed from Team or Project or Group - remove subscriptions
         def create_subscriprions_by_target(external_source)
-          target_category = external_source.to_s.underscore.to_sym
-          typed_subscriptions = ::Event::Subscription.by_target_type(target_category)
+          target_category = external_source.class.name.underscore.to_sym
+          typed_subscriptions = ::Event::Subscription.by_target_category(target_category)
           typed_subscriptions.each do |subscription|
             user = subscription.user
             action = subscription.action
-            target = source
+            target = external_source
             source = subscription.source
             subscribe!(user, action, target, source) if can_subscribe?(user, action, target, source)
           end
@@ -39,12 +41,16 @@ module Gitlab
         # Expected Symbol || Class_name
         def subscribe_on_target_category(user, target, action = :all, source = :all)
           target = target.to_s.underscore.to_sym if target.is_a? Class
+          target = target.to_sym if target.is_a? String
 
           subscribe!(user, action, target, source)
         end
 
         def unsubscribe(user, action, target, source)
-          new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && source != :all
+          target = target.to_sym if target.is_a? String
+
+          new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && !([:all, :new].include?(source))
+
           target = new_source if target.blank?
 
           unsubscribe!(user, action, target, source)
@@ -101,7 +107,12 @@ module Gitlab
         end
 
         def unsubscribe!(user, action, target, source)
-          subscription = ::Event::Subscription.by_user(user).by_target(target).by_source_type(source).by_action(action)
+          subscription = nil
+          if target.is_a? Symbol
+            subscription = ::Event::Subscription.by_user(user).by_target_category(target).by_action(action)
+          else
+            subscription = ::Event::Subscription.by_user(user).by_target(target).by_source_type(source).by_action(action)
+          end
           if subscription.any?
             subscription.each do |sbs|
               sbs.destroy
@@ -114,7 +125,7 @@ module Gitlab
           return false if user_exist_subscriptions.blank?
 
           if subscription.target_category
-            targeted_by_category_subscriptions = user_exist_subscriptions.by_target_type(subscription.target_category)
+            targeted_by_category_subscriptions = user_exist_subscriptions.by_target_category(subscription.target_category)
             return false if targeted_by_category_subscriptions.blank?
           else
             targeted_subscriptions = user_exist_subscriptions.by_target(subscription.target)

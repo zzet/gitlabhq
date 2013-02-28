@@ -18,6 +18,10 @@ class Event::Action
 
         # Git specific
         :pushed,
+        :created_branch,
+        :deleted_branch,
+        :created_tag,
+        :deleted_tag,
         :cloned,
 
         # Issuable
