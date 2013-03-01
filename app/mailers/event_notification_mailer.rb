@@ -209,7 +209,7 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @group = @source = @event.source
     @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] Group #{@source.name} was updated by #{@user.name} [updated]")
