@@ -26,13 +26,15 @@ module Gitlab
         # Subscribe on target
         # TODO. If user removed from Team or Project or Group - remove subscriptions
         def create_subscriprions_by_target(external_source)
+
           target_category = external_source.class.name.underscore.to_sym
           typed_subscriptions = ::Event::Subscription.by_target_category(target_category)
+
           typed_subscriptions.each do |subscription|
             user = subscription.user
             action = subscription.action
             target = external_source
-            source = subscription.source
+            source = subscription.source_category.to_sym
             subscribe!(user, action, target, source) if can_subscribe?(user, action, target, source)
           end
         end
@@ -70,9 +72,10 @@ module Gitlab
         protected
 
         def subscribe!(user, action, target, source)
-          subscription = nil
 
+          subscription = nil
           subscription_params = { user: user, action: action }
+
           if target
             if target.is_a? Symbol
               subscription_params[:target_category] = target
@@ -82,6 +85,8 @@ module Gitlab
                 subscription_params[:target_type] = target.class.name
               end
             end
+
+            raise ArgumentError, "Incorrect target" if subscription_params[:target_type].blank? && subscription_params[:target_category].blank?
 
             case source
               # User subscribe on source type by target
@@ -100,9 +105,12 @@ module Gitlab
               end
             end
 
-            # Check, if user have some similar subscription
+            raise ArgumentError, "Incorrect source" if subscription_params[:source_type].blank? && subscription_params[:source_category].blank?
+
             subscription = ::Event::Subscription.new(subscription_params)
             subscription.save unless exist_similar_subscription?(subscription)
+          else
+            raise ArgumentError, "Incorrect target. Empty!"
           end
         end
 
@@ -111,7 +119,11 @@ module Gitlab
           if target.is_a? Symbol
             subscription = ::Event::Subscription.by_user(user).by_target_category(target).by_action(action)
           else
-            subscription = ::Event::Subscription.by_user(user).by_target(target).by_source_type(source).by_action(action)
+            if target.persisted?
+              subscription = ::Event::Subscription.by_user(user).by_target(target).by_source_type(source).by_action(action)
+            else
+              raise ArgumentError, "Incorrect target" if subscription_params[:target_type].blank? && subscription_params[:target_category].blank?
+            end
           end
           if subscription.any?
             subscription.each do |sbs|
