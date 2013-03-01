@@ -1,2 +1,13 @@
 = render "hello", user: @user
+= "#{ link_to @user.name, @user.username } assigned #{ link_to @project.name_with_namespace, project_url(@project.name_with_namespace) } project to #{ link_to @team.name, team_url(@team.path) } team with #{ @user_team_project_relationship.greatest_access } permission for team members."
+%table
+  %caption Assigned projects
+  %tr
+    %th Name
+    %td Greates project access
+  - @team.user_team_project_relationships.each do |pr|
+    %tr
+      %td= link_to pr.project.name_with_namespace, project_url(pr.project.name_with_namespace)
+      %td= pr.greatest_access
+%br
 = render "footer", user: @user

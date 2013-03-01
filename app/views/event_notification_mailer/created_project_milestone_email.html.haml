@@ -1,2 +1,3 @@
 = render "hello", user: @user
+= "#{ link_to @user.name, user_url(@user.username) } created new milestone (#{ link_to @milestone.title, project_milestone_url(@project.name_with_namespace, @milestone) }) on #{ link_to @project.name_with_namespace, project_url(@project.name_with_namespace) } project"
 = render "footer", user: @user

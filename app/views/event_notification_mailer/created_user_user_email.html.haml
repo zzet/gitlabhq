@@ -1,2 +1,31 @@
 = render "hello", user: @user
+= "#{ link_to @user.name, user_url(@user.username)} add new account:"
+%table
+  %tr
+    %td Name
+    %td= @new_user.name
+  %tr
+    %td Username
+    %td= @new_user.username
+  %tr
+    %td Skype
+    %td= @new_user.skype
+  %tr
+    %td Twitter
+    %td= @new_user.twitter
+  %tr
+    %td Linkedin
+    %td= @new_user.linkedin
+  %tr
+    %td Bio
+    %td= @new_user.bio
+  %tr
+    %td Can create groups?
+    %td= @new_user.can_create_group? ? "Yes" : "No"
+  %tr
+    %td Can create teams?
+    %td= @new_user.can_create_team? ? "Yes" : "No"
+  %tr
+    %td Admin
+    %td= @new_user.admin? ? "Yes" : "No"
 = render "footer", user: @user
