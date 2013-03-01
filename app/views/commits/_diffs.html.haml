@@ -10,10 +10,10 @@
 %p.cgray
   Showing #{pluralize(diffs.count, "changed file")}
 .file-stats
-  = render "commits/diff_head", diffs: diffs
+  -#= render "commits/diff_head", diffs: diffs
 
 .files
-  - unless @suppress_diff
+  - if @suppress_diff
     - diffs.each_with_index do |diff, i|
       - next if diff.diff.empty?
       - file = (@commit.tree / diff.new_path)
