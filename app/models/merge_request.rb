@@ -30,7 +30,6 @@ class MergeRequest < NewDb
   attr_accessible :title, :assignee_id, :target_branch, :source_branch, :milestone_id,
     :author_id_of_changes, :state_event
 
-  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented]
   attr_accessor :should_remove_source_branch
 
   state_machine :state, initial: :opened do
@@ -91,7 +90,6 @@ class MergeRequest < NewDb
   # both merged and closed mr's
   scope :closed, -> { with_states(:closed, :merged) }
   actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
-  >>>>>>> feature/notifications
 
   serialize :st_commits
   serialize :st_diffs
