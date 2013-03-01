@@ -1,0 +1,14 @@
+= render "hello", user: @user
+= "#{ link_to @user.name, user_url(@user.username)} added #{ @service.title } to #{ @project.name_with_namespace, project_url(@project.name_with_namespace)} project:"
+%table
+  %tr
+    %td Name
+    %td= @service.title
+  %tr
+    %td Token
+    %td= @service.token
+  %tr
+    %td Type
+    %td= @service.type
+%br
+= render "footer", user: @user
