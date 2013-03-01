@@ -8,6 +8,7 @@ module Gitlab
         # - Event Source changes, which associated with target
         # - Event category (Source by type) changes
         # - Event category (Source by type) changes which associated with target
+        # - Category of Entity
         #
         def subscribe(user, action, target, source)
           target = target.to_sym if target.is_a? String

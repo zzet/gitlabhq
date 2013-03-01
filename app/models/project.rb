@@ -46,7 +46,7 @@ class Project < ActiveRecord::Base
 
   has_many :old_events,         dependent: :destroy, class_name: OldEvent
 
-  has_many :events,         as: :source,    dependent: :destroy
+  has_many :events,         as: :source
   has_many :subscriptions,  conditions: { action: "some_action" }
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
@@ -103,7 +103,7 @@ class Project < ActiveRecord::Base
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
   scope :public_only, -> { where(public: true) }
 
-  enumerize :issues_tracker, :in => (Gitlab.config.issues_tracker.keys).append(:gitlab), :default => :gitlab
+  enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
   actions_to_watch [:created, :updated, :deleted, :transfer]
 
   actions_to_watch [:created, :updated, :deleted, :transfer]
