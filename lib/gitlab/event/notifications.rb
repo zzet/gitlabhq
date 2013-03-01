@@ -43,13 +43,14 @@ module Gitlab
                 stored_notification.notified_at = Time.zone.now
               rescue
                 stored_notification.failing
+                raise RuntimeError, "Can't send notification. Email error."
               end
 
               stored_notification.save
             end
 
           else
-            Rails.logger.warn("Can't send email to notification ##{notification["id"]}. Event is deleted.")
+            raise ArgumentError, "Can't send email to notification ##{notification["id"]}. Event is unavailable."
           end
         end
 
