@@ -1,5 +1,5 @@
 = render "hello", user: @user
-= "#{ link_to @user.name, user_url(@user.username) } created new project in #{ link_to @group.name, group_url(@group.path)}:"
+= raw "#{ link_to @user.name, user_url(@user.username) } created new project in #{ link_to @group.name, group_url(@group.path)}:"
 %table
   %tr
     %td Name
