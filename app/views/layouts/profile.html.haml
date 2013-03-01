@@ -2,8 +2,8 @@
 %html{ lang: "en"}
   = render "layouts/head", title: "Profile"
   %body{class: "#{app_theme} profile"}
-    = render "layouts/flash"
     = render "layouts/head_panel", title: "Profile"
+    = render "layouts/flash"
     .container
       %ul.main_menu
         = nav_link(path: 'profiles#show', html_options: {class: 'home'}) do
@@ -15,6 +15,8 @@
           = link_to keys_path do
             SSH Keys
             %span.count= current_user.keys.count
+        = nav_link(path: 'profiles/subscriptions') do
+          = link_to "Subscriptions", profile_subscriptions_path
         = nav_link(path: 'profiles#design') do
           = link_to "Design", design_profile_path
         = nav_link(path: 'profiles#history') do

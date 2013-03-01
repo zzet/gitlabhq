@@ -53,17 +53,6 @@ production: &base
       ##  :id                - Issue id (from commit messages)
       issues_url: "http://redmine.sample/issues/:id"
 
-
-  ## External issues trackers
-  issues_tracker:
-    redmine:
-      ## If not nil, links from /#\d/ entities from commit messages will replaced to this
-      ## Use placeholders:
-      ##  :project_id        - Gitlab project identifier
-      ##  :issues_tracker_id - Project Name or Id in external issue tracker
-      ##  :id                - Issue id (from commit messages)
-      issues_url: "http://redmine.sample/issues/:id"
-
   ## Gravatar
   gravatar:
     enabled: true                 # Use user avatar images from Gravatar.com (default: true)

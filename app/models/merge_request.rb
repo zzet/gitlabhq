@@ -25,12 +25,13 @@ class MergeRequest < NewDb
   include Issuable
   include Watchable
 
-  attr_accessible :title, :assignee_id, :target_branch, :source_branch, :milestone_id,
-                  :author_id_of_changes, :state_event
+  BROKEN_DIFF = "--broken-diff"
 
-  attr_accessor :should_remove_source_branch
+  attr_accessible :title, :assignee_id, :target_branch, :source_branch, :milestone_id,
+    :author_id_of_changes, :state_event
 
   actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented]
+  attr_accessor :should_remove_source_branch
 
   state_machine :state, initial: :opened do
     event :close do
@@ -54,8 +55,6 @@ class MergeRequest < NewDb
     state :merged
   end
 
-  BROKEN_DIFF = "--broken-diff"
-
   state_machine :merge_status, initial: :unchecked do
     event :mark_as_unchecked do
       transition [:can_be_merged, :cannot_be_merged] => :unchecked
@@ -69,12 +68,30 @@ class MergeRequest < NewDb
       transition unchecked: :cannot_be_merged
     end
 
-    state :unchecked 
+    state :unchecked
 
     state :can_be_merged
 
     state :cannot_be_merged
   end
+
+  serialize :st_commits
+  serialize :st_diffs
+
+  validates :source_branch, presence: true
+  validates :target_branch, presence: true
+  validate  :validate_branches
+
+  scope :merged, -> { with_state(:merged) }
+  scope :by_branch, ->(branch_name) { where("source_branch LIKE :branch OR target_branch LIKE :branch", branch: branch_name) }
+  scope :cared, ->(user) { where('assignee_id = :user OR author_id = :user', user: user.id) }
+  scope :by_milestone, ->(milestone) { where(milestone_id: milestone) }
+
+  # Closed scope for merge request should return
+  # both merged and closed mr's
+  scope :closed, -> { with_states(:closed, :merged) }
+  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
+  >>>>>>> feature/notifications
 
   serialize :st_commits
   serialize :st_diffs
@@ -143,11 +160,11 @@ class MergeRequest < NewDb
   end
 
   def merge_event
-    self.project.old_events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::MERGED).last
+    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::MERGED).last
   end
 
   def closed_event
-    self.project.old_events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::CLOSED).last
+    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::CLOSED).last
   end
 
   def commits
@@ -176,15 +193,8 @@ class MergeRequest < NewDb
   end
 
   def merge!(user_id)
+    self.author_id_of_changes = user_id
     self.merge
-
-    OldEvent.create(
-      project: self.project,
-      action: OldEvent::MERGED,
-      target_id: self.id,
-      target_type: "MergeRequest",
-      author_id: user_id
-    )
   end
 
   def automerge!(current_user)

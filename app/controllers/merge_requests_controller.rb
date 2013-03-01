@@ -75,13 +75,14 @@ class MergeRequestsController < ProjectResourceController
     if @merge_request.unchecked?
       @merge_request.check_if_can_be_merged
     end
-    render json: {merge_status: @merge_request.human_merge_status_name}
+    render json: {merge_status: @merge_request.merge_status_name}
   rescue Gitlab::SatelliteNotExistError
     render json: {merge_status: :no_satellite}
   end
 
   def automerge
-    return access_denied! unless can?(current_user, :accept_mr, @project)
+    return access_denied! unless allowed_to_merge?
+
     if @merge_request.opened? && @merge_request.can_be_merged?
       @merge_request.should_remove_source_branch = params[:should_remove_source_branch]
       @merge_request.automerge!(current_user)
@@ -143,5 +144,18 @@ class MergeRequestsController < ProjectResourceController
     # or from cache if already merged
     @commits = @merge_request.commits
     @commits = CommitDecorator.decorate(@commits)
+
+    @allowed_to_merge = allowed_to_merge?
+    @show_merge_controls = @merge_request.opened? && @commits.any? && @allowed_to_merge
+  end
+
+  def allowed_to_merge?
+    action = if project.protected_branch?(@merge_request.target_branch)
+               :push_code_to_protected_branches
+             else
+               :push_code
+             end
+
+    can?(current_user, action, @project)
   end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130220133245) do
+ActiveRecord::Schema.define(:version => 20130226102513) do
 
   create_table "event_subscription_notifications", :force => true do |t|
     t.integer  "event_id"
@@ -34,26 +34,7 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
     t.datetime "last_notified_at"
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
-  end
-
-  create_table "event_subscription_notifications", :force => true do |t|
-    t.integer  "event_id"
-    t.integer  "subscription_id"
-    t.string   "notification_state"
-    t.datetime "notified_at"
-    t.datetime "created_at",         :null => false
-    t.datetime "updated_at",         :null => false
-  end
-
-  create_table "event_subscriptions", :force => true do |t|
-    t.integer  "user_id"
-    t.string   "action"
-    t.integer  "target_id"
-    t.string   "target_type"
-    t.integer  "notification_interval"
-    t.datetime "last_notified_at"
-    t.datetime "created_at",            :null => false
-    t.datetime "updated_at",            :null => false
+    t.string   "target_category"
   end
 
   create_table "events", :force => true do |t|
@@ -288,8 +269,9 @@ ActiveRecord::Schema.define(:version => 20130220133245) do
     t.string   "name"
     t.string   "path"
     t.integer  "owner_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+    t.string   "description", :default => "", :null => false
   end
 
   create_table "users", :force => true do |t|

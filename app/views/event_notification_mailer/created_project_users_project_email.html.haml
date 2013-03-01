@@ -1,0 +1,16 @@
+= render "hello", user: @user
+= "#{ link_to @user.name, @user.username } add #{ link_to @new_member, user_url(@new_member.username) } to #{ link_to @project.name_with_namespace, project_url(@project.name_with_namespace) } project team with #{ @users_project.project_access } permission"
+%br
+%table
+  %caption Project team members now
+  %tr
+    %th Name
+    %td Project access
+    %td Repo access
+  - @project.users_projects.each do |pm|
+    %tr
+      %td= link_to pm.name, user_url(pm.username)
+      %td= pm.project_access_human
+      %td= pm.repo_access_human
+%br
+= render "footer", user: @user

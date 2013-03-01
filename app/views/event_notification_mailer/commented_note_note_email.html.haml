@@ -1,0 +1,5 @@
+= render "hello", user: @user
+= "#{ link_to @user.name, user_url(@user.username)} commented note #{ link_to @note.title, project_note_url(@note.project.name_with_namespace, @note.id) } in #{ link_to @note.project.name_with_namespace, project_url(@note.project.name_with_namespace) } project some message:"
+%br
+= "#{ @note.note}"
+= render "footer", user: @user

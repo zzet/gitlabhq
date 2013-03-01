@@ -39,7 +39,8 @@ gem "pygments.rb",  git: "https://github.com/gitlabhq/pygments.rb.git", branch: 
 gem "github-linguist", "~> 2.3.4" , require: "linguist"
 
 # API
-gem "grape", "~> 0.2.1"
+gem "grape", "~> 0.3.1"
+gem "grape-entity", "~> 0.2.0"
 
 # Format dates and times
 # based on human-friendly examples
@@ -124,6 +125,7 @@ group :assets do
   gem "font-awesome-sass-rails", "~> 3.0.0"
   gem "gemoji", "~> 1.2.1", require: 'emoji/railtie'
   gem "gon"
+  gem "js-routes"
 end
 
 group :development do

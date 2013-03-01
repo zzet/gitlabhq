@@ -1,0 +1,14 @@
+= render "hello", user: @user
+= "#{ link_to @user.name, user_url(@user.username) } created new group of projects:"
+%table
+  %tr
+    %td Name
+    %td= @group.name
+  %tr
+    %td Description
+    %td= @group.description
+  %tr
+    %td Page
+    %td= link_to @group.name, group_url(@group.path)
+%br
+= render "footer", user: @user

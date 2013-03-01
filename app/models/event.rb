@@ -16,10 +16,6 @@
 
 class Event < NewDb
   include Actionable
-  attr_accessible :project, :action, :data, :author_id, :project_id,
-                  :target_id, :target_type, :created_at, :updated_at
-
-  default_scope where("author_id IS NOT NULL")
 
   attr_accessible :action, :data,
                   :source_id, :source_type, :source,
@@ -36,13 +32,24 @@ class Event < NewDb
   has_many :subscribers,    through: :subscriptions, class_name: User
 
   validates :author,  presence: true
-  validates :source,  presence: true, unless: -> { action && action.to_sym == :deleted }
+  validates :source,  presence: true, unless: -> { action && (deleted_event? || push_event?) }
+
+  # Custom validators
+  def push_event?
+    return false unless [:pushed].include? action.to_sym
+    return true if data["repository"]
+  end
+
+  def deleted_event?
+    action.to_sym == :deleted
+  end
 
   # For Hash only
-  serialize :data
+  #serialize :data
 
   # Scopes
   scope :with_source, ->(source) { where(source_id: source, source_type: source.class.name) }
   scope :recent, -> { order("created_at DESC") }
   scope :with_target, ->(target) { where(target_id: target, target_type: target.class.name) }
+  scope :with_push, -> { where(source_type: "Push_summary") }
 end

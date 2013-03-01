@@ -77,6 +77,7 @@ class User < NewDb
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, through: :subscriprions
 
   validates :name, presence: true
+  validates :email, presence: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/ }
   validates :bio, length: { within: 0..255 }
   validates :extern_uid, allow_blank: true, uniqueness: {scope: :provider}
   validates :projects_limit, presence: true, numericality: {greater_than_or_equal_to: 0}
@@ -222,17 +223,6 @@ class User < NewDb
   # Team membership in authorized projects
   def tm_in_authorized_projects
     UsersProject.where(project_id:  authorized_projects.map(&:id), user_id: self.id)
-  end
-
-  # Returns a string for use as a Gitolite user identifier
-  #
-  # Note that Gitolite 2.x requires the following pattern for users:
-  #
-  #   ^@?[0-9a-zA-Z][0-9a-zA-Z._\@+-]*$
-  def identifier
-    # Replace non-word chars with underscores, then make sure it starts with
-    # valid chars
-    email.gsub(/\W/, '_').gsub(/\A([\W\_])+/, '')
   end
 
   def is_admin?

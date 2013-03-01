@@ -1,0 +1,3 @@
+= render "hello", user: @user
+= "User #{ link_to @issue.assignee.name, user_url(@issue.assignee.username) } was assigned to #{ link_to @issue.title, project_issue_url(@issue.project.name_with_namespace, @issue) } issue in #{ link_to @issue.project.name_with_namespace, project_url(@issue.project.name_with_namespace)} project by #{ link_to @user.name, user_url(@user.username)}."
+= render "footer", user: @user

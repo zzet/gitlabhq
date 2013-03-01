@@ -13,6 +13,10 @@ module Watchable
     end
   end
 
+  def watched_by?(user)
+    Event::Subscription.by_user(user).by_target(self).by_action(:all).any?
+  end
+
   def watch_status?(user)
 
   end

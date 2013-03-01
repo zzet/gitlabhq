@@ -17,7 +17,4 @@ describe Gitlab::Event::Builder::UsersProject do
   it "should build events from hash" do
     @events = Gitlab::Event::Builder::UsersProject.build(@action, @data[:source], @data[:user], @data[:data])
   end
-
-
-
 end

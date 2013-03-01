@@ -1,0 +1,5 @@
+= render "hello", user: @user
+= "#{ link_to @user.name, user_url(@user.username)} commented merge request #{ link_to @merge_request.title, project_merge_request_url(@merge_request.project.name_with_namespace, @merge_request.id) } in #{ link_to @merge_request.project.name_with_namespace, project_url(@merge_request.project.name_with_namespace) } project some message:"
+%br
+= "#{ @note.note}"
+= render "footer", user: @user

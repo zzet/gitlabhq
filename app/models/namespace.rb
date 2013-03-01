@@ -17,8 +17,6 @@ class Namespace < NewDb
 
   belongs_to :owner,  class_name: "User"
 
-  belongs_to :owner,  class_name: "User"
-
   has_many :projects, dependent: :destroy
 
   validates :owner, presence: true

@@ -1,0 +1,43 @@
+= render "hello", user: @user
+-#%div
+  -#%div{:style => "background: #efefef; padding: .4em; margin-bottom: 1.4em"}
+    -#%table{:style => "color: #545454; font: .9em; width: 100%"}
+      -#%tr
+        -#%td{:style => "font-weight: bold; vertical-align: top; width: 200px"} Message
+        -#%td= (@commit.message).gsub("\n", "<br />"))
+      -#%tr
+        -#%td{:style => "font-weight: bold"} Date
+        -#%td= @commit.authored_date
+      -#%tr
+        -#%td{:style => "font-weight: bold"} Branch
+        -#%td= link_to @branch, with_base_url(log_path(@branch))
+      -#- if @branches.any?
+        -#%tr
+          -#%td{:style => "font-weight: bold"} Already in branches
+          -#%td= @branches.map{ |b| link_to b, with_base_url(log_path(b)) }.join(', ')
+      -#%tr
+        -#%td{:style => "font-weight: bold"} Commiter
+        -#%td
+          -#= @commit.committer.name
+          -#<#{mail_to @commit.committer.email}>
+      -#%tr
+        -#%td{:style => "font-weight: bold"} Author
+        -#%td
+          -#= @commit.author.name
+          -#<#{mail_to @commit.author.email}>
+      -#%tr
+        -#%td{:style => "font-weight: bold; width: 90px"} Commit
+        -#%td
+          -#= link_to @commit.id, with_base_url(repo_owner_path(@repository, :project_repository_commit_path, @repository.project, @repository, @commit.id))
+  -#= render_cached_diffs
+
+- if @commits.present?
+  %div.ui-box
+    %h5.title
+      Commits (#{@commits.count})
+    -#%ul.well-list= render @commits
+
+  - unless @diffs.empty?
+    %h4 Diff
+    -#= render "commits/diffs", diffs: @diffs
+= render "footer", user: @user

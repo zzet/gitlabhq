@@ -52,7 +52,7 @@ class Project < NewDb
   has_many :subscribers,    through: :subscriptions
 
   has_many :merge_requests,     dependent: :destroy
-  has_many :issues,             dependent: :destroy, order: "state, created_at DESC"
+  has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
   has_many :milestones,         dependent: :destroy
   has_many :users_projects,     dependent: :destroy
   has_many :notes,              dependent: :destroy
@@ -104,10 +104,7 @@ class Project < NewDb
   scope :public_only, -> { where(public: true) }
 
   enumerize :issues_tracker, :in => (Gitlab.config.issues_tracker.keys).append(:gitlab), :default => :gitlab
-
   actions_to_watch [:created, :updated, :deleted, :transfer]
-
-  #enumerize :issues_tracker, :in => (Settings[:issues_tracker].keys).append(:gitlab), :default => :gitlab
 
   class << self
     def abandoned
@@ -279,32 +276,6 @@ class Project < NewDb
     users_projects.find_by_user_id(user_id)
   end
 
-  def transfer(new_namespace)
-    Project.transaction do
-      old_namespace = namespace
-      self.namespace = new_namespace
-
-      old_dir = old_namespace.try(:path) || ''
-      new_dir = new_namespace.try(:path) || ''
-
-      old_repo = if old_dir.present?
-                   File.join(old_dir, self.path)
-                 else
-                   self.path
-                 end
-
-      if Project.where(path: self.path, namespace_id: new_namespace.try(:id)).present?
-        raise TransferError.new("Project with same path in target namespace already exists")
-      end
-
-      Gitlab::ProjectMover.new(self, old_dir, new_dir).execute
-
-      save!
-    end
-  rescue Gitlab::ProjectMover::ProjectMoveError => ex
-    raise Project::TransferError.new(ex.message)
-  end
-
   def name_with_namespace
     @name_with_namespace ||= begin
                                if namespace
@@ -325,6 +296,10 @@ class Project < NewDb
     else
       path
     end
+  end
+
+  def transfer(new_namespace)
+    ProjectTransferService.new.transfer(self, new_namespace)
   end
 
   def execute_hooks(data)

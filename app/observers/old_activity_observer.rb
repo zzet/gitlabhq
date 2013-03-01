@@ -39,4 +39,18 @@ class OldActivityObserver < ActiveRecord::Observer
       author_id: record.author_id_of_changes
     )
   end
+
+  def after_merge(record, transition)
+    # Since MR can be merged via sidekiq
+    # to prevent event duplication do this check
+    return true if record.merge_event
+
+    OldEvent.create(
+      project: record.project,
+      target_id: record.id,
+      target_type: record.class.name,
+      action: OldEvent::MERGED,
+      author_id: record.author_id_of_changes
+    )
+  end
 end

@@ -1,0 +1,19 @@
+.sb{class: @user.admin? ? :span8 : :span12 }
+  - @subscriptions.each do |type, subscriptions|
+    = render 'subscription_group', type: type, subscriptions: subscriptions
+
+- if @user.admin?
+  .span3
+    %fieldset.tips
+      %legend Auto-subscribe on new
+      %table
+        %tr
+          %th Name
+          %th Control
+          - @available_subscription_types.each do |st|
+            %tr
+              %td= st.to_s.camelize
+              - if @subscriptions_by_target_type.has_key?(st.to_s)
+                %td= link_to "Unsubscribe", notifications_subscription_path( category: st.to_s ), remote: true, method: :delete, format: :json, class: "btn btn-small btn-remove"
+              - else
+                %td= link_to "Subscribe", notifications_subscription_path( category: st.to_s ), remote: true, method: :post, format: :json, class: "btn btn-small btn-success"

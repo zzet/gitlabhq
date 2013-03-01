@@ -1,0 +1,3 @@
+= render "hello", user: @user
+= "User #{ link_to @merge_request.assignee.name, user_url(@merge_request.assignee.username) } was assigned to #{ link_to @merge_request.title, project_merge_request_url(@merge_request.project.name_with_namespace, @merge_request) } merge request in #{ link_to @merge_request.project.name_with_namespace, project_url(@merge_request.project.name_with_namespace)} project by #{ link_to @user.name, user_url(@user.username)}."
+= render "footer", user: @user

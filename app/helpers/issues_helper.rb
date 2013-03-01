@@ -27,6 +27,7 @@ module IssuesHelper
       all: "all",
       closed: "closed",
       to_me: "assigned-to-me",
+      by_me: "created-by-me",
       open: "open"
     }
   end
