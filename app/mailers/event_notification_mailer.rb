@@ -928,28 +928,17 @@ class EventNotificationMailer < ActionMailer::Base
   #
 
   def pushed_project_push_summary_email(notification)
-    p "Start push"
     @notification = notification
 
     @event = @notification.event
-    p @event
-
     @user = @event.author
-    p @user
-
     @source = @event.source_type
-    p @source
-
     @project = @target = @event.target
-    p @project
-
     @push_data = JSON.load(@event.data).to_hash
-    p @push_data
-
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
-    puts ""
     @commits       = result[:commits]
+    puts ""
     p @commits
     puts ""
 
