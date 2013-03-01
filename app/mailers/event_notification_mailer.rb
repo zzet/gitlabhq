@@ -118,7 +118,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @source = @event.source
     @group = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New project #{@source.name} was created on #{@target.name} group [created]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New project #{@project.name_with_namespace} was created on #{@group.name} group [created]")
   end
 
   def created_project_project_email(notification)
@@ -128,7 +128,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New project #{@source.name} was created [created]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New project #{@project.name_with_namespace} was created [created]")
   end
 
   def created_project_project_hook_email(notification)
@@ -200,76 +200,6 @@ class EventNotificationMailer < ActionMailer::Base
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New Team #{@source.name} was created [created]")
   end
-
-  #def created_user_team_user_team_project_relationship_email(notification)
-    #@notification = notification
-    #@event = @notification.event
-    #@user = @event.author
-    #@source = @event.source
-    #@target = @event.target
-
-    #mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New issue #{@source.name} was created on #{@target.name} [created]")
-  #end
-
-  #def created_project_user_team_project_relationship_email(notification)
-    #@notification = notification
-    #@event = @notification.event
-    #@user = @event.author
-    #@source = @event.source
-    #@target = @event.target
-
-    #mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New issue #{@source.name} was created on #{@target.name} [created]")
-  #end
-
-  #def created_user_user_team_user_relationship_email(notification)
-    #@notification = notification
-    #@event = @notification.event
-    #@user = @event.author
-    #@source = @event.source
-    #@target = @event.target
-
-    #mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New issue #{@source.name} was created on #{@target.name} [created]")
-  #end
-
-  #def created_user_team_user_team_user_relationship_email(notification)
-    #@notification = notification
-    #@event = @notification.event
-    #@user = @event.author
-    #@source = @event.source
-    #@target = @event.target
-
-    #mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New issue #{@source.name} was created on #{@target.name} [created]")
-  #end
-
-  #def created_user_users_project_email(notification)
-    #@notification = notification
-    #@event = @notification.event
-    #@user = @event.author
-    #@source = @event.source
-    #@target = @event.target
-
-    #mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New issue #{@source.name} was created on #{@target.name} [created]")
-  #end
-
-  #def created_project_users_project_email(notification)
-    #@notification = notification
-    #@event = @notification.event
-    #@user = @event.author
-    #@source = @event.source
-    #@target = @event.target
-
-    #mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New issue #{@source.name} was created on #{@target.name} [created]")
-  #end
-
-  #def created_project_wiki_email(notification)
-    #@notification = notification
-    #@event = @notification.event
-    #@user = @event.author
-    #@source = @event.source
-    #@target = @event.target
-
-    #mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New issue #{@source.name} was created on #{@target.name} [created]")
-  #end
 
   #
   # Updated action
@@ -682,10 +612,11 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @users_project = @source = @event.source
+    @project = @target = @event.target
+    @member = @users_project.user
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@source.user.name} was added to #{@target.name} project by #{@user.name} [joined]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@member.name} was added to #{@project.name_with_namespace} project by #{@user.name} [joined]")
   end
 
   def joined_user_users_project_email(notification)
@@ -702,8 +633,10 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @utur = @source = @event.source
+    @tm = @target = @event.target
+    @team = @utur.user_team
+    @projects = @team.projects
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@target.name} was added to #{@source.user_team.name} team by #{@user.name} [joined]")
   end
@@ -894,20 +827,22 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @utpr = @source = @event.source
+    @project = @target = @event.target
+    @team = @utpr.user_team
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] Team #{@source.user_team.name} was assigned to #{@target.name} project by #{@user.name} [assigned]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] Team #{@team.name} was assigned to #{@project.name_with_namespace} project by #{@user.name} [assigned]")
   end
 
   def assigned_user_team_user_team_project_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @utpr = @source = @event.source
+    @team = @target = @event.target
+    @project = @utpr.project
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] Team #{@target.name} was assigned to #{@source.project.name} project by #{@user.name} [assigned]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] Team #{@team.name} was assigned to #{@project.name_with_namespace} project by #{@user.name} [assigned]")
   end
 
   def assigned_user_issue_email(notification)
@@ -997,13 +932,28 @@ class EventNotificationMailer < ActionMailer::Base
     @push_data = JSON.load(@event.data).to_hash
     p @push_data
 
-    result = commit.compare(@project, @push_data["before"], @push_data["after"])
-    p result
+    result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
+    puts ""
     @commits       = result[:commits]
+    p @commits
+    puts ""
+
     @commit        = result[:commit]
+    p @commit
+    p @commit.commit
+    p @commit.commit.commit
+    puts ""
+
     @diffs         = result[:diffs]
+    p @diffs
+    p @diffs[:diff]
+    puts ""
+
     @refs_are_same = result[:same]
+    p @refs_are_same
+    puts ""
+
     @line_notes    = []
 
     @commits = CommitDecorator.decorate(@commits)

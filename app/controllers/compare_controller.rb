@@ -8,7 +8,7 @@ class CompareController < ProjectResourceController
   end
 
   def show
-    result = commit.compare(project, params[:from], params[:to])
+    result = Commit.compare(project, params[:from], params[:to])
 
     @commits       = result[:commits]
     @commit        = result[:commit]
@@ -16,7 +16,7 @@ class CompareController < ProjectResourceController
     @refs_are_same = result[:same]
     @line_notes    = []
 
-    @commits = commitdecorator.decorate(@commits)
+    @commits = CommitDecorator.decorate_collection(@commits)
   end
 
   def create

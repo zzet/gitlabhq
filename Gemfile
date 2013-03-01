@@ -15,7 +15,7 @@ gem "mysql2", group: :mysql
 gem "pg", group: :postgres
 
 # Auth
-gem "devise", "~> 2.1.0"
+gem "devise"
 gem 'omniauth', "~> 1.1.1"
 gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
@@ -24,7 +24,7 @@ gem 'omniauth-github'
 # GITLAB patched libs
 gem "grit",          git: "https://github.com/gitlabhq/grit.git",           ref: '9e98418ce2d654485b967003726aa2706a10060b'
 gem 'grack',         git: "https://github.com/gitlabhq/grack.git",          ref: 'ba46f3b0845c6a09d488ae6abdce6ede37e227e8'
-gem 'grit_ext',      git: "https://github.com/gitlabhq/grit_ext.git",       ref: '8e6afc2da821354774aa4d1ee8a1aa2082f84a3e'
+gem 'grit_ext',      git: "https://github.com/gitlabhq/grit_ext.git",       ref: '2d1b2f13cabc02520405985fccb2a0abfcba9907'
 
 # LDAP Auth
 gem 'gitlab_omniauth-ldap', '1.0.2', require: "omniauth-ldap"
@@ -53,10 +53,10 @@ gem 'enumerize'
 gem "kaminari", "~> 0.14.1"
 
 # HAML
-gem "haml-rails", "~> 0.3.5"
+gem "haml-rails"
 
 # Files attachments
-gem "carrierwave", "~> 0.7.1"
+gem "carrierwave"
 
 # Authorization
 gem "six"
@@ -72,7 +72,7 @@ gem "redcarpet",     "~> 2.2.2"
 gem "github-markup", "~> 0.7.4", require: 'github/markup'
 
 # Servers
-gem "unicorn", "~> 4.4.0"
+gem "unicorn"
 
 # State machine
 gem "state_machine"
@@ -81,12 +81,12 @@ gem "state_machine"
 gem "acts-as-taggable-on", "2.3.3"
 
 # Decorators
-gem "draper", "~> 0.18.0"
+gem "draper"
 
 # Background jobs
 gem 'slim'
 gem 'sinatra', require: nil
-gem 'sidekiq', '2.7.3'
+gem 'sidekiq'
 
 # HTTP requests
 gem "httparty"
@@ -158,7 +158,7 @@ group :development, :test do
   gem "capybara", '2.0.2'
   gem "pry"
   gem "awesome_print"
-  gem "database_cleaner", ref: "9f898fc50d87a5d51760f9dcf374bf5ffda21baf", git: "https://github.com/bmabey/database_cleaner.git"
+  gem "database_cleaner"
   gem "launchy"
   gem 'factory_girl_rails'
 

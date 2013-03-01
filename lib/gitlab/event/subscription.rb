@@ -71,6 +71,7 @@ module Gitlab
         protected
 
         def subscribe!(user, action, target, source)
+
           subscription = nil
           subscription_params = { user: user, action: action }
 
