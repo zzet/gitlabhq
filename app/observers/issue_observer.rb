@@ -1,24 +1,12 @@
 class IssueObserver < BaseObserver
   cattr_accessor :current_user
 
-  def after_create(issue)
-    notification.new_issue(issue, current_user)
-  end
-
   def after_close(issue, transition)
-    notification.close_issue(issue, current_user)
-
     create_note(issue)
   end
 
   def after_reopen(issue, transition)
     create_note(issue)
-  end
-
-  def after_update(issue)
-    if issue.is_being_reassigned?
-      notification.reassigned_issue(issue, current_user)
-    end
   end
 
   protected

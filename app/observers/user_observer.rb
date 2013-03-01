@@ -1,8 +1,6 @@
 class UserObserver < BaseObserver
   def after_create(user)
     log_info("User \"#{user.name}\" (#{user.email}) was created")
-
-    notification.new_user(user)
   end
 
   def after_destroy user
