@@ -1,3 +1,3 @@
 = render "hello", user: @user
-= "Key #{ link_to @key.title, key_url(@key)} was added to #{ link_to @user.name, user_url(@user.username)}"
+= "Key #{ link_to @key.title, key_url(@key)} was added to #{ link_to @updated_user.name, user_url(@updated_user.username)}"
 = render "footer", user: @user

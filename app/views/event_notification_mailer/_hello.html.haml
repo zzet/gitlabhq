@@ -7,7 +7,7 @@
     %th
   %tr
     %td You watch
-    %td= @target.name
+    %td= @target.respond_to?(:name) ? @target.name : @target["name"]
   %tr
     %td Was action
     %td= @event.action
