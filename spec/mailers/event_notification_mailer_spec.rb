@@ -22,115 +22,115 @@ describe EventNotificationMailer do
     ActionMailer::Base.deliveries.clear
   end
 
-#  it "should send email about create project" do
-    #project = create :project, creator: @another_user
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+  it "should send email about create project" do
+    project = create :project, creator: @another_user
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about create group" do
-    #group = create :group, owner: @another_user
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+  it "should send email about create group" do
+    group = create :group, owner: @another_user
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about create team" do
-    #team = create :user_team, owner: @another_user
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+  it "should send email about create team" do
+    team = create :user_team, owner: @another_user
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about create user" do
-    #user = create :user
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+  it "should send email about create user" do
+    user = create :user
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about update project" do
-    #project = create :project, creator: @another_user
+  it "should send email about update project" do
+    project = create :project, creator: @another_user
 
-    #ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear
 
-    #project.name = "#{project.name}_updated"
-    #project.save
+    project.name = "#{project.name}_updated"
+    project.save
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about update group" do
-    #group = create :group, owner: @another_user
+  it "should send email about update group" do
+    group = create :group, owner: @another_user
 
-    #ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear
 
-    #group.name = "#{group.name}_updated"
-    #group.save
+    group.name = "#{group.name}_updated"
+    group.save
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about update team" do
-    #team = create :user_team, owner: @another_user
+  it "should send email about update team" do
+    team = create :user_team, owner: @another_user
 
-    #ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear
 
-    #team.name = "#{team.name}_updated"
-    #team.save
+    team.name = "#{team.name}_updated"
+    team.save
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about update user" do
-    #user = create :user
+  it "should send email about update user" do
+    user = create :user
 
-    #ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear
 
-    #user.name = "#{user.name}_updated"
-    #user.save
+    user.name = "#{user.name}_updated"
+    user.save
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about destroy project" do
-    #project = create :project, creator: @another_user
+  it "should send email about destroy project" do
+    project = create :project, creator: @another_user
 
-    #ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear
 
-    #project.destroy
+    project.destroy
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about destroy group" do
-    #group = create :group, owner: @another_user
+  it "should send email about destroy group" do
+    group = create :group, owner: @another_user
 
-    #ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear
 
-    #group.destroy
+    group.destroy
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about destroy team" do
-    #team = create :user_team, owner: @another_user
+  it "should send email about destroy team" do
+    team = create :user_team, owner: @another_user
 
-    #ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear
 
-    #team.destroy
+    team.destroy
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about destroy user" do
-    #user = create :user
+  it "should send email about destroy user" do
+    user = create :user
 
-    #ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear
 
-    #user.destroy
+    user.destroy
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
-  #it "should send email about self key add" do
-    #key = create :key, user: @user
+  it "should send email about self key add" do
+    key = create :key, user: @user
 
-    #ActionMailer::Base.deliveries.should_not be_blank
-  #end
+    ActionMailer::Base.deliveries.should_not be_blank
+  end
 
   describe "Push actions mails" do
 
@@ -149,6 +149,7 @@ describe EventNotificationMailer do
 
         p ActionMailer::Base.deliveries.inspect
         ActionMailer::Base.deliveries.should_not be_blank
+        p ActionMailer::Base.deliveries.first.body.inspect
       end
     end
   end
