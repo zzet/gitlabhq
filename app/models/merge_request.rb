@@ -25,70 +25,70 @@ class MergeRequest < ActiveRecord::Base
   include Issuable
   include Watchable
 
-BROKEN_DIFF = "--broken-diff"
+  BROKEN_DIFF = "--broken-diff"
 
-attr_accessible :title, :assignee_id, :target_branch, :source_branch, :milestone_id,
-                :author_id_of_changes, :state_event
+  attr_accessible :title, :assignee_id, :target_branch, :source_branch, :milestone_id,
+    :author_id_of_changes, :state_event
 
-attr_accessor :should_remove_source_branch
+  attr_accessor :should_remove_source_branch
 
-state_machine :state, initial: :opened do
-  event :close do
-    transition [:reopened, :opened] => :closed
+  state_machine :state, initial: :opened do
+    event :close do
+      transition [:reopened, :opened] => :closed
+    end
+
+    event :merge do
+      transition [:reopened, :opened] => :merged
+    end
+
+    event :reopen do
+      transition closed: :reopened
+    end
+
+    state :opened
+
+    state :reopened
+
+    state :closed
+
+    state :merged
   end
 
-  event :merge do
-    transition [:reopened, :opened] => :merged
+  state_machine :merge_status, initial: :unchecked do
+    event :mark_as_unchecked do
+      transition [:can_be_merged, :cannot_be_merged] => :unchecked
+    end
+
+    event :mark_as_mergeable do
+      transition unchecked: :can_be_merged
+    end
+
+    event :mark_as_unmergeable do
+      transition unchecked: :cannot_be_merged
+    end
+
+    state :unchecked
+
+    state :can_be_merged
+
+    state :cannot_be_merged
   end
 
-  event :reopen do
-    transition closed: :reopened
-  end
+  serialize :st_commits
+  serialize :st_diffs
 
-  state :opened
+  validates :source_branch, presence: true
+  validates :target_branch, presence: true
+  validate  :validate_branches
 
-  state :reopened
+  scope :merged, -> { with_state(:merged) }
+  scope :by_branch, ->(branch_name) { where("source_branch LIKE :branch OR target_branch LIKE :branch", branch: branch_name) }
+  scope :cared, ->(user) { where('assignee_id = :user OR author_id = :user', user: user.id) }
+  scope :by_milestone, ->(milestone) { where(milestone_id: milestone) }
 
-  state :closed
-
-  state :merged
-end
-
-state_machine :merge_status, initial: :unchecked do
-  event :mark_as_unchecked do
-    transition [:can_be_merged, :cannot_be_merged] => :unchecked
-  end
-
-  event :mark_as_mergeable do
-    transition unchecked: :can_be_merged
-  end
-
-  event :mark_as_unmergeable do
-    transition unchecked: :cannot_be_merged
-  end
-
-  state :unchecked
-
-  state :can_be_merged
-
-  state :cannot_be_merged
-end
-
-serialize :st_commits
-serialize :st_diffs
-
-validates :source_branch, presence: true
-validates :target_branch, presence: true
-validate  :validate_branches
-
-scope :merged, -> { with_state(:merged) }
-scope :by_branch, ->(branch_name) { where("source_branch LIKE :branch OR target_branch LIKE :branch", branch: branch_name) }
-scope :cared, ->(user) { where('assignee_id = :user OR author_id = :user', user: user.id) }
-scope :by_milestone, ->(milestone) { where(milestone_id: milestone) }
-
-# Closed scope for merge request should return
-# both merged and closed mr's
-scope :closed, -> { with_states(:closed, :merged) }
+  # Closed scope for merge request should return
+  # both merged and closed mr's
+  scope :closed, -> { with_states(:closed, :merged) }
   actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
 
   def validate_branches
@@ -97,90 +97,90 @@ scope :closed, -> { with_states(:closed, :merged) }
     end
   end
 
-def reload_code
-  self.reloaded_commits
-  self.reloaded_diffs
-end
-
-def check_if_can_be_merged
-  if Gitlab::Satellite::MergeAction.new(self.author, self).can_be_merged?
-    mark_as_mergeable
-  else
-    mark_as_unmergeable
+  def reload_code
+    self.reloaded_commits
+    self.reloaded_diffs
   end
-end
 
-def diffs
-  st_diffs || []
-end
+  def check_if_can_be_merged
+    if Gitlab::Satellite::MergeAction.new(self.author, self).can_be_merged?
+      mark_as_mergeable
+    else
+      mark_as_unmergeable
+    end
+  end
 
-def reloaded_diffs
-  if opened? && unmerged_diffs.any?
-    self.st_diffs = unmerged_diffs
+  def diffs
+    st_diffs || []
+  end
+
+  def reloaded_diffs
+    if opened? && unmerged_diffs.any?
+      self.st_diffs = unmerged_diffs
+      self.save
+    end
+
+  rescue Grit::Git::GitTimeout
+    self.st_diffs = [BROKEN_DIFF]
     self.save
   end
 
-rescue Grit::Git::GitTimeout
-  self.st_diffs = [BROKEN_DIFF]
-  self.save
-end
-
-def broken_diffs?
-  diffs == [BROKEN_DIFF]
-end
-
-def valid_diffs?
-  !broken_diffs?
-end
-
-def unmerged_diffs
-  # Only show what is new in the source branch compared to the target branch, not the other way around.
-  # The linex below with merge_base is equivalent to diff with three dots (git diff branch1...branch2)
-  # From the git documentation: "git diff A...B" is equivalent to "git diff $(git-merge-base A B) B"
-  common_commit = project.repo.git.native(:merge_base, {}, [target_branch, source_branch]).strip
-  diffs = project.repo.diff(common_commit, source_branch)
-end
-
-def last_commit
-  commits.first
-end
-
-def merge_event
-  self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::MERGED).last
-end
-
-def closed_event
-  self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::CLOSED).last
-end
-
-def commits
-  st_commits || []
-end
-
-def probably_merged?
-  unmerged_commits.empty? &&
-    commits.any? && opened?
-end
-
-def reloaded_commits
-  if opened? && unmerged_commits.any?
-    self.st_commits = unmerged_commits
-    save
+  def broken_diffs?
+    diffs == [BROKEN_DIFF]
   end
-  commits
-end
 
-def unmerged_commits
-  self.project.repo.
-    commits_between(self.target_branch, self.source_branch).
-    map {|c| Commit.new(c)}.
-    sort_by(&:created_at).
-    reverse
-end
+  def valid_diffs?
+    !broken_diffs?
+  end
 
-def merge!(user_id)
-  self.author_id_of_changes = user_id
-  self.merge
+  def unmerged_diffs
+    # Only show what is new in the source branch compared to the target branch, not the other way around.
+    # The linex below with merge_base is equivalent to diff with three dots (git diff branch1...branch2)
+    # From the git documentation: "git diff A...B" is equivalent to "git diff $(git-merge-base A B) B"
+    common_commit = project.repo.git.native(:merge_base, {}, [target_branch, source_branch]).strip
+    diffs = project.repo.diff(common_commit, source_branch)
+  end
+
+  def last_commit
+    commits.first
+  end
+
+  def merge_event
+    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::MERGED).last
+  end
+
+  def closed_event
+    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::CLOSED).last
+  end
+
+  def commits
+    st_commits || []
+  end
+
+  def probably_merged?
+    unmerged_commits.empty? &&
+      commits.any? && opened?
+  end
+
+  def reloaded_commits
+    if opened? && unmerged_commits.any?
+      self.st_commits = unmerged_commits
+      save
+    end
+    commits
+  end
+
+  def unmerged_commits
+    self.project.repo.
+      commits_between(self.target_branch, self.source_branch).
+      map {|c| Commit.new(c)}.
+      sort_by(&:created_at).
+      reverse
+  end
+
+  def merge!(user_id)
+    self.author_id_of_changes = user_id
+    self.merge
   end
 
   def automerge!(current_user)
