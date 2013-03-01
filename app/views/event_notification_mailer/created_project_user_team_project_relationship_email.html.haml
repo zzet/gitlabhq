@@ -1,5 +1,5 @@
 = render "hello", user: @user
-= "#{ link_to @user.name, @user.username } assigned #{ link_to @project.name_with_namespace, project_url(@project.name_with_namespace) } project to #{ link_to @team.name, team_url(@team.path) } team with #{ @user_team_project_relationship.greatest_access } permission for team members."
+= raw "#{ link_to @user.name, @user.username } assigned #{ link_to @project.name_with_namespace, project_url(@project.name_with_namespace) } project to #{ link_to @team.name, team_url(@team.path) } team with #{ @user_team_project_relationship.greatest_access } permission for team members."
 %table
   %caption Project team members
   %tr
