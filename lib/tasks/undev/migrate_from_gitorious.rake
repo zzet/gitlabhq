@@ -25,6 +25,13 @@ namespace :undev do
     @admin.admin = true
     @admin.save
 
+    Gitlab::Event::Action.current_user = @admin
+    SubscriptionService.subscribe(@admin, :all, @admin, :all)
+    SubscriptionService.subscribe(@admin, :all, :group, :all)
+    SubscriptionService.subscribe(@admin, :all, :project, :all)
+    SubscriptionService.subscribe(@admin, :all, :user_team, :all)
+    SubscriptionService.subscribe(@admin, :all, :user, :all)
+
     Rake::Task["undev:migrate:users"].invoke
     Rake::Task["undev:migrate:teams"].invoke
     Rake::Task["undev:migrate:projects"].invoke
@@ -224,7 +231,7 @@ namespace :undev do
 
       Legacy::Repository.actual.each do |repo|
 
-        group = Group.find_by_name(repo.project.slug)
+        group = Group.find_by_path(repo.project.slug)
         user = User.find_by_username(repo.project.slug)
 
         project = Project.new
