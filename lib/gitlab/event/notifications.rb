@@ -35,15 +35,14 @@ module Gitlab
                 if EventNotificationMailer.respond_to?(mail_method)
                   EventNotificationMailer.send(mail_method, stored_notification).deliver!
                 else
-                  Rails.logger.info "Undefined mail_method in notifications: #{mail_method}"
-                  EventNotificationMailer.default_email(stored_notification)
+                  raise RuntimeError, "Undefined mail_method in notifications: #{mail_method}"
                 end
 
                 stored_notification.deliver
                 stored_notification.notified_at = Time.zone.now
               rescue
                 stored_notification.failing
-                raise RuntimeError, "Can't send notification. Email error."
+                raise RuntimeError, "Can't send notification. Email error in #{mail_method}"
               end
 
               stored_notification.save
