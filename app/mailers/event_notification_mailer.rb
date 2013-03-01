@@ -997,13 +997,28 @@ class EventNotificationMailer < ActionMailer::Base
     @push_data = JSON.load(@event.data).to_hash
     p @push_data
 
-    result = commit.compare(@project, @push_data["before"], @push_data["after"])
-    p result
+    result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
+    puts ""
     @commits       = result[:commits]
+    p @commits
+    puts ""
+
     @commit        = result[:commit]
+    p @commit
+    p @commit.commit
+    p @commit.commit.commit
+    puts ""
+
     @diffs         = result[:diffs]
+    p @diffs
+    p @diffs[:diff]
+    puts ""
+
     @refs_are_same = result[:same]
+    p @refs_are_same
+    puts ""
+
     @line_notes    = []
 
     @commits = CommitDecorator.decorate(@commits)
