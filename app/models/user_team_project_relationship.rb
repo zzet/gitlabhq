@@ -18,7 +18,7 @@ class UserTeamProjectRelationship < ActiveRecord::Base
   belongs_to :user_team
   belongs_to :project
 
-  has_many :events,         as: :source,    dependent: :destroy
+  has_many :events,         as: :source
   has_many :subscriptions,  conditions: { action: "some_action" }
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
