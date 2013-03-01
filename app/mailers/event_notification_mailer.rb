@@ -32,7 +32,7 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @group = @source = @event.source
     @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New group #{@source.name} was created [created]")
@@ -115,8 +115,8 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @project = @source = @event.source
+    @group = @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New project #{@source.name} was created on #{@target.name} group [created]")
   end
@@ -125,7 +125,7 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @project = @source = @event.source
     @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New project #{@source.name} was created [created]")
@@ -185,7 +185,7 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @new_user = @source = @event.source
     @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New user #{@source.name} was created [created]")
@@ -195,7 +195,7 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @team = @source = @event.source
     @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] New Team #{@source.name} was created [created]")
@@ -580,34 +580,54 @@ class EventNotificationMailer < ActionMailer::Base
   # Deleted action
   #
 
+  def deleted_group_group_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @group = @source = @event.data
+    @target = @event.data
+
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source["name"]} group was deleted by #{@user.name} [deleted]")
+  end
+
   def deleted_group_project_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @source = @event.data
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source.name} group was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source["name"]} project was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_project_project_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @source = @event.data
+    @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source.name} user was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source['name']} user was deleted by #{@user.name} [deleted]")
+  end
+
+  def deleted_user_team_user_team_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @source = @event.data
+    @target = @event.data
+
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source['name']} team was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_user_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @source = @event.data
+    @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source.name} user was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source['name']} user was deleted by #{@user.name} [deleted]")
   end
 
   #
@@ -618,8 +638,8 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @key = @source = @event.source
+    @updated_user = @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] Key #{@source.name} was added to #{@target.name} profile by #{@user.name} user [added]")
   end
@@ -959,17 +979,26 @@ class EventNotificationMailer < ActionMailer::Base
   #
 
   def pushed_project_push_summary_email(notification)
+    p "Start push"
     @notification = notification
 
     @event = @notification.event
+    p @event
 
     @user = @event.author
+    p @user
+
     @source = @event.source_type
+    p @source
+
     @project = @target = @event.target
+    p @project
 
-    @push_data = @event.data
+    @push_data = JSON.load(@event.data).to_hash
+    p @push_data
 
-    result = commit.compare(@project, @push_data[:before], @push_data[:after])
+    result = commit.compare(@project, @push_data["before"], @push_data["after"])
+    p result
 
     @commits       = result[:commits]
     @commit        = result[:commit]

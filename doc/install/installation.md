@@ -92,7 +92,10 @@ Create a `git` user for Gitlab:
 
     sudo adduser --disabled-login --gecos 'GitLab' git
 
+
 # 4. GitLab shell
+
+GitLab Shell is a ssh access and repository management software developed specially for GitLab.
 
     # Login as git 
     sudo su git
@@ -103,9 +106,14 @@ Create a `git` user for Gitlab:
     # Clone gitlab shell
     git clone https://github.com/gitlabhq/gitlab-shell.git
 
-    # Setup
     cd gitlab-shell
     cp config.yml.example config.yml
+
+    # Edit config and replace gitlab_url 
+    # with something like 'http://domain.com/'
+    vim config.yml
+
+    # Do setup
     ./bin/install 
 
 

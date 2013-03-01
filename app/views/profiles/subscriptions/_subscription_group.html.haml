@@ -1,12 +1,11 @@
 .span3.pull-left
   %fieldset.tips
-    %legend= type
+    %legend= type.pluralize
     %table
       %tr
-        %th Name
+        %th= "#{type} name"
         %th Control
       - subscriptions.each do |subscription|
         %tr
-          -# TODO. Write correct table data
-          %td= link_to subscription.target.name
-          %td Unsubscribe
+          %td= link_to link_to subscription.target.name, subscription.target
+          %td= link_to "Unsubscribe", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name } ), remote: true, method: :delete, format: :json, class: "btn btn-small btn-remove"

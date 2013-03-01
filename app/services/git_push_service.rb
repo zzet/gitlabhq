@@ -19,6 +19,10 @@ class GitPushService
     # Collect data for this git push
     @push_data = post_receive_data(oldrev, newrev, ref)
 
+    Gitlab::Event::Action.trigger :pushed, "Push_summary", user, { project_id: project.id, push_data: @push_data, source: :repository }
+
+    create_push_event
+
     project.ensure_satellite_exists
     project.discover_default_branch
 
@@ -27,10 +31,16 @@ class GitPushService
       project.execute_hooks(@push_data.dup)
       project.execute_services(@push_data.dup)
     end
+  end
 
-    Gitlab::Event::Action.trigger :pushed, "Push_summary", user, { project_id: project.id, push_data: @push_data, source: :repository }
-
-    create_push_event
+  # This method provide a sample data
+  # generated with post_receive_data method
+  # for given project
+  #
+  def sample_data(project, user)
+    @project, @user = project, user
+    commits = project.repository.commits(project.default_branch, nil, 3)
+    post_receive_data(commits.last.id, commits.first.id, "refs/heads/#{project.default_branch}")
   end
 
   protected

@@ -1,7 +1,7 @@
 class ConvertClosedToStateInMilestone < ActiveRecord::Migration
   def up
     Milestone.transaction do
-      Milestone.where(closed: false).update_all(state: :opened)
+      Milestone.where(closed: true).update_all(state: :closed)
       Milestone.where(closed: false).update_all(state: :active)
     end
   end
