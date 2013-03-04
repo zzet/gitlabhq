@@ -3,13 +3,13 @@
 %table
   %tr
     %td Name
-    %td= @project.name_with_namespace
+    %td= @project.path_with_namespace
   %tr
     %td Description
     %td= @project.description
   %tr
     %td Page
-    %td= link_to @project.name_with_namespace, project_url(@project.name_with_namespace)
+    %td= link_to @project.path_with_namespace, project_url(@project.path_with_namespace)
   - if @project.issues_enabled?
     %tr
       %td Issue tracker
