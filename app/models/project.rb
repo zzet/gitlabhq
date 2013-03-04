@@ -106,8 +106,6 @@ class Project < ActiveRecord::Base
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
   actions_to_watch [:created, :updated, :deleted, :transfer]
 
-  actions_to_watch [:created, :updated, :deleted, :transfer]
-
   class << self
     def abandoned
       project_ids = OldEvent.select('max(created_at) as latest_date, project_id').

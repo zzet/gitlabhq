@@ -10,7 +10,7 @@
 %p.cgray
   Showing #{pluralize(diffs.count, "changed file")}
 .file-stats
-  = render "commits/diff_head", diffs: diffs
+  -#= render "commits/diff_head", diffs: diffs
 
 .files
   - if @suppress_diff

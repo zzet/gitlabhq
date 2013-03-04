@@ -27,6 +27,7 @@ module Gitlab
         # Subscribe on target
         # TODO. If user removed from Team or Project or Group - remove subscriptions
         def create_subscriprions_by_target(external_source)
+
           target_category = external_source.class.name.underscore.to_sym
           typed_subscriptions = ::Event::Subscription.by_target_category(target_category)
 
