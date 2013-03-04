@@ -40,9 +40,9 @@ module Gitlab
 
                 stored_notification.deliver
                 stored_notification.notified_at = Time.zone.now
-              rescue
+              rescue Exception => ex
                 stored_notification.failing
-                raise RuntimeError, "Can't send notification. Email error in #{mail_method}"
+                raise RuntimeError, "Can't send notification. Email error in #{mail_method}. \r\n#{ex.backtrace.inspect}"
               end
 
               stored_notification.save
