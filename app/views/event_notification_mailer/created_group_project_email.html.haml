@@ -9,7 +9,7 @@
     %td= @project.description
   %tr
     %td Page
-    %td= link_to @project.name_with_namespace, group_url(@project.name_with_namespace)
+    %td= link_to @project.path_with_namespace, group_url(@project.path_with_namespace)
   - if @project.issues_enabled?
     %tr
       %td Issue tracker
