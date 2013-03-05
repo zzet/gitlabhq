@@ -9,7 +9,11 @@ module Gitlab
             subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
 
             subscriptions.each do |subscription|
-              subscription.notifications.create(event: event)
+              # Not send notification about changes to changes author
+              # TODO. Rewrite in future with check by Entity type
+              if subscription.user != event.author
+                subscription.notifications.create(event: event)
+              end
             end
 
           end
