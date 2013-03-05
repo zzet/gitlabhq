@@ -59,42 +59,29 @@ class User < ActiveRecord::Base
   has_many :keys, dependent: :destroy
 
   # Groups
-  has_many :groups, class_name: "Group", foreign_key: :owner_id
-
-  # Teams
-  has_many :own_teams,
-    class_name: "UserTeam",
-    foreign_key: :owner_id,
-    dependent: :destroy
-
-  has_many :user_team_user_relationships, dependent: :destroy
-  has_many :user_teams, through: :user_team_user_relationships
-  has_many :user_team_project_relationships, through: :user_teams
-  has_many :team_projects, through: :user_team_project_relationships
+  has_many :groups,         class_name: Group, foreign_key: :owner_id
 
   # Projects
   has_many :users_projects,           dependent: :destroy
+  has_many :projects,                 through:   :users_projects
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
   has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
-  has_many :old_events,               dependent: :destroy, foreign_key: :author_id,   class_name: OldEvent
-  has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: "Issue"
-  has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
-  has_many :projects, through: :users_projects
+  has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: Issue
+  has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: MergeRequest
 
-  has_many :groups,         class_name: Group, foreign_key: :owner_id
-  has_many :recent_events,  class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
-
-  has_many :projects,       through: :users_projects
-
-  has_many :user_team_user_relationships, dependent: :destroy
-
+  # Teams
+  has_many :own_teams,                       dependent: :destroy, foreign_key: :owner_id, class_name: UserTeam
+  has_many :user_team_user_relationships,    dependent: :destroy
   has_many :user_teams,                      through: :user_team_user_relationships
   has_many :user_team_project_relationships, through: :user_teams
   has_many :team_projects,                   through: :user_team_project_relationships
 
-  has_many :personal_events,          class_name: Event, foreign_key: :author_id
+  # Events
   has_many :events,                   as: :source
+  has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
+  has_many :recent_events,                                 class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
+  has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
   has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, through: :subscriprions
 
