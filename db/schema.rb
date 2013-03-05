@@ -13,6 +13,13 @@
 
 ActiveRecord::Schema.define(:version => 20130318212250) do
 
+  create_table "event_subscription_notification_settings", :force => true do |t|
+    t.integer  "user_id"
+    t.boolean  "own_changes"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
   create_table "event_subscription_notifications", :force => true do |t|
     t.integer  "event_id"
     t.integer  "subscription_id"
