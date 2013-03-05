@@ -517,37 +517,37 @@ class EventNotificationMailer < ActionMailer::Base
     @group = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source["name"]} group was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@group["name"]} group was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_group_project_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @project = @source = @event.data
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source["name"]} project was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@project["name"]} project was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_project_project_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @project = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source['name']} user was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@project['name']} user was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_team_user_team_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @team = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@source['name']} team was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] #{@team['name']} team was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_user_email(notification)
@@ -664,30 +664,38 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@source.user.name} was removed from #{@target.name} project by #{@user.name} [left]")
+    @source = @event.data
+    @project = @target = @event.target
+    @member = User.find_by_id(@source["user_id"])
+    if @member
+      mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@member.name} was removed from #{@project.path_with_namespace} project team by #{@user.name} [left]")
+    end
   end
 
   def left_user_users_project_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@target.name} was removed from #{@source.project.name} project by #{@user.name} [left]")
+    @source = @event.data
+    @member = @target = @event.target
+    @project = Project.find_by_id(@source["project_id"])
+    if @project
+      mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@member.name} was removed from #{@project.path_with_namespace} project by #{@user.name} [left]")
+    end
   end
 
   def left_user_user_team_user_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @source = @event.data
+    @member = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@target.name} was removed from #{@source.user_team.name} team by #{@user.name} [left]")
+    @team = UserTeam.find_by_id(@source["user_team_id"])
+
+    if @team
+      mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
+    end
   end
 
   #
