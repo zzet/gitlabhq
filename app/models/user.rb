@@ -70,7 +70,7 @@ class User < ActiveRecord::Base
   has_many :keys, dependent: :destroy
 
   # Groups
-  has_many :groups, class_name: "Group", foreign_key: :owner_id
+  has_many :groups,         class_name: Group, foreign_key: :owner_id
 
   # Teams
   has_many :own_teams,                       dependent: :destroy, class_name: "UserTeam", foreign_key: :owner_id
@@ -81,6 +81,7 @@ class User < ActiveRecord::Base
 
   # Projects
   has_many :users_projects,           dependent: :destroy
+  has_many :projects,                 through:   :users_projects
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
   has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
@@ -94,8 +95,11 @@ class User < ActiveRecord::Base
   has_many :own_projects,             foreign_key: :creator_id
   has_many :owned_projects,           through: :namespaces, source: :projects
 
-  has_many :personal_events,          class_name: Event, foreign_key: :author_id
+  # Events
   has_many :events,                   as: :source
+  has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
+  has_many :recent_events,                                 class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
+  has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
   has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, through: :subscriprions
 
