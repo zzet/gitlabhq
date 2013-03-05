@@ -48,10 +48,27 @@ class User < ActiveRecord::Base
 
   attr_accessor :force_random_password
 
+  #
+  # Relations
+  #
+
   # Namespace for personal projects
   has_one :namespace,                 dependent: :destroy, foreign_key: :owner_id,    class_name: Namespace, conditions: 'type IS NULL'
 
-  has_many :keys,                     dependent: :destroy
+  # Profile
+  has_many :keys, dependent: :destroy
+
+  # Groups
+  has_many :groups, class_name: "Group", foreign_key: :owner_id
+
+  # Teams
+  has_many :user_team_user_relationships, dependent: :destroy
+  has_many :user_teams,               through: :user_team_user_relationships
+  has_many :user_team_project_relationships, through: :user_teams
+  has_many :team_projects,            through: :user_team_project_relationships
+  has_many :own_teams,                dependent: :destroy, foreign_key: :owner_id,    class_name: UserTeam
+
+  # Projects
   has_many :users_projects,           dependent: :destroy
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
@@ -59,6 +76,7 @@ class User < ActiveRecord::Base
   has_many :old_events,               dependent: :destroy, foreign_key: :author_id,   class_name: OldEvent
   has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: "Issue"
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
+  has_many :projects, through: :users_projects
 
   has_many :groups,         class_name: Group, foreign_key: :owner_id
   has_many :recent_events,  class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
@@ -76,6 +94,9 @@ class User < ActiveRecord::Base
   has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, through: :subscriprions
 
+  #
+  # Validations
+  #
   validates :name, presence: true
   validates :email, presence: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/ }
   validates :bio, length: { within: 0..255 }
@@ -84,8 +105,6 @@ class User < ActiveRecord::Base
   validates :username, presence: true, uniqueness: true,
             format: { with: Gitlab::Regex.username_regex,
                       message: "only letters, digits & '_' '-' '.' allowed. Letter should be first" }
-
-
   validate :namespace_uniq, if: ->(user) { user.username_changed? }
 
   before_validation :generate_password, on: :create
