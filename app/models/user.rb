@@ -89,8 +89,11 @@ class User < ActiveRecord::Base
   has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
   has_many :recent_events,                                 class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
   has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
+
+  # Notifications & Subscriptions
   has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, through: :subscriprions
+  has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
 
   #
   # Validations
