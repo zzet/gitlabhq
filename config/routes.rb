@@ -100,7 +100,12 @@ Gitlab::Application.routes.draw do
   get "errors/githost"
 
   namespace :notifications do
-    resource :subscription, only: [:create, :destroy]
+    resource :subscription, only: [:create, :destroy] do
+      collection do
+        post :on_all
+        delete :from_all
+      end
+    end
   end
 
   #
