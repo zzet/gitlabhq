@@ -101,6 +101,8 @@ Gitlab::Application.routes.draw do
       collection do
         post :on_all
         delete :from_all
+        post :on_own_changes
+        delete :from_own_changes
       end
     end
   end
