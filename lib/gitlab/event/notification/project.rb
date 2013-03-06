@@ -1,13 +1,6 @@
-module Gitlab
-  module Event
-    module Notification
-      class Project < Gitlab::Event::Notification::Base
-        include Gitlab::Event::Action::Project
+class Gitlab::Event::Notification::Project < Gitlab::Event::Notification::Base
 
-        class << self
-        end
-
-      end
-    end
+  class << self
   end
+
 end
