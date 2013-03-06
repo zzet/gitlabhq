@@ -34,3 +34,7 @@
                         = link_to from_all_notifications_subscription_path(category: st), method: :delete do
                           %i.icon-star-empty
                           Unsubscribe
+      - if @notification_setting.own_changes
+        = link_to "Not notify me about changes I make", from_own_changes_notifications_subscription_path, method: :delete, class: "btn btn-remove"
+      - else
+        = link_to "Notify me about changes I make", on_own_changes_notifications_subscription_path, method: :post, class: "btn btn-primary"
