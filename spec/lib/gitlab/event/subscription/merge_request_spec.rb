@@ -1,17 +1,17 @@
 require 'spec_helper'
 
-describe Gitlab::Event::Subscriptions::Note do
+describe Gitlab::Event::Subscription::MergeRequest do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::Note.should respond_to :can_subscribe?
+    Gitlab::Event::Subscription::MergeRequest.should respond_to :can_subscribe?
   end
 
-  describe "Note subscribe" do
+  describe "MergeRequest subscribe" do
     before do
       @user = create :user
     end
 
-    it "should subscribe user on exist note changes" do
-      source = create :note
+    it "should subscribe user on exist merge_request changes" do
+      source = create :merge_request
       target = source
       action = :updated
 
@@ -22,9 +22,9 @@ describe Gitlab::Event::Subscriptions::Note do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on all notes changes by subscribe with symbol" do
-      source = :note
-      target = create :issue
+    it "should subscribe user on all merge_requests changes by subscribe with symbol" do
+      source = :merge_request
+      target = create :project, creator: @user
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
@@ -34,9 +34,9 @@ describe Gitlab::Event::Subscriptions::Note do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on all notes changes by subscribe with Class name" do
-      source = Note
-      target = create :issue
+    it "should subscribe user on all merge_requests changes by subscribe with Class name" do
+      source = MergeRequest
+      target = create :project, creator: @user
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
@@ -46,8 +46,8 @@ describe Gitlab::Event::Subscriptions::Note do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on exist note :note adds" do
-      target = create :note
+    it "should subscribe user on exist merge_request :note adds" do
+      target = create :merge_request
       source = :note
       action = :created
 

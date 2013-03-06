@@ -1,17 +1,17 @@
 require 'spec_helper'
 
-describe Gitlab::Event::Subscriptions::UserTeam do
+describe Gitlab::Event::Subscription::Issue do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::UserTeam.should respond_to :can_subscribe?
+    Gitlab::Event::Subscription::Issue.should respond_to :can_subscribe?
   end
 
-  describe "UserTeam subscribe" do
+  describe "Issue subscribe" do
     before do
       @user = create :user
     end
 
-    it "should subscribe user on exist user_team changes" do
-      source = create :user_team
+    it "should subscribe user on exist issue changes" do
+      source = create :issue
       target = source
       action = :updated
 
@@ -22,9 +22,9 @@ describe Gitlab::Event::Subscriptions::UserTeam do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on all user_teams changes by subscribe with symbol" do
-      source = :user_team
-      target = create :user_team
+    it "should subscribe user on all issues changes by subscribe with symbol" do
+      source = :issue
+      target = create :project, creator: @user
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
@@ -34,9 +34,9 @@ describe Gitlab::Event::Subscriptions::UserTeam do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on all user_teams changes by subscribe with Class name" do
-      source = UserTeam
-      target = create :user_team
+    it "should subscribe user on all issues changes by subscribe with Class name" do
+      source = Issue
+      target = create :project, creator: @user
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
@@ -46,9 +46,9 @@ describe Gitlab::Event::Subscriptions::UserTeam do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on exist user_team :users_project adds" do
-      target = create :user_team
-      source = :users_project
+    it "should subscribe user on exist issue :note adds" do
+      target = create :issue
+      source = :note
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)

@@ -1,17 +1,17 @@
 require 'spec_helper'
 
-describe Gitlab::Event::Subscriptions::User do
+describe Gitlab::Event::Subscription::Project do
   it "should respond to :subscribe method" do
-    Gitlab::Event::Subscriptions::User.should respond_to :can_subscribe?
+    Gitlab::Event::Subscription::Project.should respond_to :can_subscribe?
   end
 
-  describe "User subscribe" do
+  describe "Project subscribe" do
     before do
       @user = create :user
     end
 
-    it "should subscribe user on exist user changes" do
-      source = create :user
+    it "should subscribe user on exist project changes" do
+      source = create :project
       target = source
       action = :updated
 
@@ -22,9 +22,9 @@ describe Gitlab::Event::Subscriptions::User do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on all users changes by subscribe with symbol" do
-      source = :user
-      target = create :user
+    it "should subscribe user on all projects changes by subscribe with symbol" do
+      source = :project
+      target = create :project
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
@@ -34,9 +34,9 @@ describe Gitlab::Event::Subscriptions::User do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on all users changes by subscribe with Class name" do
-      source = User
-      target = create :user
+    it "should subscribe user on all projects changes by subscribe with Class name" do
+      source = Project
+      target = create :project
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
@@ -46,9 +46,9 @@ describe Gitlab::Event::Subscriptions::User do
       subscription.should be_persisted
     end
 
-    it "should subscribe user on exist user :key adds" do
-      target = create :user
-      source = :key
+    it "should subscribe user on exist project :issue adds" do
+      target = create :project
+      source = :issue
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
