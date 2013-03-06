@@ -1,13 +1,6 @@
-module Gitlab
-  module Event
-    module Notification
-      class UserTeamProjectRelationship < Gitlab::Event::Notification::Base
-        include Gitlab::Event::Action::UserTeamProjectRelationship
+class Gitlab::Event::Notification::UserTeamProjectRelationship < Gitlab::Event::Notification::Base
 
-        class << self
-        end
-
-      end
-    end
+  class << self
   end
+
 end
