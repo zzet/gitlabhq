@@ -17,6 +17,6 @@ $ ->
   $('.update-username form').on 'ajax:complete', ->
     $(this).find('.btn-save').enableButton()
     $(this).find('.loading-gif').hide()
-  
-  $('.update-notifications').on 'ajax:complete', ->
-    $(this).find('.btn-save').enableButton()
+
+  # Init subscriptions tabs
+  $('#subscriptionsTabs a:first').tab('show')
