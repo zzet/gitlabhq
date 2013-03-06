@@ -1,11 +1,6 @@
-module Gitlab
-  module Event
-    module Subscriptions
-      class Note < Gitlab::Event::Subscriptions::Base
-        class << self
-        end
+class Gitlab::Event::Subscription::Note < Gitlab::Event::Subscriptions::Base
 
-      end
-    end
+  class << self
   end
+
 end
