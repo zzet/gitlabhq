@@ -18,3 +18,6 @@ $ ->
     $(this).find('.save-btn').removeAttr('disabled')
     $(this).find('.save-btn').removeClass('disabled')
     $(this).find('.loading-gif').hide()
+
+  # Init subscriptions tabs
+  $('#subscriptionsTabs a:first').tab('show')
