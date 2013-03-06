@@ -8,6 +8,8 @@ class Profiles::SubscriptionsController < Profiles::ApplicationController
     @subscriptions_by_target_type.keep_if { |t, v| @available_subscription_types.include?(t.to_sym) }
 
     @subscriptions = Event::Subscription.by_user(@user).with_target.group_by(&:target_type)
+
+    notification_setting
   end
 
   def create
@@ -32,5 +34,9 @@ class Profiles::SubscriptionsController < Profiles::ApplicationController
     if params[:entity]
       @entity ||= params[:entity][:type].camelize.constantize.find params[:entity][:id]
     end
+  end
+
+  def notification_setting
+    @notification_setting ||= (@current_user.notification_setting || @current_user.create_notification_setting)
   end
 end
