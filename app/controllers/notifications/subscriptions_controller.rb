@@ -33,6 +33,28 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
     end
   end
 
+  def on_own_changes
+    @current_user.notification_setting.own_changes = true
+
+    if @current_user.notification_setting.save
+      respond_to do |format|
+        format.json { head :created }
+        format.html { redirect_to profile_subscriptions_path }
+      end
+    end
+  end
+
+  def from_own_changes
+    @current_user.notification_setting.own_changes = false
+
+    if @current_user.notification_setting.save
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html { redirect_to profile_subscriptions_path }
+      end
+    end
+  end
+
   def destroy
     if @entity
       SubscriptionService.unsubscribe(@current_user, :all, @entity, :all)
