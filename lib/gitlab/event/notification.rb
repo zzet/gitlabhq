@@ -1,6 +1,6 @@
 module Gitlab
   module Event
-    class Notifications
+    class Notification
 
       class << self
 
@@ -62,4 +62,3 @@ module Gitlab
     end
   end
 end
-
