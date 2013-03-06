@@ -1,11 +1,6 @@
-module Gitlab
-  module Event
-    module Subscriptions
-      class Snippet < Gitlab::Event::Subscriptions::Base
-        class << self
-        end
+class Gitlab::Event::Subscription::Snippet < Gitlab::Event::Subscriptions::Base
 
-      end
-    end
+  class << self
   end
+
 end
