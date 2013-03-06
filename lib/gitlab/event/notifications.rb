@@ -11,7 +11,7 @@ module Gitlab
             subscriptions.each do |subscription|
               # Not send notification about changes to changes author
               # TODO. Rewrite in future with check by Entity type
-              if ((subscription.user != event.author) || (event.author.notification_setting.own_changes))
+              if ((subscription.user != event.author) || (event.author.notification_setting && event.author.notification_setting.own_changes))
                 subscription.notifications.create(event: event)
               end
             end
