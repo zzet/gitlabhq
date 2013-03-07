@@ -614,7 +614,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @up = @source = @event.source
     @project = @target = @event.target
-    @member = @users_project.user
+    @member = @up.user
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@member.name} was added to #{@project.path_with_namespace} project team by #{@user.name} [joined]")
   end
