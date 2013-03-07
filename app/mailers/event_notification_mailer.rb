@@ -612,7 +612,7 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @users_project = @source = @event.source
+    @up = @source = @event.source
     @project = @target = @event.target
     @member = @users_project.user
 

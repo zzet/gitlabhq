@@ -1,13 +1,6 @@
-module Gitlab
-  module Event
-    module Notification
-      class MergeRequest < Gitlab::Event::Notification::Base
-        include Gitlab::Event::Action::MergeRequest
+class Gitlab::Event::Notification::MergeRequest < Gitlab::Event::Notification::Base
 
-        class << self
-        end
-
-      end
-    end
+  class << self
   end
+
 end
