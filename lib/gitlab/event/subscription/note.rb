@@ -1,4 +1,4 @@
-class Gitlab::Event::Subscription::Note < Gitlab::Event::Subscriptions::Base
+class Gitlab::Event::Subscription::Note < Gitlab::Event::Subscription::Base
 
   class << self
   end
