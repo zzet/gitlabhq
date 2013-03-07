@@ -1,4 +1,4 @@
-class Gitlab::Event::Subscription::ProjectHook < Gitlab::Event::Subscriptions::Base
+class Gitlab::Event::Subscription::ProjectHook < Gitlab::Event::Subscription::Base
 
   class << self
   end
