@@ -1,4 +1,4 @@
-class Gitlab::Event::Subscription::UserTeamUserRelationship < Gitlab::Event::Subscriptions::Base
+class Gitlab::Event::Subscription::UserTeamUserRelationship < Gitlab::Event::Subscription::Base
 
   class << self
   end

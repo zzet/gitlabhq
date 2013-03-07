@@ -1,4 +1,4 @@
-class Gitlab::Event::Subscription::Group < Gitlab::Event::Subscriptions::Base
+class Gitlab::Event::Subscription::Group < Gitlab::Event::Subscription::Base
   class << self
     def can_subscribe?(user, action, target, source)
       if target.is_a? ::Group
