@@ -16,7 +16,7 @@ module Gitlab
           if target && (target.is_a?(Symbol) || target.is_a?(Class))
             subscribe_on_target_category(user, target, action, source)
           else
-            new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && source != :all
+            new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && !([:all, :new].include? source)
             target = new_source if target.blank?
 
             subscribe!(user, action, target, source) if can_subscribe?(user, action, target, source)
