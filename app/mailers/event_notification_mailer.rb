@@ -612,9 +612,9 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @users_project = @source = @event.source
+    @up = @source = @event.source
     @project = @target = @event.target
-    @member = @users_project.user
+    @member = @up.user
 
     mail(bcc: @notification.subscriber.email, subject: "[Gitlab] User #{@member.name} was added to #{@project.path_with_namespace} project team by #{@user.name} [joined]")
   end
@@ -947,26 +947,9 @@ class EventNotificationMailer < ActionMailer::Base
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
     @commits       = result[:commits]
-    puts ""
-    p @commits
-    puts ""
-
     @commit        = result[:commit]
-    p @commit
-    p @commit.commit
-    p @commit.commit.commit
-    puts ""
-
     @diffs         = result[:diffs]
-    p @diffs
-    p @diffs[:diff]
-    puts ""
-
     @refs_are_same = result[:same]
-    p @refs_are_same
-    puts ""
-
-    @line_notes    = []
 
     @commits = CommitDecorator.decorate(@commits)
 
