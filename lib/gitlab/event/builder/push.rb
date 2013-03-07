@@ -18,10 +18,10 @@ class Gitlab::Event::Builder::Push < Gitlab::Event::Builder::Base
 
       case meta[:action]
       when :pushed
-        actions << :created_branch  if push_data[:ref]["refs/heads"] && push_data[:before] =~ /^00000/
-        actions << :deleted_branch  if push_data[:ref]["refs/heads"] && push_data[:after]  =~ /^00000/
-        actions << :created_tag     if push_data[:ref]["refs/tag"]   && push_data[:before] =~ /^00000/
-        actions << :deleted_tag     if push_data[:ref]["refs/tag"]   && push_data[:after]  =~ /^00000/
+        actions << :created_branch  if push_data[:ref] =~ "refs/heads" && push_data[:before] =~ /^00000/
+        actions << :deleted_branch  if push_data[:ref] =~ "refs/heads" && push_data[:after]  =~ /^00000/
+        actions << :created_tag     if push_data[:ref] =~ "refs/tag"   && push_data[:before] =~ /^00000/
+        actions << :deleted_tag     if push_data[:ref] =~ "refs/tag"   && push_data[:after]  =~ /^00000/
       end
 
       events = []
