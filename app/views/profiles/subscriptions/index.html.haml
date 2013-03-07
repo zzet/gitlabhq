@@ -1,4 +1,4 @@
-.sb{class: @user.admin? ? :span8 : :span12 }
+.sb.span8
   - if @subscriptions.any?
     %ul#subscriptionsTabs.nav.nav-tabs
       = render 'subscription_head', subscriptions: @subscriptions.keys
@@ -6,10 +6,10 @@
       - @subscriptions.each do |type, subscriptions|
         = render 'subscription_group', type: type, subscriptions: subscriptions
 
-- if @user.admin?
-  .span3
-    %fieldset.tips
-      %legend Global subscriptions
+.span3
+  %fieldset.tips
+    %legend Global subscriptions
+    - if @user.admin?
       %table
         %tr
           %th Name
@@ -34,7 +34,7 @@
                         = link_to from_all_notifications_subscription_path(category: st), method: :delete do
                           %i.icon-star-empty
                           Unsubscribe
-      - if @notification_setting.own_changes
-        = link_to "Not notify me about changes I make", from_own_changes_notifications_subscription_path, method: :delete, class: "btn btn-remove"
-      - else
-        = link_to "Notify me about changes I make", on_own_changes_notifications_subscription_path, method: :post, class: "btn btn-primary"
+    - if @notification_setting.own_changes
+      = link_to "Not notify me about changes I make", from_own_changes_notifications_subscription_path, method: :delete, class: "btn btn-remove"
+    - else
+      = link_to "Notify me about changes I make", on_own_changes_notifications_subscription_path, method: :post, class: "btn btn-primary"
