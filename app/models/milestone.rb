@@ -24,7 +24,7 @@ class Milestone < ActiveRecord::Base
   has_many :merge_requests
 
   has_many :events,         as: :source
-  has_many :subscriptions,  conditions: { target_id: self, target_type: self }
+  has_many :subscriptions,  as: :target, depended: :destroy, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
