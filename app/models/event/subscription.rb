@@ -12,7 +12,7 @@ class Event::Subscription < ActiveRecord::Base
   belongs_to :user
   belongs_to :target, polymorphic: true # Aggregation events, for example Project
   belongs_to :source, polymorphic: true # That generated action, for example Issue
-  has_many :notifications, dependent: :destroy
+  has_many :notifications
 
   # Validations
   validates :user, presence: true
