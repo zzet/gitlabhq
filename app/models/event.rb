@@ -20,7 +20,7 @@ class Event < ActiveRecord::Base
 
   # Custom validators
   def push_event?
-    return false unless [:pushed, :created_branch, :created_tag, :deleted_branch, :deleted_tag].include? action.to_sym
+    return false unless Event::Action.push_action?(action)
     return true if data["repository"]
   end
 
