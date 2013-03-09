@@ -38,5 +38,18 @@ class Event::Action
       action = action.to_sym if action.is_a? String
       available_actions.include? action
     end
+
+    def push_actions
+      [ :pushed,
+        :created_branch,
+        :deleted_branch,
+        :created_tag,
+        :deleted_tag ]
+    end
+
+    def push_action?(action)
+      action = action.to_sym if action.is_a? String
+      push_actions.include? action
+    end
   end
 end
