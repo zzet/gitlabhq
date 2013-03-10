@@ -11,14 +11,18 @@ class Gitlab::Event::Builder::Milestone < Gitlab::Event::Builder::Base
       meta = parse_action(action)
       actions = []
       target = source
-      actions << meta[:action]
       case meta[:action]
       when :created
+        actions << :created
       when :updated
-        #TODO. Check, if Only closed/reopened - not make :updated event
+        data[:changes] = source.changes
+        actions << :updated
       when :closed
+        actions << :closed
       when :reopened
+        actions << :reopened
       when :deleted
+        actions << :deleted
       end
 
       events = []

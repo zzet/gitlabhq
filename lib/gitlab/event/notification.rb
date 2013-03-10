@@ -5,7 +5,7 @@ module Gitlab
       class << self
 
         def create_notifications(event)
-          if (event.target || event.action == "deleted") && ((Event::Action.push_action? event.action) || event.source)
+          if (event.target || event.action == "deleted") && ((::Event::Action.push_action? event.action) || event.source)
             subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
 
             subscriptions.each do |subscription|
@@ -26,6 +26,8 @@ module Gitlab
             action = stored_notification.event.action
             target = stored_notification.event.target_type.underscore
             source = stored_notification.event.source_type.underscore
+
+            p stored_notification.data
 
             mail_method = "#{action}_#{target}_#{source}_email"
 
