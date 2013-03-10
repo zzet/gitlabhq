@@ -11,6 +11,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
       meta = parse_action(action)
       target = source
       actions = []
+      temp_data = data.attributes
 
       case source
       when ::Group
@@ -25,7 +26,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
 
           if actions.blank?
             actions << :updated
-            data[:changes] = changes
+            temp_data[:previous_changes] = changes
           end
 
         when :deleted
@@ -56,7 +57,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
         events << ::Event.new(action: act,
                               source_id: source.id, source_type: source.class.name,
                               target_id: target.id, target_type: target.class.name,
-                              data: data.to_json, author: user)
+                              data: temp_data.to_json, author: user)
       end
 
       events

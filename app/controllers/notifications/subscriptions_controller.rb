@@ -10,7 +10,7 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
       end
     end
 
-    if @category.blank?
+    if @category
       SubscriptionService.subscribe(@current_user, :all, params[:category], :new)
       respond_to do |format|
         format.json { head :created }
@@ -64,7 +64,7 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
       end
     end
 
-    if @category.present?
+    if @category
       SubscriptionService.unsubscribe(@current_user, :all, params[:category], :new)
       respond_to do |format|
         format.json { head :no_content }
