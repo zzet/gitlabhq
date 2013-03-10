@@ -14,15 +14,22 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
 
       case source
       when ::Group
-        actions << meta[:action]
 
         case meta[:action]
         when :created
+          actions << :created
         when :updated
           changes = source.changes
 
           actions << :transfer if source.owner_id_changed? && source.owner_id != changes[:owner_id].first
+
+          if actions.blank?
+            actions << :updated
+            data[:changes] = changes
+          end
+
         when :deleted
+          actions << :deleted
         end
 
       when ::Project
