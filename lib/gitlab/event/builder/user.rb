@@ -16,12 +16,14 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
       when ::User
         target = source
 
-        actions << meta[:action]
-
         case meta[:action]
         when :created
+          actions << :created
         when :updated
+          actions << :updated
+          data[:changes] = source.changes
         when :deleted
+          actions << :deleted
         end
 
       when ::Key
@@ -43,6 +45,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           actions << :joined
         when :updated
           actions << :updated
+          data[:changes] = source.changes
         when :deleted
           actions << :left
         end
@@ -54,6 +57,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           actions << :joined
         when :updated
           actions << :updated
+          data[:changes] = source.changes
         when :deleted
           actions << :left
         end
