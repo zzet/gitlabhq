@@ -1,2 +1,15 @@
 = render "hello", user: @user
+= raw "Team #{ link_to @team.name, team_url(@team.path) } was updated by #{ link_to @user.name, user_url(@user.username)}"
+%br
+%table
+  %tr
+    %th Attribute
+    %th New value
+    %th Old value
+  - @changes.each do |key, values|
+    %tr
+      %td= key
+      %td= values.first
+      %td= values.last
+%br
 = render "footer", user: @user
