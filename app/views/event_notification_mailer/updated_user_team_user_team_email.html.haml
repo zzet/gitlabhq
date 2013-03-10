@@ -9,7 +9,7 @@
   - @changes.each do |key, values|
     %tr
       %td= key
-      %td= values.first
       %td= values.last
+      %td= values.first
 %br
 = render "footer", user: @user
