@@ -27,6 +27,8 @@ module Gitlab
             target = stored_notification.event.target_type.underscore
             source = stored_notification.event.source_type.underscore
 
+            p stored_notification.data
+
             mail_method = "#{action}_#{target}_#{source}_email"
 
             ::Event::Subscription::Notification.transaction do
