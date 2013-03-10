@@ -1,3 +1,15 @@
 = render "hello", user: @user
 = raw "Project #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } was updated by #{ link_to @user.name, user_url(@user.username)}"
+%br
+%table
+  %tr
+    %th Attribute
+    %th New value
+    %th Old value
+  - @changes.each do |key, values|
+    %tr
+      %td= key
+      %td= values.first
+      %td= values.last
+%br
 = render "footer", user: @user
