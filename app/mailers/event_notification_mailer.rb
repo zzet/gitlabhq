@@ -211,6 +211,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @group = @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Group #{@source.name} was updated by #{@user.name} [updated]")
   end
@@ -318,6 +319,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @project = @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Project #{@source.name} was updated by #{@user.name} [updated]")
   end
@@ -328,6 +330,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Project #{@source.name} was updated by #{@user.name} in #{@target.name} group [updated]")
   end
@@ -386,8 +389,9 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @updated_user = @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "User #{@source.name} was updated by #{@user.name} [updated]")
   end
@@ -396,8 +400,9 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @team = @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Team #{@source.name} was updated by #{@user.name} [updated]")
   end
@@ -408,6 +413,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
   end
@@ -418,6 +424,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
   end
@@ -428,6 +435,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
   end
@@ -438,6 +446,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
   end
@@ -448,6 +457,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
   end
@@ -458,6 +468,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source
     @target = @event.target
+    @changes = JSON.load(@event.data)["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
   end
