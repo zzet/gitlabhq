@@ -10,11 +10,14 @@ class Gitlab::Event::Builder::UsersProject < Gitlab::Event::Builder::Base
       meta = parse_action(action)
       actions = []
       target = source
-      actions << meta[:action]
       case meta[:action]
       when :created
+        actions << :created
       when :updated
+        data[:changes] = source.changes
+        actions << :updated
       when :deleted
+        actions << :deleted
       end
 
       ::Event.new(action: meta[:action],
