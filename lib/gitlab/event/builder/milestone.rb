@@ -9,13 +9,14 @@ class Gitlab::Event::Builder::Milestone < Gitlab::Event::Builder::Base
 
     def build(action, source, user, data)
       meta = parse_action(action)
+      temp_data = data.attributes
       actions = []
       target = source
       case meta[:action]
       when :created
         actions << :created
       when :updated
-        data[:changes] = source.changes
+        temp_data[:previous_changes] = source.changes
         actions << :updated
       when :closed
         actions << :closed
@@ -28,7 +29,7 @@ class Gitlab::Event::Builder::Milestone < Gitlab::Event::Builder::Base
       events = []
       actions.each do |act|
         events << ::Event.new(action: act,
-                              source: source, data: data.to_json, author: user, target: target)
+                              source: source, data: temp_data.to_json, author: user, target: target)
       end
       events
     end
