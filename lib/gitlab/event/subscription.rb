@@ -169,7 +169,7 @@ module Gitlab
               return false
             else
               # We have some typed subscription
-              actioned_subscriptions = sourced_subscriptions.by_action(action).any?
+              actioned_subscriptions = sourced_subscriptions.by_action(subscription.action).any?
               return true if actioned_subscriptions.any?
               return false
             end
@@ -181,7 +181,7 @@ module Gitlab
               return false
             else
               # We have some typed subscription
-              actioned_subscriptions = sourced_subscriptions.by_action(action).any?
+              actioned_subscriptions = sourced_subscriptions.by_action(subscription.action).any?
               return true if actioned_subscriptions.any?
               return false
             end
