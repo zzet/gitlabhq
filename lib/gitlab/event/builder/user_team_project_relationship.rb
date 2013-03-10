@@ -10,11 +10,14 @@ class Gitlab::Event::Builder::UserTeamProjectRelationship < Gitlab::Event::Build
       meta = parse_action(action)
       actions = []
       target = source
-      actions << meta[:action]
       case meta[:action]
       when :created
+        actions << :created
       when :updated
+        actions << :updated
+        data[:changes] = source.changes
       when :deleted
+        actions << :deleted
       end
 
       ::Event.new(action: meta[:action], source: source, data: data.to_json, author: user, target: target)

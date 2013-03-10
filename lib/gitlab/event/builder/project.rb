@@ -18,15 +18,19 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
 
       case source
       when ::Project
-        actions << meta[:action]
         case meta[:action]
         when :created
+          actions << :created
         when :updated
           changes = source.changes
 
-          # TODO puts here transfer action ckeck
           actions << :transfer if source.creator_id_changed? && source.creator_id != changes[:creator_id].first
+          if actions.blank?
+            data[:changes] = changes
+            actions << :updated
+          end
         when :deleted
+          actions << :deleted
         end
       when ::Issue
         target = source.project
@@ -109,12 +113,10 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
 
         case meta[:action]
         when :created
-          # How Named it
-          actions << meta[:action]
+          actions << :created
         when :updated
         when :deleted
-          # How Named it
-          actions << meta[:action]
+          actions << :deleted
         end
 
       when ::Service
