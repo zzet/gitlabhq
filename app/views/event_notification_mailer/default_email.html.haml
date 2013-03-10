@@ -1,21 +1,3 @@
-%h1 Notification
-= @notification.inspect
-%br
-%br
-%h2 Event
-= @event.inspect
-%br
-%br
-%h2 User
-= @user.inspect
-%br
-%br
-%h2 Source
-= @source.inspect
-%br
-%br
-%h2 Target
-= @target.inspect
-
+= render "hello", user: @user
 = "I dont know what send on #{@function} call"
 = render "footer", user: @user

@@ -19,8 +19,8 @@ class ProtectedBranch < NewDb
   validates :name, presence: true
   validates :project, presence: true
 
-  has_many :events,         as: :source,    dependent: :destroy
-  has_many :subscriptions,  conditions: { action: "some_action" }
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 

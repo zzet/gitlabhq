@@ -1,17 +1,18 @@
 = render "hello", user: @user
-= "#{ link_to @user.name, user_url(@user.username) } add new member (#{ link_to @new_member.name, user_url(@new_member.username) }) to #{ link_to @team.name, team_ult(@team.path) } team with #{ @user_team_user_relationship.permission} default permission in assigned projects."
+= raw "#{ link_to @user.name, user_url(@user.username) } add new member (#{ link_to @new_member.name, user_url(@new_member.username) }) to #{ link_to @team.name, team_ult(@team.path) } team with #{ @user_team_user_relationship.permission} default permission in assigned projects."
 - if @user_team_user_relationship.group_admin?
-  = "New member is Team administrator."
+  New member is Team administrator.
+%br
 %table
   %caption Team members
   %tr
     %th Name
     %td Default project access
     %td Team administrator
-  - @team.user_team_user_relationships.each do |ur|
+  - @team.members.each do |member|
     %tr
-      %td= link_to ur.user.name, user_url(ur.user.username)
-      %td= ur.permission
-      %td= ur.group_admin? ? "Yes" : "No"
+      %td= link_to member.name, user_url(member.username)
+      %td= @team.human_default_projects_access(member)
+      %td= @team.admin?(member) ? "Yes" : "No"
 %br
 = render "footer", user: @user

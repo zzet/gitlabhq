@@ -31,8 +31,8 @@ class Note < NewDb
   belongs_to :noteable, polymorphic: true
   belongs_to :author,   class_name: User
 
-  has_many :events,         as: :source,    dependent: :destroy
-  has_many :subscriptions,  conditions: { action: "some_action" }
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 

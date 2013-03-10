@@ -46,8 +46,8 @@ class Project < NewDb
 
   has_many :old_events,         dependent: :destroy, class_name: OldEvent
 
-  has_many :events,         as: :source,    dependent: :destroy
-  has_many :subscriptions,  conditions: { action: "some_action" }
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
@@ -103,7 +103,7 @@ class Project < NewDb
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
   scope :public_only, -> { where(public: true) }
 
-  enumerize :issues_tracker, :in => (Gitlab.config.issues_tracker.keys).append(:gitlab), :default => :gitlab
+  enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
   actions_to_watch [:created, :updated, :deleted, :transfer]
 
   class << self
@@ -168,7 +168,7 @@ class Project < NewDb
 
   def check_limit
     unless creator.can_create_project?
-      errors[:base] << ("Your own projects limit is #{creator.projects_limit}! Please contact administrator to increase it")
+      errors[:limit_reached] << ("Your own projects limit is #{creator.projects_limit}! Please contact administrator to increase it")
     end
   rescue
     errors[:base] << ("Can't check your ability to create project")

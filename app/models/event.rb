@@ -28,7 +28,7 @@ class Event < NewDb
   belongs_to :source, polymorphic: true
 
   has_many :notifications,  dependent: :destroy,     class_name: Event::Subscription::Notification
-  has_many :subscriptions,  through: :notifications, class_name: Event::Subscription
+  has_many :subscriptions,  dependent: :destroy, through: :notifications, class_name: Event::Subscription
   has_many :subscribers,    through: :subscriptions, class_name: User
 
   validates :author,  presence: true
@@ -36,7 +36,7 @@ class Event < NewDb
 
   # Custom validators
   def push_event?
-    return false unless [:pushed].include? action.to_sym
+    return false unless Event::Action.push_action?(action)
     return true if data["repository"]
   end
 

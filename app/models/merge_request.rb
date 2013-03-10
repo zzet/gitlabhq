@@ -103,9 +103,11 @@ class MergeRequest < NewDb
   scope :cared, ->(user) { where('assignee_id = :user OR author_id = :user', user: user.id) }
   scope :by_milestone, ->(milestone) { where("milestone_id = :milestone_id", milestone_id: milestone) }
 
+  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
+
   def validate_branches
     if target_branch == source_branch
-      errors.add :base, "You can not use same branch for source and target branches"
+      errors.add :branch_conflict, "You can not use same branch for source and target branches"
     end
   end
 

@@ -18,8 +18,8 @@ class UserTeamProjectRelationship < NewDb
   belongs_to :user_team
   belongs_to :project
 
-  has_many :events,         as: :source,    dependent: :destroy
-  has_many :subscriptions,  conditions: { action: "some_action" }
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 

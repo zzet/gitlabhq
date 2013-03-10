@@ -11,7 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130226102513) do
+ActiveRecord::Schema.define(:version => 20130305122336) do
+
+  create_table "event_subscription_notification_settings", :force => true do |t|
+    t.integer  "user_id"
+    t.boolean  "own_changes"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "event_subscription_notifications", :force => true do |t|
     t.integer  "event_id"
@@ -297,7 +304,6 @@ ActiveRecord::Schema.define(:version => 20130226102513) do
     t.boolean  "dark_scheme",            :default => false, :null => false
     t.integer  "theme_id",               :default => 1,     :null => false
     t.string   "bio"
-    t.boolean  "blocked",                :default => false, :null => false
     t.integer  "failed_attempts",        :default => 0
     t.datetime "locked_at"
     t.string   "extern_uid"
@@ -305,10 +311,10 @@ ActiveRecord::Schema.define(:version => 20130226102513) do
     t.string   "username"
     t.boolean  "can_create_group",       :default => true,  :null => false
     t.boolean  "can_create_team",        :default => true,  :null => false
+    t.string   "state"
   end
 
   add_index "users", ["admin"], :name => "index_users_on_admin"
-  add_index "users", ["blocked"], :name => "index_users_on_blocked"
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
   add_index "users", ["extern_uid", "provider"], :name => "index_users_on_extern_uid_and_provider", :unique => true
   add_index "users", ["name"], :name => "index_users_on_name"

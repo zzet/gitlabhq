@@ -8,6 +8,7 @@ module Gitlab
         # - Event Source changes, which associated with target
         # - Event category (Source by type) changes
         # - Event category (Source by type) changes which associated with target
+        # - Category of Entity
         #
         def subscribe(user, action, target, source)
           target = target.to_sym if target.is_a? String
@@ -15,7 +16,7 @@ module Gitlab
           if target && (target.is_a?(Symbol) || target.is_a?(Class))
             subscribe_on_target_category(user, target, action, source)
           else
-            new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && source != :all
+            new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && !([:all, :new].include? source)
             target = new_source if target.blank?
 
             subscribe!(user, action, target, source) if can_subscribe?(user, action, target, source)
@@ -50,11 +51,8 @@ module Gitlab
 
         def unsubscribe(user, action, target, source)
           target = target.to_sym if target.is_a? String
-
           new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && !([:all, :new].include?(source))
-
           target = new_source if target.blank?
-
           unsubscribe!(user, action, target, source)
         end
 
@@ -62,11 +60,26 @@ module Gitlab
         def can_subscribe?(user, action, target, source)
           subscriptions = []
 
-          Gitlab::Event::Subscriptions::Base.descendants.each do |descendant|
+          Gitlab::Event::Subscription::Base.descendants.each do |descendant|
             subscriptions << descendant.can_subscribe?(user, action, target, source)
           end
 
           return subscriptions.inject { |c, s| c = c || s }
+        end
+
+        def subscribe_on_all(user, target_type, action = :all, source = :all)
+          target = target_type.to_s.camelize.constantize
+          subscribed_targets = ::Event::Subscription.with_target.pluck(:id)
+          targets = target.where("id not in (?)", subscribed_targets)
+          targets.each do |t|
+            subscribe(user, action, t, source)
+          end
+        end
+
+        def unsubscribe_from_all(user, target_type, action = :all, source = :all)
+          # TODO. Review.
+          # Destroy all without conditions about action and source
+          ::Event::Subscription.delete_all(target_type: target_type.to_s.camelize, user_id: user.id)
         end
 
         protected

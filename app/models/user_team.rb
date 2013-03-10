@@ -23,14 +23,14 @@ class UserTeam < NewDb
   has_many :projects, through: :user_team_project_relationships
   has_many :members,  through: :user_team_user_relationships, source: :user
 
-  has_many :events,         as: :source,    dependent: :destroy
-  has_many :subscriptions,  conditions: { action: "some_action" }
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
-  validates :description, length: { within: 0..255 }
   validates :name, presence: true, uniqueness: true
   validates :owner, presence: true
+  validates :name, presence: true, uniqueness: true
   validates :description, length: { within: 0..255 }
   validates :path, uniqueness: true, presence: true, length: { within: 1..255 },
             format: { with: Gitlab::Regex.path_regex,

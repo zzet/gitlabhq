@@ -1,11 +1,15 @@
-.sb{class: @user.admin? ? :span8 : :span12 }
-  - @subscriptions.each do |type, subscriptions|
-    = render 'subscription_group', type: type, subscriptions: subscriptions
+.sb.span8
+  - if @subscriptions.any?
+    %ul#subscriptionsTabs.nav.nav-tabs
+      = render 'subscription_head', subscriptions: @subscriptions.keys
+    .tab-content
+      - @subscriptions.each do |type, subscriptions|
+        = render 'subscription_group', type: type, subscriptions: subscriptions
 
-- if @user.admin?
-  .span3
-    %fieldset.tips
-      %legend Auto-subscribe on new
+.span3
+  %fieldset.tips
+    %legend Global subscriptions
+    - if @user.admin?
       %table
         %tr
           %th Name
@@ -13,7 +17,24 @@
           - @available_subscription_types.each do |st|
             %tr
               %td= st.to_s.camelize
-              - if @subscriptions_by_target_type.has_key?(st.to_s)
-                %td= link_to "Unsubscribe", notifications_subscription_path( category: st.to_s ), remote: true, method: :delete, format: :json, class: "btn btn-small btn-remove"
-              - else
-                %td= link_to "Subscribe", notifications_subscription_path( category: st.to_s ), remote: true, method: :post, format: :json, class: "btn btn-small btn-success"
+              %td
+                .btn-group
+                  = link_to notifications_subscription_path( category: st.to_s ), method: @subscriptions_by_target_type.has_key?(st.to_s) ? :delete : :post, class: "new_items btn btn-small" do
+                    New
+                    %i{class: @subscriptions_by_target_type.has_key?(st.to_s) ? "icon-star" : "icon-star-empty"}
+                  .btn.btn-small.btn-primary All
+                  = link_to "#", class: "btn btn-small btn-primary dropdown-toggle", "data-toggle" => "dropdown" do
+                    %span.caret
+                  %ul.dropdown-menu
+                    %li
+                      = link_to on_all_notifications_subscription_path(category: st), method: :post do
+                        %i.icon-star
+                        Subscribe
+                      - if @subscriptions[st.to_s.camelize].present?
+                        = link_to from_all_notifications_subscription_path(category: st), method: :delete do
+                          %i.icon-star-empty
+                          Unsubscribe
+    - if @notification_setting.own_changes
+      = link_to "Not notify me about changes I make", from_own_changes_notifications_subscription_path, method: :delete, class: "btn btn-remove"
+    - else
+      = link_to "Notify me about changes I make", on_own_changes_notifications_subscription_path, method: :post, class: "btn btn-primary"

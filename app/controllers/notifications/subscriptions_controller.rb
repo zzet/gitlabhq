@@ -1,27 +1,75 @@
 class Notifications::SubscriptionsController < Notifications::ApplicationController
-  before_filter :load_entity
+  before_filter :load_entity, only: [:create, :destroy]
 
   def create
     if @entity
       SubscriptionService.subscribe(@current_user, :all, @entity, :all)
-      head :created
+      respond_to do |format|
+        format.json { head :created }
+        format.html { redirect_to profile_subscriptions_path }
+      end
     end
 
     if @category.blank?
       SubscriptionService.subscribe(@current_user, :all, params[:category], :new)
-      head :created
+      respond_to do |format|
+        format.json { head :created }
+        format.html { redirect_to profile_subscriptions_path }
+      end
+    end
+  end
+
+  def on_all
+    if params[:category]
+      SubscriptionService.subscribe_on_all(@current_user, params[:category], :all, :all)
+      redirect_to profile_subscriptions_path
+    end
+  end
+
+  def from_all
+    if params[:category]
+      SubscriptionService.unsubscribe_from_all(@current_user, params[:category], :all, :all)
+      redirect_to profile_subscriptions_path
+    end
+  end
+
+  def on_own_changes
+    @current_user.notification_setting.own_changes = true
+
+    if @current_user.notification_setting.save
+      respond_to do |format|
+        format.json { head :created }
+        format.html { redirect_to profile_subscriptions_path }
+      end
+    end
+  end
+
+  def from_own_changes
+    @current_user.notification_setting.own_changes = false
+
+    if @current_user.notification_setting.save
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html { redirect_to profile_subscriptions_path }
+      end
     end
   end
 
   def destroy
     if @entity
       SubscriptionService.unsubscribe(@current_user, :all, @entity, :all)
-      head :no_content
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html { redirect_to profile_subscriptions_path }
+      end
     end
 
     if @category.present?
       SubscriptionService.unsubscribe(@current_user, :all, params[:category], :new)
-      head :no_content
+      respond_to do |format|
+        format.json { head :no_content }
+        format.html { redirect_to profile_subscriptions_path }
+      end
     end
   end
 
