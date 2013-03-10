@@ -13,6 +13,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
     def build(action, source, user, data)
       meta = parse_action(action)
       target = source
+      temp_data = data.attributes
 
       actions = []
 
@@ -26,7 +27,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
 
           actions << :transfer if source.creator_id_changed? && source.creator_id != changes[:creator_id].first
           if actions.blank?
-            data[:changes] = changes
+            temp_data[:previous_changes] = changes
             actions << :updated
           end
         when :deleted
@@ -161,7 +162,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
 
       actions.each do |act|
         events << ::Event.new(action: act,
-                              source: source, data: data.to_json, author: user, target: target)
+                              source: source, data: temp_data.to_json, author: user, target: target)
       end
 
       events
