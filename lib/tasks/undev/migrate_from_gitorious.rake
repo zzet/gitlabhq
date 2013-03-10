@@ -279,7 +279,7 @@ namespace :undev do
               unless File.exists?(project_path)
                 @shell.import_repository(project.path_with_namespace, repo.git_clone_url)
 
-                @logger.info "#{repo.hashed_path}.git;#{project_path}"
+                @logger.info "#{repo.url_path};#{repo.real_gitdir};#{project.path_with_namespace};#{project_path};#{project.name_with_namespace}"
 
                 @import_log.info "OK".green
               else
@@ -551,7 +551,7 @@ namespace :undev do
                 updated_at: event.updated_at
               )
 
-              print "-".green
+              print "-".red
 
             end
 
