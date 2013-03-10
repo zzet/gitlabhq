@@ -17,8 +17,6 @@ class Gitlab::Event::Builder::Issue < Gitlab::Event::Builder::Base
       case source
       when ::Issue
 
-        actions << meta[:action]
-
         case meta[:action]
         when :created
           actions << :assigned if source.assignee_id_changed?
@@ -27,11 +25,12 @@ class Gitlab::Event::Builder::Issue < Gitlab::Event::Builder::Base
 
           actions << :assigned if source.assignee_id_changed? && changes['assignee_id'].first.nil?
           actions << :reassigned if source.assignee_id_changed? && changes['assignee_id'].first.present?
-
-          #TODO. Check, if Only closed/reopened - not make :updated event
         when :closed
+          actions << :closed
         when :reopened
+          actions << :reopened
         when :deleted
+          actions << :deleted
         end
 
       when ::Note
