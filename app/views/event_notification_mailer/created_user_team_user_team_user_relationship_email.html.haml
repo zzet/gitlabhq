@@ -9,10 +9,10 @@
     %th Name
     %td Default project access
     %td Team administrator
-  - @team.user_team_user_relationships.each do |ur|
+  - @team.members.each do |member|
     %tr
-      %td= link_to ur.user.name, user_url(ur.user.username)
-      %td= ur.permission
-      %td= ur.group_admin? ? "Yes" : "No"
+      %td= link_to member.name, user_url(member.username)
+      %td= @team.human_default_projects_access(member)
+      %td= @team.admin?(member) ? "Yes" : "No"
 %br
 = render "footer", user: @user

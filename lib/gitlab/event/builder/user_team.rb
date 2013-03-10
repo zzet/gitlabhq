@@ -14,12 +14,15 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
       case source
       when ::UserTeam
         target = source
-        actions << meta[:action]
 
         case meta[:action]
         when :created
+          actions << :created
         when :updated
+          actions << :updated
+          data[:changes] = source.changes
         when :deleted
+          actions << :deleted
         end
 
       when ::UserTeamUserRelationship
@@ -30,6 +33,7 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
           actions << :joined
         when :updated
           actions << :updated
+          data[:changes] = source.changes
         when :deleted
           actions << :left
         end
@@ -42,6 +46,7 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
           actions << :assigned
         when :updated
           actions << :updated
+          data[:changes] = source.changes
         when :deleted
           actions << :reassigned
         end

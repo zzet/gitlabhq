@@ -9,7 +9,6 @@ class Gitlab::Event::Builder::Service < Gitlab::Event::Builder::Base
     def build(action, source, user, data)
       meta = parse_action(action)
       meta[:action]
-
       target = source
 
       ::Event.new(action: meta[:action],
