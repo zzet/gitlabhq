@@ -9,6 +9,8 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
 
     def build(action, source, user, data)
       meta = parse_action(action)
+      changes = source.changes
+      temp_data = data.attributes
 
       actions = []
 
@@ -21,7 +23,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           actions << :created
         when :updated
           actions << :updated
-          data[:changes] = source.changes
+          temp_data["previous_changes"] = changes
         when :deleted
           actions << :deleted
         end
@@ -45,7 +47,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           actions << :joined
         when :updated
           actions << :updated
-          data[:changes] = source.changes
+          temp_data["previous_changes"] = changes
         when :deleted
           actions << :left
         end
@@ -57,7 +59,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           actions << :joined
         when :updated
           actions << :updated
-          data[:changes] = source.changes
+          temp_data["previous_changes"] = changes
         when :deleted
           actions << :left
         end
@@ -68,9 +70,11 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
 
       events = []
 
+      p data
+
       actions.each do |act|
         events << ::Event.new(action: act,
-                              source: source, data: data.to_json, author: user, target: target)
+                              source: source, data: temp_data.to_json, author: user, target: target)
       end
 
       events

@@ -8,20 +8,21 @@ class Gitlab::Event::Builder::UsersProject < Gitlab::Event::Builder::Base
 
     def build(action, source, user, data)
       meta = parse_action(action)
+      temp_data = data.attributes
       actions = []
       target = source
       case meta[:action]
       when :created
         actions << :created
       when :updated
-        data[:changes] = source.changes
+        temp_data["previous_changes"] = source.changes
         actions << :updated
       when :deleted
         actions << :deleted
       end
 
       ::Event.new(action: meta[:action],
-                  source: source, data: data.to_json, author: user, target: target)
+                  source: source, data: temp_data.to_json, author: user, target: target)
     end
   end
 end
