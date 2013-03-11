@@ -5,8 +5,7 @@
     %title
       = "#{title} | " if defined?(title)
       GitLab
-    %style
-      :plain
+    %link{href: "/assets/application.css", rel: "stylesheet", type: "text/css"}
   %body
     %h1= "Hello, #{@user.name}!"
     %br
