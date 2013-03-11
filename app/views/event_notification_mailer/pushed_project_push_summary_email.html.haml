@@ -1,5 +1,12 @@
 %h2= "#{@event.author.name} #{@event.action} to #{@event.target.name} at #{@event.created_at}"
 
+Push summary between 
+%strong=@commits.last.sha
+and
+%strong=@commits.first.sha
+
+= link_to 'Compare', project_compare_url(@event.target, @commits.first, @commits.last)
+
 %p.cgray
   = "Showing #{pluralize(@diffs.count, "changed file")}"
 .file-stats
