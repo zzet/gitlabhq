@@ -1,3 +1,1 @@
-= render "hello", user: @user
 = raw "User #{link_to @user.name, user_url(@user.username)} deleted branch '#{@branch}' in #{link_to @project.path_with_namespace, project_url(@project.path_with_namespace)} project."
-= render "footer", user: @user
