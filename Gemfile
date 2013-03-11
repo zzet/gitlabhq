@@ -165,7 +165,7 @@ gem 'airbrake'
 
 group :development, :test do
   gem 'rails-dev-tweaks'
-  gem 'spinach-rails', '0.2.0'
+  gem 'spinach-rails'
   gem "rspec-rails", '2.12.2'
   gem "capybara", '2.0.2'
   gem "pry"
