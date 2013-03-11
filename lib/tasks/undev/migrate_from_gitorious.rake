@@ -457,11 +457,16 @@ namespace :undev do
 
         Legacy::Event.push_events.repository_events(nil).find_each do |event|
 
-          project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
+          project = Project.find_with_namespace(Legacy::Repository.find(event.target_id).url_path)
+          project = Project.find_by_path(Legacy::Repository.find(event.target_id).name) if project.blank?
           user = nil
           user = User.find_by_username(event.user.login) if event.user
 
           if project && user
+            service = GitPusService.new
+            service.project = project
+            service.user = user
+
             case event.action
             when Legacy::Action::COMMIT
               print "c".green
@@ -476,36 +481,45 @@ namespace :undev do
             when Legacy::Action::PUSH
 
               tmp = event.body.split " "
-              data = project.post_receive_data(tmp[3], tmp[5], event.data, user)
+              data = service.post_receive_data(tmp[3], tmp[5], event.data)
 
-              OldEvent.create(
-                project: project,
-                action: OldEvent::PUSHED,
-                data: data,
-                author_id: data[:user_id],
-                created_at: event.created_at,
-                updated_at: event.updated_at
-              )
-
-              print "p".green
+              begin
+                OldEvent.create(
+                  project: project,
+                  action: OldEvent::PUSHED,
+                  data: data,
+                  author_id: data[:user_id],
+                  created_at: event.created_at,
+                  updated_at: event.updated_at
+                )
+                print "p".green
+              rescue
+                pront "p".red
+              end
 
             when Legacy::Action::PUSH_SUMMARY
 
               oldrev, newrev, ref, commits = event.data.split "$"
-              data = project.post_receive_data(oldrev, newrev, ref, user)
+              data = service.post_receive_data(oldrev, newrev, ref)
 
-              OldEvent.create(
-                project: project,
-                action: OldEvent::PUSHED,
-                data: data,
-                author_id: data[:user_id],
-                created_at: event.created_at,
-                updated_at: event.updated_at
-              )
+              begin
+                OldEvent.create(
+                  project: project,
+                  action: OldEvent::PUSHED,
+                  data: data,
+                  author_id: data[:user_id],
+                  created_at: event.created_at,
+                  updated_at: event.updated_at
+                )
 
-              print "P".green
+                print "P".green
+              rescue
+                pront "P".red
+              end
 
             end
+          else
+            print "F".red
           end
         end
         @import_log.info

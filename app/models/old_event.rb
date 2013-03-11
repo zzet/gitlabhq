@@ -16,7 +16,7 @@
 
 class OldEvent < ActiveRecord::Base
   attr_accessible :project, :action, :data, :author_id, :project_id,
-                  :target_id, :target_type
+                  :target_id, :target_type, :created_at, :updated_at
 
   default_scope where("author_id IS NOT NULL")
 

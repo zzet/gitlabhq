@@ -44,8 +44,6 @@ class GitPushService
     post_receive_data(commits.last.id, commits.first.id, "refs/heads/#{project.default_branch}")
   end
 
-  protected
-
   def create_push_event
     OldEvent.create(
       project: project,
