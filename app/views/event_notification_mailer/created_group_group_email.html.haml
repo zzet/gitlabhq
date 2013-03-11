@@ -1,4 +1,3 @@
-= render "hello", user: @user
 = raw "#{ link_to @user.name, user_url(@user.username) } created new group of projects:"
 %br
 %table
@@ -12,4 +11,3 @@
     %td Page
     %td= link_to @group.name, group_url(@group.path)
 %br
-= render "footer", user: @user

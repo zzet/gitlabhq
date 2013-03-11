@@ -1,4 +1,3 @@
-= render "hello", user: @user
 = raw "#{ link_to @user.name, user_url(@user.username)} add new account:"
 %table
   %tr
@@ -28,4 +27,3 @@
   %tr
     %td Admin
     %td= @new_user.admin? ? "Yes" : "No"
-= render "footer", user: @user
