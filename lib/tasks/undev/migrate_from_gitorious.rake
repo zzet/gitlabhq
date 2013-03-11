@@ -21,7 +21,6 @@ namespace :undev do
     @admin.password = "123456"
     @admin.projects_limit = 1000
     @admin.email = "admin@undev.cc"
-    @admin.blocked = false
     @admin.admin = true
     @admin.save
 
@@ -62,7 +61,7 @@ namespace :undev do
           new_user.username = user.login
           new_user.name = user.fullname.blank? ? user.login : user.fullname
           new_user.email = user.email
-          new_user.blocked = (user.aasm_state != "terms_accepted")
+          new_user.state = :blocked if (user.aasm_state != "terms_accepted")
 
           new_user.admin = user.is_admin
           new_user.projects_limit = 1000
