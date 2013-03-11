@@ -1,4 +1,6 @@
 class EventNotificationMailer < ActionMailer::Base
+  layout 'event_notification_email' 
+  helper :application, :commits, :tree
   default from: "Gitlab messeger <#{Gitlab.config.gitlab.email_from}>"
 
   # Just send email with 6 seconds delay

@@ -1,4 +1,3 @@
-= render "hello", user: @user
 = raw "#{ link_to @user.name, @user.username } assigned #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project to #{ link_to @team.name, team_url(@team.path) } team with #{ @user_team_project_relationship.greatest_access } permission for team members."
 %br
 %table
@@ -11,4 +10,3 @@
       %td= link_to pp.path_with_namespace, project_url(pp.path_with_namespace)
       %td= @team.human_max_project_access(pp)
 %br
-= render "footer", user: @user
