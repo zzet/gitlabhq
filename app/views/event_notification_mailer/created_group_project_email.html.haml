@@ -1,4 +1,3 @@
-= render "hello", user: @user
 = raw "#{ link_to @user.name, user_url(@user.username) } created new project in #{ link_to @group.name, group_url(@group.path)}:"
 %br
 %table
@@ -30,4 +29,3 @@
     %td= @project.merge_requests_enabled? ? "Enabled" : "Disabled"
 
 %br
-= render "footer", user: @user
