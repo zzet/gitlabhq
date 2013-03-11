@@ -123,6 +123,9 @@ GEM
       simplecov (>= 0.7)
       thor
     crack (0.3.2)
+    css_parser (1.2.6)
+      addressable
+      rdoc
     daemons (1.1.9)
     database_cleaner (0.9.1)
     debug_inspector (0.0.2)
@@ -383,6 +386,11 @@ GEM
     request_store (1.0.5)
     rest-client (1.6.7)
       mime-types (>= 1.16)
+    roadie (2.3.4)
+      actionmailer (> 3.0.0, < 3.3.0)
+      css_parser
+      nokogiri (>= 1.4.4)
+      sprockets
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -570,6 +578,8 @@ DEPENDENCIES
   redcarpet (~> 2.2.2)
   redis-rails
   rspec-rails
+  rugged (~> 0.17.0.b7)
+  roadie
   sass-rails (~> 3.2.5)
   sdoc
   seed-fu
