@@ -1,4 +1,3 @@
-= render "hello", user: @user
 = raw "Project #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } was updated by #{ link_to @user.name, user_url(@user.username)}"
 %br
 %table
@@ -12,4 +11,3 @@
       %td= values.last
       %td= values.first
 %br
-= render "footer", user: @user

@@ -1,4 +1,3 @@
-= render "hello", user: @user
 = raw "User #{ link_to @user.name, user_url(@user.username)} added #{ @service.title } service to #{ @project.path_with_namespace, project_url(@project.path_with_namespace)} project:"
 %table
   %tr
@@ -11,4 +10,3 @@
     %td Type
     %td= @service.type
 %br
-= render "footer", user: @user

@@ -1,0 +1,23 @@
+!!! 5
+%html{ lang: "en"}
+  %head
+    %meta{charset: "utf-8"}
+    %title
+      = "#{title} | " if defined?(title)
+      GitLab
+    %link{href: "/assets/application.css", rel: "stylesheet", type: "text/css"}
+  %body
+    %h1= "Hello, #{@user.name}!"
+    %br
+
+    = yield
+
+    %br
+    =========================
+    %br
+    .footer
+      %span You are receiving this email because you have chosen to be notified by email whenever this favorite has new activity.
+      %br
+      %span
+        You can manage your favorite subscriptions at
+        = link_to "Manage subscriptions page", profile_subscriptions_url
