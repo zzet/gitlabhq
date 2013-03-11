@@ -1,3 +1,1 @@
-= render "hello", user: @user
 = raw "#{ link_to @user.name, user_url(@user.username) } created new Team #{ link_to @team.name, team_url(@team.path) }."
-= render "footer", user: @user
