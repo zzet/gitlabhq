@@ -84,7 +84,8 @@ class User < ActiveRecord::Base
   has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
 
   # Notifications & Subscriptions
-  has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription
+  has_many :personal_subscriprions,   dependent: :destroy, class_name: Event::Subscription
+  has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription, as: :target
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, through: :subscriprions
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
 
