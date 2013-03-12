@@ -15,7 +15,7 @@ module Issuable
 
     has_many :notes,          as: :noteable,  dependent: :destroy
     has_many :events,         as: :source
-    has_many :subscriptions,  as: :target, dependent: :destroy, class_name: Event::Subscription
+    has_many :subscriptions,  as: :target, class_name: Event::Subscription
     has_many :notifications,  through: :subscriptions
     has_many :subscribers,    through: :subscriptions
 
