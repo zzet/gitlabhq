@@ -959,7 +959,8 @@ class EventNotificationMailer < ActionMailer::Base
 
     @push_data = JSON.load(@event.data).to_hash
 
-    @branch = @push_data["ref"].delete("refs/heads/")
+    @branch = @push_data["ref"]
+    @branch.slice!("refs/heads/")
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted branch '#{@branch}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
@@ -974,7 +975,8 @@ class EventNotificationMailer < ActionMailer::Base
 
     @push_data = JSON.load(@event.data).to_hash
 
-    @branch = @push_data["ref"].delete("refs/heads/")
+    @branch = @push_data["ref"]
+    @branch.slice!("refs/heads/")
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new branch '#{@branch}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
@@ -989,7 +991,8 @@ class EventNotificationMailer < ActionMailer::Base
 
     @push_data = JSON.load(@event.data).to_hash
 
-    @tag = @push_data["ref"].delete("refs/tags/")
+    @tag = @push_data["ref"]
+    @tag.slice!("refs/tags/")
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted tag '#{tag}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
@@ -1004,7 +1007,8 @@ class EventNotificationMailer < ActionMailer::Base
 
     @push_data = JSON.load(@event.data).to_hash
 
-    @tag = @push_data["ref"].delete("refs/tags/")
+    @tag = @push_data["ref"]
+    @tag.slice!("refs/tags/")
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new tag '#{tag}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
