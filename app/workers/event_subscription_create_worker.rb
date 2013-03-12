@@ -1,10 +1,10 @@
-class EventSubscriptionWorker
+class EventSubscriptionCreateWorker
   def self.call(name, started, finished, unique_id, data)
 
     gitlab, action, source = name.split "."
 
     begin
-      if (Event::Subscription.global_entity_to_subscription.include? source.to_sym) && (action.to_sym == :created)
+      if (Event::Subscription.global_entity_to_subscription.include? source.to_sym) && ([:deleted].include? action.to_sym)
         Rails.logger.info "Create subscription by action: " << name
         Gitlab::Event::Subscription.create_subscriprions_by_target(data[:source])
       end
