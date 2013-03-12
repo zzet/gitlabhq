@@ -56,9 +56,7 @@ module Gitlab
             raise ArgumentError, "Can't send email to notification ##{notification["id"]}. Event is unavailable."
           end
         end
-
       end
-
     end
   end
 end
