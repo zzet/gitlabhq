@@ -392,6 +392,11 @@ GEM
       sprockets
     rest-client (1.6.7)
       mime-types (>= 1.16)
+    roadie (2.3.4)
+      actionmailer (> 3.0.0, < 3.3.0)
+      css_parser
+      nokogiri (>= 1.4.4)
+      sprockets
     rspec (2.12.0)
       rspec-core (~> 2.12.0)
       rspec-expectations (~> 2.12.0)

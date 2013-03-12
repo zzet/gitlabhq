@@ -95,6 +95,8 @@ class MergeRequest < ActiveRecord::Base
 
   actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
 
+  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
+
   def validate_branches
     if target_branch == source_branch
       errors.add :branch_conflict, "You can not use same branch for source and target branches"
