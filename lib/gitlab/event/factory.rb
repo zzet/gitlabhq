@@ -16,7 +16,6 @@ module Gitlab
         events = self.build(action, data)
         events.each do |event|
           event.save
-          p event.data
         end
       end
     end
