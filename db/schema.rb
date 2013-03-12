@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130305122336) do
+ActiveRecord::Schema.define(:version => 20130312211655) do
 
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(:version => 20130305122336) do
     t.datetime "notified_at"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
+    t.integer  "subscriber_id"
   end
 
   create_table "event_subscriptions", :force => true do |t|
