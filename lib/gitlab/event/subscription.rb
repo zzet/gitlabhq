@@ -40,6 +40,19 @@ module Gitlab
           end
         end
 
+        def destroy_subscriprions_by_target(external_source)
+
+          typed_subscriptions = ::Event::Subscription.by_target(external_source)
+
+          typed_subscriptions.each do |subscription|
+            user = subscription.user
+            action = subscription.action
+            target = external_source
+            source = subscription.source_category.to_sym
+            unsubscribe(user, action, target, source)
+          end
+        end
+
         # target = event target
         # Expected Symbol || Class_name
         def subscribe_on_target_category(user, target, action = :all, source = :all)
