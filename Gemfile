@@ -160,6 +160,7 @@ gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
 
 group :development, :test do
+  gem 'coveralls', require: false
   gem 'rails-dev-tweaks'
   gem 'spinach-rails'
   gem "rspec-rails", '2.12.2'
