@@ -530,7 +530,7 @@ class EventNotificationMailer < ActionMailer::Base
     @group = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@group["name"]} group was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Group '#{@group["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_group_project_email(notification)
@@ -540,7 +540,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @source = @event.data
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@project["name"]} project was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_project_project_email(notification)
@@ -550,7 +550,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@project['name']} user was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_team_user_team_email(notification)
@@ -560,17 +560,17 @@ class EventNotificationMailer < ActionMailer::Base
     @team = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@team['name']} team was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Team '#{@team['name']}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_user_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @deleted_user = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@source['name']} user was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "User '#{@source['name']}' was deleted by #{@user.name} [deleted]")
   end
 
   #
