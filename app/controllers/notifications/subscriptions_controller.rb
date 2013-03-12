@@ -3,7 +3,7 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
 
   def create
     SubscriptionService.subscribe(@current_user, :all, @entity, :all) if @entity
-    SubscriptionService.subscribe(@current_user, :all, params[:category], :new) if @category.blank?
+    SubscriptionService.subscribe(@current_user, :all, params[:category], :new) if @category.blank? && params[:category].present?
 
     respond_to do |format|
       format.json { head :created }
