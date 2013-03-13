@@ -1021,14 +1021,14 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source_type
     @project = @target = @event.target
     @push_data = JSON.load(@event.data).to_hash
+
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
-    @commits       = result[:commits]
+    @commits       = CommitDecorator.decorate_collection result[:commits]
     @commit        = result[:commit]
     @diffs         = result[:diffs]
     @refs_are_same = result[:same]
-
-    @commits = CommitDecorator.decorate(@commits)
+    @line_notes    = []
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [branch] #{@user.name} [undev gitlab commits] [pushed]")
   end
