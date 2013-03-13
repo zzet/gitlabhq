@@ -59,6 +59,12 @@
           SSH:
       %td
         = link_to @project.ssh_url_to_repo
+  %tr
+    %td
+      %b
+        Project page:
+    %td
+      = link_to @project.name_with_namespace, project_path(@project)
   - if @project.public
     %tr.bgred
       %td
