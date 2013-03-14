@@ -133,7 +133,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "New project #{@project.path_with_namespace} was created [created]")
   end
 
-  def created_project_project_hook_email(notification)
+  def added_project_web_hook_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
