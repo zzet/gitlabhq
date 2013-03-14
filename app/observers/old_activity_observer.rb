@@ -45,11 +45,11 @@ class OldActivityObserver < ActiveRecord::Observer
     # to prevent event duplication do this check
     return true if record.merge_event
 
-    Event.create(
+    OldEvent.create(
       project: record.project,
       target_id: record.id,
       target_type: record.class.name,
-      action: Event::MERGED,
+      action: OldEvent::MERGED,
       author_id: record.author_id_of_changes
     )
   end
