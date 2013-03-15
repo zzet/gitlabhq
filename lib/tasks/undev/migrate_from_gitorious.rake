@@ -232,14 +232,13 @@ namespace :undev do
 
         group = Group.find_by_path(repo.project.slug)
         user = User.find_by_username(repo.project.slug)
+        user = User.find_by_username(repo.user.login) if user.blank?
 
         project = Project.new
 
-        if group
-          project.group = group # unless group.projects.find_by_name(repo.name)
-        else
-          project.namespace_id = user.namespace_id
-        end
+        project.group = group if group.present?
+        project.namespace_id = user.namespace_id if user.present? && group.blank?
+        project.namespace_id = @admin.namespace_id if user.blank? && group.blank?
 
         project.name = repo.name
         project.description = repo.description
@@ -249,6 +248,7 @@ namespace :undev do
         project.updated_at = repo.updated_at
 
         creator = User.find_by_username(repo.user.login)
+        creator = @admin if creator.blank?
 
         if creator
           project.creator = creator
@@ -419,7 +419,9 @@ namespace :undev do
           begin
             case favorite.watchable_type
             when "Repository"
-              project = Project.find_by_path(Legacy::Repository.find(favorite.watchable_id).name)
+              project = Project.find_with_namespace(Legacy::Repository.find(favorite.watchable_id).url_path)
+              project = Project.find_by_path(Legacy::Repository.find(favorite.watchable_id).name) if project.blank?
+
               user = User.find_by_username(favorite.user.login) if favorite.user
               if project && user
                 Gitlab::Event::Subscription.subscribe(user, :all, project, :all)
@@ -461,6 +463,7 @@ namespace :undev do
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name) if project.blank?
           user = nil
           user = User.find_by_username(event.user.login) if event.user
+          print "u".red if user.blank?
 
           if project && user
             service = GitPusService.new
@@ -481,9 +484,9 @@ namespace :undev do
             when Legacy::Action::PUSH
 
               tmp = event.body.split " "
+              begin
               data = service.post_receive_data(tmp[3], tmp[5], event.data)
 
-              begin
                 OldEvent.create(
                   project: project,
                   action: OldEvent::PUSHED,
@@ -500,9 +503,9 @@ namespace :undev do
             when Legacy::Action::PUSH_SUMMARY
 
               oldrev, newrev, ref, commits = event.data.split "$"
+              begin
               data = service.post_receive_data(oldrev, newrev, ref)
 
-              begin
                 OldEvent.create(
                   project: project,
                   action: OldEvent::PUSHED,
@@ -519,7 +522,7 @@ namespace :undev do
 
             end
           else
-            print "F".red
+            print "*".yellow
           end
         end
         @import_log.info
@@ -537,7 +540,9 @@ namespace :undev do
 
         Legacy::Event.committers_events.repository_events(nil).find_each do |event|
 
-          project = Project.find_by_path(Legacy::Repository.find(event.target_id).name)
+          project = Project.find_with_namespace(Legacy::Repository.find(event.target_id).url_path)
+          project = Project.find_by_path(Legacy::Repository.find(event.target_id).name) if project.blank?
+
           luser = Legacy::User.find_by_fullname(event.data)
           user = User.find_by_username(luser.login) if luser
 
