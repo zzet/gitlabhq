@@ -2,74 +2,54 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
   before_filter :load_entity, only: [:create, :destroy]
 
   def create
-    if @entity
-      SubscriptionService.subscribe(@current_user, :all, @entity, :all)
-      respond_to do |format|
-        format.json { head :created }
-        format.html { redirect_to profile_subscriptions_path }
-      end
-    end
+    SubscriptionService.subscribe(@current_user, :all, @entity, :all) if @entity
+    SubscriptionService.subscribe(@current_user, :all, params[:category], :new) if @category.blank? && params[:category].present?
 
-    if @category
-      SubscriptionService.subscribe(@current_user, :all, params[:category], :new)
-      respond_to do |format|
-        format.json { head :created }
-        format.html { redirect_to profile_subscriptions_path }
-      end
+    respond_to do |format|
+      format.json { head :created }
+      format.html { redirect_to profile_subscriptions_path }
     end
   end
 
   def on_all
-    if params[:category]
-      SubscriptionService.subscribe_on_all(@current_user, params[:category], :all, :all)
-      redirect_to profile_subscriptions_path
-    end
+    SubscriptionService.subscribe_on_all(@current_user, params[:category], :all, :all) if params[:category]
+    redirect_to profile_subscriptions_path
   end
 
   def from_all
-    if params[:category]
-      SubscriptionService.unsubscribe_from_all(@current_user, params[:category], :all, :all)
-      redirect_to profile_subscriptions_path
-    end
+    SubscriptionService.unsubscribe_from_all(@current_user, params[:category], :all, :all) if params[:category]
+    redirect_to profile_subscriptions_path
   end
 
   def on_own_changes
     @current_user.notification_setting.own_changes = true
 
-    if @current_user.notification_setting.save
-      respond_to do |format|
-        format.json { head :created }
-        format.html { redirect_to profile_subscriptions_path }
-      end
+    @current_user.notification_setting.save
+
+    respond_to do |format|
+      format.json { head :created }
+      format.html { redirect_to profile_subscriptions_path }
     end
   end
 
   def from_own_changes
     @current_user.notification_setting.own_changes = false
 
-    if @current_user.notification_setting.save
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html { redirect_to profile_subscriptions_path }
-      end
+    @current_user.notification_setting.save
+
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { redirect_to profile_subscriptions_path }
     end
   end
 
   def destroy
-    if @entity
-      SubscriptionService.unsubscribe(@current_user, :all, @entity, :all)
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html { redirect_to profile_subscriptions_path }
-      end
-    end
+    SubscriptionService.unsubscribe(@current_user, :all, @entity, :all) if @entity
+    SubscriptionService.unsubscribe(@current_user, :all, params[:category], :new) if @category
 
-    if @category
-      SubscriptionService.unsubscribe(@current_user, :all, params[:category], :new)
-      respond_to do |format|
-        format.json { head :no_content }
-        format.html { redirect_to profile_subscriptions_path }
-      end
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { redirect_to profile_subscriptions_path }
     end
   end
 

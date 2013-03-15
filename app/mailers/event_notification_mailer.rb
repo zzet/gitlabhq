@@ -1,6 +1,6 @@
 class EventNotificationMailer < ActionMailer::Base
   layout 'event_notification_email' 
-  helper :application, :commits, :tree
+  helper :application, :commits, :tree, :gitlab_markdown
   default from: "Gitlab messeger <#{Gitlab.config.gitlab.email_from}>"
 
   # Just send email with 6 seconds delay
@@ -133,7 +133,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "New project #{@project.path_with_namespace} was created [created]")
   end
 
-  def created_project_project_hook_email(notification)
+  def added_project_web_hook_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
@@ -530,7 +530,7 @@ class EventNotificationMailer < ActionMailer::Base
     @group = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@group["name"]} group was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Group '#{@group["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_group_project_email(notification)
@@ -540,7 +540,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @source = @event.data
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@project["name"]} project was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_project_project_email(notification)
@@ -550,7 +550,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@project['name']} user was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_team_user_team_email(notification)
@@ -560,17 +560,17 @@ class EventNotificationMailer < ActionMailer::Base
     @team = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@team['name']} team was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Team '#{@team['name']}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_user_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @deleted_user = @source = @event.data
     @target = @event.data
 
-    mail(bcc: @notification.subscriber.email, subject: "#{@source['name']} user was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "User '#{@source['name']}' was deleted by #{@user.name} [deleted]")
   end
 
   #
@@ -959,7 +959,8 @@ class EventNotificationMailer < ActionMailer::Base
 
     @push_data = JSON.load(@event.data).to_hash
 
-    @branch = @push_data["ref"].delete("refs/heads/")
+    @branch = @push_data["ref"]
+    @branch.slice!("refs/heads/")
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted branch '#{@branch}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
@@ -974,7 +975,8 @@ class EventNotificationMailer < ActionMailer::Base
 
     @push_data = JSON.load(@event.data).to_hash
 
-    @branch = @push_data["ref"].delete("refs/heads/")
+    @branch = @push_data["ref"]
+    @branch.slice!("refs/heads/")
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new branch '#{@branch}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
@@ -989,7 +991,8 @@ class EventNotificationMailer < ActionMailer::Base
 
     @push_data = JSON.load(@event.data).to_hash
 
-    @tag = @push_data["ref"].delete("refs/tags/")
+    @tag = @push_data["ref"]
+    @tag.slice!("refs/tags/")
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted tag '#{tag}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
@@ -1004,7 +1007,8 @@ class EventNotificationMailer < ActionMailer::Base
 
     @push_data = JSON.load(@event.data).to_hash
 
-    @tag = @push_data["ref"].delete("refs/tags/")
+    @tag = @push_data["ref"]
+    @tag.slice!("refs/tags/")
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new tag '#{tag}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
@@ -1017,14 +1021,14 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source_type
     @project = @target = @event.target
     @push_data = JSON.load(@event.data).to_hash
+
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
-    @commits       = result[:commits]
+    @commits       = CommitDecorator.decorate_collection result[:commits]
     @commit        = result[:commit]
     @diffs         = result[:diffs]
     @refs_are_same = result[:same]
-
-    @commits = CommitDecorator.decorate(@commits)
+    @line_notes    = []
 
     mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [branch] #{@user.name} [undev gitlab commits] [pushed]")
   end

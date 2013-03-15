@@ -7,9 +7,9 @@
 #  project_id  :integer          not null
 #  description :text
 #  due_date    :date
-#  closed      :boolean          default(FALSE), not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  state       :string(255)
 #
 
 class Milestone < NewDb
@@ -24,7 +24,7 @@ class Milestone < NewDb
   has_many :merge_requests
 
   has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, dependent: :destroy, class_name: Event::Subscription
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 

@@ -1,0 +1,21 @@
+%li.commit
+  .browse_code_link_holder
+    %p
+      %strong= link_to "Browse Code »", project_tree_url(@project, commit), class: "right"
+  %p
+    = link_to commit.short_id(8), project_commit_url(@project, commit), class: "commit_short_id"
+    &nbsp;
+    = link_to_gfm truncate(commit.title, length: 70), project_commit_url(@project, commit.id), class: "row_title"
+
+    %time.committed_ago{ datetime: commit.committed_date, title: commit.committed_date.stamp("Aug 21, 2011 9:23pm") }
+      = time_ago_in_words(commit.committed_date)
+      ago 
+      = "(#{commit.committed_date})"
+      &nbsp;
+
+    %span.notes_count
+      - notes = @project.notes.for_commit_id(commit.id)
+      - if notes.any?
+        %span.btn.disabled.grouped
+          %i.icon-comment
+          = notes.count

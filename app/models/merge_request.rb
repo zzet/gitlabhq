@@ -9,14 +9,14 @@
 #  author_id     :integer
 #  assignee_id   :integer
 #  title         :string(255)
-#  state         :string(255)      not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  st_commits    :text(2147483647)
 #  st_diffs      :text(2147483647)
-#  merge_status  :integer          default(1), not null
-#
 #  milestone_id  :integer
+#  state         :string(255)
+#  merge_status  :string(255)
+#
 
 require Rails.root.join("app/models/commit")
 require Rails.root.join("lib/static_model")
@@ -102,6 +102,8 @@ class MergeRequest < NewDb
   scope :by_branch, ->(branch_name) { where("source_branch LIKE :branch OR target_branch LIKE :branch", branch: branch_name) }
   scope :cared, ->(user) { where('assignee_id = :user OR author_id = :user', user: user.id) }
   scope :by_milestone, ->(milestone) { where("milestone_id = :milestone_id", milestone_id: milestone) }
+
+  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
 
   actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
 

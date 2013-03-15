@@ -37,9 +37,11 @@ module ApplicationHelper
     if !Gitlab.config.gravatar.enabled || user_email.blank?
       'no_avatar.png'
     else
-      gravatar_url = request.ssl? ? Gitlab.config.gravatar.ssl_url : Gitlab.config.gravatar.plain_url
-      user_email.strip!
-      sprintf gravatar_url, hash: Digest::MD5.hexdigest(user_email.downcase), size: size
+      if request
+        gravatar_url = request.ssl? ? Gitlab.config.gravatar.ssl_url : Gitlab.config.gravatar.plain_url
+        user_email.strip!
+        sprintf gravatar_url, hash: Digest::MD5.hexdigest(user_email.downcase), size: size
+      end
     end
   end
 
@@ -110,7 +112,7 @@ module ApplicationHelper
       ]
     end
 
-    [groups, projects, default_nav, project_nav, help_nav].flatten.to_json
+    [groups, teams, projects, default_nav, project_nav, help_nav].flatten.to_json
   end
 
   def emoji_autocomplete_source
@@ -128,7 +130,13 @@ module ApplicationHelper
   end
 
   def user_color_scheme_class
-    current_user.dark_scheme ? :black : :white
+    case current_user.color_scheme_id
+    when 1 then 'white'
+    when 2 then 'black'
+    when 3 then 'solarized-dark'
+    else
+      'white'
+    end
   end
 
   def show_last_push_widget?(event)
@@ -169,4 +177,10 @@ module ApplicationHelper
   end
 
   alias_method :url_to_image, :image_url
+
+  def users_select_tag(id, opts = {})
+    css_class = "ajax-users-select"
+    css_class << " multiselect" if opts[:multiple]
+    hidden_field_tag(id, '', class: css_class)
+  end
 end

@@ -22,10 +22,8 @@
 #  linkedin               :string(255)      default(""), not null
 #  twitter                :string(255)      default(""), not null
 #  authentication_token   :string(255)
-#  dark_scheme            :boolean          default(FALSE), not null
 #  theme_id               :integer          default(1), not null
 #  bio                    :string(255)
-#  state                  :string(255)
 #  failed_attempts        :integer          default(0)
 #  locked_at              :datetime
 #  extern_uid             :string(255)
@@ -33,6 +31,8 @@
 #  username               :string(255)
 #  can_create_group       :boolean          default(TRUE), not null
 #  can_create_team        :boolean          default(TRUE), not null
+#  state                  :string(255)
+#  color_scheme_id        :integer          default(1), not null
 #
 
 class User < NewDb
@@ -42,7 +42,7 @@ class User < NewDb
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :registerable
 
   attr_accessible :email, :password, :password_confirmation, :remember_me, :bio, :name, :username,
-                  :skype, :linkedin, :twitter, :dark_scheme, :theme_id, :force_random_password,
+                  :skype, :linkedin, :twitter, :color_scheme_id, :theme_id, :force_random_password,
                   :extern_uid, :provider, as: [:default, :admin]
   attr_accessible :projects_limit, :can_create_team, :can_create_group, as: :admin
 
@@ -84,8 +84,9 @@ class User < NewDb
   has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
 
   # Notifications & Subscriptions
-  has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription
-  has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, through: :subscriprions
+  has_many :personal_subscriprions,   dependent: :destroy, class_name: Event::Subscription
+  has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription, as: :target
+  has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
 
   #
@@ -338,5 +339,9 @@ class User < NewDb
 
   def owned_teams
     UserTeam.where(owner_id: self.id)
+  end
+
+  def name_with_username
+    "#{name} (#{username})"
   end
 end

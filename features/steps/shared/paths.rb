@@ -125,6 +125,10 @@ module SharedPaths
     visit project_path(@project)
   end
 
+  Given "I visit my project's settings page" do
+    visit edit_project_path(@project)
+  end
+
   Given "I visit my project's files page" do
     visit project_tree_path(@project, root_ref)
   end
@@ -161,7 +165,7 @@ module SharedPaths
   end
 
   Given "I visit my project's wiki page" do
-    visit project_wiki_path(@project, :index)
+    visit project_wiki_path(@project, :home)
   end
 
   When 'I visit project hooks page' do
@@ -256,7 +260,7 @@ module SharedPaths
   end
 
   Given 'I visit project wiki page' do
-    visit project_wiki_path(@project, :index)
+    visit project_wiki_path(@project, :home)
   end
 
   def root_ref

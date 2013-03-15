@@ -102,8 +102,12 @@ gem "colored"
 # GitLab settings
 gem 'settingslogic'
 
-# State machine
-gem 'state_machine'
+# Wiki 
+# - Use latest master to resolve Gem dependency with Pygemnts
+# github-linquist needs pygments 0.4.2 but Gollum 2.4.11
+# requires pygments 0.3.2. The latest master Gollum has been updated
+# to use pygments 0.4.2. Change this after next Gollum release.
+gem "gollum", "~> 2.4.0", git: "git://github.com/gollum/gollum.git", ref: "5dcd3c8c8f"
 
 # Misc
 gem "foreman"
@@ -122,6 +126,7 @@ group :assets do
   gem "therubyracer"
 
   gem 'chosen-rails',     "0.9.8"
+  gem 'select2-rails'
   gem 'jquery-atwho-rails', "0.1.7"
   gem "jquery-rails",     "2.1.3"
   gem "jquery-ui-rails",  "2.0.2"
@@ -164,6 +169,7 @@ gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
 
 group :development, :test do
+  gem 'coveralls', require: false
   gem 'rails-dev-tweaks'
   gem 'spinach-rails'
   gem "rspec-rails", '2.12.2'

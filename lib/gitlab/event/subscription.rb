@@ -40,6 +40,19 @@ module Gitlab
           end
         end
 
+        def destroy_subscriprions_by_target(external_source)
+
+          typed_subscriptions = ::Event::Subscription.by_target(external_source)
+
+          typed_subscriptions.each do |subscription|
+            user = subscription.user
+            action = subscription.action
+            target = external_source
+            source = subscription.source_category.to_sym
+            unsubscribe(user, action, target, source)
+          end
+        end
+
         # target = event target
         # Expected Symbol || Class_name
         def subscribe_on_target_category(user, target, action = :all, source = :all)
@@ -132,7 +145,7 @@ module Gitlab
           if target.is_a? Symbol
             subscription = ::Event::Subscription.by_user(user).by_target_category(target).by_action(action)
           else
-            if target.persisted?
+            if target.persisted? || target.destroyed?
               subscription = ::Event::Subscription.by_user(user).by_target(target).by_source_type(source).by_action(action)
             else
               raise ArgumentError, "Incorrect target" if subscription_params[:target_type].blank? && subscription_params[:target_category].blank?
@@ -169,7 +182,7 @@ module Gitlab
               return false
             else
               # We have some typed subscription
-              actioned_subscriptions = sourced_subscriptions.by_action(subscription.action).any?
+              actioned_subscriptions = sourced_subscriptions.by_action(subscription.action)
               return true if actioned_subscriptions.any?
               return false
             end

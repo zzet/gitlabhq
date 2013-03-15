@@ -5,14 +5,14 @@ module Gitlab
       class << self
 
         def create_notifications(event)
-          if (event.target || event.action == "deleted") && ((::Event::Action.push_action? event.action) || event.source)
+          if (event.target || event.action.to_sym == :deleted) && ((::Event::Action.push_action? event.action) || event.source)
             subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
 
             subscriptions.each do |subscription|
               # Not send notification about changes to changes author
               # TODO. Rewrite in future with check by Entity type
               if ((subscription.user != event.author) || (event.author.notification_setting && event.author.notification_setting.own_changes))
-                subscription.notifications.create(event: event)
+                subscription.notifications.create(event: event, subscriber: subscription.user)
               end
             end
 
@@ -56,9 +56,7 @@ module Gitlab
             raise ArgumentError, "Can't send email to notification ##{notification["id"]}. Event is unavailable."
           end
         end
-
       end
-
     end
   end
 end

@@ -11,12 +11,13 @@
 #  creator_id             :integer
 #  default_branch         :string(255)
 #  issues_enabled         :boolean          default(TRUE), not null
-#  issues_tracker         :string           not null
 #  wall_enabled           :boolean          default(TRUE), not null
 #  merge_requests_enabled :boolean          default(TRUE), not null
 #  wiki_enabled           :boolean          default(TRUE), not null
 #  namespace_id           :integer
 #  public                 :boolean          default(FALSE), not null
+#  issues_tracker         :string(255)      default("gitlab"), not null
+#  issues_tracker_id      :string(255)
 #
 
 require "grit"
@@ -47,7 +48,7 @@ class Project < NewDb
   has_many :old_events,         dependent: :destroy, class_name: OldEvent
 
   has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, dependent: :destroy, class_name: Event::Subscription
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
