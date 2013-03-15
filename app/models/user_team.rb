@@ -2,12 +2,13 @@
 #
 # Table name: user_teams
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  path       :string(255)
-#  owner_id   :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id          :integer          not null, primary key
+#  name        :string(255)
+#  path        :string(255)
+#  owner_id    :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  description :string(255)      default(""), not null
 #
 
 class UserTeam < ActiveRecord::Base
@@ -79,6 +80,9 @@ class UserTeam < ActiveRecord::Base
   end
 
   def add_members(users, access, group_admin)
+    # reject existing users
+    users.reject! { |id| member_ids.include?(id.to_i) }
+
     users.each do |user|
       add_member(user, access, group_admin)
     end

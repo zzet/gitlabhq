@@ -64,15 +64,6 @@ class GroupsController < ApplicationController
     end
   end
 
-  def search
-    result = SearchContext.new(project_ids, params).execute
-
-    @projects       = result[:projects]
-    @merge_requests = result[:merge_requests]
-    @issues         = result[:issues]
-    @wiki_pages     = result[:wiki_pages]
-  end
-
   def people
     @project = group.projects.find(params[:project_id]) if params[:project_id]
     @users = @project ? @project.users : group.users
@@ -99,6 +90,7 @@ class GroupsController < ApplicationController
 
     if owner_id
       @group.owner = User.find(owner_id)
+      @group.save
     end
 
     if @group.update_attributes(group_params)
