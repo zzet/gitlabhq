@@ -26,10 +26,16 @@ namespace :undev do
 
     Gitlab::Event::Action.current_user = @admin
     SubscriptionService.subscribe(@admin, :all, @admin, :all)
-    SubscriptionService.subscribe(@admin, :all, :group, :all)
-    SubscriptionService.subscribe(@admin, :all, :project, :all)
-    SubscriptionService.subscribe(@admin, :all, :user_team, :all)
-    SubscriptionService.subscribe(@admin, :all, :user, :all)
+
+    SubscriptionService.subscribe_on_all(@admin, :group, :all, :all)
+    SubscriptionService.subscribe_on_all(@admin, :project, :all, :all)
+    SubscriptionService.subscribe_on_all(@admin, :user_team, :all, :all)
+    SubscriptionService.subscribe_on_all(@admin, :user, :all, :all)
+
+    SubscriptionService.subscribe(@admin, :all, :group, :new)
+    SubscriptionService.subscribe(@admin, :all, :project, :new)
+    SubscriptionService.subscribe(@admin, :all, :user_team, :new)
+    SubscriptionService.subscribe(@admin, :all, :user, :new)
 
     Rake::Task["undev:migrate:users"].invoke
     Rake::Task["undev:migrate:teams"].invoke
