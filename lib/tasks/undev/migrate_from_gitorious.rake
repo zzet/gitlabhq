@@ -472,7 +472,7 @@ namespace :undev do
           print "u".red if user.blank?
 
           if project && user
-            service = GitPusService.new
+            service = GitPushService.new
             service.project = project
             service.user = user
 
@@ -503,7 +503,7 @@ namespace :undev do
                 )
                 print "p".green
               rescue
-                pront "p".red
+                print "p".red
               end
 
             when Legacy::Action::PUSH_SUMMARY
@@ -523,7 +523,7 @@ namespace :undev do
 
                 print "P".green
               rescue
-                pront "P".red
+                print "P".red
               end
 
             end
