@@ -23,9 +23,7 @@ class Namespace < NewDb
   validates :owner, presence: true
   validates :name, presence: true, uniqueness: true
   validates :description, length: { within: 0..255 }
-  validates :path, uniqueness: true, presence: true, length: { within: 1..255 },
-            format: { with: Gitlab::Regex.path_regex,
-                      message: "only letters, digits & '_' '-' '.' allowed. Letter should be first" }
+  validates :path, uniqueness: true, presence: true, length: { within: 1..255 }
 
   delegate :name, to: :owner, allow_nil: true, prefix: true
 
