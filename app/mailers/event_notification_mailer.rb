@@ -524,51 +524,56 @@ class EventNotificationMailer < ActionMailer::Base
   #
 
   def deleted_group_group_email(notification)
+    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @group = @source = @event.data
-    @target = @event.data
+    @group = @source = data
+    @target = data
 
     mail(bcc: @notification.subscriber.email, subject: "Group '#{@group["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_group_project_email(notification)
+    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @project = @source = @event.data
+    @project = @source = data
     @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_project_project_email(notification)
+    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @project = @source = @event.data
-    @target = @event.data
+    @project = @source = data
+    @target = data
 
     mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_team_user_team_email(notification)
+    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @team = @source = @event.data
-    @target = @event.data
+    @team = @source = data
+    @target = data
 
     mail(bcc: @notification.subscriber.email, subject: "Team '#{@team['name']}' was deleted by #{@user.name} [deleted]")
   end
 
   def deleted_user_user_email(notification)
+    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @deleted_user = @source = @event.data
-    @target = @event.data
+    @deleted_user = @source = data
+    @target = data
 
     mail(bcc: @notification.subscriber.email, subject: "User '#{@source['name']}' was deleted by #{@user.name} [deleted]")
   end
