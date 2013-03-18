@@ -524,9 +524,11 @@ class EventNotificationMailer < ActionMailer::Base
   #
 
   def deleted_group_group_email(notification)
-    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
+
+    data = JSON.load(@event.data).to_hash
+
     @user = @event.author
     @group = @source = data
     @target = data
@@ -535,9 +537,11 @@ class EventNotificationMailer < ActionMailer::Base
   end
 
   def deleted_group_project_email(notification)
-    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
+
+    data = JSON.load(@event.data).to_hash
+
     @user = @event.author
     @project = @source = data
     @target = @event.target
@@ -546,9 +550,11 @@ class EventNotificationMailer < ActionMailer::Base
   end
 
   def deleted_project_project_email(notification)
-    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
+
+    data = JSON.load(@event.data).to_hash
+
     @user = @event.author
     @project = @source = data
     @target = data
@@ -557,9 +563,11 @@ class EventNotificationMailer < ActionMailer::Base
   end
 
   def deleted_user_team_user_team_email(notification)
-    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
+
+    data = JSON.load(@event.data).to_hash
+
     @user = @event.author
     @team = @source = data
     @target = data
@@ -568,9 +576,11 @@ class EventNotificationMailer < ActionMailer::Base
   end
 
   def deleted_user_user_email(notification)
-    data = JSON.load(@event.data).to_hash
     @notification = notification
     @event = @notification.event
+
+    data = JSON.load(@event.data).to_hash
+
     @user = @event.author
     @deleted_user = @source = data
     @target = data
