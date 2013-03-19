@@ -2,8 +2,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::Group.available_actions
-      known_sources = [::Group, ::Project]
-      known_source = known_sources.include? data.class
+      known_source = known_source? data, ::Group.watched_sources
       known_source && known_action
     end
 
@@ -13,8 +12,8 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
       actions = []
       temp_data = data.attributes
 
-      case source
-      when ::Group
+      case source.watchable_name
+      when :group
 
         case meta[:action]
         when :created
@@ -33,7 +32,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
           actions << :deleted
         end
 
-      when ::Project
+      when :project
         # TODO. refactoring
         target = source.group if source.group.present?
 

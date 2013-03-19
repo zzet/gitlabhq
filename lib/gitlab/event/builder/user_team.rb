@@ -2,8 +2,7 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::UserTeam.available_actions
-      known_sources = [::UserTeam, ::UserTeamProjectRelationship, ::UserTeamUserRelationship]
-      known_source = known_sources.include? data.class
+      known_source = known_source? data, ::UserTeam.watched_sources
       known_source && known_action
     end
 
@@ -12,8 +11,8 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
       temp_data = data.attributes
       actions = []
 
-      case source
-      when ::UserTeam
+      case source.watchable_name
+      when :user_team
         target = source
 
         case meta[:action]
@@ -26,7 +25,7 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
           actions << :deleted
         end
 
-      when ::UserTeamUserRelationship
+      when :user_team_user_relationship
         target = source.user_team
 
         case meta[:action]
@@ -39,7 +38,7 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
           actions << :left
         end
 
-      when ::UserTeamProjectRelationship
+      when :user_team_project_relationship
         target = source.user_team
 
         case meta[:action]

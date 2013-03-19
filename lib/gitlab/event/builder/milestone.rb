@@ -3,7 +3,7 @@ class Gitlab::Event::Builder::Milestone < Gitlab::Event::Builder::Base
     def can_build?(action, data)
       known_action = known_action? action, ::Milestone.available_actions
       # TODO Issue can refference to milestone?
-      known_source = data.is_a? ::Milestone
+      known_source = known_source? data, ::Milestone.watched_sources
       known_source && known_action
     end
 

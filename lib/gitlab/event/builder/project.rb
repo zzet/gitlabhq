@@ -2,11 +2,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::Project.available_actions
-      known_sources = [::Project,
-                       ::Issue, ::Milestone, ::Note, ::MergeRequest, ::Snippet,
-                       ::ProjectHook, ::ProtectedBranch, ::Service,
-                       ::UserTeamProjectRelationship, ::UsersProject]
-      known_source = known_sources.include? data.class
+      known_source = known_source? data, ::Project.watched_sources
       known_source && known_action
     end
 
@@ -17,8 +13,8 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
 
       actions = []
 
-      case source
-      when ::Project
+      case source.watchable_name
+      when :project
         case meta[:action]
         when :created
           actions << :created
@@ -33,7 +29,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :deleted
           actions << :deleted
         end
-      when ::Issue
+      when :issue
         target = source.project
 
         case meta[:action]
@@ -49,7 +45,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::Milestone
+      when :milestone
         target = source.project
 
         case meta[:action]
@@ -59,7 +55,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::Note
+      when :note
         target = source.project
 
         case meta[:action]
@@ -68,7 +64,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << :commented if source.noteable.blank?
         end
 
-      when ::MergeRequest
+      when :merge_request
         target = source.project
 
         case meta[:action]
@@ -85,7 +81,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::Snippet
+      when :snippet
         target = source.project
 
         case meta[:action]
@@ -97,7 +93,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::ProjectHook
+      when :project_hook
         target = source.project
 
         case meta[:action]
@@ -109,7 +105,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::ProtectedBranch
+      when :protected_branch
         target = source.project
 
         case meta[:action]
@@ -120,7 +116,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << :deleted
         end
 
-      when ::Service
+      when :service
         target = source.project
 
         case meta[:action]
@@ -132,7 +128,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::UserTeamProjectRelationship
+      when :user_team_project_relationship
         target = source.project
 
         case meta[:action]
@@ -144,7 +140,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::UsersProject
+      when :users_project
         target = source.project
 
         case meta[:action]

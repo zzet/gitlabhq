@@ -2,7 +2,7 @@ class Gitlab::Event::Builder::Note < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::Note.available_actions
-      known_source = data.is_a? ::Note
+      known_source = known_source? data, ::Note.watched_sources
       known_source && known_action
     end
 

@@ -21,6 +21,12 @@ class Gitlab::Event::Builder::Base
       available_actions.include? meta[:action]
     end
 
+    def known_source?(source, known_sources)
+      source_sym = source.watchable_name
+
+      known_sources.include? source_sym
+    end
+
     private
 
     def parse_action(action)

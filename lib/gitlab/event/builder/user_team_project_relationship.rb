@@ -2,7 +2,7 @@ class Gitlab::Event::Builder::UserTeamProjectRelationship < Gitlab::Event::Build
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::UserTeamProjectRelationship.available_actions
-      known_source = data.is_a? ::UserTeamProjectRelationship
+      known_source = known_source? data, ::UserTeamProjectRelationship.watched_sources
       known_source && known_action
     end
 

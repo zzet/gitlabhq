@@ -2,7 +2,7 @@ class Gitlab::Event::Builder::ProjectHook < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::ProjectHook.available_actions
-      known_source = data.is_a? ::ProjectHook
+      known_source = known_source? data, ::ProjectHook.watched_sources
       known_source && known_action
     end
 

@@ -2,7 +2,7 @@ class Gitlab::Event::Builder::ProtectedBranch < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::ProtectedBranch.available_actions
-      known_source = data.is_a? ::ProtectedBranch
+      known_source = known_source? data, ::ProtectedBranch.watched_sources
       known_source && known_action
     end
 

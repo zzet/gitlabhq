@@ -4,8 +4,7 @@ class Gitlab::Event::Builder::Issue < Gitlab::Event::Builder::Base
       known_action = known_action? action, ::Issue.available_actions
       # TODO Issue can be assigned to Milestone
       # TODO Issue can be refference to Issue
-      known_sources = [::Issue, ::Note]
-      known_source = known_sources.include? data.class
+      known_source = known_source? data, ::Issue.watched_sources
       known_source && known_action
     end
 
@@ -14,8 +13,8 @@ class Gitlab::Event::Builder::Issue < Gitlab::Event::Builder::Base
       actions = []
       target = source
 
-      case source
-      when ::Issue
+      case source.watchable_name
+      when :issue
 
         case meta[:action]
         when :created
@@ -33,7 +32,7 @@ class Gitlab::Event::Builder::Issue < Gitlab::Event::Builder::Base
           actions << :deleted
         end
 
-      when ::Note
+      when :note
 
         target = source.noteable
 

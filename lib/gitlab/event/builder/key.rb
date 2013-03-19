@@ -2,7 +2,7 @@ class Gitlab::Event::Builder::Key < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::Key.available_actions
-      known_source = data.is_a? ::Key
+      known_source = known_source? data, ::Key.watched_sources
       known_source && known_action
     end
 

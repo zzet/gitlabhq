@@ -4,8 +4,7 @@ class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
     def can_build?(action, data)
       known_action = known_action? action, ::MergeRequest.available_actions
       # TODO Issue can be refference to MergeRequest
-      known_sources = [::MergeRequest, ::Note]
-      known_source = known_sources.include? data.class
+      known_source = known_source? data, ::MergeRequest.watched_sources
       known_source && known_action
     end
 
@@ -14,8 +13,8 @@ class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
 
       actions = []
 
-      case source
-      when ::MergeRequest
+      case source.watchable_name
+      when :merge_request
         target = source
 
         case meta[:action]
@@ -33,7 +32,7 @@ class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
         when :deleted
           actions << :deleted
         end
-      when ::Note
+      when :note
         target = source.noteable
 
         if target.is_a? ::MergeRequest
