@@ -56,6 +56,7 @@ class Note < ActiveRecord::Base
   scope :inc_author, ->{ includes(:author) }
 
   actions_to_watch [:created, :deleted, :updated]
+  actions_sources [watchable_name]
 
   def self.create_status_change_note(noteable, author, status)
     create({

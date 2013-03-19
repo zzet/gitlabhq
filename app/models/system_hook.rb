@@ -15,4 +15,5 @@ class SystemHook < WebHook
   include Watchable
 
   actions_to_watch [:created, :updated, :deleted]
+  actions_sources [watchable_name]
 end

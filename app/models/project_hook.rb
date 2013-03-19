@@ -17,4 +17,5 @@ class ProjectHook < WebHook
   belongs_to :project
 
   actions_to_watch [:created, :updated, :deleted]
+  actions_sources [watchable_name]
 end

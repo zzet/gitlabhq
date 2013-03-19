@@ -30,6 +30,7 @@ class UserTeamUserRelationship < ActiveRecord::Base
   scope :with_user, ->(user) { where(user_id: user.id) }
 
   actions_to_watch [:created, :updated, :deleted]
+  actions_sources [watchable_name]
 
   def user_name
     user.name

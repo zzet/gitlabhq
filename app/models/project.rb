@@ -106,6 +106,8 @@ class Project < ActiveRecord::Base
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
   actions_to_watch [:created, :updated, :deleted, :transfer]
+  actions_sources [watchable_name, :issue, :milestone, :note, :merge_request,
+                   :snippet, :project_hook, :protected_branch, :service, :user_team_project_relationship, :users_project]
 
   class << self
     def abandoned

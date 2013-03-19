@@ -35,6 +35,7 @@ class Wiki < ActiveRecord::Base
   scope :ordered, order("created_at DESC")
 
   actions_to_watch [:created, :updated, :deleted]
+  actions_sources [watchable_name]
 
   def to_param
     slug

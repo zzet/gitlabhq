@@ -143,6 +143,7 @@ class User < ActiveRecord::Base
   scope :potential_team_members, ->(team) { team.members.any? ? active.not_in_team(team) : active  }
 
   actions_to_watch [:created, :deleted, :updated, :joined, :left, :transfer, :added]
+  actions_sources [watchable_name, :user_team_user_relationships, :users_project, :key]
 
   #
   # Class methods

@@ -21,6 +21,7 @@ class Group < Namespace
   has_many :subscribers,    through: :subscriptions
 
   actions_to_watch [:created, :deleted, :updated, :transfer]
+  actions_sources [watchable_name, :project]
 
   def add_users_to_project_teams(user_ids, project_access)
     UsersProject.add_users_into_projects(

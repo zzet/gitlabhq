@@ -42,6 +42,7 @@ class Snippet < ActiveRecord::Base
   scope :expired, -> { where(["expires_at IS NOT NULL AND expires_at < ?", Time.current]) }
 
   actions_to_watch [:created, :updated, :deleted]
+  actions_sources [watchable_name]
 
   def self.content_types
     [

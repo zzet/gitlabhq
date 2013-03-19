@@ -25,6 +25,7 @@ class Issue < ActiveRecord::Base
                   :state_event
 
   actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented]
+  actions_sources [watchable_name, :note]
 
   acts_as_taggable_on :labels
 

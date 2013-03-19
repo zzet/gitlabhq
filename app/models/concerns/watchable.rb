@@ -11,6 +11,21 @@ module Watchable
     def available_actions
       @actions
     end
+
+    def actions_sources(entities)
+      return if entities.empty?
+
+      @entities ||= entities.select { |entity| defined?(entity.to_s.camelize.constantize) }
+    end
+
+    def watched_sources
+      @entities
+    end
+
+    def watchable_name
+      self.class.name.underscore.to_sym
+    end
+
   end
 
   def watched_by?(user)

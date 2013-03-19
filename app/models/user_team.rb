@@ -46,6 +46,7 @@ class UserTeam < ActiveRecord::Base
   scope :created_by, ->(user){ where(owner_id: user) }
 
   actions_to_watch [:created, :updated, :assigned, :reassigned, :deleted, :transfer]
+  actions_sources [watchable_name, :user_team_project_relationship, :user_team_user_relationship]
 
   class << self
     def search query

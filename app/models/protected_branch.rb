@@ -25,6 +25,7 @@ class ProtectedBranch < ActiveRecord::Base
   has_many :subscribers,    through: :subscriptions
 
   actions_to_watch [:created, :updated, :deleted]
+  actions_sources [watchable_name]
 
   def commit
     project.repository.commit(self.name)

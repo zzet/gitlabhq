@@ -29,6 +29,7 @@ class Service < ActiveRecord::Base
   validates :project_id, presence: true
 
   actions_to_watch [:created, :updated, :deleted]
+  actions_sources [watchable_name]
 
   def activated?
     active

@@ -30,6 +30,7 @@ class UserTeamProjectRelationship < ActiveRecord::Base
   scope :with_project, ->(project){ where(project_id: project.id) }
 
   actions_to_watch [:created, :deleted, :updated]
+  actions_sources [watchable_name]
 
   def team_name
     user_team.name

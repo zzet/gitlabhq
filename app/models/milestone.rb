@@ -49,6 +49,7 @@ class Milestone < ActiveRecord::Base
   end
 
   actions_to_watch [:created, :closed, :reopend, :deleted, :updated]
+  actions_sources [watchable_name]
 
   def expired?
     if due_date
