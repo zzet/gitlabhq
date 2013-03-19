@@ -48,7 +48,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @issue, user: @user, data: @issue}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@issue)
 
@@ -74,7 +74,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @issue, user: @user, data: @issue}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@issue)
       @current_events.count.should be > 0
@@ -98,7 +98,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @note, user: @user, data: @note}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@note)
 
@@ -143,7 +143,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user, user: @user, data: @user}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user)
 
@@ -164,7 +164,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user, user: @user, data: @user}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user)
 
@@ -185,7 +185,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @users_project, user: @user, data: @users_project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@users_project)
 
@@ -212,7 +212,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @users_project, user: @user, data: @users_project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@users_project)
 
@@ -238,7 +238,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @users_project, user: @user, data: @users_project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@users_project)
 
@@ -263,7 +263,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_user_relationship)
 
@@ -291,7 +291,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_user_relationship)
 
@@ -318,7 +318,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_user_relationship)
 
@@ -341,7 +341,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @key, user: @user, data: @key}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@key)
 
@@ -366,7 +366,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @key, user: @user, data: @key}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@key)
 
@@ -390,7 +390,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @key, user: @user, data: @key}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@key)
 
@@ -413,7 +413,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user, user: @user, data: @user}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user)
 
@@ -446,7 +446,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @group, user: @user, data: @group}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@group)
 
@@ -467,7 +467,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @group, user: @user, data: @group}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@group)
 
@@ -487,7 +487,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @project, user: @user, data: @project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@project)
 
@@ -512,7 +512,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @project, user: @user, data: @project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@project)
 
@@ -536,7 +536,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @project, user: @user, data: @project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@project)
 
@@ -559,7 +559,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @group, user: @user, data: @group}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@group)
 
@@ -594,7 +594,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @merge_request, user: @user, data: @merge_request}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@merge_request)
 
@@ -620,7 +620,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @merge_request, user: @user, data: @merge_request}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@merge_request)
       @current_events.count.should be > 0
@@ -644,7 +644,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @note, user: @user, data: @note}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@note)
 
@@ -688,7 +688,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team, user: @user, data: @user_team}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team)
 
@@ -711,7 +711,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team, user: @user, data: @user_team}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team)
       @current_events.count.should be > 0
@@ -733,7 +733,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_user_relationship)
 
@@ -761,7 +761,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_user_relationship)
 
@@ -788,7 +788,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_user_relationship, user: @user, data: @user_team_user_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_user_relationship)
 
@@ -813,7 +813,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_project_relationship)
 
@@ -841,7 +841,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_project_relationship)
 
@@ -868,7 +868,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_project_relationship)
 
@@ -892,7 +892,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team, user: @user, data: @user_team}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team)
       @current_events.count.should be > 0
@@ -928,7 +928,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @project, user: @user, data: @project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@project)
 
@@ -949,7 +949,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @project, user: @user, data: @project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@project)
       @current_events.count.should be > 0
@@ -971,7 +971,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_project_relationship)
 
@@ -999,7 +999,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_project_relationship)
 
@@ -1026,7 +1026,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @user_team_project_relationship, user: @user, data: @user_team_project_relationship}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@user_team_project_relationship)
 
@@ -1050,7 +1050,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @users_project, user: @user, data: @users_project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@users_project)
 
@@ -1077,7 +1077,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @users_project, user: @user, data: @users_project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@users_project)
 
@@ -1103,7 +1103,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @users_project, user: @user, data: @users_project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@users_project)
 
@@ -1127,7 +1127,7 @@ describe Gitlab::Event::Factory do
       @data = {source: @project, user: @user, data: @project}
 
       @events = Gitlab::Event::Factory.build(@action, @data)
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @current_events = Event.with_source(@project)
       @current_events.count.should be > 0
@@ -1164,7 +1164,7 @@ describe Gitlab::Event::Factory do
         @data = { source: "Push_summary", user: @user, data: { project_id: @project.id, push_data: @push_data } }
 
         @events = Gitlab::Event::Factory.build(@action, @data)
-        Gitlab::Event::Factory.create_events(@action, @data)
+        Gitlab::Event.create_events(@action, @data)
 
         @current_events = Event.with_target(@project).with_push
       end

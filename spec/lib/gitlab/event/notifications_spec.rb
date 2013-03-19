@@ -20,7 +20,7 @@ describe "Gitlab::Event::Notifications" do
       @action = 'gitlab.updated.user'
       @data = {source: @user, user: @user, data: @user}
 
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @events = Event.with_source(@user)
 
@@ -47,7 +47,7 @@ describe "Gitlab::Event::Notifications" do
       @action = 'gitlab.updated.user'
       @data = {source: @user, user: @user, data: @user}
 
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @events = Event.with_source(@user)
 
@@ -65,7 +65,7 @@ describe "Gitlab::Event::Notifications" do
       @action = 'gitlab.created.key'
       @data = {source: @key, user: @user, data: @key}
 
-      Gitlab::Event::Factory.create_events(@action, @data)
+      Gitlab::Event.create_events(@action, @data)
 
       @key_events = Event.with_source(@key)
 
