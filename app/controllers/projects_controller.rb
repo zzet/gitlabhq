@@ -14,6 +14,7 @@ class ProjectsController < ProjectResourceController
   end
 
   def edit
+    check_git_protocol
   end
 
   def create
@@ -52,6 +53,7 @@ class ProjectsController < ProjectResourceController
   end
 
   def show
+    check_git_protocol
     limit = (params[:limit] || 20).to_i
     @events = @project.old_events.recent.limit(limit).offset(params[:offset] || 0)
 
@@ -68,22 +70,6 @@ class ProjectsController < ProjectResourceController
     end
   end
 
-  #
-  # Wall
-  #
-
-  def wall
-    return render_404 unless @project.wall_enabled
-
-    @target_type = :wall
-    @target_id = nil
-    @note = @project.notes.new
-
-    respond_to do |format|
-      format.html
-    end
-  end
-
   def destroy
     return access_denied! unless can?(current_user, :remove_project, project)
 
@@ -93,5 +79,11 @@ class ProjectsController < ProjectResourceController
     respond_to do |format|
       format.html { redirect_to root_path }
     end
+  end
+
+  protected
+
+  def check_git_protocol
+    @git_protocol_enabled ||= Gitlab.config.gitlab.git_daemon_enabled
   end
 end

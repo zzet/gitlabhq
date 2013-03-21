@@ -10,6 +10,7 @@ module Gitlab
       #  GET /users
       get do
         @users = User.scoped
+        @users = @users.active if params[:active].present?
         @users = @users.search(params[:search]) if params[:search].present?
         present @users, with: Entities::User
       end
@@ -124,7 +125,7 @@ module Gitlab
       # Example Request:
       #   GET /user
       get do
-        present @current_user, with: Entities::User
+        present @current_user, with: Entities::UserLogin
       end
 
       # Get currently authenticated user's keys
