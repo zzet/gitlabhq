@@ -74,11 +74,11 @@ module Gitlab
     end
 
     def enable_git_protocol(path)
-      system("#{gitlab_shell_user_home}/gitlab-shell/bin/gitlab-projects enable_git_protocol #{path}.git")
+      system("#{gitlab_shell_user_home}/gitlab-shell/bin/gitlab-projects enable-git-protocol #{path}.git")
     end
 
     def disable_git_protocol(path)
-      system("#{gitlab_shell_user_home}/gitlab-shell/bin/gitlab-projects disable_git_protocol #{path}.git")
+      system("#{gitlab_shell_user_home}/gitlab-shell/bin/gitlab-projects disable-git-protocol #{path}.git")
     end
   end
 end
