@@ -5,10 +5,6 @@ describe Gitlab::Event::Factory do
     Gitlab::Event::Factory.should respond_to :build
   end
 
-  it "should create events from action" do
-    Gitlab::Event::Factory.should respond_to :create_events
-  end
-
   #
   # Issue events
   #

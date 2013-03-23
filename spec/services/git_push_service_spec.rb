@@ -59,15 +59,15 @@ describe GitPushService do
     end
   end
 
-  describe "Push Event" do
+  describe "Push OldEvent" do
     before do
       service.execute(project, user, @oldrev, @newrev, @ref)
-      @event = Event.last
+      @event = OldEvent.last
     end
 
     it { @event.should_not be_nil }
     it { @event.project.should == project }
-    it { @event.action.should == Event::PUSHED }
+    it { @event.action.should == OldEvent::PUSHED }
     it { @event.data.should == service.push_data }
   end
 
