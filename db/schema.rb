@@ -200,6 +200,7 @@ ActiveRecord::Schema.define(:version => 20130325173941) do
     t.string   "issues_tracker",         :default => "gitlab", :null => false
     t.string   "issues_tracker_id"
     t.boolean  "snippets_enabled",       :default => true,     :null => false
+    t.boolean  "git_protocol_enabled"
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
