@@ -64,10 +64,10 @@ class User < ActiveRecord::Base
   has_one :namespace,                 dependent: :destroy, foreign_key: :owner_id,    class_name: Namespace, conditions: 'type IS NULL'
 
   # Profile
-  has_many :keys, dependent: :destroy
+  has_many :keys,                     dependent: :destroy
 
   # Groups
-  has_many :groups,         class_name: Group, foreign_key: :owner_id
+  has_many :groups,                   class_name: Group, foreign_key: :owner_id
 
   # Projects
   has_many :users_projects,           dependent: :destroy
