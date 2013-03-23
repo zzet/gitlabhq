@@ -29,7 +29,7 @@ class Gitlab::Event::Builder::Milestone < Gitlab::Event::Builder::Base
       events = []
       actions.each do |act|
         events << ::Event.new(action: act,
-                              source: source, data: temp_data.to_json, author: user, target: target)
+                              source: source, data: temp_data, author: user, target: target)
       end
       events
     end

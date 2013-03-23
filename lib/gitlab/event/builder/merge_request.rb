@@ -50,7 +50,7 @@ class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
 
       actions.each do |act|
         events << ::Event.new(action: act,
-                              source: source, data: data.to_json, author: user, target: target)
+                              source: source, data: data.attributes, author: user, target: target)
       end
 
       events

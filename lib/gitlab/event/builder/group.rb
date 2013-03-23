@@ -56,7 +56,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
         events << ::Event.new(action: act,
                               source_id: source.id, source_type: source.class.name,
                               target_id: target.id, target_type: target.class.name,
-                              data: temp_data.to_json, author: user)
+                              data: temp_data, author: user)
       end
 
       events

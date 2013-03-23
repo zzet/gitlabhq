@@ -21,7 +21,7 @@ class Gitlab::Event::Builder::UserTeamProjectRelationship < Gitlab::Event::Build
         actions << :deleted
       end
 
-      ::Event.new(action: meta[:action], source: source, data: temp_data.to_json, author: user, target: target)
+      ::Event.new(action: meta[:action], source: source, data: temp_data, author: user, target: target)
     end
   end
 end

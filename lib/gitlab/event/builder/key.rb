@@ -11,7 +11,7 @@ class Gitlab::Event::Builder::Key < Gitlab::Event::Builder::Base
       meta[:action]
       target = source
 
-      ::Event.new(action: meta[:action], source: source, data: data.to_json, author: user, target: target)
+      ::Event.new(action: meta[:action], source: source, data: data.attributes, author: user, target: target)
     end
   end
 end

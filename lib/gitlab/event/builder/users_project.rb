@@ -22,7 +22,7 @@ class Gitlab::Event::Builder::UsersProject < Gitlab::Event::Builder::Base
       end
 
       ::Event.new(action: meta[:action],
-                  source: source, data: temp_data.to_json, author: user, target: target)
+                  source: source, data: temp_data, author: user, target: target)
     end
   end
 end

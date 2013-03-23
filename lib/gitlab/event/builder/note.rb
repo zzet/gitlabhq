@@ -13,7 +13,7 @@ class Gitlab::Event::Builder::Note < Gitlab::Event::Builder::Base
       target = source.noteable if source.noteable.is_a? ::Note
 
       ::Event.new(action: meta[:action],
-                  source: source, data: data.to_json, author: user, target: target)
+                  source: source, data: data.attributes, author: user, target: target)
     end
   end
 end

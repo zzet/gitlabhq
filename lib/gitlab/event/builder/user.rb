@@ -71,7 +71,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
 
       actions.each do |act|
         events << ::Event.new(action: act,
-                              source: source, data: temp_data.to_json, author: user, target: target)
+                              source: source, data: temp_data, author: user, target: target)
       end
 
       events

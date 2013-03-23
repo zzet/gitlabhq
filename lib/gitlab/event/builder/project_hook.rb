@@ -12,7 +12,7 @@ class Gitlab::Event::Builder::ProjectHook < Gitlab::Event::Builder::Base
       target = source
 
       ::Event.new(action: meta[:action],
-                  source: source, data: data.to_json, author: user, target: target)
+                  source: source, data: data.attributes, author: user, target: target)
     end
   end
 end

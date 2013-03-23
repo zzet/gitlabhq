@@ -29,7 +29,7 @@ class Event < ActiveRecord::Base
   end
 
   # For Hash only
-  #serialize :data
+  store :data
 
   # Scopes
   scope :with_source, ->(source) { where(source_id: source, source_type: source.class.name) }

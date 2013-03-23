@@ -27,7 +27,7 @@ class Gitlab::Event::Builder::Push < Gitlab::Event::Builder::Base
       events = []
 
       actions.each do |act|
-        events << ::Event.new(action: act, source_type: source, data: push_data.to_json, author: user, target: target)
+        events << ::Event.new(action: act, source_type: source, data: push_data, author: user, target: target)
       end
 
       events
