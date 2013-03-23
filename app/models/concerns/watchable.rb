@@ -23,9 +23,12 @@ module Watchable
     end
 
     def watchable_name
-      self.class.name.underscore.to_sym
+      self.name.underscore.to_sym
     end
+  end
 
+  def watchable_name
+    self.class.name.underscore.to_sym
   end
 
   def watched_by?(user)

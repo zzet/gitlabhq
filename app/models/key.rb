@@ -35,6 +35,7 @@ class Key < ActiveRecord::Base
   delegate :name, :email, to: :user, prefix: true
 
   actions_to_watch [:created, :updated, :deleted]
+  actions_sources [watchable_name]
 
   def strip_white_space
     self.key = self.key.strip unless self.key.blank?

@@ -22,9 +22,11 @@ class Gitlab::Event::Builder::Base
     end
 
     def known_source?(source, known_sources)
-      source_sym = source.watchable_name
-
-      known_sources.include? source_sym
+      begin
+        source_sym = source.watchable_name
+        known_sources.include? source_sym
+      rescue
+      end
     end
 
     private
