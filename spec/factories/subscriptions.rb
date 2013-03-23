@@ -3,9 +3,10 @@
 FactoryGirl.define do
   factory :subscription, class: Event::Subscription do
     user
-    action "MyString"
+    action Event.action.values.first
     target
-    notification_interval 1
-    last_notified_at "2013-02-12 16:52:26"
+    source
+    notification_interval nil
+    last_notified_at nil
   end
 end
