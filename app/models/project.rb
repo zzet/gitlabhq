@@ -24,10 +24,9 @@ require "grit"
 
 class Project < ActiveRecord::Base
   include Watchable
-  include Gitolited
-  extend Enumerize
+  include Gitlab::ShellAdapter
 
-  class TransferError < StandardError; end
+  extend Enumerize
 
   attr_accessible :name, :path, :description, :default_branch, :issues_tracker,
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,

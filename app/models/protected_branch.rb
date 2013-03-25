@@ -11,7 +11,7 @@
 
 class ProtectedBranch < ActiveRecord::Base
   include Watchable
-  include Gitolited
+  include Gitlab::ShellAdapter
 
   attr_accessible :name
 

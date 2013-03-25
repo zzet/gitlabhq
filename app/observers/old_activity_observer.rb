@@ -4,9 +4,9 @@ class OldActivityObserver < ActiveRecord::Observer
   def after_create(record)
     event_author_id = record.author_id
 
-    if record.kind_of?(Note) && record.note.include?("_Status changed to ")
+    if record.kind_of?(Note)
       # Skip system status notes like 'status changed to close'
-      return true
+      return true if record.note.include?("_Status changed to ")
 
       # Skip wall notes to prevent spaming of dashboard
       return true if record.noteable_type.blank?
