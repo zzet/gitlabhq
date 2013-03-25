@@ -262,6 +262,7 @@ namespace :undev do
 
         project.created_at = repo.created_at
         project.updated_at = repo.updated_at
+        project.git_protocol_enabled = true
 
         creator = User.find_by_username(repo.user.login)
         creator = @admin if creator.blank?
