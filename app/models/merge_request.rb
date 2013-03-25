@@ -92,6 +92,7 @@ class MergeRequest < ActiveRecord::Base
 
   actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
   actions_sources [watchable_name, :note]
+  available_in_activity_feed true, actions: [:created, :closed, :reopened, :deleted, :assigned, :reassigned, :commented, :merged]
 
   def validate_branches
     if target_branch == source_branch

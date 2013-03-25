@@ -85,17 +85,17 @@ class User < ActiveRecord::Base
   has_many :user_team_project_relationships, through: :user_teams
   has_many :team_projects,                   through: :user_team_project_relationships
 
-  # Events
-  has_many :events,                   as: :source
-  has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
-  has_many :recent_events,                                 class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
-  has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
-
   # Notifications & Subscriptions
   has_many :personal_subscriprions,   dependent: :destroy, class_name: Event::Subscription
   has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription, as: :target
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
+
+  # Events
+  has_many :events,                   as: :source
+  has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
+  has_many :recent_events,                                 class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
+  has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
 
   #
   # Validations
@@ -144,6 +144,7 @@ class User < ActiveRecord::Base
 
   actions_to_watch [:created, :deleted, :updated, :joined, :left, :transfer, :added]
   actions_sources [watchable_name, :user_team_user_relationships, :users_project, :key]
+  available_in_activity_feed true, actions: [:joined, :left]
 
   #
   # Class methods

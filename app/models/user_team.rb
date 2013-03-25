@@ -47,6 +47,7 @@ class UserTeam < ActiveRecord::Base
 
   actions_to_watch [:created, :updated, :assigned, :reassigned, :deleted, :transfer]
   actions_sources [watchable_name, :user_team_project_relationship, :user_team_user_relationship]
+  available_in_activity_feed true, actions: [:created, :deleted, :assigned]
 
   class << self
     def search query

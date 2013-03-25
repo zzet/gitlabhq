@@ -30,6 +30,7 @@ class Service < ActiveRecord::Base
 
   actions_to_watch [:created, :updated, :deleted]
   actions_sources [watchable_name]
+  available_in_activity_feed false
 
   def activated?
     active

@@ -22,6 +22,7 @@ class Group < Namespace
 
   actions_to_watch [:created, :deleted, :updated, :transfer]
   actions_sources [watchable_name, :project]
+  available_in_activity_feed true, actions: [:created, :deleted, :transfer]
 
   def add_users_to_project_teams(user_ids, project_access)
     UsersProject.add_users_into_projects(

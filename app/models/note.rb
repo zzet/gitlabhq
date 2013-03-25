@@ -57,6 +57,7 @@ class Note < ActiveRecord::Base
 
   actions_to_watch [:created, :deleted, :updated]
   actions_sources [watchable_name]
+  available_in_activity_feed false
 
   def self.create_status_change_note(noteable, author, status)
     create({

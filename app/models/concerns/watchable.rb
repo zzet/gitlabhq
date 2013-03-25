@@ -25,6 +25,14 @@ module Watchable
     def watchable_name
       self.name.underscore.to_sym
     end
+
+    def available_in_activity_feed(availability, opts = {} )
+      if availability
+        ActivityFeed.register_sources(watchable_name)
+        actions = opts[:actions].blank? ? self.available_actions : opts[:actions].map {|a| a if self.available_actions.include? a}
+        ActivityFeed.register_actions(watchable_name, actions)
+      end
+    end
   end
 
   def watchable_name

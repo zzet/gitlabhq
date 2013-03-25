@@ -32,8 +32,39 @@ class Event < ActiveRecord::Base
   store :data
 
   # Scopes
-  scope :with_source, ->(source) { where(source_id: source, source_type: source.class.name) }
-  scope :recent, -> { order("created_at DESC") }
-  scope :with_target, ->(target) { where(target_id: target, target_type: target.class.name) }
-  scope :with_push, -> { where(source_type: "Push_summary") }
+  scope :with_source_or_target, ->(entity) do
+    where(arel_table[:source_type].eq(entity.class.name)
+           .and(arel_table[:source_id].eq(entity.id))
+           .or(arel_table[:target_type].eq(entity.class.name)
+               .and(arel_table[:target_id].eq(entity.id)))).uniq
+  end
+
+  scope :with_source_or_target_type, ->(entity_type) do
+    where(arel_table[:source_type].eq(entity_type.to_s.camelize)
+          .or(arel_table[:target_type].eq(entity_type.to_s.camelize))).uniq
+  end
+
+  scope :with_source,     ->(source) { where(source_id: source, source_type: source.class.name) }
+
+  scope :recent,          -> { order("created_at DESC") }
+  scope :with_target,     ->(target) { where(target_id: target, target_type: target.class.name) }
+  scope :with_push,       -> { where(source_type: "PushSummary") }
+
+  scope :watched_by_user, ->(user) { u.notifications.includes(:event) }
+
+  scope :group_events,         ->(entity) { with_source_or_target(entity) }
+  scope :team_events,          ->(entity) { with_source_or_target(entity) }
+  scope :project_events,       ->(entity) { with_source_or_target(entity) }
+  scope :issue_event,          ->(entity) { with_source_or_target(entity) }
+  scope :merge_request_events, ->(entity) { with_source_or_target(entity) }
+  scope :note_events,          ->(entity) { with_source_or_target(entity) }
+  scope :code_events,          ->(entity) { with_source_or_target(entity) }
+
+  scope :group_type_events,         -> { with_source_or_target_type(:group) }
+  scope :team_type_events,          -> { with_source_or_target_type(:user_team) }
+  scope :project_type_events,       -> { with_source_or_target_type(:project) }
+  scope :issue_type_event,          -> { with_source_or_target_type(:issue) }
+  scope :merge_request_type_events, -> { with_source_or_target_type(:merge_request) }
+  scope :note_type_events,          -> { with_source_or_target_type(:note) }
+  scope :code_type_events,          -> { with_source_or_target_type(:push_summary) }
 end

@@ -36,6 +36,7 @@ class Key < ActiveRecord::Base
 
   actions_to_watch [:created, :updated, :deleted]
   actions_sources [watchable_name]
+  available_in_activity_feed false
 
   def strip_white_space
     self.key = self.key.strip unless self.key.blank?

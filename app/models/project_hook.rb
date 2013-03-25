@@ -18,4 +18,5 @@ class ProjectHook < WebHook
 
   actions_to_watch [:created, :updated, :deleted]
   actions_sources [watchable_name]
+  available_in_activity_feed false
 end
