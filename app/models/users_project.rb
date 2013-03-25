@@ -12,7 +12,7 @@
 
 class UsersProject < NewDb
   include Watchable
-  include Gitolited
+  include Gitlab::ShellAdapter
 
   GUEST     = 10
   REPORTER  = 20

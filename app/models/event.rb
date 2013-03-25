@@ -1,19 +1,3 @@
-# == Schema Information
-#
-# Table name: events
-#
-#  id          :integer          not null, primary key
-#  target_type :string(255)
-#  target_id   :integer
-#  title       :string(255)
-#  data        :text
-#  project_id  :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  action      :integer
-#  author_id   :integer
-#
-
 class Event < NewDb
   include Actionable
 
@@ -21,7 +5,6 @@ class Event < NewDb
                   :source_id, :source_type, :source,
                   :target_id, :target_type, :target,
                   :author_id, :author
-
 
   belongs_to :author, class_name: User
   belongs_to :target, polymorphic: true

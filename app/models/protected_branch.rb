@@ -11,7 +11,7 @@
 
 class ProtectedBranch < NewDb
   include Watchable
-  include Gitolited
+  include Gitlab::ShellAdapter
 
   attr_accessible :name
 
