@@ -12,7 +12,7 @@ class Event < ActiveRecord::Base
   belongs_to :source, polymorphic: true
 
   has_many :notifications,  dependent: :destroy,     class_name: Event::Subscription::Notification
-  has_many :subscriptions,  dependent: :destroy, through: :notifications, class_name: Event::Subscription
+  has_many :subscriptions,  dependent: :destroy,     class_name: Event::Subscription, through: :notifications
   has_many :subscribers,    through: :subscriptions, class_name: User
 
   validates :author,  presence: true

@@ -1157,7 +1157,7 @@ describe Gitlab::Event::Factory do
         Event.with_target(@project).with_push.destroy_all
 
         @action = 'gitlab.pushed.push_summary'
-        @data = { source: "Push_summary", user: @user, data: { project_id: @project.id, push_data: @push_data } }
+        @data = { source: "PushSummary", user: @user, data: { project_id: @project.id, push_data: @push_data } }
 
         @events = Gitlab::Event::Factory.build(@action, @data)
         Gitlab::Event.create_events(@action, @data)

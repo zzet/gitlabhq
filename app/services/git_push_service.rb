@@ -19,7 +19,7 @@ class GitPushService
     # Collect data for this git push
     @push_data = post_receive_data(oldrev, newrev, ref)
 
-    Gitlab::Event::Action.trigger :pushed, "Push_summary", user, { project_id: project.id, push_data: @push_data, source: :repository }
+    Gitlab::Event::Action.trigger :pushed, "PushSummary", user, { project_id: project.id, push_data: @push_data, source: :repository }
 
     create_push_event
 
