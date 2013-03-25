@@ -3,6 +3,8 @@ require 'logger'
 namespace :undev do
 
   @import_log = Logger.new('import.log')
+  @repo_push_log = Logger.new('push.log')
+  @miss_repo = Logger.new('miss_repos.log')
   @logger = Logger.new('path_changes.txt')
 
   #  ActiveRecord::Base.observers.disable :all
@@ -228,6 +230,10 @@ namespace :undev do
       @import_log.info "Start migrate repositories from gitorius to gitlab".yellow
       @import_log.info "Repository count: #{repo_count}"
 
+      hs = {}
+      repos_links = File.readlines(Rails.root + "/urls.txt")
+      repos_links.each {|s| s.gsub!("\n", ""); a = s.split(";"); hs[a[0]]=a[1];}
+
       root = Gitlab.config.gitlab_shell.repos_path
 
       Gitlab::Event::Action.current_user = User.first
@@ -248,7 +254,11 @@ namespace :undev do
 
         project.name = repo.name
         project.description = repo.description
-        project.issues_tracker = "redmine"
+
+        if hs.has_kay? repo.hashed_path
+          project.issues_tracker = "redmine"
+          project.issues_tracker_id = hs[repo.hashed_path]
+        end
 
         project.created_at = repo.created_at
         project.updated_at = repo.updated_at
@@ -285,6 +295,10 @@ namespace :undev do
                 @shell.import_repository(project.path_with_namespace, repo.git_clone_url)
 
                 @logger.info "#{repo.url_path};#{repo.real_gitdir};#{project.path_with_namespace};#{project_path};#{project.name_with_namespace}"
+                @repo_push_log.info "cd /var/lib/git/repositories/#{repo.real_gitdir} && git remote add --mirror gitlab git@gitlab-staging-01.undev.cc:#{project.path_with_namespace}.git"
+                unless hs.has_kay? repo.hashed_path
+                  @miss_repos.info "#{repo.name} | /var/lib/git/repositories/#{repo.real_gitdir} | #{repo.browse_url} | #{project_path}"
+                end
 
                 @import_log.info "OK".green
               else
