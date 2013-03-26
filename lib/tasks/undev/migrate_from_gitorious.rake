@@ -231,7 +231,7 @@ namespace :undev do
       @import_log.info "Repository count: #{repo_count}"
 
       hs = {}
-      repos_links = File.readlines(Rails.root + "/urls.txt")
+      repos_links = File.readlines("/rest/u/apps/gitlab/current/urls.txt")
       repos_links.each {|s| s.gsub!("\n", ""); a = s.split(";"); hs[a[0]]=a[1];}
 
       root = Gitlab.config.gitlab_shell.repos_path
@@ -255,7 +255,7 @@ namespace :undev do
         project.name = repo.name
         project.description = repo.description
 
-        if hs.has_kay? repo.hashed_path
+        if hs.has_key? repo.hashed_path
           project.issues_tracker = "redmine"
           project.issues_tracker_id = hs[repo.hashed_path]
         end
@@ -297,7 +297,7 @@ namespace :undev do
 
                 @logger.info "#{repo.url_path};#{repo.real_gitdir};#{project.path_with_namespace};#{project_path};#{project.name_with_namespace}"
                 @repo_push_log.info "cd /var/lib/git/repositories/#{repo.real_gitdir} && git remote add --mirror gitlab git@gitlab-staging-01.undev.cc:#{project.path_with_namespace}.git"
-                unless hs.has_kay? repo.hashed_path
+                unless hs.has_key? repo.hashed_path
                   @miss_repos.info "#{repo.name} | /var/lib/git/repositories/#{repo.real_gitdir} | #{repo.browse_url} | #{project_path}"
                 end
 
