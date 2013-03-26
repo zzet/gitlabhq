@@ -4,6 +4,7 @@ set :branch, 'new_legacy_staging'
 set :user, 'gitlab'
 set :keep_releases, 5
 set :deploy_to, '/rest/u/apps/gitlab'
+set :rvm_ruby_string, 'ruby-1.9.3-p194@gitlab'
 
 set :db_adapter,     'postgres'
 set :bundle_without, %w[development test]
