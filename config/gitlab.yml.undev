@@ -15,7 +15,7 @@ production: &base
   ## GitLab settings
   gitlab:
     ## Web server settings
-    host: gitlab.platform.home
+    host: gitlab.undev.cc
     port: 80
     https: false
     # Uncomment and customize to run in non-root path
@@ -152,3 +152,8 @@ test:
 
 staging:
   <<: *base
+  gitlab:
+    ## Web server settings
+    host: gitlab-staging-01.undev.cc
+    port: 80
+    https: false
