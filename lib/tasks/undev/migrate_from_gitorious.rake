@@ -11,34 +11,8 @@ namespace :undev do
 
   desc "Migrate All data from gitorious to gitolite"
   task migrate: :environment do
-    Project.destroy_all
-    Group.destroy_all
-    UserTeam.destroy_all
-    User.destroy_all
-
-    @import_log.info "create default admin"
-    @admin = User.new
-    @admin.username = "admin"
-    @admin.name = "Admin"
-    @admin.password = "123456"
-    @admin.projects_limit = 1000
-    @admin.email = "admin@undev.cc"
-    @admin.admin = true
-    @admin.save
-
-    Gitlab::Event::Action.current_user = @admin
-    SubscriptionService.subscribe(@admin, :all, @admin, :all)
-
-    #SubscriptionService.subscribe_on_all(@admin, :group, :all, :all)
-    #SubscriptionService.subscribe_on_all(@admin, :project, :all, :all)
-    #SubscriptionService.subscribe_on_all(@admin, :user_team, :all, :all)
-    #SubscriptionService.subscribe_on_all(@admin, :user, :all, :all)
-
-    SubscriptionService.subscribe(@admin, :all, :group, :new)
-    SubscriptionService.subscribe(@admin, :all, :project, :new)
-    SubscriptionService.subscribe(@admin, :all, :user_team, :new)
-    SubscriptionService.subscribe(@admin, :all, :user, :new)
-
+    Rake::Task["undev:migrate:clean"].invoke
+    Rake::Task["undev:migrate:prepare"].invoke
     Rake::Task["undev:migrate:users"].invoke
     Rake::Task["undev:migrate:teams"].invoke
     Rake::Task["undev:migrate:projects"].invoke
@@ -48,6 +22,40 @@ namespace :undev do
   end
 
   namespace :migrate do
+
+    desc "Remove all date before migrate"
+    task clean: :environment do
+      Project.destroy_all
+      Group.destroy_all
+      UserTeam.destroy_all
+      User.destroy_all
+    end
+
+    desc "Remove all date before migrate"
+    task prepare: :environment do
+      @import_log.info "create default admin"
+      @admin = User.new
+      @admin.username = "admin"
+      @admin.name = "Admin"
+      @admin.password = "123456"
+      @admin.projects_limit = 1000
+      @admin.email = "admin@undev.cc"
+      @admin.admin = true
+      @admin.save
+
+      Gitlab::Event::Action.current_user = @admin
+      SubscriptionService.subscribe(@admin, :all, @admin, :all)
+
+      #SubscriptionService.subscribe_on_all(@admin, :group, :all, :all)
+      #SubscriptionService.subscribe_on_all(@admin, :project, :all, :all)
+      #SubscriptionService.subscribe_on_all(@admin, :user_team, :all, :all)
+      #SubscriptionService.subscribe_on_all(@admin, :user, :all, :all)
+
+      SubscriptionService.subscribe(@admin, :all, :group, :new)
+      SubscriptionService.subscribe(@admin, :all, :project, :new)
+      SubscriptionService.subscribe(@admin, :all, :user_team, :new)
+      SubscriptionService.subscribe(@admin, :all, :user, :new)
+    end
 
     desc "Migrate users from gitorious to gitlab"
     task users: :environment do
@@ -421,6 +429,7 @@ namespace :undev do
     task events: :environment do
       @import_log.info "Remove all old events".yellow
       Event.destroy_all
+      OldEvent.destroy_all
       @import_log.info "Events removed.".green
 
       Rake::Task["undev:migrate:events:committers"].invoke
@@ -478,7 +487,7 @@ namespace :undev do
 
         Gitlab::Event::Action.current_user = User.first
 
-        Legacy::Event.push_events.repository_events(nil).find_each do |event|
+        Legacy::Event.code_events.excluding_commits.repository_events(nil).find_each do |event|
 
           project = Project.find_with_namespace(Legacy::Repository.find(event.target_id).url_path)
           project = Project.find_by_path(Legacy::Repository.find(event.target_id).name) if project.blank?
@@ -493,21 +502,71 @@ namespace :undev do
 
             case event.action
             when Legacy::Action::COMMIT
-              print "c".green
+              print "c".yellow
             when Legacy::Action::CREATE_BRANCH
+              Event.create(
+                author_id:   user.id,
+                action:      :created_branch,
+                source_type: "PushSummary",
+                target_id:   project.id,
+                target_type: project.class.name,
+                data:        {"ref" => "refs/heads/#{event.data}"}, # :(
+                created_at:  event.created_at,
+                  updated_at:  event.updated_at
+              )
               print "b".green
             when Legacy::Action::DELETE_BRANCH
+              Event.create(
+                author_id:   user.id,
+                action:      :deleted_branch,
+                source_type: "PushSummary",
+                target_id:   project.id,
+                target_type: project.class.name,
+                data:        {"ref" => "refs/heads/#{event.data}"}, # :(
+                created_at:  event.created_at,
+                  updated_at:  event.updated_at
+              )
               print "b".red
             when Legacy::Action::CREATE_TAG
+              Event.create(
+                author_id:   user.id,
+                action:      :created_tag,
+                source_type: "PushSummary",
+                target_id:   project.id,
+                target_type: project.class.name,
+                data:        {"ref" => "refs/heads/#{event.data}"}, # :(
+                created_at:  event.created_at,
+                  updated_at:  event.updated_at
+              )
               print "t".green
             when Legacy::Action::DELETE_TAG
+              Event.create(
+                author_id:   user.id,
+                action:      :deleted_tag,
+                source_type: "PushSummary",
+                target_id:   project.id,
+                target_type: project.class.name,
+                data:        {"ref" => "refs/heads/#{event.data}"}, # :(
+                created_at:  event.created_at,
+                  updated_at:  event.updated_at
+              )
               print "t".red
             when Legacy::Action::PUSH
 
               tmp = event.body.split " "
               begin
-              data = service.post_receive_data(tmp[3], tmp[5], event.data)
+                data = service.post_receive_data(tmp[3], tmp[5], event.data)
 
+                Event.create(
+                  author_id:   data[:user_id],
+                  action:      :pushed,
+                  source_type: "PushSummary",
+                  target_id:   project.id,
+                  target_type: project.class.name,
+                  data:        data, # :(
+                  created_at:  event.created_at,
+                  updated_at:  event.updated_at
+                )
                 OldEvent.create(
                   project: project,
                   action: OldEvent::PUSHED,
@@ -525,8 +584,18 @@ namespace :undev do
 
               oldrev, newrev, ref, commits = event.data.split "$"
               begin
-              data = service.post_receive_data(oldrev, newrev, ref)
+                data = service.post_receive_data(oldrev, newrev, ref)
 
+                Event.create(
+                  author_id:   data[:user_id],
+                  action:      :pushed,
+                  source_type: "PushSummary",
+                  target_id:   project.id,
+                  target_type: project.class.name,
+                  data:        data, # :(
+                  created_at:  event.created_at,
+                  updated_at:  event.updated_at
+                )
                 OldEvent.create(
                   project: project,
                   action: OldEvent::PUSHED,
@@ -593,9 +662,7 @@ namespace :undev do
               print "-".red
 
             end
-
           end
-
         end
 
         @import_log.info ""

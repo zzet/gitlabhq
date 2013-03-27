@@ -26,12 +26,12 @@ class Legacy::Action
   CLONE_REPOSITORY = 3
   DELETE_REPOSITORY = 4
   COMMIT = 5
-  CREATE_BRANCH = 6
-  DELETE_BRANCH = 7
-  CREATE_TAG = 8
-  DELETE_TAG = 9
-  ADD_COMMITTER = 10
-  REMOVE_COMMITTER = 11
+  CREATE_BRANCH = 6           # +
+  DELETE_BRANCH = 7           # +
+  CREATE_TAG = 8              # +
+  DELETE_TAG = 9              # +
+  ADD_COMMITTER = 10          # +
+  REMOVE_COMMITTER = 11       # +
   COMMENT = 12
   REQUEST_MERGE = 13
   RESOLVE_MERGE_REQUEST = 14
@@ -39,12 +39,12 @@ class Legacy::Action
   DELETE_MERGE_REQUEST = 16
   UPDATE_WIKI_PAGE = 17
   # TODO: The PUSH action is deprecated, and will be removed
-  PUSH = 18
+  PUSH = 18                   # +
   ADD_PROJECT_REPOSITORY = 19
   UPDATE_REPOSITORY = 20
   REOPEN_MERGE_REQUEST = 21
   ADD_FAVORITE = 22
-  PUSH_SUMMARY = 23
+  PUSH_SUMMARY = 23           # +
   # Use high numbers to avoid conflicts
   REPO_TRANSFER = 101 # transfer repo to some project
 
