@@ -305,9 +305,9 @@ namespace :undev do
 
                 @logger.info "#{repo.url_path};#{repo.real_gitdir};#{project.path_with_namespace};#{project_path};#{project.name_with_namespace}"
                 @repo_push_log.info "cd /var/lib/git/repositories/#{repo.real_gitdir} && git remote add --mirror gitlab git@gitlab-staging-01.undev.cc:#{project.path_with_namespace}.git"
-                unless hs.has_key? repo.hashed_path
-                  @miss_repos.info "#{repo.name} | /var/lib/git/repositories/#{repo.real_gitdir} | #{repo.browse_url} | #{project_path}"
-                end
+                #unless hs.has_key? repo.hashed_path
+                  #@miss_repo.info "#{repo.name} | /var/lib/git/repositories/#{repo.real_gitdir} | #{repo.browse_url} | #{project_path}"
+                #end
 
                 @import_log.info "OK".green
               else
