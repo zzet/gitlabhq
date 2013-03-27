@@ -4,7 +4,8 @@ class Event < NewDb
   attr_accessible :action, :data,
                   :source_id, :source_type, :source,
                   :target_id, :target_type, :target,
-                  :author_id, :author
+                  :author_id, :author,
+                  :created_at, :updated_at
 
   belongs_to :author, class_name: User
   belongs_to :target, polymorphic: true
