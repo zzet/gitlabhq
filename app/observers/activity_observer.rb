@@ -6,6 +6,7 @@ class ActivityObserver < ActiveRecord::Observer
           :group,           # +
           :note,            # +
           :project,         # +
+          :push,            # +
           :protected_branch,# +
           :service,         # +
           :snippet,         # +

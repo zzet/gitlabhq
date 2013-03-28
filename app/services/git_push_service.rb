@@ -20,8 +20,6 @@ class GitPushService
     push = Push.create(project: project, user: user, before: oldrev, after: newrev, ref: ref)
     @push_data = push.push_data
 
-    Gitlab::Event::Action.trigger :pushed, push, user, { project_id: project.id, push_data: @push_data, source: push }
-
     create_push_event(project, @push_data, user)
 
     project.ensure_satellite_exists
