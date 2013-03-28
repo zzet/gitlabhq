@@ -67,4 +67,6 @@ class Event < ActiveRecord::Base
   scope :merge_request_type_events, -> { with_source_or_target_type(:merge_request) }
   scope :note_type_events,          -> { with_source_or_target_type(:note) }
   scope :code_type_events,          -> { with_source_or_target_type(:push_summary) }
+
+  scope :sorted_by_activity,        -> { order("created_at DESC") }
 end
