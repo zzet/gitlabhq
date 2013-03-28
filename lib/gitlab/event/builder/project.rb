@@ -152,6 +152,19 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << :left
         end
 
+      when :push
+        target = source.project
+
+        case meta[:action]
+        when :created
+          actions << :created_branch  if source.created_branch?
+          actions << :deleted_branch  if source.deleted_branch?
+          actions << :created_tag     if source.created_tag?
+          actions << :deleted_tag     if source.deleted_tag?
+
+          actions << :pushed
+        end
+
       end
 
       events = []
