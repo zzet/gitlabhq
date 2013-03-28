@@ -38,11 +38,11 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :updated
           # Any changes?
         when :closed
-          actions << meta[:action]
+          actions << :closed
         when :reopened
-          actions << meta[:action]
+          actions << :reopened
         when :deleted
-          actions << meta[:action]
+          actions << :deleted
         end
 
       when :milestone
@@ -50,9 +50,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
 
         case meta[:action]
         when :created
-          actions << meta[:action]
+          actions << :created
         when :closed
-          actions << meta[:action]
+          actions << :closed
         end
 
       when :note
@@ -74,11 +74,11 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           # Any changes?
           # For example if code base is updated?
         when :closed
-          actions << meta[:action]
+          actions << :closed
         when :reopened
-          actions << meta[:action]
+          actions << :reopened
         when :merged
-          actions << meta[:action]
+          actions << :merged
         end
 
       when :snippet
@@ -86,11 +86,11 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
 
         case meta[:action]
         when :created
-          actions << meta[:action]
+          actions << :created
         when :updated
-          actions << meta[:action]
+          actions << :updated
         when :deleted
-          actions << meta[:action]
+          actions << :deleted
         end
 
       when :project_hook
@@ -100,9 +100,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :created
           actions << :added
         when :updated
-          actions << meta[:action]
+          actions << :updated
         when :deleted
-          actions << meta[:action]
+          actions << :deleted
         end
 
       when :protected_branch
@@ -123,9 +123,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :created
           actions << :added
         when :updated
-          actions << meta[:action]
+          actions << :updated
         when :deleted
-          actions << meta[:action]
+          actions << :deleted
         end
 
       when :user_team_project_relationship
@@ -135,9 +135,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :created
           actions << :assigned
         when :updated
-          actions << meta[:action]
+          actions << :updated
         when :deleted
-          actions << meta[:action]
+          actions << :deleted
         end
 
       when :users_project
@@ -147,7 +147,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :created
           actions << :joined
         when :updated
-          actions << meta[:action]
+          actions << :updated
         when :deleted
           actions << :left
         end
