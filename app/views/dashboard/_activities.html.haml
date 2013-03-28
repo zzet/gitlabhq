@@ -1,10 +1,15 @@
 = render "events/event_last_push", event: @last_push
 
 .event_filter
-  = event_filter_link EventFilter.push, 'Push events'
-  = event_filter_link EventFilter.merged, 'Merge events'
-  = event_filter_link EventFilter.comments, 'Comments'
-  = event_filter_link EventFilter.team, 'Team'
+  = event_filter_link EventFilter.group, 'Group'
+  = event_filter_link EventFilter.issue, 'Issues'
+  = event_filter_link EventFilter.merge_request, 'Merge Requests'
+  = event_filter_link EventFilter.milestone, 'Milestone'
+  = event_filter_link EventFilter.project, 'Project'
+  = event_filter_link EventFilter.protected_branch, 'Protected branches'
+  = event_filter_link EventFilter.snippet, 'Snippet'
+  = event_filter_link EventFilter.user, 'User'
+  = event_filter_link EventFilter.user_team, 'Team'
 
 - if @events.any?
   .content_list

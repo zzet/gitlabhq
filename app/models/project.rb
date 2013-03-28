@@ -110,7 +110,7 @@ class Project < ActiveRecord::Base
   actions_to_watch [:created, :added, :updated, :deleted, :transfer]
   actions_sources [watchable_name, :issue, :milestone, :note, :merge_request,
                    :snippet, :project_hook, :protected_branch, :service, :user_team_project_relationship, :users_project, :push]
-  available_in_activity_feed true, actions: [:created, :deleted]
+  available_in_activity_feed true, actions: [:created, :added, :deleted], check_permissions: true
 
   class << self
     def abandoned

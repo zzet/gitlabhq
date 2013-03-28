@@ -70,7 +70,6 @@ class Gitlab::Event::Subscription
 
     def can_subscribe?(user, action, target, source)
       subscriptions = []
-
       Gitlab::Event::Subscription::Base.descendants.each do |descendant|
         subscriptions << descendant.can_subscribe?(user, action, target, source)
       end

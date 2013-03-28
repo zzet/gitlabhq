@@ -1,0 +1,7 @@
+.event-title
+  %span.author_name= link_to_event_author event
+  %span.event_label{class: event.action}= event_action_name(event)
+  - if event.source
+    %strong= link_to truncate(event.source.name), team_path(event.source)
+  - else
+    %strong= gfm truncate(event.data["name"])

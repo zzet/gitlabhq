@@ -11,8 +11,10 @@ class DashboardController < ApplicationController
     @projects_count = @projects.count
     @projects = @projects.limit(20)
 
-    @events = OldEvent.in_projects(current_user.authorized_projects.pluck(:id))
-    @events = @event_filter.apply_filter(@events)
+    #@events = Event.watched_by_user(current_user)
+    #@events = OldEvent.in_projects(current_user.authorized_projects.pluck(:id))
+    @events = activity_feed.events(@event_filter.prepare_filter)
+    #@events = @event_filter.apply_filter(@events)
     @events = @events.limit(20).offset(params[:offset] || 0)
 
     @last_push = current_user.recent_push
@@ -67,5 +69,9 @@ class DashboardController < ApplicationController
   def event_filter
     filters = cookies['event_filter'].split(',') if cookies['event_filter']
     @event_filter ||= EventFilter.new(filters)
+  end
+
+  def activity_feed
+    @feed ||= ActivityFeed.new(current_user)
   end
 end

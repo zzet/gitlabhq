@@ -29,7 +29,8 @@ class GroupsController < ApplicationController
   end
 
   def show
-    @events = OldEvent.in_projects(project_ids).limit(20).offset(params[:offset] || 0)
+    #@events = OldEvent.in_projects(project_ids).limit(20).offset(params[:offset] || 0)
+    @events = activity_feed.events.group_events(group).sorted_by_activity.limit(20).offset(params[:offset] || 0)
     @last_push = current_user.recent_push
 
     respond_to do |format|
@@ -134,4 +135,9 @@ class GroupsController < ApplicationController
       return render_404
     end
   end
+
+  def activity_feed
+    @feed ||= ActivityFeed.new(current_user)
+  end
+
 end

@@ -2,33 +2,41 @@ class EventFilter
   attr_accessor :params
 
   class << self
+    ActivityFeed.sources.each do |source|
+      define_method(source) { source.to_s }
+    end
+
     def default_filter
-      %w{ push issues merge_requests team}
-    end
-
-    def push
-      'push'
-    end
-
-    def merged
-      'merged'
-    end
-
-    def comments
-      'comments'
-    end
-
-    def team
-      'team'
+      ActivityFeed.sources
     end
   end
 
   def initialize params
     @params = if params
-                params.dup
+                params.dup.map { |i| i.to_sym }
               else
-                []#EventFilter.default_filter
+                ActivityFeed.sources
               end
+  end
+
+  def active_options
+    @params
+  end
+
+  def default_options
+    self.class.default_filter
+  end
+
+  def prepare_filter
+    exclude_list = []
+    default_options.each do |source|
+      exclude_list << source unless active_options.include? source
+    end
+    exclude_list
+  end
+
+  def active? key
+    active_options.include? key
   end
 
   def apply_filter events
@@ -62,7 +70,4 @@ class EventFilter
     filter
   end
 
-  def active? key
-    params.include? key
-  end
 end

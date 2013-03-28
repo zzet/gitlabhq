@@ -4,8 +4,8 @@ FactoryGirl.define do
   factory :subscription, class: Event::Subscription do
     user
     action Event.action.values.first
-    target
-    source
+    target { project }
+    source { project }
     notification_interval nil
     last_notified_at nil
   end

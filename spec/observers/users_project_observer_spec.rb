@@ -7,18 +7,6 @@ describe UsersProjectObserver do
   before { subject.stub(notification: mock('NotificationService').as_null_object) }
 
   describe "#after_commit" do
-    it "should called when UsersProject created" do
-      subject.should_receive(:after_commit)
-      create(:users_project)
-    end
-
-    it "should send email to user" do
-      subject.should_receive(:notification)
-      OldEvent.stub(:create => true)
-
-      create(:users_project)
-    end
-
     it "should create new event" do
       OldEvent.should_receive(:create)
 
@@ -29,16 +17,6 @@ describe UsersProjectObserver do
   describe "#after_update" do
     before do
       @users_project = create :users_project
-    end
-
-    it "should called when UsersProject updated" do
-      subject.should_receive(:after_commit)
-      @users_project.update_attribute(:project_access, UsersProject::MASTER)
-    end
-
-    it "should send email to user" do
-      subject.should_receive(:notification)
-      @users_project.update_attribute(:project_access, UsersProject::MASTER)
     end
 
     it "should not called after UsersProject destroyed" do

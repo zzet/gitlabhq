@@ -11,6 +11,7 @@ describe EventNotificationMailer do
 
     Gitlab::Event::Action.current_user = @user
 
+
     SubscriptionService.subscribe(@user, :all, @user, :all)
     SubscriptionService.subscribe(@user, :all, :group, :all)
     SubscriptionService.subscribe(@user, :all, :project, :all)
