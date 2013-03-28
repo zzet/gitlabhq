@@ -97,6 +97,8 @@ class User < ActiveRecord::Base
   has_many :recent_events,                                 class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
   has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
 
+  has_many :pushes
+
   #
   # Validations
   #

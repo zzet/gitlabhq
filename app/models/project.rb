@@ -69,6 +69,8 @@ class Project < ActiveRecord::Base
   has_many :user_team_user_relationships, through: :user_teams
   has_many :user_teams_members, through: :user_team_user_relationships
 
+  has_many :pushes,         dependent: :destroy
+
   delegate :name, to: :owner, allow_nil: true, prefix: true
 
   # Validations
@@ -105,9 +107,9 @@ class Project < ActiveRecord::Base
   scope :public_only, -> { where(public: true) }
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
-  actions_to_watch [:created, :updated, :deleted, :transfer]
+  actions_to_watch [:created, :added, :updated, :deleted, :transfer]
   actions_sources [watchable_name, :issue, :milestone, :note, :merge_request,
-                   :snippet, :project_hook, :protected_branch, :service, :user_team_project_relationship, :users_project]
+                   :snippet, :project_hook, :protected_branch, :service, :user_team_project_relationship, :users_project, :push]
   available_in_activity_feed true, actions: [:created, :deleted]
 
   class << self

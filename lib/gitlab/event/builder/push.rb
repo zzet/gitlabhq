@@ -1,8 +1,8 @@
 class Gitlab::Event::Builder::Push < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
-      known_action = known_action? action, [:pushed]
-      known_source = data.is_a? ::Hash
+      known_action = known_action? action, ::Push.available_actions
+      known_source = known_source? data, ::Push.watched_sources
       known_source && known_action
     end
 
@@ -10,18 +10,17 @@ class Gitlab::Event::Builder::Push < Gitlab::Event::Builder::Base
       meta = parse_action(action)
       actions = []
 
-      target = ::Project.find(data[:project_id])
+      target = source
       push_data = data[:push_data]
-      user = ::User.find(push_data[:user_id])
 
       case meta[:action]
       when :pushed
-        actions << :created_branch  if push_data[:ref] =~ /^refs\/heads/ && push_data[:before] =~ /^00000/
-        actions << :deleted_branch  if push_data[:ref] =~ /^refs\/heads/ && push_data[:after]  =~ /^00000/
-        actions << :created_tag     if push_data[:ref] =~ /^refs\/tag/   && push_data[:before] =~ /^00000/
-        actions << :deleted_tag     if push_data[:ref] =~ /^refs\/tag/   && push_data[:after]  =~ /^00000/
+        actions << :created_branch  if source.created_branch?
+        actions << :deleted_branch  if source.deleted_branch?
+        actions << :created_tag     if source.created_tag?
+        actions << :deleted_tag     if source.deleted_tag?
 
-        actions << :pushed          if actions.blank?
+        actions << :pushed          #if actions.blank?
       end
 
       events = []
