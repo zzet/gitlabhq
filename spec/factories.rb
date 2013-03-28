@@ -9,12 +9,13 @@ FactoryGirl.define do
 
   sequence(:url) { Faker::Internet.uri('http') }
 
-  factory :user, aliases: [:author, :assignee, :owner, :creator] do
+  factory :user, aliases: [:author, :assignee, :owner, :creator, :subscriber] do
     email { Faker::Internet.email }
     name
     sequence(:username) { |n| "#{Faker::Internet.user_name}#{n}" }
     password "123456"
     password_confirmation { password }
+    notification_setting
 
     trait :admin do
       admin true

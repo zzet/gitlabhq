@@ -86,8 +86,8 @@ class User < ActiveRecord::Base
   has_many :team_projects,                   through: :user_team_project_relationships
 
   # Notifications & Subscriptions
+  has_many :subscriprions,                                 class_name: Event::Subscription, as: :target
   has_many :personal_subscriprions,   dependent: :destroy, class_name: Event::Subscription
-  has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription, as: :target
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
 

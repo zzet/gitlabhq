@@ -20,7 +20,7 @@ class GitPushService
     push = Push.create(project: project, user: user, before: oldrev, after: newrev, ref: ref)
     @push_data = push.push_data
 
-    create_push_event(project, @push_data, user)
+    create_push_event
 
     project.ensure_satellite_exists
     project.discover_default_branch

@@ -2,12 +2,12 @@
 
 FactoryGirl.define do
   factory :push do
-    project_id 1
-    ref "MyString"
-    before "MyString"
-    after "MyString"
-    data "MyText"
-    user_id 1
+    project
+    ref "refs/heads/master"
+    before "old_rev"
+    after "new_rev"
+    data "{ push_data_hash: \"value\"}"
+    user
     commits_count 1
   end
 end

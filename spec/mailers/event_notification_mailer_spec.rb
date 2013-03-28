@@ -6,9 +6,11 @@ describe EventNotificationMailer do
 
   before do
     @user = create :user
+    @user.create_notification_setting(own_changes: true)
     @another_user = create :user
 
     Gitlab::Event::Action.current_user = @user
+
     SubscriptionService.subscribe(@user, :all, @user, :all)
     SubscriptionService.subscribe(@user, :all, :group, :all)
     SubscriptionService.subscribe(@user, :all, :project, :all)
@@ -147,9 +149,7 @@ describe EventNotificationMailer do
 
         @service.execute(@project, @user, @oldrev, @newrev, @ref)
 
-        p ActionMailer::Base.deliveries.inspect
         ActionMailer::Base.deliveries.should_not be_blank
-        p ActionMailer::Base.deliveries.first.body.inspect
       end
     end
   end
