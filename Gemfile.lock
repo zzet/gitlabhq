@@ -577,9 +577,9 @@ DEPENDENCIES
   rb-inotify
   redcarpet (~> 2.2.2)
   redis-rails
+  roadie
   rspec-rails
   rugged (~> 0.17.0.b7)
-  roadie
   sass-rails (~> 3.2.5)
   sdoc
   seed-fu

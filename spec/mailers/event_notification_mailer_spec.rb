@@ -6,11 +6,10 @@ describe EventNotificationMailer do
 
   before do
     @user = create :user
-    @user.create_notification_setting(own_changes: true)
+
     @another_user = create :user
 
-    Gitlab::Event::Action.current_user = @user
-
+    Gitlab::Event::Action.current_user = @another_user
 
     SubscriptionService.subscribe(@user, :all, @user, :all)
     SubscriptionService.subscribe(@user, :all, :group, :all)
