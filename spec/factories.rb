@@ -24,7 +24,7 @@ FactoryGirl.define do
     factory :admin, traits: [:admin]
   end
 
-  factory :project do
+  factory :project, aliases: [:target, :source] do
     sequence(:name) { |n| "project#{n}" }
     path { name.downcase.gsub(/\s/, '_') }
     creator

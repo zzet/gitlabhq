@@ -41,7 +41,7 @@ describe Gitlab::Event::Factory do
       Event.with_source(@issue).destroy_all
 
       @action = 'gitlab.created.issue'
-      @data = {source: @issue, user: @user, data: @issue}
+      @data = { source: @issue, user: @user, data: @issue }
 
       @events = Gitlab::Event::Factory.build(@action, @data)
       Gitlab::Event.create_events(@action, @data)
@@ -52,7 +52,7 @@ describe Gitlab::Event::Factory do
       @current_events.count.should == @events.count
 
       @self_targeted_events = @current_events.with_target(@issue)
-      @self_targeted_events.should_not be_blank
+      @self_targeted_events.should be_blank
 
       @targeted_events = @current_events.with_target(@project)
       @targeted_events.should_not be_blank
@@ -270,7 +270,7 @@ describe Gitlab::Event::Factory do
       @self_targeted_events.should_not be_blank
 
       @user_targeted_events = @current_events.with_target(@user)
-      @user_targeted_events.should_not be_blank
+      @user_targeted_events.should be_blank
     end
 
     it "should build User events with update user_team_user_relationship" do
@@ -298,7 +298,7 @@ describe Gitlab::Event::Factory do
       @self_targeted_events.should_not be_blank
 
       @user_targeted_events = @current_events.with_target(@user)
-      @user_targeted_events.should_not be_blank
+      @user_targeted_events.should be_blank
     end
 
     it "should build User events with remove user_team_user_relationship" do
@@ -325,7 +325,7 @@ describe Gitlab::Event::Factory do
       @self_targeted_events.should_not be_blank
 
       @user_targeted_events = @current_events.with_target(@user)
-      @user_targeted_events.should_not be_blank
+      @user_targeted_events.should be_blank
     end
 
     it "should build User events with create key" do
@@ -598,7 +598,7 @@ describe Gitlab::Event::Factory do
       @current_events.count.should == @events.count
 
       @self_targeted_events = @current_events.with_target(@merge_request)
-      @self_targeted_events.should_not be_blank
+      @self_targeted_events.should be_blank
 
       @targeted_events = @current_events.with_target(@project)
       @targeted_events.should_not be_blank
@@ -613,7 +613,7 @@ describe Gitlab::Event::Factory do
       Event.with_source(@merge_request).destroy_all
 
       @action = 'gitlab.updated.merge_request'
-      @data = {source: @merge_request, user: @user, data: @merge_request}
+      @data = { source: @merge_request, user: @user, data: @merge_request }
 
       @events = Gitlab::Event::Factory.build(@action, @data)
       Gitlab::Event.create_events(@action, @data)

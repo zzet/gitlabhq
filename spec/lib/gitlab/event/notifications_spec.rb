@@ -10,6 +10,10 @@ describe "Gitlab::Event::Notification" do
       #User.observers.enable :activity_observer
     end
 
+    after do
+      ActiveRecord::Base.observers.enable :all
+    end
+
     it "should crate notification for user self updates" do
       Event.with_source(@user).destroy_all
       SubscriptionService.subscribe(@user, :all, @user, :all)

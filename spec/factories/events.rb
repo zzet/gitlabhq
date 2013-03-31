@@ -5,6 +5,6 @@ FactoryGirl.define do
     author
     action Event.action.values.first
     data { { attr: "value" } }
-    source { project }
+    source
   end
 end
