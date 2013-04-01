@@ -423,6 +423,9 @@ namespace :undev do
         end
 
       end
+
+      system("chown -R git:gitlab /var/git/repositories/*")
+
     end
 
     desc "Migrate Repositories from gitorious to gitlab"
