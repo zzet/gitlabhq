@@ -303,7 +303,6 @@ namespace :undev do
 
             unless File.exists?(project_path)
               @shell.import_repository(project.path_with_namespace, repo.git_clone_url)
-              @shell.enable_git_protocol(project.path_with_namespace)
 
               @logger.info "#{repo.url_path};#{repo.real_gitdir};#{project.path_with_namespace};#{project_path};#{project.name_with_namespace}"
               @repo_push_log.info "cd /var/lib/git/repositories/#{repo.real_gitdir} && git remote add --mirror gitlab git@gitlab-staging-01.undev.cc:#{project.path_with_namespace}.git"
