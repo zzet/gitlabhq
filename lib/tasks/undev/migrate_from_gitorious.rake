@@ -88,8 +88,10 @@ namespace :undev do
           keys = Legacy::SshKey.where(user_id: user.id)
 
           keys.each do |key|
-            key_name = key.key.split(" ")
-            new_user.keys.new(key: key.key, title: key_name[2])
+            key_data = key.key.split(" ")
+            key_name = key_data[2]
+            key_name = "#{new_user.username}" if key_name.blank?
+            new_user.keys.new(key: key.key, title: key_name)
           end
 
           new_user.force_random_password = true
