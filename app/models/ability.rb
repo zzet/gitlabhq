@@ -92,16 +92,16 @@ class Ability
         :admin_merge_request,
         :admin_note,
         :admin_wiki,
+        :change_namespace,
+        :change_public_mode,
+        :rename_project,
+        :remove_project,
         :admin_project
       ]
     end
 
     def project_admin_rules
       project_master_rules + [
-        :change_namespace,
-        :change_public_mode,
-        :rename_project,
-        :remove_project
       ]
     end
 
