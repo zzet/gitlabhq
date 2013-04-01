@@ -17,6 +17,7 @@ namespace :undev do
     Rake::Task["undev:migrate:teams"].invoke
     Rake::Task["undev:migrate:projects"].invoke
     Rake::Task["undev:migrate:repositories"].invoke
+    Rake::Task["undev:migrate:git_protocol_access"].invoke
     Rake::Task["undev:migrate:subscriptions:favorites"].invoke
     Rake::Task["undev:migrate:events"].invoke
   end
@@ -275,7 +276,6 @@ namespace :undev do
 
         project.created_at = repo.created_at
         project.updated_at = repo.updated_at
-        project.git_protocol_enabled = true
 
         owner = case repo.owner_type
                 when 'Group'
@@ -314,8 +314,6 @@ namespace :undev do
             else
               @import_log.info "Repo already exist!".red
             end
-
-            @shell.enable_git_protocol(project.path_with_namespace) if project.git_protocol_enabled
 
             @import_log.info "Migrate committerships:"
 
@@ -426,6 +424,15 @@ namespace :undev do
 
       end
     end
+
+    desc "Migrate Repositories from gitorious to gitlab"
+    task git_protocol_access: :environment do
+      Project.find_each do |project|
+        project.git_protocol_enabled = true
+        project.save
+      end
+    end
+
 
     desc "Migrate Events"
     task events: :environment do
