@@ -242,7 +242,7 @@ class User < ActiveRecord::Base
   end
 
   def authorized_teams
-    @team_ids ||= (user_teams.select(user_team: :id) + own_teams.select(user_team: :id)).uniq
+    @team_ids ||= (user_teams.pluck(:id) + own_teams.pluck(:id)).uniq
     UserTeam.where(id: @team_ids)
   end
 
