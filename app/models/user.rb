@@ -97,10 +97,6 @@ class User < ActiveRecord::Base
   has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription, as: :target
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
-  has_many :events,                   dependent: :destroy, foreign_key: :author_id,   class_name: "Event"
-  has_many :recent_events,                                 foreign_key: :author_id,   class_name: "Event", order: "id DESC"
-  has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: "Issue"
-  has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
 
   has_many :personal_projects,        through: :namespace, source: :projects
   has_many :projects,                 through: :users_projects
