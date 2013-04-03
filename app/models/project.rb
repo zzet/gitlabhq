@@ -107,6 +107,7 @@ class Project < ActiveRecord::Base
   scope :public_only, -> { where(arel_table[:public].eq(true).or(arel_table[:git_protocol_enabled].eq(true))) }
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
+
   actions_to_watch [:created, :updated, :deleted, :transfer]
 
   class << self
@@ -173,8 +174,7 @@ class Project < ActiveRecord::Base
     unless creator.can_create_project?
       errors[:limit_reached] << ("Your own projects limit is #{creator.projects_limit}! Please contact administrator to increase it")
     end
-  rescue => ex
-    errors[:base] << ex.message
+  rescue
     errors[:base] << ("Can't check your ability to create project")
   end
 
