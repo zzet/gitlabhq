@@ -26,7 +26,8 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           changes = source.changes
 
           actions << :transfer if source.creator_id_changed? && source.creator_id != changes[:creator_id].first
-          if actions.blank?
+
+          if actions.blank? && project_changes_exists?(changes)
             temp_data[:previous_changes] = changes
             actions << :updated
           end
@@ -166,6 +167,21 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
       end
 
       events
+    end
+
+    private
+
+    def project_changes_exists?(changes)
+      watched_fields = [:name, :path, :description,
+                        :creator_id, :default_branch,
+                        :issues_enabled, :wall_enabled,
+                        :merge_requests_enabled, :public,
+                        :issues_tracker, :issues_tracker_id]
+      is_actual_changes = false
+      watched_fields.each do |field|
+        is_actual_changes = true if changes.keys.include? field
+      end
+      is_actual_changes
     end
   end
 end
