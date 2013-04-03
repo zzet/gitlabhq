@@ -712,6 +712,20 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
+  def left_user_team_user_team_user_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @source = @event.source
+
+    @team = @target = @event.target
+    @member = @source.user
+
+    if @team
+      mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
+    end
+  end
+
   def left_user_user_team_user_relationship_email(notification)
     @notification = notification
     @event = @notification.event
