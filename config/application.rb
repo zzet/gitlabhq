@@ -27,6 +27,7 @@ module Gitlab
                                      :activity_observer,
                                      :event_observer,
                                      :notification_observer,
+                                     :project_activity_cache_observer,
                                      :issue_observer,
                                      :key_observer,
                                      :merge_request_observer,

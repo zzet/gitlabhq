@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130321181228) do
+ActiveRecord::Schema.define(:version => 20130403003950) do
 
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
@@ -201,9 +201,11 @@ ActiveRecord::Schema.define(:version => 20130321181228) do
     t.string   "issues_tracker_id"
     t.boolean  "snippets_enabled",       :default => true,     :null => false
     t.boolean  "git_protocol_enabled"
+    t.datetime "last_activity_at"
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
+  add_index "projects", ["last_activity_at"], :name => "index_projects_on_last_activity_at"
   add_index "projects", ["namespace_id"], :name => "index_projects_on_namespace_id"
 
   create_table "protected_branches", :force => true do |t|
