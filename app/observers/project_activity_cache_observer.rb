@@ -1,4 +1,4 @@
-class ProjectActivityCacheObserver < BaseObserver
+class ProjectActivityCacheObserver < ActiveRecord::Observer
   observe :event
 
   def after_create(event)
