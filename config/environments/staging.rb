@@ -38,6 +38,12 @@ Gitlab::Application.configure do
 
   # Use a different logger for distributed setups
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  logger = Logger.new(STDOUT)
+  logger.formatter = Logger::Formatter.new
+  logger.formatter.datetime_format = "%Y-%m-%d %H:%M:%S.%3N"
+  config.logger = logger
+  config.colorize_logging = false
+
 
   # Use a different cache store in production
   config.cache_store = :memory_store
