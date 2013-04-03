@@ -1082,6 +1082,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source_type
     @project = @target = @event.target
     @push_data = JSON.load(@event.data).to_hash
+    @branch = @push_data["ref"].split("/")[2]
 
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
@@ -1091,7 +1092,7 @@ class EventNotificationMailer < ActionMailer::Base
     @refs_are_same = result[:same]
     @line_notes    = []
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [branch] #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")
   end
 
 end
