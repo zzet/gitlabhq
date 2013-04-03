@@ -92,9 +92,9 @@ class Ability
         :admin_merge_request,
         :admin_note,
         :admin_wiki,
+        :change_namespace,
         :change_public_mode,
         :rename_project,
-        :change_namespace,
         :remove_project,
         :admin_project
       ]

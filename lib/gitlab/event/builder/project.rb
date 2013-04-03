@@ -139,9 +139,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :created
           actions << :assigned
         when :updated
-          actions << meta[:action]
+          actions << :updated
         when :deleted
-          actions << meta[:action]
+          actions << :reassigned
         end
 
       when ::UsersProject

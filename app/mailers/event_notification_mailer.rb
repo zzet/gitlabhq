@@ -137,10 +137,12 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @web_hook = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New project_hook #{@source.name} was created on #{@target.name} project [created]")
+    if @web_hook && @project
+      mail(bcc: @notification.subscriber.email, subject: "New project_hook #{@web_hook.name} was created on #{@project.name} project [created]")
+    end
   end
 
   def created_project_protected_btanch_email(notification)
@@ -562,6 +564,20 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
+  def deleted_project_web_hook_email(notification)
+    @notification = notification
+    @event = @notification.event
+
+    data = JSON.load(@event.data).to_hash
+
+    @user = @event.author
+    @project = @event.target
+    @web_hook = data
+
+    mail(bcc: @notification.subscriber.email, subject: "Web hook was deleted from '#{@project.name}' project by #{@user.name} [deleted]")
+
+  end
+
   def deleted_user_team_user_team_email(notification)
     @notification = notification
     @event = @notification.event
@@ -697,6 +713,21 @@ class EventNotificationMailer < ActionMailer::Base
     @member = User.find_by_id(@source["user_id"])
     if @member
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@project.path_with_namespace} project team by #{@user.name} [left]")
+    end
+  end
+
+  def left_user_team_user_team_user_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+
+    @source = @event.data
+
+    @user = @event.author
+    @team = @target = @event.target
+    @member = User.find_by_id(@source["user_id"])
+
+    if @team && @user
+      mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
     end
   end
 
@@ -948,10 +979,11 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @source = JSON.load(@event.data)
+    @project = Project.find_by_id(@source["project_id"])
+    @team = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Team #{@target.name} was reassigned to #{@source.project.name} project by #{@user.name} [reassigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned to \"#{@project.path_with_namespace}\" project by #{@user.name} [reassigned]")
   end
 
   def reassigned_user_issue_email(notification)
