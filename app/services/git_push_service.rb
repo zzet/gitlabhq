@@ -75,22 +75,23 @@ class GitPushService
   # }
   #
   def post_receive_data(oldrev, newrev, ref)
-    push_commits = project.repository.commits_between(oldrev, newrev)
+    begin
+      push_commits = project.repository.commits_between(oldrev, newrev)
 
-    # Total commits count
-    push_commits_count = push_commits.size
+      # Total commits count
+      push_commits_count = push_commits.size
 
-    # Get latest 20 commits ASC
-    push_commits_limited = push_commits.last(20)
+      # Get latest 20 commits ASC
+      push_commits_limited = push_commits.last(20)
 
-    # Hash to be passed as post_receive_data
-    data = {
-      before: oldrev,
-      after: newrev,
-      ref: ref,
-      user_id: user.id,
-      user_name: user.name,
-      repository: {
+      # Hash to be passed as post_receive_data
+      data = {
+        before: oldrev,
+        after: newrev,
+        ref: ref,
+        user_id: user.id,
+        user_name: user.name,
+        repository: {
         name: project.name,
         url: project.url_to_repo,
         description: project.description,
@@ -98,25 +99,28 @@ class GitPushService
       },
       commits: [],
       total_commits_count: push_commits_count
-    }
-
-    # For performance purposes maximum 20 latest commits
-    # will be passed as post receive hook data.
-    #
-    push_commits_limited.each do |commit|
-      data[:commits] << {
-        id: commit.id,
-        message: commit.safe_message,
-        timestamp: commit.date.xmlschema,
-        url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{commit.id}",
-        author: {
-          name: commit.author_name,
-          email: commit.author_email
-        }
       }
-    end
 
-    data
+      # For performance purposes maximum 20 latest commits
+      # will be passed as post receive hook data.
+      #
+      push_commits_limited.each do |commit|
+        data[:commits] << {
+          id: commit.id,
+          message: commit.safe_message,
+          timestamp: commit.date.xmlschema,
+          url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{commit.id}",
+          author: {
+            name: commit.author_name,
+            email: commit.author_email
+          }
+        }
+      end
+
+      data
+    rescue Exception => ex
+      raise RuntimeError, "Can't process push recive data. \r\n#{ex.message}\r\n#{ex.backtrace.join("\r\n")}"
+    end
   end
 
   def push_to_branch? ref, oldrev
