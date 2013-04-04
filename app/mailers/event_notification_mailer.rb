@@ -1082,7 +1082,8 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source_type
     @project = @target = @event.target
     @push_data = JSON.load(@event.data).to_hash
-    @branch = @push_data["ref"].split("/")[2]
+    @branch = @push_data["ref"]
+    @branch.slice!("refs/heads/")
 
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
