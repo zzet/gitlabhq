@@ -525,6 +525,17 @@ class EventNotificationMailer < ActionMailer::Base
   # Deleted action
   #
 
+  def deleted_user_key_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @key = @source = JSON.load(@event.data).to_hash
+    @updated_user = @target = @event.target
+
+    mail(bcc: @notification.subscriber.email, subject: "Key #{@key["title"]} was deleted from #{@updated_user.name} profile by #{@user.name} user [deleted]")
+  end
+
+
   def deleted_group_group_email(notification)
     @notification = notification
     @event = @notification.event
