@@ -1083,6 +1083,8 @@ class EventNotificationMailer < ActionMailer::Base
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
     if result
+      @branch = @push_data["ref"]
+      @branch.slice!("refs/heads/")
 
       @commits       = CommitDecorator.decorate_collection result[:commits]
       @commit        = result[:commit]
@@ -1090,7 +1092,7 @@ class EventNotificationMailer < ActionMailer::Base
       @refs_are_same = result[:same]
       @line_notes    = []
 
-      mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [branch] #{@user.name} [undev gitlab commits] [pushed]")
+      mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")
     end
   end
 
