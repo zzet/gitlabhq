@@ -984,7 +984,7 @@ class EventNotificationMailer < ActionMailer::Base
     @team = UserTeam.find(@source["user_team_id"])
     @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Project #{@project.path_with_namespace} was reassigned from #{@team["name"]} team by #{@user.name} [reassigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Project #{@project.path_with_namespace} was reassigned from #{@team.name} team by #{@user.name} [reassigned]")
   end
 
   def reassigned_user_team_user_team_project_relationship_email(notification)
