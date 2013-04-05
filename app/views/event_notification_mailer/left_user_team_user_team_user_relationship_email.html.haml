@@ -1,1 +1,1 @@
-= "User #{link_to @member.name, user_url(@member.username)} was removed from team members of \"#{link_to @team.name, team_url(@project.path)}\" team by #{link_to @user.name, user_url(@user.username)}"
+= raw "#{ link_to @member.name, user_url(@member.username) } was removed from '#{ @team.name }' team by #{ link_to @user.name, user_url(@user.username) }."

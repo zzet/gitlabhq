@@ -711,7 +711,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.data
     @project = @target = @event.target
     @member = User.find_by_id(@source["user_id"])
-    if @member
+    if @member && @project
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@project.path_with_namespace} project team by #{@user.name} [left]")
     end
   end
@@ -766,7 +766,7 @@ class EventNotificationMailer < ActionMailer::Base
 
     @team = UserTeam.find_by_id(@source["user_team_id"])
 
-    if @team
+    if @team && @member
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
     end
   end
@@ -1055,7 +1055,7 @@ class EventNotificationMailer < ActionMailer::Base
     @tag = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted tag '#{tag}' by #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted tag '#{@tag}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
 
   def created_tag_project_push_summary_email(notification)
@@ -1071,7 +1071,7 @@ class EventNotificationMailer < ActionMailer::Base
     @tag = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new tag '#{tag}' by #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new tag '#{@tag}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
 
   def pushed_project_push_summary_email(notification)
@@ -1087,13 +1087,16 @@ class EventNotificationMailer < ActionMailer::Base
 
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
-    @commits       = CommitDecorator.decorate_collection result[:commits]
-    @commit        = result[:commit]
-    @diffs         = result[:diffs]
-    @refs_are_same = result[:same]
-    @line_notes    = []
+    if result
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")
+      @commits       = CommitDecorator.decorate_collection result[:commits]
+      @commit        = result[:commit]
+      @diffs         = result[:diffs]
+      @refs_are_same = result[:same]
+      @line_notes    = []
+
+      mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [branch] #{@user.name} [undev gitlab commits] [pushed]")
+    end
   end
 
 end

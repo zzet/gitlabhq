@@ -1,9 +1,9 @@
 %h2= "#{@event.author.name} #{@event.action} to #{@event.target.name} at #{@event.created_at}"
 
 Push summary between 
-%strong=@commits.last.sha
+%strong= @commits.last.sha
 and
-%strong=@commits.first.sha
+%strong= @commits.first.sha
 
 = link_to 'Compare', project_compare_url(@event.target, @commits.first, @commits.last)
 
