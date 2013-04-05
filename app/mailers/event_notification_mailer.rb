@@ -719,9 +719,9 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @source = JSON.load(@event.data)
     @project = @target = @event.target
-    @member = User.find_by_id(@source["user_id"])
+    @member = User.find(@source["user_id"])
     if @member && @project
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@project.path_with_namespace} project team by #{@user.name} [left]")
     end
@@ -731,11 +731,11 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
 
-    @source = @event.data
+    @source = JSON.load(@event.data)
 
     @user = @event.author
     @team = @target = @event.target
-    @member = User.find_by_id(@source["user_id"])
+    @member = User.find(@source["user_id"])
 
     if @team && @user
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
@@ -746,9 +746,9 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @source = JSON.load(@event.data)
     @member = @target = @event.target
-    @project = Project.find_by_id(@source["project_id"])
+    @project = Project.find(@source["project_id"])
     if @project
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@project.path_with_namespace} project by #{@user.name} [left]")
     end
@@ -758,10 +758,10 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @source = JSON.load(@event.data)
 
     @team = @target = @event.target
-    @member = @source.user
+    @member = User.find(@source["user_id"])
 
     if @team
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
@@ -772,12 +772,12 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @source = JSON.load(@event.data)
     @member = @target = @event.target
 
-    @team = UserTeam.find_by_id(@source["user_team_id"])
+    @team = UserTeam.find(@source["user_team_id"])
 
-    if @team && @member
+    if @member
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
     end
   end
