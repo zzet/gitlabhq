@@ -980,18 +980,19 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @team = @source = JSON.load(@event.data)
+    @source = JSON.load(@event.data).to_hash
+    @team = UserTeam.find(@source["user_team_id"])
     @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Project #{@project.path_with_namespace} was reassigned from #{@team["name"]} team by #{@user.name} [reassigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Project #{@project.path_with_namespace} was reassigned from #{@team.name} team by #{@user.name} [reassigned]")
   end
 
   def reassigned_user_team_user_team_project_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = JSON.load(@event.data)
-    @project = Project.find_by_id(@source["project_id"])
+    @source = JSON.load(@event.data).to_hash
+    @project = Project.find(@source["project_id"])
     @team = @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned to \"#{@project.path_with_namespace}\" project by #{@user.name} [reassigned]")
