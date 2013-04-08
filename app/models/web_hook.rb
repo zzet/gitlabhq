@@ -14,7 +14,7 @@
 class WebHook < NewDb
   include HTTParty
 
-  attr_accessible :url
+  attr_accessible :url, :created_at, :updated_at
 
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription

@@ -315,6 +315,19 @@ namespace :undev do
               @import_log.info "Repo already exist!".red
             end
 
+            @import_log.info "Migrate web hooks"
+
+            hooks = Legacy::Hook.where(repository_id: repo.id)
+
+            hooks.each do |hook|
+              ph = project.web_hooks.build(url: hook.url, created_at: hook.created_at, updated_at: hook.updated_at)
+              #if ph.save
+                #@import_log.info "+"
+              #else
+                #@import_log.info "- (#{hook.id})"
+              #end
+            end
+
             @import_log.info "Migrate committerships:"
 
             master_users = repo.committerships.admins.users
