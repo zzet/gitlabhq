@@ -7,4 +7,4 @@
       - if subscription.target
         %tr
           %td= notification_entity_link(subscription.target)
-          %td= link_to "Unsubscribe", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name } ), remote: true, method: :delete, format: :json, class: "btn btn-small btn-remove"
+          %td= link_to "Unsubscribe", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name } ), method: :delete, format: :json, class: "btn btn-small btn-remove"
