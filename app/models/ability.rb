@@ -95,6 +95,7 @@ class Ability
         :change_namespace,
         :change_public_mode,
         :rename_project,
+        :remove_project,
         :admin_project
       ]
 
@@ -103,9 +104,7 @@ class Ability
     end
 
     def project_admin_rules
-      project_master_rules + [
-        :remove_project
-      ]
+      project_master_rules
     end
 
     def group_abilities user, group

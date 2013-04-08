@@ -137,10 +137,12 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @web_hook = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New project_hook #{@source.name} was created on #{@target.name} project [created]")
+    if @web_hook && @project
+      mail(bcc: @notification.subscriber.email, subject: "New project_hook #{@web_hook.name} was created on #{@project.name} project [created]")
+    end
   end
 
   def created_project_protected_btanch_email(notification)
@@ -523,6 +525,17 @@ class EventNotificationMailer < ActionMailer::Base
   # Deleted action
   #
 
+  def deleted_user_key_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @key = @source = JSON.load(@event.data).to_hash
+    @updated_user = @target = @event.target
+
+    mail(bcc: @notification.subscriber.email, subject: "Key #{@key["title"]} was deleted from #{@updated_user.name} profile by #{@user.name} user [deleted]")
+  end
+
+
   def deleted_group_group_email(notification)
     @notification = notification
     @event = @notification.event
@@ -560,6 +573,20 @@ class EventNotificationMailer < ActionMailer::Base
     @target = data
 
     mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
+  end
+
+  def deleted_project_web_hook_email(notification)
+    @notification = notification
+    @event = @notification.event
+
+    data = JSON.load(@event.data).to_hash
+
+    @user = @event.author
+    @project = @event.target
+    @web_hook = data
+
+    mail(bcc: @notification.subscriber.email, subject: "Web hook was deleted from '#{@project.name}' project by #{@user.name} [deleted]")
+
   end
 
   def deleted_user_team_user_team_email(notification)
@@ -692,11 +719,26 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @source = JSON.load(@event.data)
     @project = @target = @event.target
-    @member = User.find_by_id(@source["user_id"])
-    if @member
+    @member = User.find(@source["user_id"])
+    if @member && @project
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@project.path_with_namespace} project team by #{@user.name} [left]")
+    end
+  end
+
+  def left_user_team_user_team_user_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+
+    @source = JSON.load(@event.data)
+
+    @user = @event.author
+    @team = @target = @event.target
+    @member = User.find(@source["user_id"])
+
+    if @team && @user
+      mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
     end
   end
 
@@ -704,11 +746,25 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @source = JSON.load(@event.data)
     @member = @target = @event.target
-    @project = Project.find_by_id(@source["project_id"])
+    @project = Project.find(@source["project_id"])
     if @project
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@project.path_with_namespace} project by #{@user.name} [left]")
+    end
+  end
+
+  def left_user_team_user_team_user_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @source = JSON.load(@event.data)
+
+    @team = @target = @event.target
+    @member = User.find(@source["user_id"])
+
+    if @team
+      mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
     end
   end
 
@@ -716,12 +772,12 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.data
+    @source = JSON.load(@event.data)
     @member = @target = @event.target
 
-    @team = UserTeam.find_by_id(@source["user_team_id"])
+    @team = UserTeam.find(@source["user_team_id"])
 
-    if @team
+    if @member
       mail(bcc: @notification.subscriber.email, subject: "User #{@member.name} was removed from #{@team.name} team by #{@user.name} [left]")
     end
   end
@@ -924,20 +980,22 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @source = JSON.load(@event.data).to_hash
+    @team = UserTeam.find(@source["user_team_id"])
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Project #{@target.name} was reassigned to #{@source.user_team.name} team by #{@user.name} [reassigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Project #{@project.path_with_namespace} was reassigned from #{@team.name} team by #{@user.name} [reassigned]")
   end
 
   def reassigned_user_team_user_team_project_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @source = JSON.load(@event.data).to_hash
+    @project = Project.find(@source["project_id"])
+    @team = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Team #{@target.name} was reassigned to #{@source.project.name} project by #{@user.name} [reassigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned to \"#{@project.path_with_namespace}\" project by #{@user.name} [reassigned]")
   end
 
   def reassigned_user_issue_email(notification)
@@ -1009,7 +1067,7 @@ class EventNotificationMailer < ActionMailer::Base
     @tag = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted tag '#{tag}' by #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted tag '#{@tag}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
 
   def created_tag_project_push_summary_email(notification)
@@ -1025,7 +1083,7 @@ class EventNotificationMailer < ActionMailer::Base
     @tag = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new tag '#{tag}' by #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new tag '#{@tag}' by #{@user.name} [undev gitlab commits] [pushed]")
   end
 
   def pushed_project_push_summary_email(notification)
@@ -1039,13 +1097,18 @@ class EventNotificationMailer < ActionMailer::Base
 
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
-    @commits       = CommitDecorator.decorate_collection result[:commits]
-    @commit        = result[:commit]
-    @diffs         = result[:diffs]
-    @refs_are_same = result[:same]
-    @line_notes    = []
+    if result
+      @branch = @push_data["ref"]
+      @branch.slice!("refs/heads/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [branch] #{@user.name} [undev gitlab commits] [pushed]")
+      @commits       = CommitDecorator.decorate_collection result[:commits]
+      @commit        = result[:commit]
+      @diffs         = result[:diffs]
+      @refs_are_same = result[:same]
+      @line_notes    = []
+
+      mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")
+    end
   end
 
 end
