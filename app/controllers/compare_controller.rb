@@ -8,7 +8,7 @@ class CompareController < ProjectResourceController
   end
 
   def show
-    result = commit.compare(project, params[:from], params[:to])
+    result = Commit.compare(project, params[:from], params[:to])
 
     @commits       = result[:commits]
     @commit        = result[:commit]
