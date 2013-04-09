@@ -300,6 +300,8 @@ Gitlab::Application.routes.draw do
           delete :resign
         end
       end
+
+      resources :tokens,  only: [:show, :create]
     end
 
     resources :notes, only: [:index, :create, :destroy] do

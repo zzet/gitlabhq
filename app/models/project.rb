@@ -61,6 +61,7 @@ class Project < ActiveRecord::Base
   has_many :hooks,              dependent: :destroy, class_name: "ProjectHook"
   has_many :wikis,              dependent: :destroy
   has_many :protected_branches, dependent: :destroy
+  has_many :file_tokens,        dependent: :destroy
   has_many :user_team_project_relationships, dependent: :destroy
 
   has_many :users,          through: :users_projects

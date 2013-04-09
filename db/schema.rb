@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130403003950) do
+ActiveRecord::Schema.define(:version => 20130409104924) do
 
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
@@ -55,6 +55,17 @@ ActiveRecord::Schema.define(:version => 20130403003950) do
     t.text     "data"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+  end
+
+  create_table "file_tokens", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "project_id"
+    t.string   "token"
+    t.string   "file"
+    t.datetime "last_usage_at"
+    t.integer  "usage_count"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
   end
 
   create_table "issues", :force => true do |t|
@@ -215,6 +226,18 @@ ActiveRecord::Schema.define(:version => 20130403003950) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "pushes", :force => true do |t|
+    t.integer  "project_id"
+    t.string   "ref"
+    t.string   "before"
+    t.string   "after"
+    t.text     "data"
+    t.integer  "user_id"
+    t.integer  "commits_count"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
   create_table "services", :force => true do |t|
     t.string   "type"
     t.string   "title"
@@ -317,6 +340,7 @@ ActiveRecord::Schema.define(:version => 20130403003950) do
     t.boolean  "can_create_team",        :default => true,  :null => false
     t.string   "state"
     t.integer  "color_scheme_id",        :default => 1,     :null => false
+    t.integer  "notification_level",     :default => 1,     :null => false
   end
 
   add_index "users", ["admin"], :name => "index_users_on_admin"

@@ -103,6 +103,8 @@ class User < ActiveRecord::Base
   has_many :own_projects,             foreign_key: :creator_id
   has_many :owned_projects,           through: :namespaces, source: :projects
 
+  has_many :file_tokens
+
   #
   # Validations
   #

@@ -28,9 +28,12 @@ class BlobController < ProjectResourceController
 
   def before_filters_for_users
     if file_auth_token_present?
-      # TODO
-      # Replace with check
-      true
+      token = params[:file_auth_token]
+      available_token = FileToken.for_project(@project).find_by_file(@path)
+
+      if available_token.token != token
+        not_found!
+      end
     else
       authorize_read_project!
       authorize_code_access!
