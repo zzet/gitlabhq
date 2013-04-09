@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
 
     @project = Project.find_with_namespace(id)
 
-    if @project and can?(current_user, :read_project, @project)
+    if @project
       @project
     else
       @project = nil

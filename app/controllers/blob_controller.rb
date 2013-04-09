@@ -2,10 +2,10 @@
 class BlobController < ProjectResourceController
   include ExtractsPath
 
+  skip_before_filter :authenticate_user!, :reject_blocked, :set_current_user_for_observers, :add_abilities, if: :file_auth_token_present?
+
   # Authorize
-  before_filter :authorize_read_project!
-  before_filter :authorize_code_access!
-  before_filter :require_non_empty_project
+  before_filter :before_filters_for_users
 
   def show
     if @tree.is_blob?
@@ -18,5 +18,24 @@ class BlobController < ProjectResourceController
     else
       not_found!
     end
+  end
+
+  protected
+
+  def file_auth_token_present?
+    params[:file_auth_token].present?
+  end
+
+  def before_filters_for_users
+    if file_auth_token_present?
+      # TODO
+      # Replace with check
+      true
+    else
+      authorize_read_project!
+      authorize_code_access!
+    end
+
+    require_non_empty_project
   end
 end
