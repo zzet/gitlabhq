@@ -31,7 +31,7 @@ class BlobController < ProjectResourceController
       token = params[:file_auth_token]
       available_token = FileToken.for_project(@project).find_by_file(@path)
 
-      if available_token.token != token
+      if available_token.blank? || available_token.token != token
         not_found!
       end
     else

@@ -6,9 +6,9 @@ class FileToken < ActiveRecord::Base
   belongs_to :project
 
   validates :token, presence: true
-  validates :project, presence: true, uniqueness: { scope: :file }
+  validates :project, presence: true
   validates :user, presence: true
-  validates :file, presence: true
+  validates :file, presence: true, uniqueness: { scope: :project_id }
 
   scope :for_project, ->(project) { where(project_id: project) }
 
