@@ -211,8 +211,8 @@ ActiveRecord::Schema.define(:version => 20130409104924) do
     t.string   "issues_tracker",         :default => "gitlab", :null => false
     t.string   "issues_tracker_id"
     t.boolean  "snippets_enabled",       :default => true,     :null => false
-    t.boolean  "git_protocol_enabled"
     t.datetime "last_activity_at"
+    t.boolean  "git_protocol_enabled"
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
@@ -224,18 +224,6 @@ ActiveRecord::Schema.define(:version => 20130409104924) do
     t.string   "name",       :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
-  end
-
-  create_table "pushes", :force => true do |t|
-    t.integer  "project_id"
-    t.string   "ref"
-    t.string   "before"
-    t.string   "after"
-    t.text     "data"
-    t.integer  "user_id"
-    t.integer  "commits_count"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
   end
 
   create_table "services", :force => true do |t|
