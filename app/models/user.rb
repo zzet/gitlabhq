@@ -232,8 +232,12 @@ class User < ActiveRecord::Base
 
   # Groups user has access to
   def authorized_groups
-    @group_ids ||= (groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
-    Group.where(id: @group_ids)
+    agroups = Group.scoped
+    unless self.admin?
+      @group_ids ||= (groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
+      agroups = agroups.where(id: @group_ids)
+    end
+    agroups
   end
 
 
