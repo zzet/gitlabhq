@@ -244,8 +244,12 @@ class User < ActiveRecord::Base
   end
 
   def authorized_teams
-    @team_ids ||= (user_teams.pluck(:id) + own_teams.pluck(:id)).uniq
-    UserTeam.where(id: @team_ids)
+    ateams = UserTeam.scoped
+    unless self.admin?
+      @team_ids ||= (user_teams.pluck(:id) + own_teams.pluck(:id)).uniq
+      ateams = ateams.where(id: @team_ids)
+    end
+    ateams
   end
 
   # Team membership in authorized projects
