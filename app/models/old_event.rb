@@ -200,7 +200,7 @@ class OldEvent < ActiveRecord::Base
 
   # Max 20 commits from push DESC
   def commits
-    @commits ||= data[:commits].map { |commit| repository.commit(commit[:id]) }.reverse
+    @commits ||= repository.present? ? data[:commits].map { |commit| repository.commit(commit[:id]) }.reverse : []
   end
 
   def commits_count
