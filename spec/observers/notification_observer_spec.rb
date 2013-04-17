@@ -16,7 +16,7 @@ describe NotificationObserver do
 
   context 'when user updated' do
     it 'should send email with information' do
-      Gitlab::Event::Notifications.should_receive(:process_notification)
+      Gitlab::Event::Notification.should_receive(:process_notification)
       @user.name = "#{@user.name}_updated"
       @user.save
     end
