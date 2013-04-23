@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 class Notify < ActionMailer::Base
   include Emails::Issues
   include Emails::MergeRequests
@@ -29,6 +31,13 @@ class Notify < ActionMailer::Base
     @key = Key.find(key_id)
     @user = @key.user
     mail(to: @user.email, subject: subject("SSH key was added to your account"))
+  end
+
+  def send_first_notification(user_id)
+    @user = User.find_by_id(user_id)
+    if @user
+      mail(to: @user.email, subject: "Переезд с гиториуса на гитлаб")
+    end
   end
 
   private

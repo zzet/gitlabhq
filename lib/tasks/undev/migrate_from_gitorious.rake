@@ -724,4 +724,15 @@ namespace :undev do
       end
     end
   end
+
+  namespace :notify do
+    desc "First notification"
+    task first: :environment do
+      users = User.scoped
+      users.each do |user|
+        user.send(:"generate_reset_password_token!")
+        Notify.send_first_notification(user.id)
+      end
+    end
+  end
 end
