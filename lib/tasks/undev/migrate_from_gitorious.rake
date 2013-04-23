@@ -6,6 +6,7 @@ namespace :undev do
   @repo_push_log = Logger.new('push.log')
   @miss_repo = Logger.new('miss_repos.log')
   @logger = Logger.new('path_changes.txt')
+  @updated_users = Logger.new('updated_users.txt')
 
   #  ActiveRecord::Base.observers.disable :all
 
@@ -14,6 +15,7 @@ namespace :undev do
     Rake::Task["undev:migrate:clean"].invoke
     Rake::Task["undev:migrate:prepare"].invoke
     Rake::Task["undev:migrate:users"].invoke
+    Rake::Task["undev:migrate:load_users"].invoke
     Rake::Task["undev:migrate:teams"].invoke
     Rake::Task["undev:migrate:projects"].invoke
     Rake::Task["undev:migrate:repositories"].invoke
@@ -56,6 +58,29 @@ namespace :undev do
       SubscriptionService.subscribe(@admin, :all, :project, :new)
       SubscriptionService.subscribe(@admin, :all, :user_team, :new)
       SubscriptionService.subscribe(@admin, :all, :user, :new)
+    end
+
+    desc "Save updated users from gitlab"
+    task backup_users: :environment do
+      updated_users = User.where(updated_at: (Time.now - 25.day)..Time.now)
+      updated_users.each do |user|
+        @updated_users.info user.attributes.to_json
+      end
+    end
+
+    desc "Save updated users from gitlab"
+    task load_users: :environment do
+      hs = {}
+      repos_links = File.readlines("/rest/u/apps/gitlab/current/updated_users.txt")
+      repos_links.each {|s| s.gsub!("\n", ""); a = JSON.load(s).to_hash; hs[a["username"]]=a;}
+
+      hs.each do |username, user|
+        saved_user = User.find_by_username(username)
+        if saved_user
+          saved_user.encrypted_password = user["encrypted_password"]
+          saved_user.save
+        end
+      end
     end
 
     desc "Migrate users from gitorious to gitlab"
@@ -273,6 +298,9 @@ namespace :undev do
           project.issues_tracker = "redmine"
           project.issues_tracker_id = hs[repo.hashed_path]
         end
+
+        project.wiki_enabled = false
+        project.wall_enabled = false
 
         project.created_at = repo.created_at
         project.updated_at = repo.updated_at
