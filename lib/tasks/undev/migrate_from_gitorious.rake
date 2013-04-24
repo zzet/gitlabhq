@@ -297,10 +297,14 @@ namespace :undev do
         if hs.has_key? repo.hashed_path
           project.issues_tracker = "redmine"
           project.issues_tracker_id = hs[repo.hashed_path]
+        else
+          project.issues_tracker_enabled = false
         end
 
         project.wiki_enabled = false
         project.wall_enabled = false
+        project.snippets_enabled = false
+        project.merge_requests_enabled = false
 
         project.created_at = repo.created_at
         project.updated_at = repo.updated_at
@@ -348,7 +352,7 @@ namespace :undev do
             hooks = Legacy::Hook.where(repository_id: repo.id)
 
             hooks.each do |hook|
-              ph = project.web_hooks.build(url: hook.url, created_at: hook.created_at, updated_at: hook.updated_at)
+              ph = project.hooks.build(url: hook.url, created_at: hook.created_at, updated_at: hook.updated_at)
               #if ph.save
                 #@import_log.info "+"
               #else
