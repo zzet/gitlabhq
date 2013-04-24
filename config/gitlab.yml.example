@@ -41,6 +41,13 @@ production: &base
     # You need git daemon to use this feature!
     # git_daemon_enabled: true
 
+    ## Default project features settings
+    default_projects_features:
+      issues: true
+      merge_requests: true
+      wiki: true
+      wall: true
+      snippets: true
 
   ## External issues trackers
   issues_tracker:
