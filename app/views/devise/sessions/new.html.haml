@@ -1,6 +1,15 @@
 - if ldap_enable?
   = render partial: 'devise/sessions/new_ldap'
 - else
+  #temp_info
+    %center
+      27.04.2013 мы переехали с гиториуса на гитлаб. Все данные, кроме паролей от аккаунтов были перенесены.
+      %br
+      Чтобы начать пользоваться гитлабом нужно восстановить пароль от своего аккаунта.
+      %br
+      Вопросы и предложения можно оставить в чатике
+      = link_to "“INFR || gitlab || багрепортинг”", "skype:?chat&blob=l5lSuvYSiiUL4031uYVHplQ6t20qzQ7uW2XMDLjVZGVGoQFQaD7GDgyiBDRZ6AQMmmTyBikUENGLfP6H5K3rsKzdug3odtgoFQI"
+  %br
   = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "login-box" }) do |f|
     = image_tag "login-logo.png", width: "304", height: "66", class: "login-logo", alt: "Login Logo"
     = f.text_field :login, class: "text top", placeholder: "Username or Email", autofocus: "autofocus"
