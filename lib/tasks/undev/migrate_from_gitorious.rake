@@ -740,5 +740,14 @@ namespace :undev do
         Notify.send_first_notification(user.id)
       end
     end
+
+    desc "Second notification"
+    task second: :environment do
+      users = User.scoped
+      users.each do |user|
+        user.send(:"generate_reset_password_token!")
+        Notify.send_second_notification(user.id)
+      end
+    end
   end
 end

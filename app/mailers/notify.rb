@@ -40,6 +40,13 @@ class Notify < ActionMailer::Base
     end
   end
 
+  def send_second_notification(user_id)
+    @user = User.find_by_id(user_id)
+    if @user
+      mail(to: @user.email, subject: "Установка пароля в гитлабе")
+    end
+  end
+
   private
 
   # Look up a User by their ID and return their email address
