@@ -15,7 +15,7 @@ namespace :undev do
     Rake::Task["undev:migrate:clean"].invoke
     Rake::Task["undev:migrate:prepare"].invoke
     Rake::Task["undev:migrate:users"].invoke
-    Rake::Task["undev:migrate:load_users"].invoke
+    # Rake::Task["undev:migrate:load_users"].invoke
     Rake::Task["undev:migrate:teams"].invoke
     Rake::Task["undev:migrate:projects"].invoke
     Rake::Task["undev:migrate:repositories"].invoke
@@ -294,9 +294,11 @@ namespace :undev do
         project.name = repo.name
         project.description = repo.description
 
-        if hs.has_key? repo.hashed_path
+        path_with_namespace = "#{repo.project.slug}/#{repo.name}"
+
+        if hs.has_key? path_with_namespace
           project.issues_tracker = "redmine"
-          project.issues_tracker_id = hs[repo.hashed_path]
+          project.issues_tracker_id = hs[path_with_namespace]
         else
           project.issues_tracker_enabled = false
         end
@@ -337,7 +339,7 @@ namespace :undev do
               @shell.import_repository(project.path_with_namespace, repo.git_clone_url)
 
               @logger.info "#{repo.url_path};#{repo.real_gitdir};#{project.path_with_namespace};#{project_path};#{project.name_with_namespace}"
-              @repo_push_log.info "cd /var/lib/git/repositories/#{repo.real_gitdir} && git remote add --mirror gitlab git@gitlab-staging-01.undev.cc:#{project.path_with_namespace}.git"
+              #@repo_push_log.info "cd /var/lib/git/repositories/#{repo.real_gitdir} && git remote add --mirror gitlab git@gitlab-staging-01.undev.cc:#{project.path_with_namespace}.git"
               #unless hs.has_key? repo.hashed_path
               #@miss_repo.info "#{repo.name} | /var/lib/git/repositories/#{repo.real_gitdir} | #{repo.browse_url} | #{project_path}"
               #end
@@ -353,11 +355,11 @@ namespace :undev do
 
             hooks.each do |hook|
               ph = project.hooks.build(url: hook.url, created_at: hook.created_at, updated_at: hook.updated_at)
-              #if ph.save
-                #@import_log.info "+"
-              #else
-                #@import_log.info "- (#{hook.id})"
-              #end
+              if ph.save
+                @import_log.info "+"
+              else
+                @import_log.info "- (#{hook.id})"
+              end
             end
 
             @import_log.info "Migrate committerships:"
