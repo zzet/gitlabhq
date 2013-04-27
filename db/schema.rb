@@ -11,26 +11,62 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130318212250) do
+ActiveRecord::Schema.define(:version => 20130409104924) do
 
-  create_table "events", :force => true do |t|
-    t.string   "target_type"
-    t.integer  "target_id"
-    t.string   "title"
-    t.text     "data"
-    t.integer  "project_id"
+  create_table "event_subscription_notification_settings", :force => true do |t|
+    t.integer  "user_id"
+    t.boolean  "own_changes"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
-    t.integer  "action"
-    t.integer  "author_id"
   end
 
-  add_index "events", ["action"], :name => "index_events_on_action"
-  add_index "events", ["author_id"], :name => "index_events_on_author_id"
-  add_index "events", ["created_at"], :name => "index_events_on_created_at"
-  add_index "events", ["project_id"], :name => "index_events_on_project_id"
-  add_index "events", ["target_id"], :name => "index_events_on_target_id"
-  add_index "events", ["target_type"], :name => "index_events_on_target_type"
+  create_table "event_subscription_notifications", :force => true do |t|
+    t.integer  "event_id"
+    t.integer  "subscription_id"
+    t.string   "notification_state"
+    t.datetime "notified_at"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+    t.integer  "subscriber_id"
+  end
+
+  create_table "event_subscriptions", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "action"
+    t.integer  "target_id"
+    t.string   "target_type"
+    t.integer  "source_id"
+    t.string   "source_type"
+    t.string   "source_category"
+    t.integer  "notification_interval"
+    t.datetime "last_notified_at"
+    t.datetime "created_at",            :null => false
+    t.datetime "updated_at",            :null => false
+    t.string   "target_category"
+  end
+
+  create_table "events", :force => true do |t|
+    t.integer  "author_id"
+    t.string   "action"
+    t.integer  "source_id"
+    t.string   "source_type"
+    t.integer  "target_id"
+    t.string   "target_type"
+    t.text     "data"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  create_table "file_tokens", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "project_id"
+    t.string   "token"
+    t.string   "file"
+    t.datetime "last_usage_at"
+    t.integer  "usage_count"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
 
   create_table "issues", :force => true do |t|
     t.string   "title"
@@ -138,6 +174,25 @@ ActiveRecord::Schema.define(:version => 20130318212250) do
   add_index "notes", ["project_id", "noteable_type"], :name => "index_notes_on_project_id_and_noteable_type"
   add_index "notes", ["project_id"], :name => "index_notes_on_project_id"
 
+  create_table "old_events", :force => true do |t|
+    t.string   "target_type"
+    t.integer  "target_id"
+    t.string   "title"
+    t.text     "data"
+    t.integer  "project_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.integer  "action"
+    t.integer  "author_id"
+  end
+
+  add_index "old_events", ["action"], :name => "index_events_on_action"
+  add_index "old_events", ["author_id"], :name => "index_events_on_author_id"
+  add_index "old_events", ["created_at"], :name => "index_events_on_created_at"
+  add_index "old_events", ["project_id"], :name => "index_events_on_project_id"
+  add_index "old_events", ["target_id"], :name => "index_events_on_target_id"
+  add_index "old_events", ["target_type"], :name => "index_events_on_target_type"
+
   create_table "projects", :force => true do |t|
     t.string   "name"
     t.string   "path"
@@ -155,9 +210,12 @@ ActiveRecord::Schema.define(:version => 20130318212250) do
     t.string   "issues_tracker",         :default => "gitlab", :null => false
     t.string   "issues_tracker_id"
     t.boolean  "snippets_enabled",       :default => true,     :null => false
+    t.datetime "last_activity_at"
+    t.boolean  "git_protocol_enabled"
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
+  add_index "projects", ["last_activity_at"], :name => "index_projects_on_last_activity_at"
   add_index "projects", ["namespace_id"], :name => "index_projects_on_namespace_id"
 
   create_table "protected_branches", :force => true do |t|
@@ -269,6 +327,7 @@ ActiveRecord::Schema.define(:version => 20130318212250) do
     t.boolean  "can_create_team",        :default => true,  :null => false
     t.string   "state"
     t.integer  "color_scheme_id",        :default => 1,     :null => false
+    t.integer  "notification_level",     :default => 1,     :null => false
   end
 
   add_index "users", ["admin"], :name => "index_users_on_admin"

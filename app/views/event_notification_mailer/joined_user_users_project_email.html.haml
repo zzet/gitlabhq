@@ -1,0 +1,1 @@
+= "User #{link_to @member.name, user_url(@member.username)} was added to project members of #{link_to @project.path_with_namespace, project_url(@project.path_with_namespace)} project with #{@project.project_access_human(@member)} permission by #{link_to @user.name, user_url(@user.username)}"

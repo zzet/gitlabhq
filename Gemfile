@@ -113,6 +113,9 @@ gem "git"
 # Cache
 gem "redis-rails"
 
+# Inline CSS in email
+gem 'roadie'
+
 group :assets do
   gem "sass-rails",   "~> 3.2.5"
   gem "coffee-rails", "~> 3.2.2"
@@ -130,6 +133,7 @@ group :assets do
   gem "font-awesome-sass-rails", "~> 3.0.0"
   gem "gemoji", "~> 1.2.1", require: 'emoji/railtie'
   gem "gon"
+  gem "js-routes"
 end
 
 group :development do
@@ -154,14 +158,17 @@ group :development do
   gem 'capistrano'
   gem 'rvm-capistrano'
   gem 'capistrano-ext'
-  gem 'capistrano_colors'
   gem 'airbrake'
+  gem 'capistrano-maintenance'
 end
+
+gem 'rb-inotify', require: linux_only('rb-inotify')
+gem 'airbrake'
 
 group :development, :test do
   gem 'coveralls', require: false
   gem 'rails-dev-tweaks'
-  gem 'spinach-rails', '0.2.0'
+  gem 'spinach-rails'
   gem "rspec-rails", '2.12.2'
   gem "capybara", '2.0.2'
   gem "pry"
@@ -177,7 +184,6 @@ group :development, :test do
   # Notification
   gem 'rb-fsevent', require: darwin_only('rb-fsevent')
   gem 'growl',      require: darwin_only('growl')
-  gem 'rb-inotify', require: linux_only('rb-inotify')
 
   # PhantomJS driver for Capybara
   gem 'poltergeist', '1.1.0'

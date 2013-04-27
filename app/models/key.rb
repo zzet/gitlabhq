@@ -15,18 +15,26 @@
 require 'digest/md5'
 
 class Key < ActiveRecord::Base
+  include Watchable
+
   belongs_to :user
   belongs_to :project
+
+  has_many :events, as: :source
+  has_many :subscriptions, through: :user, source: :subscriprions
+  has_many :notifications, through: :subscriptions
 
   attr_accessible :key, :title
 
   before_validation :strip_white_space
 
   validates :title, presence: true, length: { within: 0..255 }
-  validates :key, presence: true, length: { within: 0..5000 }, format: { :with => /ssh-.{3} / }, uniqueness: true
+  validates :key, presence: true, length: { within: 0..5000 }, format: { with: /ssh-.{3} / }, uniqueness: true
   validate :fingerprintable_key
 
   delegate :name, :email, to: :user, prefix: true
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def strip_white_space
     self.key = self.key.strip unless self.key.blank?
@@ -48,7 +56,7 @@ class Key < ActiveRecord::Base
   end
 
   def is_deploy_key
-    !!project_id
+    project.present?
   end
 
   # projects that has this key

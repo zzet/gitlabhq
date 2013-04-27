@@ -14,13 +14,19 @@
 #
 
 class Snippet < ActiveRecord::Base
+  include Watchable
   include Linguist::BlobHelper
 
   attr_accessible :title, :content, :file_name, :expires_at
 
   belongs_to :project
-  belongs_to :author, class_name: "User"
-  has_many :notes, as: :noteable, dependent: :destroy
+  belongs_to :author, class_name: User
+  has_many :notes,    as: :noteable,  dependent: :destroy
+
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
 
   delegate :name, :email, to: :author, prefix: true, allow_nil: true
 
@@ -34,6 +40,8 @@ class Snippet < ActiveRecord::Base
   scope :fresh, -> { order("created_at DESC") }
   scope :non_expired, -> { where(["expires_at IS NULL OR expires_at > ?", Time.current]) }
   scope :expired, -> { where(["expires_at IS NOT NULL AND expires_at < ?", Time.current]) }
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def self.content_types
     [

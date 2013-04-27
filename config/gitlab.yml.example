@@ -37,6 +37,17 @@ production: &base
     # signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
     # username_changing_enabled: false # default: true - User can change her username/namespace
 
+    ## Enable support cloning projects via git protocol (git://)
+    # You need git daemon to use this feature!
+    # git_daemon_enabled: true
+
+    ## Default project features settings
+    default_projects_features:
+      issues: true
+      merge_requests: true
+      wiki: true
+      wall: true
+      snippets: true
 
   ## External issues trackers
   issues_tracker:
@@ -152,6 +163,7 @@ test:
     redmine:
       project_url: "http://redmine/projects/:issues_tracker_id"
       issues_url: "http://redmine/:project_id/:issues_tracker_id/:id"
+      new_issue_url: "http://redmine/projects/:issues_tracker_id/issues/new"
 
 staging:
   <<: *base

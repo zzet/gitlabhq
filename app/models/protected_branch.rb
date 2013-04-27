@@ -10,6 +10,7 @@
 #
 
 class ProtectedBranch < ActiveRecord::Base
+  include Watchable
   include Gitlab::ShellAdapter
 
   attr_accessible :name
@@ -17,6 +18,13 @@ class ProtectedBranch < ActiveRecord::Base
   belongs_to :project
   validates :name, presence: true
   validates :project, presence: true
+
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def commit
     project.repository.commit(self.name)

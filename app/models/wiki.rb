@@ -13,11 +13,18 @@
 #
 
 class Wiki < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :title, :content, :slug
 
   belongs_to :project
   belongs_to :user
   has_many :notes, as: :noteable, dependent: :destroy
+
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
 
   validates :content, presence: true
   validates :user, presence: true
@@ -26,6 +33,8 @@ class Wiki < ActiveRecord::Base
   before_update :set_slug
 
   scope :ordered, order("created_at DESC")
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def to_param
     slug

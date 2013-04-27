@@ -85,11 +85,7 @@ Gitlab::Application.routes.draw do
     resource :logs, only: [:show]
     resource :resque, controller: 'resque', only: [:show]
 
-    resources :projects, constraints: { id: /[a-zA-Z.\/0-9_\-]+/ }, except: [:new, :create] do
-      member do
-        get :team
-        put :team_update
-      end
+    resources :projects, constraints: { id: /[a-zA-Z.\/0-9_\-]+/ }, only: [:index, :show] do
       scope module: :projects, constraints: { id: /[a-zA-Z.\/0-9_\-]+/ } do
         resources :members, only: [:edit, :update, :destroy]
       end
@@ -99,6 +95,17 @@ Gitlab::Application.routes.draw do
   end
 
   get "errors/githost"
+
+  namespace :notifications do
+    resource :subscription, only: [:create, :destroy] do
+      collection do
+        post :on_all
+        delete :from_all
+        post :on_own_changes
+        delete :from_own_changes
+      end
+    end
+  end
 
   #
   # Profile Area
@@ -114,12 +121,13 @@ Gitlab::Application.routes.draw do
       put :reset_private_token
       put :update_username
     end
+    scope module: :profiles do
+      resources :subscriptions
+    end
   end
 
   resources :keys
   match "/u/:username" => "users#show", as: :user, constraints: { username: /.*/ }
-
-
 
   #
   # Dashboard Area
@@ -167,15 +175,19 @@ Gitlab::Application.routes.draw do
   # Project Area
   #
   resources :projects, constraints: { id: /(?:[a-zA-Z.0-9_\-]+\/)?[a-zA-Z.0-9_\-]+/ }, except: [:new, :create, :index], path: "/" do
+    member do
+      put :transfer
+    end
+
     resources :blob,    only: [:show], constraints: {id: /.+/}
-    resources :tree,    only: [:show, :edit, :update], constraints: {id: /.+/}
+    resources :tree,    only: [:show], constraints: {id: /.+/, format: /(html|js)/ }
+    resources :edit_tree,    only: [:show, :update], constraints: {id: /.+/}, path: 'edit'
     resources :commit,  only: [:show], constraints: {id: /[[:alnum:]]{6,40}/}
     resources :commits, only: [:show], constraints: {id: /(?:[^.]|\.(?!atom$))+/, format: /atom/}
     resources :compare, only: [:index, :create]
     resources :blame,   only: [:show], constraints: {id: /.+/}
     resources :graph,   only: [:show], constraints: {id: /(?:[^.]|\.(?!json$))+/, format: /json/}
-    match "/compare/:from...:to" => "compare#show", as: "compare",
-                    :via => [:get, :post], constraints: {from: /.+/, to: /.+/}
+    match "/compare/:from...:to" => "compare#show", as: "compare", via: [:get, :post], constraints: {from: /.+/, to: /.+/}
 
     resources :wikis, only: [:show, :edit, :destroy, :create] do
       collection do
@@ -288,6 +300,8 @@ Gitlab::Application.routes.draw do
           delete :resign
         end
       end
+
+      resources :tokens,  only: [:show, :create]
     end
 
     resources :notes, only: [:index, :create, :destroy] do

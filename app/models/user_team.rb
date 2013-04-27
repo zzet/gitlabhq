@@ -12,6 +12,8 @@
 #
 
 class UserTeam < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :name, :description, :owner_id, :path
 
   belongs_to :owner, class_name: User
@@ -22,6 +24,12 @@ class UserTeam < ActiveRecord::Base
   has_many :projects, through: :user_team_project_relationships
   has_many :members,  through: :user_team_user_relationships, source: :user
 
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
+  validates :name, presence: true, uniqueness: true
   validates :owner, presence: true
   validates :name, presence: true, uniqueness: true,
             length: { within: 0..255 },
@@ -36,6 +44,8 @@ class UserTeam < ActiveRecord::Base
   scope :with_project, ->(project){ joins(:user_team_project_relationships).where(user_team_project_relationships: {project_id: project})}
   scope :without_project, ->(project){ where("user_teams.id NOT IN (:ids)", ids: (a = with_project(project); a.blank? ? 0 : a))}
   scope :created_by, ->(user){ where(owner_id: user) }
+
+  actions_to_watch [:created, :updated, :assigned, :reassigned, :deleted, :transfer]
 
   class << self
     def search query
@@ -111,7 +121,7 @@ class UserTeam < ActiveRecord::Base
   end
 
   def admin?(member)
-    user_team_user_relationships.with_user(member).first.group_admin?
+    member.admin? || user_team_user_relationships.with_user(member).first.group_admin?
   end
 
 end

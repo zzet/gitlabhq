@@ -1,0 +1,1 @@
+= raw "#{ link_to @member.name, user_url(@member.username) } was added to #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project team with #{ @project.project_access_human(@member) } permision by #{ link_to @user.name, user_url(@user.username) }."

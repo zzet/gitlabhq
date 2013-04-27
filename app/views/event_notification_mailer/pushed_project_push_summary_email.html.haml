@@ -1,0 +1,19 @@
+%h2= "#{@event.author.name} #{@event.action} to #{@event.target.name} at #{@event.created_at}"
+
+Push summary between 
+%strong= @commits.last.sha
+and
+%strong= @commits.first.sha
+
+= link_to 'Compare', project_compare_url(@event.target, @commits.first, @commits.last)
+
+- if @commits.present?
+  %div.ui-box
+    %h5.title
+      Commits (#{@commits.count})
+    %ul.well-list= render partial: "event_notification_mailer/commit", collection: @commits
+
+  - unless @diffs.empty?
+    %h4 Diff
+    = render "event_notification_mailer/diffs", diffs: @diffs
+

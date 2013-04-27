@@ -1,0 +1,9 @@
+= raw "#{ link_to @user.name, user_url(@user.username) } deleted group of projects:"
+%br
+%table
+  %tr
+    %td Name
+    %td= @group["name"]
+  %tr
+    %td Description
+    %td= @group["description"]

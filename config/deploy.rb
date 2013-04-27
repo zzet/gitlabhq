@@ -1,16 +1,30 @@
+require 'rake'
+
 set :stages, %w(production staging)
 set :default_stage, "staging"
 
-require 'capistrano/ext/multistage'
-require 'capi/unicorn'
-require 'airbrake/capistrano'
-require 'rake'
+#set :domain,         'set application domain here'
+set :db_adapter,     'postgres' # or mysql
+set :mount_point,    '/'
+set :application,    'gitlabhq'
+set :user,           'git'
+set :rails_env,      'production'
+set :deploy_to,      "/home/#{user}/apps/#{application}"
+set :bundle_without, %w[development test] + (%w[mysql postgres] - [db_adapter])
+set :asset_env,      "RAILS_GROUPS=assets RAILS_RELATIVE_URL_ROOT=#{mount_point.sub(/\/+\Z/, '')}"
+
+#set :sidekiq_cmd, "#{bundle_cmd} exec sidekiq"
+#set :sidekiqctl_cmd, "#{bundle_cmd} exec sidekiqctl"
+#set :sidekiq_timeout, 10
+#set :sidekiq_role, :app
+#set :sidekiq_pid, "#{current_path}/tmp/pids/sidekiq.pid"
+#set :sidekiq_processes, 1
 
 set :application, "gitlab"
 set :rvm_type, :system
 
 set :scm, :git
-set :repository, "git://github.com/Undev/gitlabhq.git"# "git@gitlab.home:gitlabhq.git"
+set :repository, "gitorious@git.undev.cc:infrastructure/gitlab.git"
 
 set :use_sudo, false
 set :ssh_options, :forward_agent => true
@@ -40,10 +54,8 @@ namespace :deploy do
 end
 
 before 'deploy:finalize_update',
-       'deploy:symlink_db',
-       'deploy:symlink_gitlab',
-       #'deploy:symlink_resque',
-       'deploy:symlink_unicorn'
+  'deploy:symlink_gitlab',
+  'deploy:symlink_resque',
+  'deploy:symlink_unicorn'
 after "deploy:restart", "unicorn:stop"
 after "deploy:update", "deploy:cleanup"
-
