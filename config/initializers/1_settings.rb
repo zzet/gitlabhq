@@ -17,13 +17,14 @@ class Settings < Settingslogic
       end
     end
 
-    def build_gitlab_url
+    def build_gitlab_url(protocol = nil)
       if gitlab_on_non_standard_port?
         custom_port = ":#{gitlab.port}"
       else
         custom_port = nil
       end
-      [ gitlab.protocol,
+      protocol ||= gitlab.protocol
+      [ protocol,
         "://",
         gitlab.host,
         custom_port,
@@ -57,9 +58,17 @@ Settings.gitlab['protocol']   ||= Settings.gitlab.https ? "https" : "http"
 Settings.gitlab['email_from'] ||= "gitlab@#{Settings.gitlab.host}"
 Settings.gitlab['support_email']  ||= Settings.gitlab.email_from
 Settings.gitlab['url']        ||= Settings.send(:build_gitlab_url)
+Settings.gitlab['git_url']    ||= Settings.send(:build_gitlab_url, "git")
 Settings.gitlab['user']       ||= 'git'
 Settings.gitlab['signup_enabled'] ||= false
 Settings.gitlab['username_changing_enabled'] = true if Settings.gitlab['username_changing_enabled'].nil?
+Settings.gitlab['git_daemon_enabled'] ||= false
+Settings.gitlab['default_projects_features'] ||= {}
+Settings.gitlab.default_projects_features['issues']         = true if Settings.gitlab.default_projects_features['issues'].nil?
+Settings.gitlab.default_projects_features['merge_requests'] = true if Settings.gitlab.default_projects_features['merge_requests'].nil?
+Settings.gitlab.default_projects_features['wiki']           = true if Settings.gitlab.default_projects_features['wiki'].nil?
+Settings.gitlab.default_projects_features['wall']           = true if Settings.gitlab.default_projects_features['wall'].nil?
+Settings.gitlab.default_projects_features['snippets']       = true if Settings.gitlab.default_projects_features['snippets'].nil?
 
 #
 # Gravatar

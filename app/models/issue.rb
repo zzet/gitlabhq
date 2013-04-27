@@ -18,26 +18,19 @@
 
 class Issue < ActiveRecord::Base
   include Issuable
+  include Watchable
 
   attr_accessible :title, :assignee_id, :position, :description,
                   :milestone_id, :label_list, :author_id_of_changes,
                   :state_event
 
+  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented]
+
   acts_as_taggable_on :labels
 
-  class << self
-    def cared(user)
-      where('assignee_id = :user', user: user.id)
-    end
-
-    def authored(user)
-      where('author_id = :user', user: user.id)
-    end
-
-    def open_for(user)
-      opened.assigned(user)
-    end
-  end
+  scope :cared, ->(user) { where(assignee_id: user) }
+  scope :authored, ->(user) { where(author_id: user) }
+  scope :open_for, ->(user) { opened.assigned(user) }
 
   state_machine :state, initial: :opened do
     event :close do

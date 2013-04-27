@@ -37,7 +37,10 @@
           %span.light Created at:
           %strong
             = @project.created_at.stamp("March 1, 1999")
-
+        %li
+          %span.light Project page:
+          %strong
+            = link_to @project.name_with_namespace, project_path(@project)
         %li
           %span.light http:
           %strong

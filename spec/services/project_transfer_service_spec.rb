@@ -44,4 +44,3 @@ describe ProjectTransferService do
     service
   end
 end
-

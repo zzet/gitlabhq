@@ -76,6 +76,7 @@ FactoryGirl.define do
     project
     source_branch "master"
     target_branch "stable"
+    state :opened
 
     # pick 3 commits "at random" (from bcf03b5d~3 to bcf03b5d)
     trait :with_diffs do
@@ -135,10 +136,10 @@ FactoryGirl.define do
     end
   end
 
-  factory :event do
+  factory :old_event do
     factory :closed_issue_event do
       project
-      action { Event::CLOSED }
+      action { OldEvent::CLOSED }
       target factory: :closed_issue
       author factory: :user
     end

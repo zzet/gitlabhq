@@ -11,16 +11,25 @@
 #
 
 class UserTeamProjectRelationship < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :greatest_access, :project_id, :user_team_id
 
   belongs_to :user_team
   belongs_to :project
+
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
 
   validates :project,   presence: true
   validates :user_team, presence: true
   validate :check_greatest_access
 
   scope :with_project, ->(project){ where(project_id: project.id) }
+
+  actions_to_watch [:created, :deleted, :updated]
 
   def team_name
     user_team.name

@@ -13,18 +13,27 @@
 #
 
 class Milestone < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :title, :description, :due_date, :state_event, :author_id_of_changes
+
   attr_accessor :author_id_of_changes
 
   belongs_to :project
   has_many :issues
   has_many :merge_requests
+  has_many :participants, through: :issues, source: :assignee
 
-  scope :active, -> { with_state(:active) }
-  scope :closed, -> { with_state(:closed) }
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
 
   validates :title, presence: true
   validates :project, presence: true
+
+  scope :active, -> { with_state(:active) }
+  scope :closed, -> { with_state(:closed) }
 
   state_machine :state, initial: :active do
     event :close do
@@ -40,16 +49,14 @@ class Milestone < ActiveRecord::Base
     state :active
   end
 
+  actions_to_watch [:created, :closed, :reopend, :deleted, :updated]
+
   def expired?
     if due_date
       due_date.past?
     else
       false
     end
-  end
-
-  def participants
-    User.where(id: issues.pluck(:assignee_id))
   end
 
   def open_items_count

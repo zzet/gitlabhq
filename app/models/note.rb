@@ -19,12 +19,19 @@ require 'carrierwave/orm/activerecord'
 require 'file_size_validator'
 
 class Note < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :note, :noteable, :noteable_id, :noteable_type, :project_id,
                   :attachment, :line_code, :commit_id
 
   belongs_to :project
   belongs_to :noteable, polymorphic: true
-  belongs_to :author, class_name: "User"
+  belongs_to :author,   class_name: User
+
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
 
   delegate :name, to: :project, prefix: true
   delegate :name, :email, to: :author, prefix: true
@@ -47,6 +54,8 @@ class Note < ActiveRecord::Base
   scope :fresh, ->{ order("created_at ASC, id ASC") }
   scope :inc_author_project, ->{ includes(:project, :author) }
   scope :inc_author, ->{ includes(:author) }
+
+  actions_to_watch [:created, :deleted, :updated]
 
   def self.create_status_change_note(noteable, author, status)
     create({

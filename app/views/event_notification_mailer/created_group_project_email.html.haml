@@ -1,0 +1,31 @@
+= raw "#{ link_to @user.name, user_url(@user.username) } created new project in #{ link_to @group.name, group_url(@group.path)}:"
+%br
+%table
+  %tr
+    %td Name
+    %td= @project.name
+  %tr
+    %td Description
+    %td= @project.description
+  %tr
+    %td Page
+    %td= link_to @project.path_with_namespace, group_url(@project.path_with_namespace)
+  - if @project.issues_enabled?
+    %tr
+      %td Issue tracker
+      %td= @project.issues_tracker
+    %tr
+      %td Issue tracker external id
+      %td= @project.issues_tracker_id
+  - else
+    %tr
+      %td Issue status
+      %td Disabled
+  %tr
+    %td Wall status
+    %td= @project.wall_enabled? ? "Enabled" : "Disabled"
+  %tr
+    %td Merge request status
+    %td= @project.merge_requests_enabled? ? "Enabled" : "Disabled"
+
+%br

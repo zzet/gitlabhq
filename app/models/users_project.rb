@@ -11,6 +11,7 @@
 #
 
 class UsersProject < ActiveRecord::Base
+  include Watchable
   include Gitlab::ShellAdapter
 
   GUEST     = 10
@@ -22,6 +23,11 @@ class UsersProject < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :project
+
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
 
   attr_accessor :skip_git
 
@@ -38,8 +44,10 @@ class UsersProject < ActiveRecord::Base
   scope :masters,  -> { where(project_access: MASTER) }
 
   scope :in_project, ->(project) { where(project_id: project.id) }
-  scope :in_projects, ->(projects) { where(project_id: project_ids) }
+  scope :in_projects, ->(projects) { where(project_id: projects) }
   scope :with_user, ->(user) { where(user_id: user.id) }
+
+  actions_to_watch [:created, :updated, :deleted]
 
   class << self
 

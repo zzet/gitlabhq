@@ -37,7 +37,7 @@ class Ability
       elsif team.reporters.include?(user)
         rules << project_report_rules
 
-      elsif team.guests.include?(user)
+      elsif team.guests.include?(user) || project.public?
         rules << project_guest_rules
       end
 
@@ -80,7 +80,7 @@ class Ability
     end
 
     def project_master_rules
-      project_dev_rules + [
+      rules = project_dev_rules << [
         :push_code_to_protected_branches,
         :modify_issue,
         :modify_snippet,
@@ -92,17 +92,19 @@ class Ability
         :admin_merge_request,
         :admin_note,
         :admin_wiki,
-        :admin_project
-      ]
-    end
-
-    def project_admin_rules
-      project_master_rules + [
         :change_namespace,
         :change_public_mode,
         :rename_project,
-        :remove_project
+        :remove_project,
+        :admin_project
       ]
+
+      rules << [:change_public_via_git_mode] if Gitlab.config.gitlab.git_daemon_enabled
+      rules.flatten
+    end
+
+    def project_admin_rules
+      project_master_rules
     end
 
     def group_abilities user, group

@@ -38,9 +38,14 @@ Gitlab::Application.configure do
 
   # Use a different logger for distributed setups
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  logger = Logger.new(STDOUT)
+  logger.formatter = Logger::Formatter.new
+  logger.formatter.datetime_format = "%Y-%m-%d %H:%M:%S.%3N"
+  config.logger = logger
+  config.colorize_logging = false
 
   # Use a different cache store in production
-  config.cache_store = :redis_store
+  config.cache_store = :memory
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -65,12 +70,12 @@ Gitlab::Application.configure do
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
-  config.action_mailer.delivery_method = :sendmail
+  config.action_mailer.delivery_method = :smtp
   # Defaults to:
-  # # config.action_mailer.sendmail_settings = {
-  # #   :location => '/usr/sbin/sendmail',
-  # #   :arguments => '-i -t'
-  # # }
+  # config.action_mailer.sendmail_settings = {
+  #   :location => '/usr/sbin/sendmail',
+  #   :arguments => '-i -t'
+  # }
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
 end

@@ -1,16 +1,21 @@
 class GroupsController < ApplicationController
   respond_to :html
-  layout 'group', except: [:new, :create]
+  layout 'group', except: [:new, :create, :index]
 
-  before_filter :group, except: [:new, :create]
+  before_filter :group, except: [:new, :create, :index]
 
   # Authorize
-  before_filter :authorize_read_group!, except: [:new, :create]
+  before_filter :authorize_read_group!, except: [:new, :create, :index]
   before_filter :authorize_admin_group!, only: [:edit, :update, :destroy]
   before_filter :authorize_create_group!, only: [:new, :create]
 
   # Load group projects
-  before_filter :projects, except: [:new, :create]
+  before_filter :projects, except: [:new, :create, :index]
+
+  def index
+    @groups = current_user.authorized_groups
+    @groups = @groups.search(params[:name]) if params[:name].present?
+  end
 
   def new
     @group = Group.new
@@ -29,7 +34,7 @@ class GroupsController < ApplicationController
   end
 
   def show
-    @events = Event.in_projects(project_ids).limit(20).offset(params[:offset] || 0)
+    @events = OldEvent.in_projects(project_ids).limit(20).offset(params[:offset] || 0)
     @last_push = current_user.recent_push
 
     respond_to do |format|

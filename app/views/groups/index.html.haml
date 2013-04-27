@@ -1,0 +1,47 @@
+%h3.page_title
+  Groups
+
+%hr
+.row
+  .span12
+    = form_tag groups_path, method: :get, class: 'form-inline' do
+      = text_field_tag :name, params[:name], class: "xlarge"
+      = button_tag type: 'submit', class: 'btn' do
+        %i.icon-search
+
+    %ul.well-list
+      - @groups.each do |group|
+        %li.clearfix{id: "group#{group.id}"}
+          .left
+            - if group.projects.any?
+              %a.accordion-toggle{"href" => "#projects#{group.id}", "data-parent" => "group#{group.id}", "data-toggle" => "collapse"}
+                %i.icon-plus
+            %strong= link_to group.name, [:admin, group]
+          .pull-right.light
+            %strong Created
+            %span= time_ago_in_words(group.created_at)
+            ago by
+            = link_to group.owner_name, admin_user_path(group.owner_id)
+
+        - if group.projects.any?
+          %ul.well-list.collapse{id: "projects#{group.id}"}
+            - group.projects.each do |project|
+              %li.clearfix
+                .left
+                  = link_to project_path(project), class: dom_class(project) do
+                    - if project.namespace
+                      = project.namespace.human_name
+                      \/
+                    %strong.well-title
+                      = truncate(project.name, length: 25)
+                  %br
+                  %small.light
+                    %strong Last activity:
+                    %span= project_last_activity(project)
+                .right.light
+                  - if project.owner == current_user
+                    %i.icon-wrench
+                  - tm = project.team.get_tm(current_user.id)
+                  - if tm
+                    = tm.project_access_human
+

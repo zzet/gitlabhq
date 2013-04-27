@@ -50,8 +50,18 @@
               %i.icon-share
             - else
               %i.icon-lock.cgreen
+            - if @git_protocol_enabled
+              %span.cblue
+              - if project.git_protocol_enabled
+                %i.icon-ok
+              - else
+                %i.icon-off
+
             = link_to project.name_with_namespace, [:admin, project]
             .pull-right
+              = link_to project_path(project), id: "view_#{dom_id(project)}", class: "btn btn-small" do
+                %i.icon-list-alt
+                Public page
               = link_to 'Edit', edit_project_path(project), id: "edit_#{dom_id(project)}", class: "btn btn-small"
               = link_to 'Destroy', [project], confirm: "REMOVE #{project.name}? Are you sure?", method: :delete, class: "btn btn-small btn-remove"
         - if @projects.blank?

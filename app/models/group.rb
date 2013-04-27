@@ -13,6 +13,15 @@
 #
 
 class Group < Namespace
+  include Watchable
+
+  has_many :events,         as: :source
+  has_many :subscriptions,  as: :target, class_name: Event::Subscription
+  has_many :notifications,  through: :subscriptions
+  has_many :subscribers,    through: :subscriptions
+
+  actions_to_watch [:created, :deleted, :updated, :transfer]
+
   def add_users_to_project_teams(user_ids, project_access)
     UsersProject.add_users_into_projects(
       projects.map(&:id),
@@ -34,4 +43,5 @@ class Group < Namespace
   def truncate_teams
     UsersProject.truncate_teams(project_ids)
   end
+
 end

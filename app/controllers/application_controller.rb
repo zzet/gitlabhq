@@ -50,6 +50,7 @@ class ApplicationController < ActionController::Base
   def set_current_user_for_observers
     MergeRequestObserver.current_user = current_user
     IssueObserver.current_user = current_user
+    Gitlab::Event::Action.current_user = current_user
   end
 
   def abilities
@@ -65,7 +66,7 @@ class ApplicationController < ActionController::Base
 
     @project = Project.find_with_namespace(id)
 
-    if @project and can?(current_user, :read_project, @project)
+    if @project
       @project
     else
       @project = nil
