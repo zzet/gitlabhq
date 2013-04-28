@@ -5,8 +5,6 @@ class KeyObserver < BaseObserver
       key.shell_id,
       key.key
     )
-
-    notification.new_key(key)
   end
 
   def after_destroy(key)

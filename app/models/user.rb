@@ -33,7 +33,6 @@
 #  can_create_team        :boolean          default(TRUE), not null
 #  state                  :string(255)
 #  color_scheme_id        :integer          default(1), not null
-#  notification_level     :integer          default(1), not null
 #
 
 class User < ActiveRecord::Base
@@ -207,10 +206,6 @@ class User < ActiveRecord::Base
 
   def to_param
     username
-  end
-
-  def notification
-    @notification ||= Notification.new(self)
   end
 
   def generate_password

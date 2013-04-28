@@ -9,12 +9,6 @@ class UsersProjectObserver < BaseObserver
       action: OldEvent::JOINED,
       author_id: users_project.user.id
     )
-
-    notification.new_team_member(users_project)
-  end
-
-  def after_update(users_project)
-    notification.update_team_member(users_project)
   end
 
   def after_destroy(users_project)

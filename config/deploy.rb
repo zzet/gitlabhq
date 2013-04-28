@@ -54,6 +54,7 @@ namespace :deploy do
 end
 
 before 'deploy:finalize_update',
+  'deploy:symlink_db',
   'deploy:symlink_gitlab',
   'deploy:symlink_resque',
   'deploy:symlink_unicorn'
