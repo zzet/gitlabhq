@@ -170,8 +170,8 @@ group :development, :test do
   gem 'coveralls', require: false
   gem 'rails-dev-tweaks'
   gem 'spinach-rails'
-  gem "rspec-rails", '2.12.2'
-  gem "capybara", '2.0.2'
+  gem "rspec-rails"
+  gem "capybara"
   gem "pry"
   gem "awesome_print"
   gem "database_cleaner"
