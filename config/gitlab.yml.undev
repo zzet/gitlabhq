@@ -36,6 +36,15 @@ production: &base
     default_projects_limit: 10
     git_daemon_enabled: true
     # signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
+    # Default project features settings
+    default_projects_features:
+      issues: false
+      merge_requests: false
+      wiki: false
+      wall: false
+      snippets: false
+
+
 
   ## External issues trackers
   issues_tracker:
