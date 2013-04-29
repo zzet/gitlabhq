@@ -481,6 +481,16 @@ class EventNotificationMailer < ActionMailer::Base
   # Commented action
   #
 
+  def commented_related_project_note_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @source = @event.source
+    @target = @event.target
+
+    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created by #{@user.name} in #{@target.name} project wall [commented]")
+  end
+
   def commented_project_note_email(notification)
     @notification = notification
     @event = @notification.event
