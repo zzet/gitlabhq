@@ -32,6 +32,9 @@ class GitPushService
       project.execute_hooks(@push_data.dup)
       project.execute_services(@push_data.dup)
     end
+
+    project.execute_hooks(@push_data.dup) if push_tag?(ref, oldrev)
+
   end
 
   # This method provide a sample data
@@ -128,5 +131,12 @@ class GitPushService
 
     # Return if this is not a push to a branch (e.g. new commits)
     !(ref_parts[1] !~ /heads/ || oldrev == "00000000000000000000000000000000")
+  end
+
+  def push_tag? ref, oldrev
+    ref_parts = ref.split('/')
+
+    # Return if this is not a push to a branch (e.g. new commits)
+    !(ref_parts[1] !~ /tags/ || oldrev == "00000000000000000000000000000000")
   end
 end
