@@ -136,6 +136,7 @@ class Project < ActiveRecord::Base
     def find_with_namespace(id)
       if id.include?("/")
         id = id.split("/")
+        id.shift if id.count == 3
         namespace = ::Namespace.find_by_path(id.first)
         return nil unless namespace
 
