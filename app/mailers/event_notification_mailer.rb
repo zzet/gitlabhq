@@ -141,7 +141,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @target = @event.target
 
     if @web_hook && @project
-      mail(bcc: @notification.subscriber.email, subject: "New project_hook #{@web_hook.name} was created on #{@project.name} project [created]")
+      mail(bcc: @notification.subscriber.email, subject: "New project web hook was created on #{@project.name} project [created]")
     end
   end
 
