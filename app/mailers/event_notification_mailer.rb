@@ -141,7 +141,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @target = @event.target
 
     if @web_hook && @project
-      mail(bcc: @notification.subscriber.email, subject: "New project_hook #{@web_hook.name} was created on #{@project.name} project [created]")
+      mail(bcc: @notification.subscriber.email, subject: "New project web hook was created on #{@project.name} project [created]")
     end
   end
 
@@ -480,6 +480,16 @@ class EventNotificationMailer < ActionMailer::Base
   #
   # Commented action
   #
+
+  def commented_related_project_note_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @source = @event.source
+    @target = @event.target
+
+    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created by #{@user.name} in #{@target.name} project wall [commented]")
+  end
 
   def commented_project_note_email(notification)
     @notification = notification
