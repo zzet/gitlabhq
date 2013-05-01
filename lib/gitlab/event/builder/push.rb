@@ -16,7 +16,7 @@ class Gitlab::Event::Builder::Push < Gitlab::Event::Builder::Base
 
       case meta[:action]
       when :pushed
-        if refs_exists?
+        if refs_exists? push_data
           actions << :created_branch  if push_data[:ref] =~ /^refs\/heads/ && push_data[:before] =~ /^00000/
           actions << :deleted_branch  if push_data[:ref] =~ /^refs\/heads/ && push_data[:after]  =~ /^00000/
           actions << :created_tag     if push_data[:ref] =~ /^refs\/tag/   && push_data[:before] =~ /^00000/
