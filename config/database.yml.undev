@@ -5,7 +5,7 @@ production:
   adapter: postgresql
   encoding: unicode
   database: gitlab
-  pool: 5
+  pool: 150
   username: gitlab
   password:
   # socket:
@@ -29,7 +29,7 @@ staging:
   adapter: postgresql
   encoding: unicode
   database: gitlab
-  pool: 5
+  pool: 50
   username: gitlab
   password:
   # socket:
