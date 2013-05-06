@@ -492,7 +492,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created by #{@user.name} in #{@target.name} project wall [commented]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@target.name} project wall [commented]")
   end
 
   def commented_project_note_email(notification)
@@ -502,7 +502,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created by #{@user.name} in #{@target.name} project wall [commented]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@target.name} project wall [commented]")
   end
 
   def commented_merge_request_note_email(notification)
@@ -512,7 +512,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created by #{@user.name} in #{@target.name} merge request [commented]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@target.name} merge request [commented]")
   end
 
   def commented_issue_note_email(notification)
@@ -522,7 +522,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created by #{@user.name} in #{@target.name} issue [commented]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@target.name} issue [commented]")
   end
 
   def commented_note_note_email(notification)
@@ -532,7 +532,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created by #{@user.name} on #{@target.name} note [commented]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} on #{@target.name} note [commented]")
   end
 
   #
