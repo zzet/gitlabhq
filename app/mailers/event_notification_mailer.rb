@@ -1,7 +1,12 @@
 class EventNotificationMailer < ActionMailer::Base
-  layout 'event_notification_email' 
+  layout 'event_notification_email'
   helper :application, :commits, :tree, :gitlab_markdown
   default from: "Gitlab messeger <#{Gitlab.config.gitlab.email_from}>"
+
+  default_url_options[:host]     = Gitlab.config.gitlab.host
+  default_url_options[:protocol] = Gitlab.config.gitlab.protocol
+  default_url_options[:port]     = Gitlab.config.gitlab.port if Gitlab.config.gitlab_on_non_standard_port?
+  default_url_options[:script_name] = Gitlab.config.gitlab.relative_url_root
 
   # Just send email with 6 seconds delay
   # Wait presence of all objects
@@ -12,7 +17,6 @@ class EventNotificationMailer < ActionMailer::Base
   #
   # Default email
   #
-
   def default_email(notification, function)
     Rails.logger.info "unprocessed notification #{notification.inspect}"
     @notification = notification
@@ -1110,6 +1114,7 @@ class EventNotificationMailer < ActionMailer::Base
     result = Commit.compare(@project, @push_data["before"], @push_data["after"])
 
     if result
+      @before_commit = CommitDecorator.decorate(@project.repository.commit(@push_data["before"]))
       @branch = @push_data["ref"]
       @branch.slice!("refs/heads/")
 
@@ -1122,5 +1127,4 @@ class EventNotificationMailer < ActionMailer::Base
       mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")
     end
   end
-
 end

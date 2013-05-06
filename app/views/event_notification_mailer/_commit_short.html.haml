@@ -1,0 +1,26 @@
+%table{style: "background: #eee; color: #444"}
+  %tr
+    %th
+      Sha
+    %td
+      = commit.sha
+  %tr
+    %th
+      Date
+    %td
+      = commit.date
+  %tr
+    %th
+      Message
+    %td
+      = commit.safe_message
+  %tr
+    %th
+      Author
+    %td
+      = commit.author_link
+  %tr
+    %th
+      Commiter
+    %td
+      = commit.committer_link
