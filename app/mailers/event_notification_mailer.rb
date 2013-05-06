@@ -322,7 +322,7 @@ class EventNotificationMailer < ActionMailer::Base
     @target = @event.target
     @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "User #{@source.name} was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "User #{@updated_user.name} was updated by #{@user.name} [updated]")
   end
 
   def updated_user_team_user_team_email(notification)
@@ -333,7 +333,7 @@ class EventNotificationMailer < ActionMailer::Base
     @target = @event.target
     @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "Team #{@source.name} was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was updated by #{@user.name} [updated]")
   end
 
   def updated_user_team_user_team_project_relationship_email(notification)
@@ -341,10 +341,11 @@ class EventNotificationMailer < ActionMailer::Base
     @event = @notification.event
     @user = @event.author
     @source = @event.source
-    @target = @event.target
+    @team = @event.target
+    @project = @source.project
     @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "Default project access rules for team #{@team.name} were updated by #{@user.name} [updated]")
   end
 
   def updated_user_team_user_team_group_relationship_email(notification)
@@ -364,10 +365,11 @@ class EventNotificationMailer < ActionMailer::Base
     @event = @notification.event
     @user = @event.author
     @source = @event.source
-    @target = @event.target
+    @project = @event.target
+    @team = @source.user_team
     @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "Default project access rules for team #{@team.name} was updated by #{@user.name} [updated]")
   end
 
   def updated_user_team_user_team_user_relationship_email(notification)
@@ -375,10 +377,11 @@ class EventNotificationMailer < ActionMailer::Base
     @event = @notification.event
     @user = @event.author
     @source = @event.source
-    @target = @event.target
+    @team = @event.target
+    @member = @source.user
     @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "Membership settings for user #{@member.name} in team #{@team.name} was updated by #{@user.name} [updated]")
   end
 
   def updated_user_user_team_user_relationship_email(notification)
@@ -386,10 +389,11 @@ class EventNotificationMailer < ActionMailer::Base
     @event = @notification.event
     @user = @event.author
     @source = @event.source
-    @target = @event.target
+    @member = @event.target
+    @team = @source.user_team
     @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "Membership settings for user #{@member.name} in team #{@team.name} was updated by #{@user.name} [updated]")
   end
 
   def updated_user_users_project_email(notification)
@@ -397,10 +401,11 @@ class EventNotificationMailer < ActionMailer::Base
     @event = @notification.event
     @user = @event.author
     @source = @event.source
-    @target = @event.target
+    @member = @target = @event.target
+    @project = @source.project
     @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "Permissions for user #{ @member.name } in project #{@project.path_with_namespace} was updated by #{@user.name} [updated]")
   end
 
   def updated_project_users_project_email(notification)
@@ -408,10 +413,11 @@ class EventNotificationMailer < ActionMailer::Base
     @event = @notification.event
     @user = @event.author
     @source = @event.source
-    @target = @event.target
+    @project = @target = @event.target
+    @member = @source.user
     @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "Permissions for user #{ @member.name } in project #{@project.path_with_namespace} was updated by #{@user.name} [updated]")
   end
 
   #
