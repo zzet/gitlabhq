@@ -46,6 +46,14 @@ production: &base
 
 
 
+    ## Default project features settings
+    default_projects_features:
+      issues: false
+      merge_requests: false
+      wiki: false
+      wall: false
+      snippets: false
+
   ## External issues trackers
   issues_tracker:
     redmine:
