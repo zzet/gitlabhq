@@ -114,9 +114,6 @@ gem "git"
 # Cache
 gem "redis-rails"
 
-# Inline CSS in email
-gem 'roadie'
-
 group :assets do
   gem "sass-rails",   "~> 3.2.5"
   gem "coffee-rails", "~> 3.2.2"
