@@ -36,8 +36,7 @@ production: &base
     default_projects_limit: 10
     git_daemon_enabled: true
     # signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
-
-    ## Default project features settings
+    # Default project features settings
     default_projects_features:
       issues: false
       merge_requests: false
@@ -58,8 +57,8 @@ production: &base
       ##  :project_id        - Gitlab project identifier
       ##  :issues_tracker_id - Project Name or Id in external issue tracker
       ##  :id                - Issue id (from commit messages)
-      issues_url: "http://redmine/:project_id/:issues_tracker_id/:id"
-      new_issue_url: "http://redmine/projects/:issues_tracker_id/issues/new"
+      issues_url: "http://pm.undev.cc/:project_id/:issues_tracker_id/:id"
+      new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
 
   ## Gravatar
   gravatar:
@@ -168,3 +167,16 @@ staging:
     host: gitlab-staging-01.undev.cc
     port: 80
     https: false
+
+    default_projects_features:
+      issues: false
+      merge_requests: false
+      wiki: false
+      wall: false
+      snippets: false
+  ## External issues trackers
+  issues_tracker:
+    redmine:
+      project_url: "http://pm.undev.cc/projects/:issues_tracker_id"
+      issues_url: "http://pm.undev.cc/:project_id/:issues_tracker_id/:id"
+      new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
