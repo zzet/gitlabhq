@@ -12,6 +12,7 @@ class Admin::GroupsController < Admin::ApplicationController
     @projects = @projects.not_in_group(@group) if @group.projects.present?
     @projects = @projects.all
     @projects.reject!(&:empty_repo?)
+    @teams = @group.user_teams
 
     @users = User.active
   end

@@ -962,6 +962,28 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@project.path_with_namespace} project by #{@user.name} [assigned]")
   end
 
+  def assigned_group_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utgr = @source = @event.source
+    @group = @target = @event.target
+    @team = @utgr.user_team
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} project by #{@user.name} [assigned]")
+  end
+
+  def assigned_user_team_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utgr = @source = @event.source
+    @team = @target = @event.target
+    @group = @utgr.group
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} project by #{@user.name} [assigned]")
+  end
+
   def assigned_user_issue_email(notification)
     @notification = notification
     @event = @notification.event
@@ -1006,6 +1028,28 @@ class EventNotificationMailer < ActionMailer::Base
     @team = @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned to \"#{@project.path_with_namespace}\" project by #{@user.name} [reassigned]")
+  end
+
+  def reassigned_user_team_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @source = JSON.load(@event.data).to_hash
+    @group = Group.find(@source["group_id"])
+    @team = @target = @event.target
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned from \"#{@group.name}\" project by #{@user.name} [reassigned]")
+  end
+
+  def reassigned_group_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @source = JSON.load(@event.data).to_hash
+    @team = UserTeam.find(@source["user_team_id"])
+    @group = @target = @event.target
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned from \"#{@group.name}\" project by #{@user.name} [reassigned]")
   end
 
   def reassigned_user_issue_email(notification)

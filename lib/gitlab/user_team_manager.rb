@@ -132,6 +132,50 @@ module Gitlab
           UsersProject.in_projects(team.projects).with_user(user).destroy_all
         end
       end
+
+      def assign_to_group(team, group, access)
+        group = find_entity(group, Group)
+        team = find_entity(team, UserTeam)
+
+        searched_group = team.user_team_group_relationships.find_by_group_id(group.id)
+
+        unless searched_group.present?
+          team.user_team_group_relationships.create(group_id: group.id, greatest_access: access)
+          group.projects.each do |project|
+            assign(team, project, access)
+          end
+        end
+      end
+
+      def resign_from_group(team, group)
+        group = find_entity(group, Group)
+        team = find_entity(team, UserTeam)
+
+        team.user_team_group_relationships.with_group(group).destroy_all
+
+        group.projects.each do |project|
+          resign(team, project)
+        end
+      end
+
+      def update_team_user_access_in_group(team, group, access, rebuild_flag = nil)
+        group = find_entity(group, Group)
+        team = find_entity(team, UserTeam)
+
+        relationship = team.user_team_group_relationships.with_group(group)
+        relationship.update_all(greatest_access: access)
+
+        if rebuild_flag
+          group.projects.each do |project|
+            update_project_greates_access(team, project, permission)
+          end
+        end
+      end
+
+      def find_entity(entity, entity_type)
+        entity.is_a?(entity_type) ? entity : entity_type.find(entity)
+      end
+
     end
   end
 end

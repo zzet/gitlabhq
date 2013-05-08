@@ -111,7 +111,7 @@ class Ability
       rules = []
 
       # Only group owner and administrators can manage group
-      if group.owner == user || user.admin?
+      if group.owner == user || user.admin? || group.admins.include?(user)
         rules << [
           :manage_group,
           :manage_namespace

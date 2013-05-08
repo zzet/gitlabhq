@@ -15,6 +15,10 @@
 class Group < Namespace
   include Watchable
 
+  has_many :user_team_group_relationships, dependent: :destroy
+  has_many :user_teams, through: :user_team_group_relationships
+  has_many :admins, through: :user_teams, class_name: User, conditions: { user_team_user_relationships: { group_admin: true } }
+
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
