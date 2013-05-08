@@ -52,6 +52,19 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
           actions << :reassigned
         end
 
+      when ::UserTeamGroupRelationship
+        target = source.user_team
+
+        case meta[:action]
+        when :created
+          actions << :assigned
+        when :updated
+          actions << :updated
+          temp_data[:previous_changes] = source.changes
+        when :deleted
+          actions << :reassigned
+        end
+
       end
       events = []
       actions.each do |act|

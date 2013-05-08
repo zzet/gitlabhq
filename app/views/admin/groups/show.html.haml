@@ -70,7 +70,17 @@
           %td= project.users.count
           %td.bgred
             = link_to 'Transfer project to global namespace', remove_project_admin_group_path(@group, project_id: project.id), confirm: 'Remove project from group and move to global namespace. Are you sure?', method: :delete, class: "btn btn-remove small"
+- else
+  %fieldset
+    %legend Group is empty
 
+%fieldset
+  %legend Teams (#{@group.user_teams.count})
+  = render "groups/teams/team_list"
+
+%fieldset
+  %legend Users (#{@group.users.count})
+- if @group.users.any?
   = form_tag project_teams_update_admin_group_path(@group), id: "new_team_member", class: "bulk_import", method: :put  do
     %table.zebra-striped
       %thead

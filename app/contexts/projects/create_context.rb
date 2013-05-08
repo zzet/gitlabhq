@@ -55,10 +55,18 @@ module Projects
 
       if @project.save
         @project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
+
+        if namespace.type == "Group"
+          namespace.user_teams.each do |team|
+            access = team.max_project_access_in_group(namespace)
+            Gitlab::UserTeamManager.assign(team, project, access)
+          end
+        end
       end
 
       @project
     rescue => ex
+      @project.errors.add(:base, ex.message)
       @project.errors.add(:base, "Can't save project. Please try again later")
       @project
     end
