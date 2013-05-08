@@ -9,14 +9,18 @@
         = nav_link(path: 'groups#show', html_options: {class: 'home'}) do
           = link_to group_path(@group), title: "Home" do
             %i.icon-home
-        = nav_link(path: 'groups#issues') do
-          = link_to issues_group_path(@group) do
-            Issues
-            %span.count= current_user.assigned_issues.opened.of_group(@group).count
-        = nav_link(path: 'groups#merge_requests') do
-          = link_to merge_requests_group_path(@group) do
-            Merge Requests
-            %span.count= current_user.cared_merge_requests.opened.of_group(@group).count
+        - issues_count = current_user.assigned_issues.opened.of_group(@group).count
+        - if issues_count > 0
+          = nav_link(path: 'groups#issues') do
+            = link_to issues_group_path(@group) do
+              Issues
+              %span.count= issues_count
+        - mr_count = current_user.cared_merge_requests.opened.of_group(@group).count
+        - if mr_count > 0
+          = nav_link(path: 'groups#merge_requests') do
+            = link_to merge_requests_group_path(@group) do
+              Merge Requests
+              %span.count= mr_count
         = nav_link(path: 'groups#people') do
           = link_to "People", people_group_path(@group)
 
