@@ -177,3 +177,10 @@ staging:
     host: gitlab-staging-01.undev.cc
     port: 80
     https: false
+
+    default_projects_features:
+      issues: false
+      merge_requests: false
+      wiki: false
+      wall: false
+      snippets: false
