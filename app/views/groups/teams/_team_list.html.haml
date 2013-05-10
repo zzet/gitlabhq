@@ -1,5 +1,3 @@
-= link_to 'Add Team', new_group_team_path(@group), class: "btn btn-small pull-right"
-%br
 %table.zebra-striped
   %thead
     %tr
@@ -10,7 +8,6 @@
       %th Permission
       %th Admins
       %th Owner
-      %th.cred Danger Zone!
 
   - @teams.each do |team|
     %tr
@@ -18,12 +15,9 @@
         %strong= link_to team.name, team_path(team)
       %td= truncate team.description
       %td= team.human_max_group_access(@group)
-      %td= raw team.admins.any? ? team.admins.map { |a| link_to a.name, user_path(a) }.join(",") : "-"
+      %td= raw team.admins.any? ? team.admins.map { |a| link_to a.name, user_path(a) }.join(", ") : "-"
       %td
         - if team.owner
           = link_to team.owner.name, user_path(team.owner)
         - else
           (deleted)
-      %td.bgred
-        = link_to 'Edit', edit_group_team_path(@group, team), id: "edit_#{dom_id(team)}", class: "btn btn-small"
-        = link_to 'Destroy', group_team_path(@group, team), confirm: "REMOVE #{team.name}? Are you sure?", method: :delete, class: "btn btn-small btn-remove"
