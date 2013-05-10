@@ -28,7 +28,7 @@ class Ability
       team = project.team
 
       # Rules based on role in project
-      if team.masters.include?(user)
+      if team.masters.include?(user) || team.admin?(user)
         rules << project_master_rules
 
       elsif team.developers.include?(user)
