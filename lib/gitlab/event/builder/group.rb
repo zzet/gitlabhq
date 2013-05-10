@@ -60,7 +60,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
           actions << :updated
           temp_data[:previous_changes] = source.changes
         when :deleted
-          actions << :reassigned
+          actions << :resigned
         end
       end
 

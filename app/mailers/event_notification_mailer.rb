@@ -220,6 +220,17 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Group #{@source.name} was updated by #{@user.name} [updated]")
   end
 
+  def updated_group_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utgr = @source = @event.source
+    @group = @target = @event.target
+    @team = @utgr.user_team
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} project by #{@user.name} [assigned]")
+  end
+
   # User watch issue
   def updated_issue_issue_email(notification)
     @notification = notification
@@ -421,6 +432,18 @@ class EventNotificationMailer < ActionMailer::Base
 
     mail(bcc: @notification.subscriber.email, subject: "UT - P was updated by #{@user.name} [updated]")
   end
+
+  def updated_user_team_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utgr = @source = @event.source
+    @group = @target = @event.target
+    @team = @utgr.user_team
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} project by #{@user.name} [assigned]")
+  end
+
 
   def updated_project_user_team_project_relationship_email(notification)
     @notification = notification
@@ -810,10 +833,10 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @project = @source = @event.source
+    @group = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Project owner of #{@source.name} project in #{@target.name} group was changed by #{@user.name} [transfered]")
+    mail(bcc: @notification.subscriber.email, subject: "Project owner of #{@project.name} project in #{@group.name} group was changed by #{@user.name} [transfered]")
   end
 
   def transfer_project_project_email(notification)
@@ -973,7 +996,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} project by #{@user.name} [assigned]")
   end
 
-  def assigned_user_team_user_team_group_relationship_email(notification)
+  def joined_user_team_user_team_group_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
@@ -1030,7 +1053,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned to \"#{@project.path_with_namespace}\" project by #{@user.name} [reassigned]")
   end
 
-  def reassigned_user_team_user_team_group_relationship_email(notification)
+  def left_user_team_user_team_group_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
@@ -1041,7 +1064,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned from \"#{@group.name}\" project by #{@user.name} [reassigned]")
   end
 
-  def reassigned_group_user_team_group_relationship_email(notification)
+  def resigned_group_user_team_group_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
