@@ -25,6 +25,7 @@ class UserTeam < ActiveRecord::Base
   has_many :projects, through: :user_team_project_relationships
   has_many :members,  through: :user_team_user_relationships, source: :user
   has_many :admins,   through: :user_team_user_relationships, source: :user, conditions: { user_team_user_relationships: { group_admin: true } }
+  has_many :groups,   through: :user_team_group_relationships
 
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
