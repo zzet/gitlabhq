@@ -509,10 +509,10 @@ class EventNotificationMailer < ActionMailer::Base
     data = JSON.load(@event.data).to_hash
 
     @user = @event.author
-    @project = @source = data
+    @project = data
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted by #{@user.name} [deleted]")
+    mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted from #{@group.name} group by #{@user.name} [deleted]")
   end
 
   def deleted_project_project_email(notification)
@@ -977,11 +977,10 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = JSON.load(@event.data).to_hash
-    @project = Project.find(@source["project_id"])
+    @project = @source = JSON.load(@event.data).to_hash
     @team = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned to \"#{@project.path_with_namespace}\" project by #{@user.name} [reassigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned to \"#{@project["name"]}\" project by #{@user.name} [reassigned]")
   end
 
   def left_user_team_user_team_group_relationship_email(notification)
