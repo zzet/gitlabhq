@@ -79,10 +79,16 @@ module Gitlab
         granted_access = max_teams_member_permission_in_project(user, project, action)
 
         project_team_user = UsersProject.find_by_user_id_and_project_id(user.id, project.id)
-        project_team_user.destroy if project_team_user.present?
+        project_team_user.update_attributes(project_access: granted_access) if update_team_user_access_in_project?(project_team_user, granted_access)
+        #project_team_user.destroy if project_team_user.present?
+        ## project_team_user.project_access != granted_access
+        #project.team << [user, granted_access] if granted_access > 0
+      end
 
-        # project_team_user.project_access != granted_access
-        project.team << [user, granted_access] if granted_access > 0
+      def update_team_user_access_in_project?(project_team_user, granted_access)
+        return false if project_team_user.project_access == granted_access
+        return true if granted_access > 0
+        false
       end
 
       def max_teams_member_permission_in_project(user, project, action = nil, teams = nil)
