@@ -1,3 +1,9 @@
+- if @suppress_diff
+  .alert.alert-block
+    %p
+      %strong Warning! Large commit with more than #{Commit::DIFF_SAFE_SIZE} files changed.
+    %p To prevent performance issue we rejected diff information.
+
 %p{style: "color:gray"}
   Showing #{pluralize(diffs.count, "changed file")}
 %div
@@ -27,38 +33,39 @@
               *
               = diff.new_path
 
-%div
-  - diffs.each_with_index do |diff, i|
-    - next if diff.diff.empty?
-    - file = (@commit.tree / diff.new_path)
-    - file = (@commit.prev_commit.tree / diff.old_path) unless file
-    - next unless file
-    %div{id: "diff-#{i}", style: "border:1px solid #ccc;margin-bottom:1em"}
-      %div{style: "padding:5px 5px 5px 10px;color:#555;border-bottom:1px solid #ccc;background:#eee;background-image:-o-linear-gradient(#eee 6.6%,#dfdfdf)"}
-        - if diff.deleted_file
-          %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:14px;line-height:30px"}
-            = diff.old_path
+- unless @suppress_diff
+  %div
+    - diffs.each_with_index do |diff, i|
+      - next if diff.diff.empty?
+      - file = (@commit.tree / diff.new_path)
+      - file = (@commit.prev_commit.tree / diff.old_path) unless file
+      - next unless file
+      %div{id: "diff-#{i}", style: "border:1px solid #ccc;margin-bottom:1em"}
+        %div{style: "padding:5px 5px 5px 10px;color:#555;border-bottom:1px solid #ccc;background:#eee;background-image:-o-linear-gradient(#eee 6.6%,#dfdfdf)"}
+          - if diff.deleted_file
+            %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:14px;line-height:30px"}
+              = diff.old_path
 
-          - if @commit.prev_commit
-            = link_to project_tree_url(@project, tree_join(@commit.prev_commit_id, diff.new_path)), {style: 'color:#474d57;font-weight:bold'} do
+            - if @commit.prev_commit
+              = link_to project_tree_url(@project, tree_join(@commit.prev_commit_id, diff.new_path)), {style: 'color:#474d57;font-weight:bold'} do
+                View file @
+                %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:smaller"}
+                  = @commit.short_id(6)
+          - else
+            %span= diff.new_path
+            - if diff.a_mode && diff.b_mode && diff.a_mode != diff.b_mode
+              %span.file-mode= "#{diff.a_mode} → #{diff.b_mode}"
+
+            = link_to project_tree_url(@project, tree_join(@commit.id, diff.new_path)), {style: 'color:#474d57;font-weight:bold'} do
               View file @
               %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:smaller"}
                 = @commit.short_id(6)
-        - else
-          %span= diff.new_path
-          - if diff.a_mode && diff.b_mode && diff.a_mode != diff.b_mode
-            %span.file-mode= "#{diff.a_mode} → #{diff.b_mode}"
 
-          = link_to project_tree_url(@project, tree_join(@commit.id, diff.new_path)), {style: 'color:#474d57;font-weight:bold'} do
-            View file @
-            %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:smaller"}
-              = @commit.short_id(6)
-
-      %div{style: "overflow:auto;overflow-y:hidden;background:#fff;color:#333;font-size:12px"}
-        -# Skipp all non non-supported blobs
-        - next unless file.respond_to?('text?')
-        - if file.text?
-          = render "event_notification_mailer/text_file", diff: diff, index: i
-        - else
-          %p
-            No preview for this file type
+        %div{style: "overflow:auto;overflow-y:hidden;background:#fff;color:#333;font-size:12px"}
+          -# Skipp all non non-supported blobs
+          - next unless file.respond_to?('text?')
+          - if file.text?
+            = render "event_notification_mailer/text_file", diff: diff, index: i
+          - else
+            %p
+              No preview for this file type
