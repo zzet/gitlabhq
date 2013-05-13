@@ -12,6 +12,7 @@ class ActivityObserver < ActiveRecord::Observer
           :user,            # +
           :user_team,       # +
           :user_team_project_relationship,
+          :user_team_group_relationship,
           :user_team_user_relationship,
           :users_project,   # +
           :project_hook,    # +

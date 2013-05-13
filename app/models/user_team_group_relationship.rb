@@ -1,4 +1,6 @@
 class UserTeamGroupRelationship < ActiveRecord::Base
+  include Watchable
+
   attr_accessible :group_id, :user_team_id, :greatest_access
 
   belongs_to :group
@@ -9,6 +11,8 @@ class UserTeamGroupRelationship < ActiveRecord::Base
   validate :check_greatest_access
 
   scope :with_group, ->(group) {where(group_id: group)}
+
+  actions_to_watch [:created, :deleted, :updated]
 
   def human_max_access
     UserTeam.access_roles.key(greatest_access)

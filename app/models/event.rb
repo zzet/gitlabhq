@@ -25,7 +25,7 @@ class Event < ActiveRecord::Base
   end
 
   def deleted_event?
-    action.to_sym == :deleted
+     [:deleted, :resigned].include? action.to_sym
   end
 
   # For Hash only

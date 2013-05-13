@@ -9,11 +9,24 @@ class Gitlab::Event::Notifications
         subscriptions.each do |subscription|
           # Not send notification about changes to changes author
           # TODO. Rewrite in future with check by Entity type
-          if ((subscription.user != event.author) || (event.author.notification_setting && event.author.notification_setting.own_changes))
+          if build_notification?(subscription, event)
             subscription.notifications.create(event: event, subscriber: subscription.user)
           end
         end
 
+      end
+    end
+
+    def build_notification?(subscription, event)
+      if ((subscription.user != event.author) || (event.author.notification_setting && event.author.notification_setting.own_changes))
+        event_data = JSON.load(event.data).to_hash
+        if event_data["team_echo"].present?
+          return false
+        else
+          return true
+        end
+      else
+        return false
       end
     end
 

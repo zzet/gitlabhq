@@ -25,9 +25,10 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :updated
           changes = source.changes
 
-          actions << :transfer if source.creator_id_changed? && source.creator_id != changes[:creator_id].first
+          #actions << :ownership_changed if source.creator_id_changed? && source.creator_id != changes[:creator_id].first
+          actions << :transfer if source.namespace_id_changed? && (source.namespace_id != changes[:namespace_id].first)
 
-          if actions.blank? && project_changes_exists?(changes)
+          if project_changes_exists?(changes)
             temp_data[:previous_changes] = changes
             actions << :updated
           end
@@ -146,6 +147,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         end
 
       when ::UsersProject
+        team_events = ::Event.where(target_id: target.id, target_type: target.class, created_at: (Time.now - 5.minutes)..Time.now)
+        temp_data[:team_echo] = true if team_events.any?
+
         target = source.project
 
         case meta[:action]
@@ -179,7 +183,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
                         :issues_tracker, :issues_tracker_id]
       is_actual_changes = false
       watched_fields.each do |field|
-        is_actual_changes = true if changes.keys.include? field
+        is_actual_changes = true if changes.keys.include? field.to_s
       end
       is_actual_changes
     end
