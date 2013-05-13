@@ -44,47 +44,15 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "New group #{@source.name} was created [created]")
   end
 
-  # User subscribed on self updates
-  def created_user_key_email(notification)
-    @notification = notification
-    @event = @notification.event
-    @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "New key was created for #{@target.name} [created]")
-  end
-
-  # User subscribed on new issues in project
-  def created_project_issue_email(notification)
-    @notification = notification
-    @event = @notification.event
-    @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "New issue #{@source.name} was created on #{@target.name} [created]")
-  end
-
   # User subscribed on new milestones in project
   def created_project_milestone_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @milestone = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New milestone #{@source.name} was created on #{@target.name} [created]")
-  end
-
-  def created_project_note_email(notification)
-    @notification = notification
-    @event = @notification.event
-    @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created on #{@target.name} wall [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New milestone #{@milestone.title} was created on #{@project.path_with_namespace} [created]")
   end
 
   def created_issue_note_email(notification)
@@ -117,16 +85,6 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created on #{@target.name} in #{@target.project.name} [created]")
   end
 
-  def created_group_project_email(notification)
-    @notification = notification
-    @event = @notification.event
-    @user = @event.author
-    @project = @source = @event.source
-    @group = @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "New project #{@project.path_with_namespace} was created on #{@group.name} group [created]")
-  end
-
   def created_project_project_email(notification)
     @notification = notification
     @event = @notification.event
@@ -149,7 +107,7 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
-  def created_project_protected_btanch_email(notification)
+  def created_project_protected_branch_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
@@ -159,24 +117,24 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "New protected_branch #{@source.name} was created on #{@target.name} project [created]")
   end
 
-  def created_project_service_email(notification)
+  def added_project_service_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @service = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New service #{@source.name} was created on #{@target.name} project [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New service #{@service.title} was created on #{@project.path_with_namespace} project [created]")
   end
 
   def created_project_snippet_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @snippet = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New snippet #{@source.name} was created on #{@target.name} project [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New snippet #{@snippet.title} was created on #{@project.path_with_namespace} project [created]")
   end
 
   def created_project_system_hook_email(notification)
@@ -246,17 +204,6 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Issue #{@source.name} was updated by #{@user.name} [updated]")
   end
 
-  # User watch project
-  def updated_project_issue_email(notification)
-    @notification = notification
-    @event = @notification.event
-    @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "Issue #{@source.name} was updated by #{@user.name} in #{@target.name} project [updated]")
-  end
-
   # User watch self changes
   def updated_user_key_email(notification)
     @notification = notification
@@ -277,39 +224,6 @@ class EventNotificationMailer < ActionMailer::Base
     @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "Merge Request #{@source.name} was updated by #{@user.name} in #{@target.project.name} project [updated]")
-  end
-
-  # User watch project
-  def updated_project_merge_request_email(notification)
-    @notification = notification
-    @event = @notification.event
-    @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "Merge Request #{@source.name} was updated by #{@user.name} in #{@target.name} project [updated]")
-  end
-
-  # User watch project
-  def updated_project_milestone_email(notification)
-    @notification = notification
-    @event = @notification.event
-    @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "Milestone #{@source.name} was updated by #{@user.name} in #{@target.name} project [updated]")
-  end
-
-  # User watch project
-  def updated_project_note_email(notification)
-    @notification = notification
-    @event = @notification.event
-    @user = @event.author
-    @source = @event.source
-    @target = @event.target
-
-    mail(bcc: @notification.subscriber.email, subject: "Note #{@source.name} was updated by #{@user.name} in #{@target.name} project [updated]")
   end
 
   def updated_merge_request_note_email(notification)
@@ -518,20 +432,20 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @note = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@target.name} project wall [commented]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@project.path_with_namespace} project wall [commented]")
   end
 
   def commented_project_note_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @note = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@target.name} project wall [commented]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@project.path_with_namespace} project wall [commented]")
   end
 
   def commented_merge_request_note_email(notification)
@@ -915,20 +829,20 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @merge_request = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Merge request #{@source.name} was open in #{@target.name} project by #{@user.name} [opened]")
+    mail(bcc: @notification.subscriber.email, subject: "Merge request #{@merge_request.title} was open in #{@project.path_with_namespace} project by #{@user.name} [opened]")
   end
 
   def opened_project_issue_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @issue = @source = @event.source
+    @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Issue #{@source.name} was open in #{@target.name} project by #{@user.name} [opened]")
+    mail(bcc: @notification.subscriber.email, subject: "Issue #{@issue.title} was open in #{@project.path_with_namespace} project by #{@user.name} [opened]")
   end
 
   #
@@ -1007,6 +921,17 @@ class EventNotificationMailer < ActionMailer::Base
   end
 
   def joined_user_team_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utgr = @source = @event.source
+    @team = @target = @event.target
+    @group = @utgr.group
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} project by #{@user.name} [assigned]")
+  end
+
+  def assigned_user_team_user_team_group_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
