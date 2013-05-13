@@ -21,6 +21,7 @@ class Gitlab::Event::Notifications
       if ((subscription.user != event.author) || (event.author.notification_setting && event.author.notification_setting.own_changes))
         event_data = JSON.load(event.data).to_hash
         if event_data["team_echo"].present?
+          p "skip event"
           return false
         else
           return true
