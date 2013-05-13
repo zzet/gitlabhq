@@ -35,7 +35,7 @@ class ActivityObserver < ActiveRecord::Observer
     Gitlab::Event::Action.trigger :updated, model
   end
 
-  def after_destroy(model)
+  def before_destroy(model)
     Gitlab::Event::Action.trigger :deleted, model
   end
 end
