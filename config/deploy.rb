@@ -51,6 +51,14 @@ namespace :deploy do
   task :symlink_unicorn, :roles => :app do
     run "ln -nfs #{release_path}/config/unicorn.rb.undev #{release_path}/config/unicorn.rb"
   end
+
+  desc <<-DESC
+    Send a USR2 to the unicorn process to restart for zero downtime deploys.
+      runit expects 2 to tell it to send the USR2 signal to the process.
+  DESC
+  task :restart, :roles => :app, :except => { :no_release => true } do
+    run "sudo sv reload /etc/sv/*"
+  end
 end
 
 before 'deploy:finalize_update',
@@ -58,5 +66,6 @@ before 'deploy:finalize_update',
   'deploy:symlink_gitlab',
   'deploy:symlink_resque',
   'deploy:symlink_unicorn'
-after "deploy:restart", "unicorn:stop"
+#after "deploy:restart", "unicorn:stop"
+#after "deploy:reload"
 after "deploy:update", "deploy:cleanup"
