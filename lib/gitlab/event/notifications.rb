@@ -3,7 +3,7 @@ class Gitlab::Event::Notifications
   class << self
 
     def create_notifications(event)
-      if can_create_notification?
+      if can_create_notifications?(event)
         subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
 
         subscriptions.each do |subscription|
@@ -17,7 +17,7 @@ class Gitlab::Event::Notifications
       end
     end
 
-    def can_create_notification?
+    def can_create_notifications?(event)
       event.deleted_related? || event.deleted_self? || event.push_event? || event.full?
       # (event.target || event.action.to_sym == :deleted) && ((::Event::Action.push_action?(event.action)) || event.source_type)
     end
