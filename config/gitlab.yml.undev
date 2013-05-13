@@ -35,7 +35,7 @@ production: &base
     ## Project settings
     default_projects_limit: 10
     git_daemon_enabled: true
-    # signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
+    signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
     # Default project features settings
     default_projects_features:
       issues: false
@@ -167,6 +167,7 @@ staging:
     host: gitlab-staging-01.undev.cc
     port: 80
     https: false
+    signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
 
     default_projects_features:
       issues: false
