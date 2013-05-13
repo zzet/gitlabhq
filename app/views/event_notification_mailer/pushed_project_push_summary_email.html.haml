@@ -26,14 +26,14 @@
   %table{style: "background: #eee; color: #444"}
     %tr
       %th{width: '50%'}
-        Last commit before push
-      %th{width: '50%'}
         Last commit after push
+      %th{width: '50%'}
+        Last commit before push
     %tr
       %td
-        = render "event_notification_mailer/commit_short", commit: @before_commit
-      %td
         = render "event_notification_mailer/commit_short", commit: @commits.first
+      %td
+        = render "event_notification_mailer/commit_short", commit: @before_commit
     %tr
       %th{colspan: 2}
         = link_to 'Compare it', project_compare_url(@event.target, @commits.first, @commits.last)
