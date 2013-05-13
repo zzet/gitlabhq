@@ -514,7 +514,7 @@ class EventNotificationMailer < ActionMailer::Base
 
     @user = @event.author
     @project = data
-    @target = @event.target
+    @group = @target = @event.target
 
     mail(bcc: @notification.subscriber.email, subject: "Project '#{@project["name"]}' was deleted from #{@group.name} group by #{@user.name} [deleted]")
   end
