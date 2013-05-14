@@ -156,7 +156,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :created
           actions << :joined
         when :updated
-          actions << meta[:action]
+          actions << :updated
+          changes = source.changes
+          temp_data["previous_changes"] = changes
         when :deleted
           actions << :left
         end
