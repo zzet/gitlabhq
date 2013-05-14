@@ -25,7 +25,7 @@ class Event < ActiveRecord::Base
   end
 
   def deleted_event?
-    action.to_sym == :deleted
+     [:deleted, :resigned].include? action.to_sym
   end
 
   # For Hash only
@@ -36,4 +36,17 @@ class Event < ActiveRecord::Base
   scope :recent, -> { order("created_at DESC") }
   scope :with_target, ->(target) { where(target_id: target, target_type: target.class.name) }
   scope :with_push, -> { where(source_type: "Push_summary") }
+
+  def deleted_related?
+    target && deleted_event? && source_type.blank?
+  end
+
+  def deleted_self?
+    source.blank? && deleted_event? && target.blank?
+  end
+
+  def full?
+    source.present? && target.present?
+  end
+
 end

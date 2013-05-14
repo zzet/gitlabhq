@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130409104924) do
+ActiveRecord::Schema.define(:version => 20130506001109) do
 
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
@@ -269,6 +269,14 @@ ActiveRecord::Schema.define(:version => 20130409104924) do
 
   create_table "tags", :force => true do |t|
     t.string "name"
+  end
+
+  create_table "user_team_group_relationships", :force => true do |t|
+    t.integer  "user_team_id"
+    t.integer  "group_id"
+    t.integer  "greatest_access"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "user_team_project_relationships", :force => true do |t|

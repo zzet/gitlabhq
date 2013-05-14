@@ -12,6 +12,7 @@ class ActivityObserver < ActiveRecord::Observer
           :user,            # +
           :user_team,       # +
           :user_team_project_relationship,
+          :user_team_group_relationship,
           :user_team_user_relationship,
           :users_project,   # +
           :project_hook,    # +
@@ -34,7 +35,7 @@ class ActivityObserver < ActiveRecord::Observer
     Gitlab::Event::Action.trigger :updated, model
   end
 
-  def after_destroy(model)
+  def before_destroy(model)
     Gitlab::Event::Action.trigger :deleted, model
   end
 end

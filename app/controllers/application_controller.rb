@@ -157,4 +157,8 @@ class ApplicationController < ActionController::Base
     gon.api_token = current_user.private_token if current_user
     gon.gravatar_url = request.ssl? ? Gitlab.config.gravatar.ssl_url : Gitlab.config.gravatar.plain_url
   end
+
+  def redirect_back_or_default(default)
+    redirect_to(session[:return_to] || default)
+  end
 end

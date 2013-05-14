@@ -86,6 +86,9 @@ class User < ActiveRecord::Base
   has_many :user_team_project_relationships, through: :user_teams
   has_many :team_projects,                   through: :user_team_project_relationships
 
+  has_many :user_team_group_relationships,   through: :user_teams, conditions: { user_team_user_relationships: { group_admin: true } }
+  has_many :team_groups,                     through: :user_team_group_relationships, source: :group
+
   # Events
   has_many :events,                   as: :source
   has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
@@ -223,7 +226,8 @@ class User < ActiveRecord::Base
 
   # Groups where user is an owner
   def owned_groups
-    groups
+   @group_ids = groups.pluck(:id) + team_groups.pluck(:id)
+   Group.where(id: @group_ids)
   end
 
   def owned_teams
@@ -234,12 +238,16 @@ class User < ActiveRecord::Base
   def authorized_groups
     agroups = Group.scoped
     unless self.admin?
-      @group_ids ||= (groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
+      @group_ids ||= (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
       agroups = agroups.where(id: @group_ids)
     end
     agroups
   end
 
+  def authorized_namespaces
+    namespace_ids = owned_groups.pluck(:id) + [namespace.id]
+    Namespace.where(id: namespace_ids)
+  end
 
   # Projects user has access to
   def authorized_projects
@@ -324,7 +332,7 @@ class User < ActiveRecord::Base
   end
 
   def several_namespaces?
-    namespaces.many?
+    authorized_namespaces.many?
   end
 
   def namespace_id
