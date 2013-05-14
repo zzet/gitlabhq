@@ -1,7 +1,8 @@
 class EventNotificationMailer < ActionMailer::Base
   layout 'event_notification_email'
   helper :application, :commits, :tree, :gitlab_markdown
-  default from: "Gitlab messeger <#{Gitlab.config.gitlab.email_from}>"
+  default from: "Gitlab messeger <#{Gitlab.config.gitlab.email_from}>",
+          return_path: Gitlab.config.gitlab.email_from
 
   default_url_options[:host]     = Gitlab.config.gitlab.host
   default_url_options[:protocol] = Gitlab.config.gitlab.protocol
