@@ -44,6 +44,10 @@ class GitLabTestRepo < Repository
     @repo ||= Grit::Repo.new(Rails.root.join('tmp', 'repositories', 'gitlabhq'))
   end
 
+  def rugged
+    @rugged ||= Rugged::Repository.new(Rails.root.join('tmp', 'repositories', 'gitlabhq').to_s)
+  end
+
   # patch repo size (in mb)
   def size
     12.45

@@ -2,7 +2,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::Group.available_actions
-      known_sources = [::Group, ::Project]
+      known_sources = [::Group, ::Project, ::UserTeamGroupRelationship]
       known_source = known_sources.include? data.class
       known_source && known_action
     end
@@ -48,6 +48,19 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
           actions << :transfer if source.namespace_id_changed? && source.namespace_id != changes[:namespace_id].first && ::Group.find_by_id(changes["namespace_id"]).present?
         when :deleted
           actions << :deleted
+        end
+
+      when ::UserTeamGroupRelationship
+        target = source.group
+
+        case meta[:action]
+        when :created
+          actions << :assigned
+        when :updated
+          actions << :updated
+          temp_data[:previous_changes] = source.changes
+        when :deleted
+          actions << :resigned
         end
       end
 

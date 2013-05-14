@@ -51,72 +51,14 @@
           = f.submit 'Change Owner', class: "btn btn-remove"
           = link_to "Cancel", "#", class: "btn change-owner-cancel-link"
 
-- if @group.projects.any?
-  %fieldset
-    %legend Projects (#{@group.projects.count})
-    %table
-      %thead
-        %tr
-          %th Project name
-          %th Path
-          %th Users
-          %th.cred Danger Zone!
-      - @group.projects.each do |project|
-        %tr
-          %td
-            = link_to project.name_with_namespace, [:admin, project]
-          %td
-            %span.monospace= project.path_with_namespace + ".git"
-          %td= project.users.count
-          %td.bgred
-            = link_to 'Transfer project to global namespace', remove_project_admin_group_path(@group, project_id: project.id), confirm: 'Remove project from group and move to global namespace. Are you sure?', method: :delete, class: "btn btn-remove small"
-
-  = form_tag project_teams_update_admin_group_path(@group), id: "new_team_member", class: "bulk_import", method: :put  do
-    %table.zebra-striped
-      %thead
-        %tr
-          %th Users
-          %th Project Access:
-
-      - @group.users.each do |user|
-        - next unless user
-        %tr{class: "user_#{user.id}"}
-          %td.name= link_to user.name, admin_user_path(user)
-          %td.projects_access
-            - user.authorized_projects.in_namespace(@group).each do |project|
-              - u_p = user.users_projects.in_project(project).first
-              - next unless u_p
-              %span
-                = project.name_with_namespace
-                = link_to "(#{ u_p.project_access_human })", edit_admin_project_member_path(project, user)
-      %tr
-        %td.input= select_tag :user_ids, options_from_collection_for_select(@users , :id, :name), multiple: true, data: {placeholder: 'Select users'}, class: 'chosen span5'
-        %td= select_tag :project_access, options_for_select(Project.access_options), {class: "project-access-select chosen span3"}
-
-      %tr
-        %td= submit_tag 'Add user to projects in group', class: "btn btn-primary"
-        %td
-          Read more about project permissions
-          %strong= link_to "here", help_permissions_path, class: "vlink"
-
-- else
-  %fieldset
-    %legend Group is empty
-
-= form_tag project_update_admin_group_path(@group), class: "bulk_import", method: :put  do
-  %fieldset
-    %legend Move projects to group
-    .alert
-      You can move only projects with existing repos
-      %br
-      Group projects will be moved in group directory and will not be accessible by old path
-    .clearfix
-      = label_tag :project_ids do
-        Projects
-      .input
-        = select_tag :project_ids, options_from_collection_for_select(@projects , :id, :name_with_namespace), multiple: true, data: {placeholder: 'Select projects'}, class: 'chosen span5'
-    .form-actions
-      = submit_tag 'Add', class: "btn btn-primary"
+%ul#group-relations.nav.nav-tabs
+  %li= link_to("Projects (#{@group_projects.count})", "#projects-list", "data-toggle" => "tab")
+  %li= link_to("Members (#{@members.count})", "#members-list", "data-toggle" => "tab")
+  %li= link_to("Teams (#{@teams.count})", "#teams-list", "data-toggle" => "tab")
+.tab-content
+  = render "projects_list"
+  = render "members_list"
+  = render "teams_list"
 
 :javascript
   $(function(){
@@ -129,5 +71,6 @@
       modal.hide();
       $('.change-owner-link').show();
     })
-  })
 
+    $('#group-relations a:first').tab('show')
+  })

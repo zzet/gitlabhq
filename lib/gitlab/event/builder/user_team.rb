@@ -2,7 +2,9 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
   class << self
     def can_build?(action, data)
       known_action = known_action? action, ::UserTeam.available_actions
-      known_sources = [::UserTeam, ::UserTeamProjectRelationship, ::UserTeamUserRelationship]
+      known_sources = [::UserTeam, ::UserTeamProjectRelationship,
+                                   ::UserTeamUserRelationship,
+                                   ::UserTeamGroupRelationship]
       known_source = known_sources.include? data.class
       known_source && known_action
     end
@@ -49,7 +51,20 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
           actions << :updated
           temp_data[:previous_changes] = source.changes
         when :deleted
-          actions << :reassigned
+          actions << :resigned
+        end
+
+      when ::UserTeamGroupRelationship
+        target = source.user_team
+
+        case meta[:action]
+        when :created
+          actions << :joined
+        when :updated
+          actions << :updated
+          temp_data[:previous_changes] = source.changes
+        when :deleted
+          actions << :left
         end
 
       end
