@@ -32,6 +32,7 @@ describe Gitlab::UserTeamManager do
 
     it "should resign tema from group with one or more project in group" do
       project = create :project, creator: @user, namespace: @group
+      second_project = create :project, creator: @user, namespace: @group
       project.users.count.should == 0
 
       additional_user = create :user
@@ -43,6 +44,24 @@ describe Gitlab::UserTeamManager do
       @group.user_teams.count.should == 1
 
       Gitlab::UserTeamManager.resign_from_group(@team, @group)
+      @group.user_teams.count.should == 0
+      project.users.count.should == 0
+
+      Gitlab::UserTeamManager.assign_to_group(@team, @group, UserTeam.access_roles.first.second)
+      project.users.count.should == 1
+      @group.user_teams.count.should == 1
+
+      second_team = create :user_team, owner: @user
+      second_additional_user = create :user
+      Gitlab::UserTeamManager.add_member_into_team(second_team, additional_user, UserTeam.access_roles.first.second, true)
+      Gitlab::UserTeamManager.add_member_into_team(second_team, second_additional_user, UserTeam.access_roles.first.second, true)
+      Gitlab::UserTeamManager.assign_to_group(second_team, @group, UserTeam.access_roles.first.second)
+
+      project.users.count.should == 2
+      @group.user_teams.count.should == 2
+
+      Gitlab::UserTeamManager.resign_from_group(@team, @group)
+      Gitlab::UserTeamManager.resign_from_group(second_team, @group)
       @group.user_teams.count.should == 0
       project.users.count.should == 0
     end
