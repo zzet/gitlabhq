@@ -589,7 +589,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @source = @event.source
     @group = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Project #{@project.name} was added to #{@group.name} group by #{@user.name} [added]")
+    mail(bcc: @notification.subscriber.email, subject: "Project #{@project.path_with_namespace} was added to #{@group.name} group by #{@user.name} [added]")
   end
 
   def added_project_system_hook_email(notification)
