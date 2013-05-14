@@ -18,7 +18,6 @@ class Gitlab::Event::Notifications
     end
 
     def can_create_notifications?(event)
-      return false if event.author.username == "stepashka"
       event.deleted_related? || event.deleted_self? || event.push_event? || event.full?
       # (event.target || event.action.to_sym == :deleted) && ((::Event::Action.push_action?(event.action)) || event.source_type)
     end
