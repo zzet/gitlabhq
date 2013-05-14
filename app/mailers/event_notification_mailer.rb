@@ -982,7 +982,7 @@ class EventNotificationMailer < ActionMailer::Base
     @team = @target = @event.target
 
     if @project
-      mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was resigned from \"#{@project.path_with_namespace}\" project by #{@user.name} [reassigned]")
+      mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was resigned from \"#{@project.path_with_namespace}\" project by #{@user.name} [resigned]")
     end
   end
 
@@ -1005,7 +1005,7 @@ class EventNotificationMailer < ActionMailer::Base
     @team = UserTeam.find(@source["user_team_id"])
     @group = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was reassigned from \"#{@group.name}\" project by #{@user.name} [reassigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was resigned from \"#{@group.name}\" group by #{@user.name} [resigned]")
   end
 
   def reassigned_user_issue_email(notification)
