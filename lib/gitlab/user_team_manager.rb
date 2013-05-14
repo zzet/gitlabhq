@@ -19,7 +19,7 @@ module Gitlab
 
         team.user_team_project_relationships.with_project(project).destroy_all
 
-        update_team_users_access_in_project(team, project, :updated)
+        update_team_users_access_in_project(team, project, :deleted)
       end
 
       def update_team_user_membership(team, member, options)
@@ -79,10 +79,14 @@ module Gitlab
         granted_access = max_teams_member_permission_in_project(user, project, action)
 
         project_team_user = UsersProject.find_by_user_id_and_project_id(user.id, project.id)
-        if project_team_user.present?
-          project_team_user.update_attributes(project_access: granted_access) if update_team_user_access_in_project?(project_team_user, granted_access)
+        if granted_access > 0
+          if project_team_user.present?
+            project_team_user.update_attributes(project_access: granted_access) if update_team_user_access_in_project?(project_team_user, granted_access)
+          else
+            project.team << [user, granted_access]
+          end
         else
-          project.team << [user, granted_access] if granted_access > 0
+          project_team_user.destroy
         end
         #project_team_user.destroy if project_team_user.present?
         ## project_team_user.project_access != granted_access
