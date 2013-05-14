@@ -29,5 +29,22 @@ describe Gitlab::UserTeamManager do
       Gitlab::UserTeamManager.update_team_user_access_in_group(@team, @group, UserTeam.access_roles.dup.drop(1).last.second)
       @group.user_team_group_relationships.last.greatest_access.should_not be_equal(greatest_access)
     end
+
+    it "should resign tema from group with one or more project in group" do
+      project = create :project, creator: @user, namespace: @group
+      project.users.count.should == 0
+
+      additional_user = create :user
+      Gitlab::UserTeamManager.add_member_into_team(@team, additional_user, UserTeam.access_roles.first.second, true)
+      project.users.count.should == 0
+
+      Gitlab::UserTeamManager.assign_to_group(@team, @group, UserTeam.access_roles.first.second)
+      project.users.count.should == 1
+      @group.user_teams.count.should == 1
+
+      Gitlab::UserTeamManager.resign_from_group(@team, @group)
+      @group.user_teams.count.should == 0
+      project.users.count.should == 0
+    end
   end
 end
