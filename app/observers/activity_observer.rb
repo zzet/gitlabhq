@@ -16,8 +16,7 @@ class ActivityObserver < ActiveRecord::Observer
           :user_team_user_relationship,
           :users_project,   # +
           :project_hook,    # +
-          :system_hook,     # +
-          :wiki             # +
+          :system_hook
 
   def after_create(model)
     Gitlab::Event::Action.trigger :created, model
