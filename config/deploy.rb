@@ -52,6 +52,11 @@ namespace :deploy do
     run "ln -nfs #{release_path}/config/unicorn.rb.undev #{release_path}/config/unicorn.rb"
   end
 
+  desc "Symlinks the unicorn.rb"
+  task :symlink_puma, :roles => :app do
+    run "ln -nfs #{release_path}/config/puma.rb.undev #{release_path}/config/puma.rb"
+  end
+
   desc <<-DESC
     Send a USR2 to the unicorn process to restart for zero downtime deploys.
       runit expects 2 to tell it to send the USR2 signal to the process.
@@ -65,7 +70,7 @@ before 'deploy:finalize_update',
   'deploy:symlink_db',
   'deploy:symlink_gitlab',
   'deploy:symlink_resque',
-  'deploy:symlink_unicorn'
+  'deploy:symlink_puma'
 #after "deploy:restart", "unicorn:stop"
 #after "deploy:reload"
 after "deploy:update", "deploy:cleanup"
