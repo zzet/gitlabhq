@@ -11,10 +11,6 @@ module IssuesHelper
     classes
   end
 
-  def issue_tags
-    @project.issues.tag_counts_on(:labels).map(&:name)
-  end
-
   # Returns an OpenStruct object suitable for use by <tt>options_from_collection_for_select</tt>
   # to allow filtering issues by an unassigned User or Milestone
   def unassigned_filter
@@ -32,12 +28,6 @@ module IssuesHelper
     }
   end
 
-  def labels_autocomplete_source
-    labels = @project.issues_labels.order('count DESC')
-    labels = labels.map{ |l| { label: l.name, value: l.name } }
-    labels.to_json
-  end
-
   def issues_active_milestones
     @project.milestones.active.order("id desc").all
   end
@@ -48,9 +38,21 @@ module IssuesHelper
     if @project.used_default_issues_tracker?
       project_issues_filter_path(@project)
     else
-      url = Settings[:issues_tracker][@project.issues_tracker]["project_url"]
+      url = Gitlab.config.issues_tracker[@project.issues_tracker]["project_url"]
       url.gsub(':project_id', @project.id.to_s)
          .gsub(':issues_tracker_id', @project.issues_tracker_id.to_s)
+    end
+  end
+
+  def url_for_new_issue
+    return "" if @project.nil?
+
+    if @project.used_default_issues_tracker?
+      url = new_project_issue_path project_id: @project
+    else
+      url = Gitlab.config.issues_tracker[@project.issues_tracker]["new_issue_url"]
+      url.gsub(':project_id', @project.id.to_s)
+        .gsub(':issues_tracker_id', @project.issues_tracker_id.to_s)
     end
   end
 
@@ -60,7 +62,7 @@ module IssuesHelper
     if @project.used_default_issues_tracker?
       url = project_issue_url project_id: @project, id: issue_id
     else
-      url = Settings[:issues_tracker][@project.issues_tracker]["issues_url"]
+      url = Gitlab.config.issues_tracker[@project.issues_tracker]["issues_url"]
       url.gsub(':id', issue_id.to_s)
         .gsub(':project_id', @project.id.to_s)
         .gsub(':issues_tracker_id', @project.issues_tracker_id.to_s)
@@ -75,5 +77,16 @@ module IssuesHelper
     else
       ""
     end
+  end
+
+  def project_issues_with_filter_path(project, opts)
+    default_opts = {
+      status: params[:status],
+      label_name: params[:label_name],
+      milestone_id: params[:milestone_id],
+      assignee_id: params[:assignee_id],
+    }
+
+    project_issues_path(@project, default_opts.merge(opts))
   end
 end

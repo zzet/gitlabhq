@@ -10,4 +10,8 @@ class NotificationService
     end
 
   end
+
+  def mailer
+    Notify.delay
+  end
 end

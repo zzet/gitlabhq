@@ -19,6 +19,7 @@
 #  issues_tracker         :string(255)      default("gitlab"), not null
 #  issues_tracker_id      :string(255)
 #  snippets_enabled       :boolean          default(TRUE), not null
+#  last_activity_at       :datetime
 #
 
 require "grit"
@@ -29,11 +30,13 @@ class Project < ActiveRecord::Base
 
   extend Enumerize
 
-  attr_accessible :name, :path, :description, :default_branch, :issues_tracker,
+  attr_accessible :name, :path, :description, :default_branch, :issues_tracker, :label_list,
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
     :wiki_enabled, :git_protocol_enabled, :public, :import_url, :last_activity_at, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
+
+  acts_as_taggable_on :labels, :issues_default_labels
 
   attr_accessor :import_url
 
@@ -44,6 +47,8 @@ class Project < ActiveRecord::Base
 
   has_one :last_event, class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
   has_one :gitlab_ci_service, dependent: :destroy
+  has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
+  has_one :forked_from_project, through: :forked_project_link
 
   has_many :old_events,         dependent: :destroy, class_name: OldEvent
 
@@ -58,9 +63,7 @@ class Project < ActiveRecord::Base
   has_many :users_projects,     dependent: :destroy
   has_many :notes,              dependent: :destroy
   has_many :snippets,           dependent: :destroy
-  has_many :deploy_keys,        dependent: :destroy, class_name: "Key", foreign_key: "project_id"
   has_many :hooks,              dependent: :destroy, class_name: "ProjectHook"
-  has_many :wikis,              dependent: :destroy
   has_many :protected_branches, dependent: :destroy
   has_many :file_tokens,        dependent: :destroy
   has_many :user_team_project_relationships, dependent: :destroy
@@ -69,6 +72,9 @@ class Project < ActiveRecord::Base
   has_many :user_teams,     through: :user_team_project_relationships
   has_many :user_team_user_relationships, through: :user_teams
   has_many :user_teams_members, through: :user_team_user_relationships
+
+  has_many :deploy_keys_projects, dependent: :destroy
+  has_many :deploy_keys, through: :deploy_keys_projects
 
   delegate :name, to: :owner, allow_nil: true, prefix: true
 
@@ -155,13 +161,7 @@ class Project < ActiveRecord::Base
   end
 
   def repository
-    if path
-      @repository ||= Repository.new(path_with_namespace, default_branch)
-    else
-      nil
-    end
-  rescue Grit::NoSuchPathError
-    nil
+    @repository ||= Repository.new(path_with_namespace, default_branch)
   end
 
   def saved?
@@ -217,7 +217,7 @@ class Project < ActiveRecord::Base
   end
 
   def issues_labels
-    issues.tag_counts_on(:labels)
+    @issues_labels ||= (issues_default_labels + issues.tags_on(:labels)).uniq.sort_by(&:name)
   end
 
   def issue_exists?(issue_id)
@@ -346,14 +346,14 @@ class Project < ActiveRecord::Base
   end
 
   def valid_repo?
-    repo
+    repository.exists?
   rescue
     errors.add(:path, "Invalid repository path")
     false
   end
 
   def empty_repo?
-    !repository || repository.empty?
+    !repository.exists? || repository.empty?
   end
 
   def ensure_satellite_exists
@@ -377,18 +377,25 @@ class Project < ActiveRecord::Base
   end
 
   def repo_exists?
-    @repo_exists ||= (repository && repository.branches.present?)
+    @repo_exists ||= repository.exists?
   rescue
     @repo_exists = false
   end
 
   def open_branches
-    if protected_branches.empty?
-      self.repo.heads
-    else
-      pnames = protected_branches.map(&:name)
-      self.repo.heads.reject { |h| pnames.include?(h.name) }
-    end.sort_by(&:name)
+    all_branches = repository.branches
+
+    if protected_branches.present?
+      all_branches.reject! do |branch|
+        protected_branches_names.include?(branch.name)
+      end
+    end
+
+    all_branches
+  end
+
+  def protected_branches_names
+    @protected_branches_names ||= protected_branches.map(&:name)
   end
 
   def root_ref?(branch)
@@ -415,6 +422,10 @@ class Project < ActiveRecord::Base
 
   # Check if current branch name is marked as protected in the system
   def protected_branch? branch_name
-    protected_branches.map(&:name).include?(branch_name)
+    protected_branches_names.include?(branch_name)
+  end
+
+  def forked?
+    !(forked_project_link.nil? || forked_project_link.forked_from_project.nil?)
   end
 end

@@ -67,8 +67,8 @@ Settings.gitlab['default_projects_features'] ||= {}
 Settings.gitlab.default_projects_features['issues']         = true if Settings.gitlab.default_projects_features['issues'].nil?
 Settings.gitlab.default_projects_features['merge_requests'] = true if Settings.gitlab.default_projects_features['merge_requests'].nil?
 Settings.gitlab.default_projects_features['wiki']           = true if Settings.gitlab.default_projects_features['wiki'].nil?
-Settings.gitlab.default_projects_features['wall']           = true if Settings.gitlab.default_projects_features['wall'].nil?
-Settings.gitlab.default_projects_features['snippets']       = true if Settings.gitlab.default_projects_features['snippets'].nil?
+Settings.gitlab.default_projects_features['wall']           = false if Settings.gitlab.default_projects_features['wall'].nil?
+Settings.gitlab.default_projects_features['snippets']       = false if Settings.gitlab.default_projects_features['snippets'].nil?
 
 #
 # Gravatar
@@ -109,3 +109,8 @@ Settings.git['timeout']   ||= 10
 
 Settings['satellites'] ||= Settingslogic.new({})
 Settings.satellites['path'] = File.expand_path(Settings.satellites['path'] || "tmp/repo_satellites/", Rails.root)
+
+#
+# Extra customization
+#
+Settings['extra'] ||= Settingslogic.new({})

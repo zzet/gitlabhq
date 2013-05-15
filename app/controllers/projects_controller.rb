@@ -81,6 +81,33 @@ class ProjectsController < ProjectResourceController
     end
   end
 
+  def fork
+    @project = ::Projects::ForkContext.new(project, current_user).execute
+
+    respond_to do |format|
+      format.html do
+        if @project.saved? && @project.forked?
+          redirect_to(@project, notice: 'Project was successfully forked.')
+        else
+          render action: "new"
+        end
+      end
+      format.js
+    end
+  end
+
+  def autocomplete_sources
+    @suggestions = {
+      emojis: Emoji.names,
+      issues: @project.issues.select([:id, :title, :description]),
+      members: @project.users.select([:username, :name]).order(:username)
+    }
+
+    respond_to do |format|
+      format.json { render :json => @suggestions }
+    end
+  end
+
   protected
 
   def check_git_protocol

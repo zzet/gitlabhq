@@ -34,8 +34,11 @@ class DashboardController < ApplicationController
                   @projects
                 end
 
+    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
     @projects = @projects.search(params[:search]) if params[:search].present?
     @projects = @projects.page(params[:page]).per(30)
+
+    @labels = Project.where(id: @projects.map(&:id)).tags_on(:labels)
   end
 
   # Get authored or assigned open merge requests
