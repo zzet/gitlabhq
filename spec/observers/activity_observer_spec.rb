@@ -874,58 +874,5 @@ describe ActivityObserver do
       data[:name].should match(/deleted/)
       data[:data][:source].should be_kind_of ::SystemHook
     end
-
   end
-
-
-  #
-  # Observe Wiki changes
-  #
-
-  describe "Wiki events" do
-    before do
-      ActiveRecord::Base.observers.disable :all
-      Wiki.observers.enable :activity_observer
-
-      @user = create :user
-      Gitlab::Event::Action.current_user = @user
-
-      @project = create :project, creator: @user
-    end
-
-    it "Should generate :created event" do
-
-      data = notification_data_for(/gitlab/) do
-        @wiki = create(:wiki, project: @project)
-      end
-
-      data[:name].should match(/created/)
-      data[:data][:source].should be_kind_of ::Wiki
-    end
-
-    it "Should generate :updated event" do
-      @wiki = create(:wiki, project: @project)
-
-      data = notification_data_for(/gitlab/) do
-        @wiki.title = "#{@wiki.title}_updated"
-        @wiki.save
-      end
-
-      data[:name].should match(/updated/)
-      data[:data][:source].should be_kind_of ::Wiki
-    end
-
-    it "Should generate :deleted event" do
-      @wiki = create(:wiki, project: @project)
-
-      data = notification_data_for(/gitlab/) do
-        @wiki.destroy
-      end
-
-      data[:name].should match(/deleted/)
-      data[:data][:source].should be_kind_of ::Wiki
-    end
-
-  end
-
 end
