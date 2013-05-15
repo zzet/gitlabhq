@@ -12,8 +12,7 @@
   %tr
     %th
       Project
-    %td
-      = @event.target.name
+    %td= link_to @project.path_with_namespace, project_url(@project.path_with_namespace)
   %tr
     %th
       Branch
