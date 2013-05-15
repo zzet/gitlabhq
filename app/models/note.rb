@@ -48,7 +48,7 @@ class Note < ActiveRecord::Base
   # Scopes
   scope :for_commit_id, ->(commit_id) { where(noteable_type: "Commit", commit_id: commit_id) }
   scope :inline, -> { where("line_code IS NOT NULL") }
-  scope :not_inline, -> { where("line_code IS NULL") }
+  scope :not_inline, -> { where(line_code: [nil, '']) }
 
   scope :common, ->{ where(noteable_type: ["", nil]) }
   scope :fresh, ->{ order("created_at ASC, id ASC") }
@@ -77,8 +77,8 @@ class Note < ActiveRecord::Base
   def diff
     if noteable.diffs.present?
       noteable.diffs.select do |d|
-        if d.b_path
-          Digest::SHA1.hexdigest(d.b_path) == diff_file_index
+        if d.new_path
+          Digest::SHA1.hexdigest(d.new_path) == diff_file_index
         end
       end.first
     end
@@ -89,7 +89,7 @@ class Note < ActiveRecord::Base
   end
 
   def diff_file_name
-    diff.b_path
+    diff.new_path
   end
 
   def diff_new_line
@@ -97,7 +97,7 @@ class Note < ActiveRecord::Base
   end
 
   def discussion_id
-    @discussion_id ||= [:discussion, noteable_type.try(:underscore), noteable_id, line_code].join("-").to_sym
+    @discussion_id ||= [:discussion, noteable_type.try(:underscore), noteable_id || commit_id, line_code].join("-").to_sym
   end
 
   # Returns true if this is a downvote note,

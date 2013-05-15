@@ -2,7 +2,7 @@
 
 - if @path.present?
   %ul.breadcrumb
-    = breadcrumbs
+    = commits_breadcrumbs
 
 %div{id: dom_id(@project)}
   #commits-list= render "commits"
@@ -11,7 +11,5 @@
 
 - if @commits.count == @limit
   :javascript
-    $(function(){
-      CommitsList.init("#{@ref}", #{@limit});
-    });
+    CommitsList.init("#{@ref}", #{@limit});
 

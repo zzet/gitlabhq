@@ -23,6 +23,8 @@ namespace :gitlab do
       check_init_script_exists
       check_init_script_up_to_date
       check_satellites_exist
+      check_redis_version
+      check_git_version
 
       finished_checking "GitLab"
     end
@@ -241,6 +243,23 @@ namespace :gitlab do
         )
         for_more_information(
           see_installation_guide_section "GitLab"
+        )
+        fix_and_rerun
+      end
+    end
+
+    def check_redis_version
+      print "Redis version >= 2.0.0? ... "
+
+      if run_and_match("redis-cli --version", /redis-cli 2.\d.\d/)
+        puts "yes".green
+      else
+        puts "no".red
+        try_fixing_it(
+          "Update your redis server to a version >= 2.0.0"
+        )
+        for_more_information(
+          "gitlab-public-wiki/wiki/Trouble-Shooting-Guide in section sidekiq"
         )
         fix_and_rerun
       end
@@ -636,11 +655,32 @@ namespace :gitlab do
   end
 
   def check_gitlab_shell
-    print "GitLab Shell version? ... "
-    if gitlab_shell_version.strip == '1.2.0'
-      puts 'OK (1.2.0)'.green
+    required_version = Gitlab::VersionInfo.new(1, 4, 0)
+    current_version = Gitlab::VersionInfo.parse(gitlab_shell_version)
+
+    print "GitLab Shell version >= #{required_version} ? ... "
+    if required_version <= current_version
+      puts "OK (#{current_version})".green
     else
-      puts 'FAIL. Please update gitlab-shell to v1.1.0'.red
+      puts "FAIL. Please update gitlab-shell to #{required_version} from #{current_version}".red
+    end
+  end
+
+  def check_git_version
+    required_version = Gitlab::VersionInfo.new(1, 7, 10)
+    current_version = Gitlab::VersionInfo.parse(run("#{Gitlab.config.git.bin_path} --version"))
+
+    puts "Your git bin path is \"#{Gitlab.config.git.bin_path}\""
+    print "Git version >= #{required_version} ? ... "
+
+    if required_version <= current_version
+        puts "yes (#{current_version})".green
+    else
+      puts "no".red
+      try_fixing_it(
+        "Update your git to a version >= #{required_version} from #{current_version}"
+      )
+      fix_and_rerun
     end
   end
 end

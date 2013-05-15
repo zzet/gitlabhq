@@ -1,4 +1,4 @@
-module Gitlab
+module API
   # Projects API
   class Projects < Grape::API
     before { authenticate! }
@@ -274,7 +274,7 @@ module Gitlab
       #   hook_id (required) - The ID of hook to delete
       # Example Request:
       #   DELETE /projects/:id/hooks/:hook_id
-      delete ":id/hooks" do
+      delete ":id/hooks/:hook_id" do
         authorize! :admin_project, user_project
         required_attributes! [:hook_id]
 
@@ -372,7 +372,7 @@ module Gitlab
         ref = params[:ref_name] || user_project.try(:default_branch) || 'master'
 
         commits = user_project.repository.commits(ref, nil, per_page, page * per_page)
-        present CommitDecorator.decorate(commits), with: Entities::RepoCommit
+        present commits, with: Entities::RepoCommit
       end
 
       # Get a project snippets
@@ -493,14 +493,16 @@ module Gitlab
 
         ref = params[:sha]
 
-        commit = user_project.repository.commit ref
+        repo = user_project.repository
+
+        commit = repo.commit(ref)
         not_found! "Commit" unless commit
 
-        tree = Tree.new commit.tree, ref, params[:filepath]
-        not_found! "File" unless tree.try(:tree)
+        blob = Gitlab::Git::Blob.new(repo, commit.id, ref, params[:filepath])
+        not_found! "File" unless blob.exists?
 
-        content_type tree.mime_type
-        present tree.data
+        content_type blob.mime_type
+        present blob.data
       end
 
       # Get a specific project's keys
@@ -529,8 +531,8 @@ module Gitlab
       #   POST /projects/:id/keys
       post ":id/keys" do
         attrs = attributes_for_keys [:title, :key]
-        key = user_project.deploy_keys.new attrs
-        if key.save
+        key = DeployKey.new attrs
+        if key.valid? && user_project.deploy_keys << key
           present key, with: Entities::SSHKey
         else
           not_found!
@@ -543,9 +545,8 @@ module Gitlab
       #   DELETE /projects/:id/keys/:id
       delete ":id/keys/:key_id" do
         key = user_project.deploy_keys.find params[:key_id]
-        key.delete
+        key.destroy
       end
-
     end
   end
 end

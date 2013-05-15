@@ -1,9 +1,45 @@
+v 5.2.0
+  - Turbolinks
+  - Git over http with ldap credentials
+  - Diff with better colors and some spacing on the corners
+  - Default values for project features
+  - Fixed huge_commit view
+  - Restyle project clone panel
+  - Move Gitlab::Git code to gitlab_git gem
+  - Move update docs in repo
+  - Requires gitlab-shell v1.4.0
+  - Fixed submodules listing under file tab
+  - Fork feature (Angus MacArthur)
+  - git version check in gitlab:check
+  - Shared deploy keys feature
+  - Ability to generate default labels set for issues
+  - Improve gfm autocomplete (Harold Luo)
+  - Added support for Google Analytics
+  - Code search feature (Javier Castro)
+
 v 5.1.0
   - You can login with email or username now
   - Corrected project transfer rollback when repository cannot be moved
   - Move both repo and wiki when project transfer requrested
   - Admin area: project editing was removed from admin namespace
   - Access: admin user has now access to any project.
+  - Notification settings
+  - Gitlab::Git set of objects to abstract from grit library
+  - Replace Unicorn web server with Puma
+  - Backup/Restore refactored. Backup dump project wiki too now
+  - Restyled Issues list. Show milestone version in issue row
+  - Restyled Merge Request list
+  - Backup now dump/restore uploads
+  - Improved perfomance of dashboard (Andrew Kumanyaev)
+  - File history now tracks renames (Akzhan Abdulin)
+  - Drop wiki migration tools
+  - Drop sqlite migration tools
+  - project tagging
+  - Paginate users in API
+  - Restyled network graph (Hiroyuki Sato)
+
+v 5.0.1
+  - Fixed issue with gitlab-grit being overrided by grit
 
 v 5.0.0
   - Replaced gitolite with gitlab-shell

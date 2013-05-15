@@ -1,7 +1,8 @@
 class EventNotificationMailer < ActionMailer::Base
   layout 'event_notification_email'
   helper :application, :commits, :tree, :gitlab_markdown
-  default from: "Gitlab messeger <#{Gitlab.config.gitlab.email_from}>"
+  default from: "Gitlab messeger <#{Gitlab.config.gitlab.email_from}>",
+          return_path: Gitlab.config.gitlab.email_from
 
   default_url_options[:host]     = Gitlab.config.gitlab.host
   default_url_options[:protocol] = Gitlab.config.gitlab.protocol
@@ -360,7 +361,7 @@ class EventNotificationMailer < ActionMailer::Base
     @group = @target = @event.target
     @team = @utgr.user_team
 
-    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} project by #{@user.name} [assigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} assignation to #{@group.name} group was updated by #{@user.name} [assigned]")
   end
 
 
