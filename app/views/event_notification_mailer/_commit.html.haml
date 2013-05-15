@@ -1,21 +1,9 @@
-%li{style: "background-color:#fff;padding:10px;min-height:20px;border-bottom:1px solid rgba(0,0,0,0.05)"}
-  %div{style: "float:right"}
-    %p{style: "padding-top:1px;margin:0;color:#222"}
-      %strong= link_to "Browse Code »", project_tree_url(@project, commit)
-  %p{style: "padding-top:1px;margin:0;color:#222"}
+%tr
+  %td
     = link_to commit.short_id(8), project_commit_url(@project, commit), style: "float:left;min-width:65px;font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace"
-    &nbsp;
-    = link_to_gfm truncate(commit.title, length: 70), project_commit_url(@project, commit.id), style: "font-weight:bold;color:#444"
-
-    %time.committed_ago{ datetime: commit.committed_date, title: commit.committed_date.stamp("Aug 21, 2011 9:23pm") }
-      = time_ago_in_words(commit.committed_date)
-      ago
-      = "(#{commit.committed_date})"
-      &nbsp;
-
-    %span.notes_count
-      - notes = @project.notes.for_commit_id(commit.id)
-      - if notes.any?
-        %span.btn.disabled.grouped
-          %i.icon-comment
-          = notes.count
+  %td
+    = truncate(commit.title, length: 70)
+  %td
+    = commit.committed_date.strftime("%Y-%d-%m %H:%M:%S")
+  %td
+    = commit.author_link
