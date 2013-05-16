@@ -10,6 +10,7 @@ class TreeController < ProjectResourceController
   def show
     @hex_path  = Digest::SHA1.hexdigest(@path)
     @logs_path = logs_file_project_ref_path(@project, @ref, @path)
+    @file_token = FileToken.for_project(@project).find_by_file(@path)
 
     respond_to do |format|
       format.html

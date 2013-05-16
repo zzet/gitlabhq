@@ -31,7 +31,7 @@ class Project < ActiveRecord::Base
 
   attr_accessible :name, :path, :description, :default_branch, :issues_tracker,
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
-    :wiki_enabled, :public, :import_url, as: [:default, :admin]
+    :wiki_enabled, :git_protocol_enabled, :public, :import_url, :last_activity_at, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
 
@@ -62,6 +62,7 @@ class Project < ActiveRecord::Base
   has_many :hooks,              dependent: :destroy, class_name: "ProjectHook"
   has_many :wikis,              dependent: :destroy
   has_many :protected_branches, dependent: :destroy
+  has_many :file_tokens,        dependent: :destroy
   has_many :user_team_project_relationships, dependent: :destroy
 
   has_many :users,          through: :users_projects
@@ -96,17 +97,21 @@ class Project < ActiveRecord::Base
   validate :check_limit, :repo_name
 
   # Scopes
-  scope :without_user, ->(user)  { where("id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
-  scope :not_in_group, ->(group) { where("id NOT IN (:ids)", ids: group.project_ids ) }
-  scope :without_team, ->(team) { team.projects.present? ? where("id NOT IN (:ids)", ids: team.projects.map(&:id)) : scoped  }
-  scope :in_team, ->(team) { where("id IN (:ids)", ids: team.projects.map(&:id)) }
+  scope :without_user, ->(user)  { where("projects.id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
+  scope :without_team, ->(team) { team.projects.present? ? where("projects.id NOT IN (:ids)", ids: team.projects.map(&:id)) : scoped  }
+  scope :not_in_group, ->(group) { where("projects.id NOT IN (:ids)", ids: group.project_ids ) }
+  scope :in_team, ->(team) { where("projects.id IN (:ids)", ids: team.projects.map(&:id)) }
   scope :in_namespace, ->(namespace) { where(namespace_id: namespace.id) }
-  scope :sorted_by_activity, ->() { order("(SELECT max(old_events.created_at) FROM old_events WHERE old_events.project_id = projects.id) DESC") }
+  scope :in_group_namespace, -> { joins(:group) }
+  scope :sorted_by_activity, -> { order("projects.last_activity_at DESC") }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
-  scope :public_only, -> { where(public: true) }
+  scope :public_via_http, -> { where(public: true) }
+  scope :public_via_git, -> { where(git_protocol_enabled: true) }
+  scope :public_only, -> { where(arel_table[:public].eq(true).or(arel_table[:git_protocol_enabled].eq(true))) }
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
+
   actions_to_watch [:created, :added, :updated, :deleted, :transfer]
   actions_sources [watchable_name, :issue, :milestone, :note, :merge_request,
                    :snippet, :project_hook, :protected_branch, :service, :user_team_project_relationship, :users_project, :push]
@@ -136,7 +141,7 @@ class Project < ActiveRecord::Base
     def find_with_namespace(id)
       if id.include?("/")
         id = id.split("/")
-        namespace = Namespace.find_by_path(id.first)
+        namespace = ::Namespace.find_by_path(id.first)
         return nil unless namespace
 
         where(namespace_id: namespace.id).find_by_path(id.second)
@@ -209,7 +214,7 @@ class Project < ActiveRecord::Base
   end
 
   def last_activity_date
-    last_event.try(:created_at) || updated_at
+    last_activity_at || updated_at
   end
 
   def project_id
@@ -400,8 +405,13 @@ class Project < ActiveRecord::Base
   end
 
   def http_url_to_repo
-    http_url = [Gitlab.config.gitlab.url, "/", path_with_namespace, ".git"].join('')
+    [Gitlab.config.gitlab.url, "/", path_with_namespace, ".git"].join('')
   end
+
+  def git_url_to_repo
+    [Gitlab.config.gitlab.git_url, "/", path_with_namespace, ".git"].join('')
+  end
+
 
   def project_access_human(member)
     project_user_relation = self.users_projects.find_by_user_id(member.id)

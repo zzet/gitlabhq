@@ -151,6 +151,9 @@ Gitlab::Application.routes.draw do
       get :people
       post :team_members
     end
+    scope module: :groups do
+      resources :teams
+    end
   end
 
   #
@@ -187,7 +190,7 @@ Gitlab::Application.routes.draw do
     resources :compare, only: [:index, :create]
     resources :blame,   only: [:show], constraints: {id: /.+/}
     resources :graph,   only: [:show], constraints: {id: /(?:[^.]|\.(?!json$))+/, format: /json/}
-    match "/compare/:from...:to" => "compare#show", as: "compare", :via => [:get, :post], constraints: {from: /.+/, to: /.+/}
+    match "/compare/:from...:to" => "compare#show", as: "compare", via: [:get, :post], constraints: {from: /.+/, to: /.+/}
 
     resources :wikis, only: [:show, :edit, :destroy, :create] do
       collection do
@@ -300,6 +303,8 @@ Gitlab::Application.routes.draw do
           delete :resign
         end
       end
+
+      resources :tokens,  only: [:show, :create]
     end
 
     resources :notes, only: [:index, :create, :destroy] do

@@ -27,6 +27,7 @@ module Gitlab
                                      :activity_observer,
                                      :event_observer,
                                      :notification_observer,
+                                     :project_activity_cache_observer,
                                      :issue_observer,
                                      :key_observer,
                                      :merge_request_observer,
@@ -66,6 +67,7 @@ module Gitlab
 
     # Enable the asset pipeline
     config.assets.enabled = true
+    config.assets.precompile += ['mailer/base.css']
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'

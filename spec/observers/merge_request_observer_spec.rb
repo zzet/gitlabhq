@@ -21,11 +21,6 @@ describe MergeRequestObserver do
       subject.should_receive(:after_create)
       create(:merge_request, project: create(:project))
     end
-
-    it 'trigger notification service' do
-      subject.should_receive(:notification)
-      subject.after_create(mr_mock)
-    end
   end
 
   context '#after_update' do
@@ -40,22 +35,6 @@ describe MergeRequestObserver do
       MergeRequest.observers.enable :merge_request_observer do
         changed.title = 'I changed'
         changed.save
-      end
-    end
-
-    context 'a notification' do
-      it 'is sent if the merge request is being reassigned' do
-        mr_mock.should_receive(:is_being_reassigned?).and_return(true)
-        subject.should_receive(:notification)
-
-        subject.after_update(mr_mock)
-      end
-
-      it 'is not sent if the merge request is not being reassigned' do
-        mr_mock.should_receive(:is_being_reassigned?).and_return(false)
-        subject.should_not_receive(:notification)
-
-        subject.after_update(mr_mock)
       end
     end
   end

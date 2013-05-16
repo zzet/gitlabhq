@@ -11,11 +11,6 @@ describe UserObserver do
   end
 
   context 'when a new user is created' do
-    it 'sends an email' do
-      subject.should_receive(:notification)
-      create(:user)
-    end
-
     it 'trigger logger' do
       user = double(:user, id: 42, password: 'P@ssword!', name: 'John', email: 'u@mail.local', extern_uid?: false)
       Gitlab::AppLogger.should_receive(:info)

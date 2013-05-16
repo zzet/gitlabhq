@@ -48,6 +48,19 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
         when :deleted
           actions << :deleted
         end
+
+      when :user_team_group_relationship
+        target = source.group
+
+        case meta[:action]
+        when :created
+          actions << :assigned
+        when :updated
+          actions << :updated
+          temp_data[:previous_changes] = source.changes
+        when :deleted
+          actions << :resigned
+        end
       end
 
       events = []

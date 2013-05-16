@@ -19,7 +19,7 @@ module Gitlab
 
         team.user_team_project_relationships.with_project(project).destroy_all
 
-        update_team_users_access_in_project(team, project, :updated)
+        update_team_users_access_in_project(team, project, :deleted)
       end
 
       def update_team_user_membership(team, member, options)
@@ -64,7 +64,7 @@ module Gitlab
 
       def rebuild_project_permissions_to_member(team, member)
         team.projects.each do |project|
-          update_team_user_access_in_project(team, member, project)
+          update_team_user_access_in_project(team, member, project, :updated)
         end
       end
 
@@ -79,10 +79,24 @@ module Gitlab
         granted_access = max_teams_member_permission_in_project(user, project, action)
 
         project_team_user = UsersProject.find_by_user_id_and_project_id(user.id, project.id)
-        project_team_user.destroy if project_team_user.present?
+        if granted_access > 0
+          if project_team_user.present?
+            project_team_user.update_attributes(project_access: granted_access) if update_team_user_access_in_project?(project_team_user, granted_access)
+          else
+            project.team << [user, granted_access]
+          end
+        else
+          project_team_user.destroy
+        end
+        #project_team_user.destroy if project_team_user.present?
+        ## project_team_user.project_access != granted_access
+        #project.team << [user, granted_access] if granted_access > 0
+      end
 
-        # project_team_user.project_access != granted_access
-        project.team << [user, granted_access] if granted_access > 0
+      def update_team_user_access_in_project?(project_team_user, granted_access)
+        return false if project_team_user.project_access == granted_access
+        return true if granted_access > 0
+        false
       end
 
       def max_teams_member_permission_in_project(user, project, action = nil, teams = nil)
@@ -132,6 +146,50 @@ module Gitlab
           UsersProject.in_projects(team.projects).with_user(user).destroy_all
         end
       end
+
+      def assign_to_group(team, group, access)
+        group = find_entity(group, Group)
+        team = find_entity(team, UserTeam)
+
+        searched_group = team.user_team_group_relationships.find_by_group_id(group.id)
+
+        unless searched_group.present?
+          team.user_team_group_relationships.create(group_id: group.id, greatest_access: access)
+          group.projects.each do |project|
+            assign(team, project, access)
+          end
+        end
+      end
+
+      def resign_from_group(team, group)
+        group = find_entity(group, Group)
+        team = find_entity(team, UserTeam)
+
+        team.user_team_group_relationships.with_group(group).destroy_all
+
+        group.projects.each do |project|
+          resign(team, project)
+        end
+      end
+
+      def update_team_user_access_in_group(team, group, access, rebuild_flag = nil)
+        group = find_entity(group, Group)
+        team = find_entity(team, UserTeam)
+
+        relationship = team.user_team_group_relationships.with_group(group)
+        relationship.update_all(greatest_access: access)
+
+        if rebuild_flag
+          group.projects.each do |project|
+            update_project_greates_access(team, project, permission)
+          end
+        end
+      end
+
+      def find_entity(entity, entity_type)
+        entity.is_a?(entity_type) ? entity : entity_type.find(entity)
+      end
+
     end
   end
 end

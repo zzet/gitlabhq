@@ -22,6 +22,7 @@ class Milestone < ActiveRecord::Base
   belongs_to :project
   has_many :issues
   has_many :merge_requests
+  has_many :participants, through: :issues, source: :assignee
 
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
@@ -58,10 +59,6 @@ class Milestone < ActiveRecord::Base
     else
       false
     end
-  end
-
-  def participants
-    User.where(id: issues.pluck(:assignee_id))
   end
 
   def open_items_count

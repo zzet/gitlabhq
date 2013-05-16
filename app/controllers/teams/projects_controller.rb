@@ -21,7 +21,7 @@ class Teams::ProjectsController < Teams::ApplicationController
 
   def update
     if user_team.update_project_access(team_project, params[:greatest_project_access])
-      redirect_to edit_team_path(user_team), notice: 'Access was successfully updated.'
+      redirect_to team_path(user_team), notice: 'Access was successfully updated.'
     else
       render :edit
     end
@@ -29,7 +29,7 @@ class Teams::ProjectsController < Teams::ApplicationController
 
   def destroy
     user_team.resign_from_project(team_project)
-    redirect_to team_projects_path(user_team), notice: 'Team of users was successfully reassigned from project.'
+    redirect_to team_path(user_team), notice: 'Team of users was successfully reassigned from project.'
   end
 
   private

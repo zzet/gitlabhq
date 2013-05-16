@@ -1,0 +1,50 @@
+%table{style: "background: #eee; color: #444"}
+  %tr
+    %th
+      Pushed by
+    %td
+      = link_to @event.author.name, user_url(@event.author.name)
+  %tr
+    %th
+      Date
+    %td
+      = @event.created_at
+  %tr
+    %th
+      Pushed to project
+    %td
+      = @event.target.name
+  %tr
+    %th
+      Branch
+    %td
+      = @branch
+
+- if @commits.present?
+  %br
+
+  %table{style: "background: #eee; color: #444"}
+    %tr
+      %th{width: '50%'}
+        Last commit before push
+      %th{width: '50%'}
+        Last commit after push
+    %tr
+      %td
+        = render "event_notification_mailer/commit_short", commit: @before_commit
+      %td
+        = render "event_notification_mailer/commit_short", commit: @commits.first
+    %tr
+      %th{colspan: 2}
+        = link_to 'Compare it', project_compare_url(@event.target, @commits.first, @commits.last)
+  %br
+
+  %div{style: "background:#f9f9f9;margin-bottom:25px;border:1px solid #ccc"}
+    %h5{style: "background:#eee;background-image:-o-linear-gradient(#eee 6.6%,#dfdfdf);border-bottom:1px solid #ccc;color:#456;padding:0px 10px;font-size:14px;font-weight:normal"}
+      Commits in push(#{@commits.count})
+    %ul{style:"list-style:none;margin:0"}= render partial: "event_notification_mailer/commit", collection: @commits
+
+  - unless @diffs.empty?
+    %h4 Diff
+    = render "event_notification_mailer/diffs", diffs: @diffs
+

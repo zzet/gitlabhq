@@ -58,7 +58,7 @@ class Key < ActiveRecord::Base
   end
 
   def is_deploy_key
-    !!project_id
+    project.present?
   end
 
   # projects that has this key

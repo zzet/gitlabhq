@@ -30,7 +30,8 @@ class Event::Action
         :reopened,
         :merged,
         :assigned,
-        :reassigned
+        :reassigned,
+        :resigned
       ]
     end
 

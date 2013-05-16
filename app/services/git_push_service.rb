@@ -20,6 +20,8 @@ class GitPushService
     push = Push.create(project: project, user: user, before: oldrev, after: newrev, ref: ref)
     @push_data = push.push_data
 
+    Gitlab::Event::Action.trigger :pushed, "Push_summary", user, { project_id: project.id, push_data: @push_data, source: :repository }
+
     create_push_event
 
     project.ensure_satellite_exists
@@ -31,6 +33,9 @@ class GitPushService
       project.execute_hooks(@push_data.dup)
       project.execute_services(@push_data.dup)
     end
+
+    project.execute_hooks(@push_data.dup) if push_tag?(ref, oldrev)
+
   end
 
   # This method provide a sample data
@@ -52,5 +57,6 @@ class GitPushService
       data: push_data,
       author: user
     )
+
   end
 end

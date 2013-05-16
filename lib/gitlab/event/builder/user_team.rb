@@ -48,7 +48,20 @@ class Gitlab::Event::Builder::UserTeam < Gitlab::Event::Builder::Base
           actions << :updated
           temp_data[:previous_changes] = source.changes
         when :deleted
-          actions << :reassigned
+          actions << :resigned
+        end
+
+      when :user_team_group_relationship
+        target = source.user_team
+
+        case meta[:action]
+        when :created
+          actions << :joined
+        when :updated
+          actions << :updated
+          temp_data[:previous_changes] = source.changes
+        when :deleted
+          actions << :left
         end
 
       end

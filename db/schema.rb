@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130327221124) do
+ActiveRecord::Schema.define(:version => 20130506001109) do
 
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
@@ -57,6 +57,17 @@ ActiveRecord::Schema.define(:version => 20130327221124) do
     t.datetime "updated_at",  :null => false
   end
 
+  create_table "file_tokens", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "project_id"
+    t.string   "token"
+    t.string   "file"
+    t.datetime "last_usage_at"
+    t.integer  "usage_count"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
   create_table "issues", :force => true do |t|
     t.string   "title"
     t.integer  "assignee_id"
@@ -93,16 +104,16 @@ ActiveRecord::Schema.define(:version => 20130327221124) do
   add_index "keys", ["user_id"], :name => "index_keys_on_user_id"
 
   create_table "merge_requests", :force => true do |t|
-    t.string   "target_branch",                       :null => false
-    t.string   "source_branch",                       :null => false
-    t.integer  "project_id",                          :null => false
+    t.string   "target_branch", :null => false
+    t.string   "source_branch", :null => false
+    t.integer  "project_id",    :null => false
     t.integer  "author_id"
     t.integer  "assignee_id"
     t.string   "title"
-    t.datetime "created_at",                          :null => false
-    t.datetime "updated_at",                          :null => false
-    t.text     "st_commits",    :limit => 2147483647
-    t.text     "st_diffs",      :limit => 2147483647
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.text     "st_commits"
+    t.text     "st_diffs"
     t.integer  "milestone_id"
     t.string   "state"
     t.string   "merge_status"
@@ -200,9 +211,12 @@ ActiveRecord::Schema.define(:version => 20130327221124) do
     t.string   "issues_tracker",         :default => "gitlab", :null => false
     t.string   "issues_tracker_id"
     t.boolean  "snippets_enabled",       :default => true,     :null => false
+    t.boolean  "git_protocol_enabled"
+    t.datetime "last_activity_at"
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
+  add_index "projects", ["last_activity_at"], :name => "index_projects_on_last_activity_at"
   add_index "projects", ["namespace_id"], :name => "index_projects_on_namespace_id"
 
   create_table "protected_branches", :force => true do |t|
@@ -267,6 +281,14 @@ ActiveRecord::Schema.define(:version => 20130327221124) do
 
   create_table "tags", :force => true do |t|
     t.string "name"
+  end
+
+  create_table "user_team_group_relationships", :force => true do |t|
+    t.integer  "user_team_id"
+    t.integer  "group_id"
+    t.integer  "greatest_access"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "user_team_project_relationships", :force => true do |t|

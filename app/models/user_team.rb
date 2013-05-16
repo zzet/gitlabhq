@@ -20,9 +20,12 @@ class UserTeam < ActiveRecord::Base
 
   has_many :user_team_project_relationships, dependent: :destroy
   has_many :user_team_user_relationships, dependent: :destroy
+  has_many :user_team_group_relationships, dependent: :destroy
 
   has_many :projects, through: :user_team_project_relationships
   has_many :members,  through: :user_team_user_relationships, source: :user
+  has_many :admins,   through: :user_team_user_relationships, source: :user, conditions: { user_team_user_relationships: { group_admin: true } }
+  has_many :groups,   through: :user_team_group_relationships
 
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
@@ -110,6 +113,14 @@ class UserTeam < ActiveRecord::Base
     user_team_project_relationships.find_by_project_id(project).greatest_access
   end
 
+  def max_project_access_in_group(group)
+    user_team_group_relationships.find_by_group_id(group).greatest_access
+  end
+
+  def human_max_group_access(group)
+    self.class.access_roles.invert[max_project_access_in_group(group)]
+  end
+
   def human_max_project_access(project)
     self.class.access_roles.invert[max_project_access(project)]
   end
@@ -123,7 +134,7 @@ class UserTeam < ActiveRecord::Base
   end
 
   def admin?(member)
-    user_team_user_relationships.with_user(member).first.group_admin?
+    member.admin? || user_team_user_relationships.with_user(member).first.group_admin?
   end
 
 end

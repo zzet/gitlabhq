@@ -33,8 +33,11 @@ module Projects
       end
 
       # Disable less important features by default
-      @project.wall_enabled = false
-      @project.snippets_enabled = false
+      @project.issues_enabled         = Gitlab.config.gitlab.default_projects_features.issues
+      @project.wiki_enabled           = Gitlab.config.gitlab.default_projects_features.wiki
+      @project.wall_enabled           = Gitlab.config.gitlab.default_projects_features.wall
+      @project.snippets_enabled       = Gitlab.config.gitlab.default_projects_features.snippets
+      @project.merge_requests_enabled = Gitlab.config.gitlab.default_projects_features.merge_requests
 
       @project.creator = current_user
 
@@ -52,10 +55,19 @@ module Projects
 
       if @project.save
         @project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
+
+        group = Group.find_by_id(@project.namespace_id)
+        if group
+          group.user_teams.each do |team|
+            access = team.max_project_access_in_group(group)
+            Gitlab::UserTeamManager.assign(team, project, access)
+          end
+        end
       end
 
       @project
     rescue => ex
+      @project.errors.add(:base, ex.message)
       @project.errors.add(:base, "Can't save project. Please try again later")
       @project
     end

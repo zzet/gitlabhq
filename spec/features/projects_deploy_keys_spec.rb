@@ -19,7 +19,7 @@ describe "Projects", "DeployKeys" do
     it { should have_content(@key.title) }
 
     describe "Destroy" do
-      before { visit project_deploy_key_path(project, @key) }
+      before { ActiveRecord::Base.observers.disable :all; visit project_deploy_key_path(project, @key) }
 
       it "should remove entry" do
         expect {

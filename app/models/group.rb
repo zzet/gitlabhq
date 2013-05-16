@@ -15,13 +15,17 @@
 class Group < Namespace
   include Watchable
 
+  has_many :user_team_group_relationships, dependent: :destroy
+  has_many :user_teams, through: :user_team_group_relationships
+  has_many :admins,     through: :user_teams, class_name: User, conditions: { user_team_user_relationships: { group_admin: true } }
+
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
   actions_to_watch [:created, :deleted, :updated, :transfer]
-  actions_sources [watchable_name, :project]
+  actions_sources [watchable_name, :project, :user_team_group_relationship]
   available_in_activity_feed true, actions: [:created, :deleted, :transfer], check_permissions: true
 
   def add_users_to_project_teams(user_ids, project_access)

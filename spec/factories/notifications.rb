@@ -5,6 +5,7 @@ FactoryGirl.define do
     event
     subscriber
     subscription
+    target
     notification_state "new"
     notified_at nil
   end

@@ -11,5 +11,11 @@ class Gitlab::Event::Factory
       events.flatten
     end
 
+    def create_events(action, data)
+      events = self.build(action, data)
+      events.each do |event|
+        event.save
+      end
+    end
   end
 end

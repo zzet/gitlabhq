@@ -1,5 +1,7 @@
 class Projects::TeamsController < Projects::ApplicationController
 
+  before_filter :authorize_admin_team_member!
+
   def available
     @teams = current_user.is_admin? ? UserTeam.scoped : current_user.user_teams
     @teams = @teams.without_project(project)
@@ -22,6 +24,12 @@ class Projects::TeamsController < Projects::ApplicationController
     team.resign_from_project(project)
 
     redirect_to project_team_index_path(project)
+  end
+
+  protected
+
+  def user_team
+    @team ||= UserTeam.find_by_path(params[:id])
   end
 
 end

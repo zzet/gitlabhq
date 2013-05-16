@@ -21,8 +21,10 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :updated
           changes = source.changes
 
-          actions << :transfer if source.creator_id_changed? && source.creator_id != changes[:creator_id].first
-          if actions.blank?
+          #actions << :ownership_changed if source.creator_id_changed? && source.creator_id != changes[:creator_id].first
+          actions << :transfer if source.namespace_id_changed? && (source.namespace_id != changes[:namespace_id].first)
+
+          if project_changes_exists?(changes)
             temp_data[:previous_changes] = changes
             actions << :updated
           end
@@ -141,6 +143,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         end
 
       when :users_project
+        team_events = ::Event.where(target_id: target.id, target_type: target.class, created_at: (Time.now - 5.minutes)..Time.now)
+        temp_data[:team_echo] = true if team_events.any?
+
         target = source.project
 
         case meta[:action]
@@ -148,6 +153,8 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << :joined
         when :updated
           actions << :updated
+          changes = source.changes
+          temp_data["previous_changes"] = changes
         when :deleted
           actions << :left
         end
@@ -175,6 +182,21 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
       end
 
       events
+    end
+
+    private
+
+    def project_changes_exists?(changes)
+      watched_fields = [:name, :path, :description,
+                        :creator_id, :default_branch,
+                        :issues_enabled, :wall_enabled,
+                        :merge_requests_enabled, :public,
+                        :issues_tracker, :issues_tracker_id]
+      is_actual_changes = false
+      watched_fields.each do |field|
+        is_actual_changes = true if changes.keys.include? field.to_s
+      end
+      is_actual_changes
     end
   end
 end

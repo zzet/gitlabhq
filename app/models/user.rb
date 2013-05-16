@@ -33,7 +33,6 @@
 #  can_create_team        :boolean          default(TRUE), not null
 #  state                  :string(255)
 #  color_scheme_id        :integer          default(1), not null
-#  notification_level     :integer          default(1), not null
 #
 
 class User < ActiveRecord::Base
@@ -63,6 +62,9 @@ class User < ActiveRecord::Base
   # Namespace for personal projects
   has_one :namespace,                 dependent: :destroy, foreign_key: :owner_id,    class_name: Namespace, conditions: 'type IS NULL'
 
+  # Namespaces (owned groups and own namespace)
+  has_many :namespaces, foreign_key: :owner_id
+
   # Profile
   has_many :keys,                     dependent: :destroy
 
@@ -71,12 +73,17 @@ class User < ActiveRecord::Base
 
   # Projects
   has_many :users_projects,           dependent: :destroy
-  has_many :projects,                 through:   :users_projects
+  has_many :projects,                 through: :users_projects
+  has_many :personal_projects,        through: :namespace, source: :projects
+  has_many :own_projects,             foreign_key: :creator_id
+  has_many :owned_projects,           through: :namespaces, source: :projects
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
   has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
   has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: Issue
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: MergeRequest
+
+  has_many :file_tokens
 
   # Teams
   has_many :own_teams,                       dependent: :destroy, foreign_key: :owner_id, class_name: UserTeam
@@ -84,9 +91,11 @@ class User < ActiveRecord::Base
   has_many :user_teams,                      through: :user_team_user_relationships
   has_many :user_team_project_relationships, through: :user_teams
   has_many :team_projects,                   through: :user_team_project_relationships
+  has_many :user_team_group_relationships,   through: :user_teams, conditions: { user_team_user_relationships: { group_admin: true } }
+  has_many :team_groups,                     through: :user_team_group_relationships, source: :group
 
   # Notifications & Subscriptions
-  has_many :subscriprions,                                 class_name: Event::Subscription, as: :target
+  has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription, as: :target
   has_many :personal_subscriprions,   dependent: :destroy, class_name: Event::Subscription
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
@@ -142,6 +151,9 @@ class User < ActiveRecord::Base
   scope :alphabetically, -> { order('name ASC') }
   scope :in_team, ->(team){ where(id: team.member_ids) }
   scope :not_in_team, ->(team){ where('users.id NOT IN (:ids)', ids: team.member_ids) }
+  scope :not_in_project, ->(project) { project.users.present? ? where("id not in (:ids)", ids: project.users.map(&:id) ) : scoped }
+  scope :without_projects, -> { where('id NOT IN (SELECT DISTINCT(user_id) FROM users_projects)') }
+
   scope :potential_team_members, ->(team) { team.members.any? ? active.not_in_team(team) : active  }
 
   actions_to_watch [:created, :deleted, :updated, :joined, :left, :transfer, :added]
@@ -170,18 +182,6 @@ class User < ActiveRecord::Base
       else
         self.active
       end
-    end
-
-    def not_in_project(project)
-      if project.users.present?
-        where("id not in (:ids)", ids: project.users.map(&:id) )
-      else
-        scoped
-      end
-    end
-
-    def without_projects
-      where('id NOT IN (SELECT DISTINCT(user_id) FROM users_projects)')
     end
 
     def create_from_omniauth(auth, ldap = false)
@@ -213,10 +213,6 @@ class User < ActiveRecord::Base
     username
   end
 
-  def notification
-    @notification ||= Notification.new(self)
-  end
-
   def generate_password
     if self.force_random_password
       self.password = self.password_confirmation = Devise.friendly_token.first(8)
@@ -230,56 +226,49 @@ class User < ActiveRecord::Base
     end
   end
 
-  # Namespaces user has access to
-  def namespaces
-    namespaces = []
-
-    # Add user account namespace
-    namespaces << self.namespace if self.namespace
-
-    # Add groups you can manage
-    namespaces += groups.all
-
-    namespaces
-  end
-
   # Groups where user is an owner
   def owned_groups
-    groups
+   @group_ids = groups.pluck(:id) + team_groups.pluck(:id)
+   Group.where(id: @group_ids)
+  end
+
+  def owned_teams
+    own_teams
   end
 
   # Groups user has access to
   def authorized_groups
-    @authorized_groups ||= begin
-                           groups = Group.where(id: self.authorized_projects.pluck(:namespace_id)).all
-                           groups = groups + self.groups
-                           groups.uniq
-                         end
+    agroups = Group.scoped
+    unless self.admin?
+      @group_ids ||= (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
+      agroups = agroups.where(id: @group_ids)
+    end
+    agroups
   end
 
+  def authorized_namespaces
+    namespace_ids = owned_groups.pluck(:id) + [namespace.id]
+    Namespace.where(id: namespace_ids)
+  end
 
   # Projects user has access to
   def authorized_projects
-    project_ids = users_projects.pluck(:project_id)
-    project_ids = project_ids | owned_projects.pluck(:id)
-    Project.where(id: project_ids)
+    @project_ids ||= (owned_projects.pluck(:id) + projects.pluck(:id)).uniq
+    Project.where(id: @project_ids)
   end
 
-  # Projects in user namespace
-  def personal_projects
-    Project.personal(self)
-  end
-
-  # Projects where user is an owner
-  def owned_projects
-    Project.where("(projects.namespace_id IN (:namespaces)) OR
-                  (projects.namespace_id IS NULL AND projects.creator_id = :user_id)",
-                  namespaces: namespaces.map(&:id), user_id: self.id)
+  def authorized_teams
+    ateams = UserTeam.scoped
+    unless self.admin?
+      @team_ids ||= (user_teams.pluck(:id) + own_teams.pluck(:id)).uniq
+      ateams = ateams.where(id: @team_ids)
+    end
+    ateams
   end
 
   # Team membership in authorized projects
   def tm_in_authorized_projects
-    UsersProject.where(project_id:  authorized_projects.map(&:id), user_id: self.id)
+    UsersProject.where(project_id: authorized_projects.map(&:id), user_id: self.id)
   end
 
   def is_admin?
@@ -345,26 +334,11 @@ class User < ActiveRecord::Base
   end
 
   def several_namespaces?
-    namespaces.size > 1
+    authorized_namespaces.many?
   end
 
   def namespace_id
     namespace.try :id
-  end
-
-  def authorized_teams
-    @authorized_teams ||= begin
-                            ids = []
-                            ids << UserTeam.with_member(self).pluck('user_teams.id')
-                            ids << UserTeam.created_by(self).pluck('user_teams.id')
-                            ids.flatten
-
-                            UserTeam.where(id: ids)
-                          end
-  end
-
-  def owned_teams
-    UserTeam.where(owner_id: self.id)
   end
 
   def name_with_username

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Gitlab::Event::Notification" do
+describe "Gitlab::Event::Notifications" do
     describe "User subscriptions" do
     before do
       @user = create :user
@@ -29,7 +29,7 @@ describe "Gitlab::Event::Notification" do
       @events = Event.with_source(@user)
 
       @events.each do |event|
-        Gitlab::Event::Notification.create_notifications(event)
+        Gitlab::Event::Notifications.create_notifications(event)
       end
 
       @user_notificatons = @user.notifications
@@ -56,7 +56,7 @@ describe "Gitlab::Event::Notification" do
       @events = Event.with_source(@user)
 
       @events.each do |event|
-        Gitlab::Event::Notification.create_notifications(event)
+        Gitlab::Event::Notifications.create_notifications(event)
       end
 
       @user_notificatons = @user.notifications
@@ -74,7 +74,7 @@ describe "Gitlab::Event::Notification" do
       @key_events = Event.with_source(@key)
 
       @key_events.each do |event|
-        Gitlab::Event::Notification.create_notifications(event)
+        Gitlab::Event::Notifications.create_notifications(event)
       end
 
       @user.reload

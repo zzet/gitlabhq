@@ -2,29 +2,36 @@ class Admin::GroupsController < Admin::ApplicationController
   before_filter :group, only: [:edit, :show, :update, :destroy, :project_update, :project_teams_update]
 
   def index
-    @groups = Group.order('name ASC')
+    @groups = ::Group.order('name ASC')
     @groups = @groups.search(params[:name]) if params[:name].present?
     @groups = @groups.page(params[:page]).per(20)
   end
 
   def show
+    @group_projects = @group.projects
+    @members = @group.users
+    @teams = @group.user_teams
+
     @projects = Project.scoped
     @projects = @projects.not_in_group(@group) if @group.projects.present?
     @projects = @projects.all
     @projects.reject!(&:empty_repo?)
 
     @users = User.active
+    @available_teams = group.user_teams.any? ? UserTeam.where("id not in (?)", group.user_teams) : UserTeam.scoped
+
+    session[:redirect_to] = admin_group_path(@group)
   end
 
   def new
-    @group = Group.new
+    @group = ::Group.new
   end
 
   def edit
   end
 
   def create
-    @group = Group.new(params[:group])
+    @group = ::Group.new(params[:group])
     @group.path = @group.name.dup.parameterize if @group.name
     @group.owner = current_user
 
@@ -83,6 +90,6 @@ class Admin::GroupsController < Admin::ApplicationController
   private
 
   def group
-    @group = Group.find_by_path(params[:id])
+    @group = ::Group.find_by_path(params[:id])
   end
 end
