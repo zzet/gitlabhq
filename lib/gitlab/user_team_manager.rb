@@ -30,7 +30,7 @@ module Gitlab
         end
 
         if options[:group_admin].to_s != team.admin?(member).to_s
-          updates[:group_admin] = options[:group_admin].present?
+          updates[:group_admin] = options[:group_admin].present? && options[:group_admin].to_i > 0
         end
 
         unless updates.blank?
