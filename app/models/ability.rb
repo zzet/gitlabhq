@@ -28,7 +28,7 @@ class Ability
       team = project.team
 
       user_teams = project.user_teams
-      is_team_admin = user_teams.inject { |a, b| a = a || b.admin?(user)}
+      is_team_admin = user_teams.inject(false) { |a, b| a = a || b.admin?(user)}
 
 
       # Rules based on role in project
