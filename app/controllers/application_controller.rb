@@ -156,4 +156,8 @@ class ApplicationController < ActionController::Base
     gon.gravatar_url = request.ssl? || Gitlab.config.gitlab.https ? Gitlab.config.gravatar.ssl_url : Gitlab.config.gravatar.plain_url
     gon.relative_url_root = Gitlab.config.gitlab.relative_url_root
   end
+
+  def redirect_back_or_default(default)
+    redirect_to(session[:return_to] || default)
+  end
 end

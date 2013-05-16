@@ -152,6 +152,9 @@ Gitlab::Application.routes.draw do
       get :people
       post :team_members
     end
+    scope module: :groups do
+      resources :teams
+    end
   end
 
   #
