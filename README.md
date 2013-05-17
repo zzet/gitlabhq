@@ -16,13 +16,13 @@
 
 ### Code status
 
-* [![build status](http://ci.gitlab.org/projects/1/status.png?ref=master)](http://ci.gitlab.org/projects/1?ref=master) ci.gitlab.org (master branch)
+* [![build status](http://ci.gitlab.org/projects/1/status.png?ref=master)](http://ci.gitlab.org/projects/1?ref=master) on ci.gitlab.org (master branch)
 
-* [![build status](https://secure.travis-ci.org/gitlabhq/gitlabhq.png)](https://travis-ci.org/gitlabhq/gitlabhq) travis-ci.org (master branch)
+* [![build status](https://secure.travis-ci.org/gitlabhq/gitlabhq.png)](https://travis-ci.org/gitlabhq/gitlabhq) on travis-ci.org (master branch)
 
 * [![Code Climate](https://codeclimate.com/github/gitlabhq/gitlabhq.png)](https://codeclimate.com/github/gitlabhq/gitlabhq)
 
-* [![Dependency Status](https://gemnasium.com/gitlabhq/gitlabhq.png)](https://gemnasium.com/gitlabhq/gitlabhq)
+* [![Dependency Status](https://gemnasium.com/gitlabhq/gitlabhq.png)](https://gemnasium.com/gitlabhq/gitlabhq) this button can be yellow (small updates are available) but must not be red (a security fix or an important update is available)
 
 * [![Coverage Status](https://coveralls.io/repos/gitlabhq/gitlabhq/badge.png?branch=master)](https://coveralls.io/r/gitlabhq/gitlabhq)
 
@@ -38,7 +38,7 @@
 
 * Ubuntu/Debian**
 * ruby 1.9.3
-* MySQL
+* MySQL or PostgreSQL
 * git
 * gitlab-shell
 * redis
@@ -46,8 +46,6 @@
 ** More details are in the [requirements doc](https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/requirements.md)
 
 ### Installation
-
-Check out our [maintenance policy](MAINTENANCE.md) to see what versions are supported.
 
 #### Official production installation
 
@@ -137,17 +135,19 @@ Start it with [Foreman](https://github.com/ddollar/foreman)
 
 ### Getting help
 
+* [Maintenance policy](MAINTENANCE.md) specifies what versions are supported.
+
 * [Troubleshooting guide](https://github.com/gitlabhq/gitlab-public-wiki/wiki/Trouble-Shooting-Guide) contains solutions to common problems.
 
 * [Support forum](https://groups.google.com/forum/#!forum/gitlabhq) is the best place to ask questions. For example you can use it if you have questions about: permission denied errors, invisible repos, can't clone/pull/push or with web hooks that don't fire. Please search for similar issues before posting your own, there's a good chance somebody else had the same issue you have now and had it resolved. There are a lot of helpful GitLab users there who may be able to help you quickly. If your particular issue turns out to be a bug, it will find its way from there to a fix.
 
 * [Feedback and suggestions forum](http://feedback.gitlab.com) is the place to propose and discuss new features for GitLab.
 
-* [Support subscription](http://www.gitlab.com/subscription/) connect you to the knowledge of GitLab experts that will resolve your issues and answer your questions.
+* [Contributing guide](https://github.com/gitlabhq/gitlabhq/blob/master/CONTRIBUTING.md) describes how to submit pull requests and issues. Pull requests and issues not in line with the guidelines in this document will be closed.
+
+* [Support subscription](http://www.gitlab.com/subscription/) connects you to the knowledge of GitLab experts that will resolve your issues and answer your questions.
 
 * [Consultancy](http://www.gitlab.com/consultancy/) allows you hire GitLab experts for installations, upgrades and customizations.
-
-* [Contributing guide](https://github.com/gitlabhq/gitlabhq/blob/master/CONTRIBUTING.md) describes how to submit pull requests and issues. Pull requests and issues not in line with the guidelines in this document will be closed.
 
 
 ### Getting in touch
