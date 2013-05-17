@@ -1112,17 +1112,14 @@ class EventNotificationMailer < ActionMailer::Base
     @branch = @push_data["ref"]
     @branch.slice!("refs/heads/")
 
-    result = Commit.compare(@project, @push_data["before"], @push_data["after"])
+    result = Gitlab::Git::Compare.new(@project, @push_data["before"], @push_data["after"])
 
     if result
-      @before_commit = CommitDecorator.decorate(@project.repository.commit(@push_data["before"]))
-      @branch = @push_data["ref"]
-      @branch.slice!("refs/heads/")
-
-      @commits       = CommitDecorator.decorate_collection result[:commits]
-      @commit        = result[:commit]
-      @diffs         = result[:diffs]
-      @refs_are_same = result[:same]
+      #@before_commit = CommitDecorator.decorate(@project.repository.commit(@push_data["before"]))
+      @commits       = result.commits
+      @commit        = result.commit
+      @diffs         = result.diffs
+      @refs_are_same = result.same
       @line_notes    = []
 
       mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")
