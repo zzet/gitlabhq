@@ -16,7 +16,7 @@ describe SubscriptionService do
       @project = create :project, namespace: @group, creator: @user
     end
 
-    it "should subscribe user on group notificsations" do
+    it "should subscribe user on group notifications" do
       subscriptions_count = Event::Subscription.by_user(@user).count
       SubscriptionService.subscribe(@user, :all, @group, :all)
 
@@ -24,7 +24,7 @@ describe SubscriptionService do
       (subscriptions_count_after_subscribe - subscriptions_count).should == 1
     end
 
-    it "should unsubscribe user on group notificsations" do
+    it "should unsubscribe user on group notifications" do
       SubscriptionService.subscribe(@user, :all, @group, :all)
       subscriptions_count = Event::Subscription.by_user(@user).count
 
@@ -34,7 +34,7 @@ describe SubscriptionService do
       (subscriptions_count - subscriptions_count_after_unsubscribe).should == 1
     end
 
-    it "should subscribe user on project notificsations on group" do
+    it "should subscribe user on project notifications on group" do
       subscriptions_count = Event::Subscription.by_user(@user).count
       SubscriptionService.subscribe(@user, :all, @group, :all)
       SubscriptionService.subscribe(@user, :all, @group, :project)
@@ -46,6 +46,7 @@ describe SubscriptionService do
       subscriptions_count_after_unsubscribe = Event::Subscription.by_user(@user).count
 
       (subscriptions_count_after_subscribe - subscriptions_count_after_unsubscribe).should == 1
+      Event::Subscription.by_user(@user).first.source_category.should == "all"
 
       SubscriptionService.unsubscribe(@user, :all, @group, :all)
       subscriptions_count_after_unsubscribe = Event::Subscription.by_user(@user).count
