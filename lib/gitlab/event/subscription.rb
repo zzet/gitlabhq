@@ -62,13 +62,23 @@ module Gitlab
           subscribe!(user, action, target, source)
         end
 
-        def unsubscribe(user, action, target, source)
+        def unsubscribe(user, action, target, source = :all)
           target = target.to_sym if target.is_a? String
           new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && !([:all, :new].include?(source))
           target = new_source if target.blank?
           unsubscribe!(user, action, target, source)
+          if source == :all
+            target.class.watched_adjacent_sources.each do |adjacent_source|
+              unsubscribe!(user, action, target, adjacent_source)
+            end
+          end
         end
 
+        def unsubscribe_from_adjacent_sources(user)
+          subscriptions = user.personal_subscriprions.where("source_category NOT IN ('all', 'new')")
+
+          subscriptions.destroy_all
+        end
 
         def can_subscribe?(user, action, target, source)
           subscriptions = []
@@ -77,7 +87,7 @@ module Gitlab
             subscriptions << descendant.can_subscribe?(user, action, target, source)
           end
 
-          return subscriptions.inject { |c, s| c = c || s }
+          return subscriptions.inject(false) { |c, s| c = c || s }
         end
 
         def subscribe_on_all(user, target_type, action = :all, source = :all)
@@ -188,7 +198,7 @@ module Gitlab
             end
           else
             sourced_subscriptions = targeted_subscriptions.without_source
-            if sourced_subscriptions.count == sourcesed_subscriptions.count?
+            if sourced_subscriptions.count == sourcesed_subscriptions.count
               # We have subscriptions by type, but wants to subscribe on current event
               # I will subscribe, to save all user subscriptions
               return false

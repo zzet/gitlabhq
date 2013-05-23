@@ -290,7 +290,7 @@ describe EventNotificationMailer do
       project.name = "#{project.name}_updated"
       project.save
 
-      ActionMailer::Base.deliveries.should be_blank
+      ActionMailer::Base.deliveries.should_not be_blank
     end
 
     it "should send email about delete project in group" do
