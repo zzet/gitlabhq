@@ -19,5 +19,9 @@ class SubscriptionService
     def subscribe_on_all(user, action, target_type, source)
       Gitlab::Event::Subscription.subscribe_on_all(user, action, target_type, source)
     end
+
+    def unsubscribe_from_adjacent_sources(user)
+      Gitlab::Event::Subscription.unsubscribe_from_adjacent_sources(user)
+    end
   end
 end
