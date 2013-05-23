@@ -72,7 +72,8 @@ module Gitlab
         if File.exists?(project_path)
           print '-'
         else
-          if system("/home/git/gitlab-shell/bin/gitlab-projects import-project #{path} #{git_repo}")
+          shell = Gitlab::Shell.new
+          if shell.import_repository(project.path_with_namespace, git_repo)
             print '.'
           else
             print 'F'
