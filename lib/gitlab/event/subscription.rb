@@ -60,13 +60,23 @@ class Gitlab::Event::Subscription
       subscribe!(user, action, target, source)
     end
 
-    def unsubscribe(user, action, target, source)
+    def unsubscribe(user, action, target, source = :all)
       target = target.to_sym if target.is_a? String
       new_source = source.to_s.camelize.constantize if source.is_a?(Symbol) && !([:all, :new].include?(source))
       target = new_source if target.blank?
       unsubscribe!(user, action, target, source)
+      if source == :all
+        target.class.watched_adjacent_sources.each do |adjacent_source|
+          unsubscribe!(user, action, target, adjacent_source)
+        end
+      end
     end
 
+    def unsubscribe_from_adjacent_sources(user)
+      subscriptions = user.personal_subscriprions.where("source_category NOT IN ('all', 'new')")
+
+      subscriptions.destroy_all
+    end
 
     def can_subscribe?(user, action, target, source)
       subscriptions = []
@@ -75,7 +85,7 @@ class Gitlab::Event::Subscription
         subscriptions << descendant.can_subscribe?(user, action, target, source)
       end
 
-      return subscriptions.inject { |c, s| c = c || s }
+      return subscriptions.inject(false) { |c, s| c = c || s }
     end
 
     def subscribe_on_all(user, target_type, action = :all, source = :all)
@@ -137,14 +147,13 @@ class Gitlab::Event::Subscription
         raise ArgumentError, "Incorrect target. Empty!"
       end
     end
-
     def unsubscribe!(user, action, target, source)
       subscription = nil
       if target.is_a? Symbol
         subscription = ::Event::Subscription.by_user(user).by_target_category(target).by_action(action)
       else
         if target.persisted? || target.destroyed?
-          subscription = ::Event::Subscription.by_user(user).by_target(target).by_source_type(source).by_action(action)
+          subscription = ::Event::Subscription.by_user(user).by_target(target).by_source_type_hard(source).by_action(action)
         else
           raise ArgumentError, "Incorrect target" if subscription_params[:target_type].blank? && subscription_params[:target_category].blank?
         end
@@ -153,6 +162,7 @@ class Gitlab::Event::Subscription
         subscription.each do |sbs|
           sbs.destroy
         end
+
       end
     end
 

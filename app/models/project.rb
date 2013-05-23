@@ -113,6 +113,7 @@ class Project < ActiveRecord::Base
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
 
   actions_to_watch [:created, :added, :updated, :deleted, :transfer]
+  adjacent_targets [:group]
   actions_sources [watchable_name, :issue, :milestone, :note, :merge_request,
                    :snippet, :project_hook, :protected_branch, :service, :user_team_project_relationship, :users_project, :push]
   available_in_activity_feed true, actions: [:created, :added, :deleted], check_permissions: true

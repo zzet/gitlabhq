@@ -33,6 +33,39 @@ module Watchable
         ActivityFeed.register_actions(watchable_name, actions)
       end
     end
+
+    def adjacent_targets(adjacents)
+      return if adjacents.empty?
+
+      @adjacent_targets ||= adjacents.select { |adjacent| defined?(adjacent.to_s.camelize.constantize) }
+      fill_adjacent_sources(@adjacent_targets)
+    end
+
+    def watched_adjacent_targets
+      @adjacent_targets
+    end
+
+    def adjacent_sources(adjacents)
+      return if adjacents.empty?
+
+      @adjacent_sources ||= adjacents.select { |adjacent| defined?(adjacent.to_s.camelize.constantize) }
+    end
+
+    def watched_adjacent_sources
+      @adjacent_sources ||= []
+    end
+
+    protected
+
+    def fill_adjacent_sources(targets)
+      targets.each do |target|
+        target.to_s.camelize.constantize.add_to_adjacent_sources(self.name.downcase.to_sym)
+      end
+    end
+
+    def add_to_adjacent_sources(source)
+      @adjacent_sources << source if !watched_adjacent_sources.include?(source)
+    end
   end
 
   def watchable_name

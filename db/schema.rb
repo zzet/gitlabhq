@@ -11,13 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130506001109) do
+ActiveRecord::Schema.define(:version => 20130506001112) do
 
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+    t.boolean  "adjacent_changes"
   end
 
   create_table "event_subscription_notifications", :force => true do |t|

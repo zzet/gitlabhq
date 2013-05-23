@@ -4,16 +4,67 @@ class Gitlab::Event::Notifications
 
     def create_notifications(event)
       if can_create_notifications?(event)
-        subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
+        create_air_notifications(event)
+        create_adjacent_notifications(event)
+      end
+    end
+
+    def create_air_notifications(event)
+      subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
+
+      subscriptions.each do |subscription|
+        # Not send notification about changes to changes author
+        # TODO. Rewrite in future with check by Entity type
+        if build_notification?(subscription, event)
+          subscription.notifications.create(event: event, subscriber: subscription.user)
+        end
+      end
+
+    end
+
+    def create_adjacent_notifications(event)
+      subscription_target = nil
+      subscription_source = nil
+
+      case event.target
+      when Project
+        project = event.target
+        namespace = project.namespace
+
+        if namespace
+          subscription_target = namespace.type == "Group" ? namespace.becomes(Group) : namespace.becomes(User)
+          subscription_source = :project
+        end
+      end
+
+      if subscription_target && subscription_source
+        subscribe_users_to_adjacent_resources(subscription_target, subscription_source)
+
+        subscriptions = ::Event::Subscription.by_target(subscription_target).by_source_type_hard(subscription_source)
 
         subscriptions.each do |subscription|
           # Not send notification about changes to changes author
           # TODO. Rewrite in future with check by Entity type
           if build_notification?(subscription, event)
-            subscription.notifications.create(event: event, subscriber: subscription.user)
+            air_subscriptions = ::Event::Subscription.by_user(subscription.user).by_target(event.target).by_source_type_hard(event.source)
+            if air_subscriptions.blank?
+              subscription.notifications.create(event: event, subscriber: subscription.user)
+            end
           end
         end
 
+      end
+    end
+
+    def subscribe_users_to_adjacent_resources(target, source)
+      ss = Event::Subscription::NotificationSetting.where(adjacent_changes: true)
+      ss.each do |settings|
+        user = settings.user
+        subscriptions = Event::Subscription.by_user(user).by_target(target).by_source_type(:all)
+        if subscriptions.any?
+          tageted_subscriptions = Event::Subscription.by_user(user).by_target(target).by_source_type_hard(source)
+          SubscriptionService.subscribe(user, :all, target, source) if tageted_subscriptions.blank?
+        end
       end
     end
 
@@ -25,7 +76,6 @@ class Gitlab::Event::Notifications
       if ((subscription.user != event.author) || (event.author.notification_setting && event.author.notification_setting.own_changes))
         event_data = JSON.load(event.data).to_hash
         if event_data["team_echo"].present?
-          p "skip event"
           return false
         else
           return true
