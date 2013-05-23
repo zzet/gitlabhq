@@ -283,6 +283,9 @@ describe EventNotificationMailer do
 
     it "should send email about update project in group" do
       group = create :group, owner: @another_user
+
+      SubscriptionService.subscribe(@user, :all, group, :project)
+
       project = create :project, creator: @another_user, namespace: group
 
       ActionMailer::Base.deliveries.clear
@@ -291,6 +294,22 @@ describe EventNotificationMailer do
       project.save
 
       ActionMailer::Base.deliveries.should_not be_blank
+    end
+
+    it "should send emails without dublicates about update project in group" do
+      group = create :group, owner: @another_user
+
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+      SubscriptionService.subscribe(@user, :all, group, :project)
+
+      project = create :project, creator: @another_user, namespace: group
+
+      ActionMailer::Base.deliveries.clear
+
+      project.name = "#{project.name}_updated"
+      project.save
+
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about delete project in group" do

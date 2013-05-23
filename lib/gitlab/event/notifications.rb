@@ -38,10 +38,11 @@ class Gitlab::Event::Notifications
       end
 
       if subscription_target && subscription_source
-        subscribe_users_to_adjacent_resources(subscription_target, subscription_source)
-
         air_subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
-        if air_subscriptions.any?
+
+        if air_subscriptions.blank?
+          subscribe_users_to_adjacent_resources(subscription_target, subscription_source)
+
           subscriptions = ::Event::Subscription.by_target(subscription_target).by_source_type(subscription_source)
 
           subscriptions.each do |subscription|
