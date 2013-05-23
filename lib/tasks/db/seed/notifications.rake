@@ -1,9 +1,8 @@
-require 'factory_girl_rails'
-
 namespace :db do
   namespace :seed do
     desc "Creates data for previewing notification emails"
     task :notifications => :environment do
+      require 'factory_girl_rails'
 
       builder = Gitlab::Event::SeedBuilder.new
 
