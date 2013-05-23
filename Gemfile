@@ -101,6 +101,9 @@ gem "foreman"
 # Cache
 gem "redis-rails"
 
+# Campfire integration
+gem 'tinder', '~> 1.9.2'
+
 group :assets do
   gem "sass-rails"
   gem "coffee-rails"
@@ -116,7 +119,7 @@ group :assets do
   gem "jquery-ui-rails",  "2.0.2"
   gem "modernizr",        "2.6.2"
   gem "raphael-rails",    git: "https://github.com/gitlabhq/raphael-rails.git"
-  gem 'bootstrap-sass',   "2.2.1.1"
+  gem 'bootstrap-sass'
   gem "font-awesome-sass-rails", "~> 3.0.0"
   gem "gemoji", "~> 1.2.1", require: 'emoji/railtie'
   gem "gon"
@@ -179,14 +182,14 @@ group :development, :test do
   gem 'growl',      require: darwin_only('growl')
 
   # PhantomJS driver for Capybara
-  gem 'poltergeist', git: 'https://github.com/jonleighton/poltergeist.git', ref: '9645b52009e258921b860d3b7601d00008b22c45'
+  gem 'poltergeist', '~> 1.3.0'
 
   gem 'spork', '~> 1.0rc'
 end
 
 group :test do
   gem "simplecov", require: false
-  gem "shoulda-matchers", "1.3.0"
+  gem "shoulda-matchers", "~> 2.1.0"
   gem 'email_spec'
   gem "webmock"
   gem 'test_after_commit'
