@@ -8,30 +8,32 @@ module Gitlab
       end
 
       def create_push_event
-        push_data = GitPushService.new.sample_data(project, user)
+        unless Event.find_by_action :pushed
+          push_data = GitPushService.new.sample_data(project, user)
 
-        event = FactoryGirl.create :event, {
-          action: :pushed,
-          data: push_data.to_json,
-          author_id: user.id,
-          source_id: nil,
-          source_type: "Push_summary",
-          target_id: project.id,
-          target_type: 'Project'
-        }
+          event = FactoryGirl.create :event, {
+            action: :pushed,
+            data: push_data.to_json,
+            author_id: user.id,
+            source_id: nil,
+            source_type: "Push_summary",
+            target_id: project.id,
+            target_type: 'Project'
+          }
 
-        subscription = FactoryGirl.create :subscription, {
-          action: :pushed,
-          user: user,
-          target_id: project.id,
-          target_type: 'Project'
-        }
+          subscription = FactoryGirl.create :subscription, {
+            action: :pushed,
+            user: user,
+            target_id: project.id,
+            target_type: 'Project'
+          }
 
-        FactoryGirl.create :notification, {
-          event: event,
-          subscription: subscription,
-          subscriber: user
-        }
+          FactoryGirl.create :notification, {
+            event: event,
+            subscription: subscription,
+            subscriber: user
+          }
+        end
       end
 
       private
@@ -49,7 +51,8 @@ module Gitlab
         @project ||= FactoryGirl.create :project, {
           name: 'notification_test_project',
           path: path,
-          creator: user
+          creator: user,
+          default_branch: 'master'
         }
       end
 
