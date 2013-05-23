@@ -40,13 +40,16 @@ class Gitlab::Event::Notifications
       if subscription_target && subscription_source
         subscribe_users_to_adjacent_resources(subscription_target, subscription_source)
 
-        subscriptions = ::Event::Subscription.by_target(subscription_target).by_source_type(subscription_source)
+        air_subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
+        if air_subscriptions.any?
+          subscriptions = ::Event::Subscription.by_target(subscription_target).by_source_type(subscription_source)
 
-        subscriptions.each do |subscription|
-          # Not send notification about changes to changes author
-          # TODO. Rewrite in future with check by Entity type
-          if build_notification?(subscription, event)
-            subscription.notifications.create(event: event, subscriber: subscription.user)
+          subscriptions.each do |subscription|
+            # Not send notification about changes to changes author
+            # TODO. Rewrite in future with check by Entity type
+            if build_notification?(subscription, event)
+              subscription.notifications.create(event: event, subscriber: subscription.user)
+            end
           end
         end
       end
