@@ -8,7 +8,7 @@ module Gitlab
       end
 
       def create_push_event
-        unless Event.find_by_action :pushed
+        unless ::Event.find_by_author_id user.id
           push_data = GitPushService.new.sample_data(project, user)
 
           event = FactoryGirl.create :event, {
