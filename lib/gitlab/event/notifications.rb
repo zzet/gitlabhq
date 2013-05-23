@@ -38,21 +38,21 @@ class Gitlab::Event::Notifications
       end
 
       if subscription_target && subscription_source
-        air_subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
+        subscribe_users_to_adjacent_resources(subscription_target, subscription_source)
 
-        if air_subscriptions.blank?
-          subscribe_users_to_adjacent_resources(subscription_target, subscription_source)
+        subscriptions = ::Event::Subscription.by_target(subscription_target).by_source_type_hard(subscription_source)
 
-          subscriptions = ::Event::Subscription.by_target(subscription_target).by_source_type(subscription_source)
-
-          subscriptions.each do |subscription|
-            # Not send notification about changes to changes author
-            # TODO. Rewrite in future with check by Entity type
-            if build_notification?(subscription, event)
+        subscriptions.each do |subscription|
+          # Not send notification about changes to changes author
+          # TODO. Rewrite in future with check by Entity type
+          if build_notification?(subscription, event)
+            air_subscriptions = ::Event::Subscription.by_user(subscription.user).by_target(event.target).by_source_type_hard(event.source)
+            if air_subscriptions.blank?
               subscription.notifications.create(event: event, subscriber: subscription.user)
             end
           end
         end
+
       end
     end
 
@@ -62,7 +62,7 @@ class Gitlab::Event::Notifications
         user = settings.user
         subscriptions = Event::Subscription.by_user(user).by_target(target).by_source_type(:all)
         if subscriptions.any?
-          tageted_subscriptions = Event::Subscription.by_user(user).by_target(target).by_source_type(source)
+          tageted_subscriptions = Event::Subscription.by_user(user).by_target(target).by_source_type_hard(source)
           SubscriptionService.subscribe(user, :all, target, source) if tageted_subscriptions.blank?
         end
       end

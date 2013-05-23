@@ -45,7 +45,7 @@ class Event::Subscription < ActiveRecord::Base
   scope :by_action, ->(action) { where(action: action.to_sym) }
   scope :by_user, ->(subscriber) { where(user_id: subscriber.id) }
   scope :by_source, ->(source) { where(source_id: source.id, source_type: source.class.name) }
-  scope :uniq_by_target, -> { select("DISTINCT ON (event_subscriptions.target_id) event_subscriptions.*") }
+  scope :uniq_by_target, -> { select("DISTINCT ON (event_subscriptions.target_id, event_subscriptions.user_id) event_subscriptions.*") }
   scope :by_target, ->(target) { where(target_id: target.id, target_type: target.class.name).uniq_by_target }
   scope :by_target_category, ->(target) { where(target_category: target).uniq_by_target }
 
@@ -53,6 +53,12 @@ class Event::Subscription < ActiveRecord::Base
     source_type = source_type.to_s.camelize
     est = self.arel_table
     where(est[:source_type].eq(source_type).or(est[:source_category].in([source_type.downcase, :all]))).uniq_by_target #.limit(1)
+  end
+
+  scope :by_source_type_hard, ->(source_type) do
+    source_type = source_type.to_s.camelize
+    est = self.arel_table
+    where(est[:source_type].eq(source_type).or(est[:source_category].eq(source_type.downcase)))
   end
 
   scope :with_source, -> { where("source_id IS NOT NULL") }
@@ -67,6 +73,6 @@ class Event::Subscription < ActiveRecord::Base
   end
 
   def with_adjacent_for?(user, source)
-    self.class.by_user(user).by_target(self.target).by_source_type(source).any?
+    self.class.by_user(user).by_target(self.target).by_source_type(source).many?
   end
 end
