@@ -155,6 +155,11 @@ end
 gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
 
+group :development, :staging do
+  # Visual email testing
+  gem "mail_view", "~> 1.0.3"
+end
+
 group :development, :test do
   gem 'coveralls', require: false
   gem 'rails-dev-tweaks'
