@@ -10,3 +10,5 @@ set :bundle_without, %w[development test] + (%w[mysql postgres] - [db_adapter])
 role :web, "10.40.42.123"
 role :app, "10.40.42.123"
 role :db,  "10.40.42.123", :primary => true
+
+after "deploy:update", "deploy:load_notifications_seeds"
