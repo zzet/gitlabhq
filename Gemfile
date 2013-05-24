@@ -163,9 +163,10 @@ end
 gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
 
-group :development, :staging do
+group :development, :staging, :test do
   # Visual email testing
   gem "mail_view", "~> 1.0.3"
+  gem 'factory_girl_rails'
 end
 
 group :development, :test do
@@ -178,7 +179,6 @@ group :development, :test do
   gem "awesome_print"
   gem "database_cleaner"
   gem "launchy"
-  gem 'factory_girl_rails'
 
   # Guard
   gem 'guard-rspec'
