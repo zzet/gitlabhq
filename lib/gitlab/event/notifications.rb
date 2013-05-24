@@ -75,10 +75,23 @@ class Gitlab::Event::Notifications
     def build_notification?(subscription, event)
       if ((subscription.user != event.author) || (event.author.notification_setting && event.author.notification_setting.own_changes))
         event_data = JSON.load(event.data).to_hash
-        if event_data["team_echo"].present?
-          return false
+        user = subscription.user
+        has_access = user.admin?
+
+        case event.source
+        when Project
+          up = user.projects.find(event.source)
+          has_access = has_access || up.present?
+        end
+
+        if has_access
+          if event_data["team_echo"].present?
+            return false
+          else
+            return true
+          end
         else
-          return true
+          return false
         end
       else
         return false
