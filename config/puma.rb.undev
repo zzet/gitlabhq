@@ -13,7 +13,7 @@ application_path = ENV['PUMA_HOME'] || '/rest/u/apps/gitlab'
 #
 # The default is the current directory.
 #
-directory application_path + 'current'
+directory application_path + '/current'
 
 # Set the environment in which the rack's app will run.
 #
