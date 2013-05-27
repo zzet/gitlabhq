@@ -61,11 +61,16 @@
               %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:smaller"}
                 = @commit.short_id(6)
 
-        %div{style: "overflow:auto;overflow-y:hidden;background:#fff;color:#333;font-size:12px"}
-          -# Skipp all non non-supported blobs
-          - next unless file.respond_to?('text?')
-          - if file.text?
-            = render "event_notification_mailer/text_file", diff: diff, index: i
-          - else
-            %p
-              No preview for this file type
+          = link_to project_tree_url(@project, tree_join(@commit.id, diff.new_path)), {style: 'color:#474d57;font-size:12px'} do
+            View file @
+            %span{style: "font-family:monospace;"}
+              = @commit.short_id(6)
+
+      %div{style: "overflow:auto;overflow-y:hidden;background:#fff;color:#333;font-size:12px"}
+        -# Skipp all non non-supported blobs
+        - next unless file.respond_to?('text?')
+        - if file.text?
+          = render "event_notification_mailer/text_file", diff: diff, index: i
+        - else
+          %p
+            No preview for this file type

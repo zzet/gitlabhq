@@ -26,7 +26,7 @@
         = render "event_notification_mailer/commit_short", commit: @before_commit
     %tr
       %th
-        = link_to 'Compare it', project_compare_url(@event.target, @before_commit, @commits.first)
+        = link_to 'Compare it', project_compare_url(@event.target, @before_commit, @commits.last)
 
 - if @commits.present?
   %br
