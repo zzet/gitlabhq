@@ -49,9 +49,9 @@
           - if diff.a_mode && diff.b_mode && diff.a_mode != diff.b_mode
             %span.file-mode= "#{diff.a_mode} → #{diff.b_mode}"
 
-          = link_to project_tree_url(@project, tree_join(@commit.id, diff.new_path)), {style: 'color:#474d57;font-weight:bold'} do
+          = link_to project_tree_url(@project, tree_join(@commit.id, diff.new_path)), {style: 'color:#474d57;font-size:12px'} do
             View file @
-            %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:smaller"}
+            %span{style: "font-family:monospace;"}
               = @commit.short_id(6)
 
       %div{style: "overflow:auto;overflow-y:hidden;background:#fff;color:#333;font-size:12px"}
