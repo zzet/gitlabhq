@@ -6,7 +6,7 @@ This is the official installation guide to set up a production server. To set up
 
 The following steps have been known to work. Please **use caution when you deviate** from this guide. Make sure you don't violate any assumptions GitLab makes about its environment.
 
-If you find a bug/error in this guide please **submit a pull request** following the [`contributing guide`](../../CONTRIBUTING.md).
+If you find a bug/error in this guide please **submit a pull request** following the [contributing guide](../../CONTRIBUTING.md).
 
 - - -
 
@@ -65,9 +65,13 @@ Make sure you have the right version of Python installed.
 mail server. By default, Debian is shipped with exim4 whereas Ubuntu
 does not ship with one. The recommended mail server is postfix and you can install it with:
 
-	sudo apt-get install postfix 
+  sudo apt-get install postfix
 
 # 2. Ruby
+
+Remove old 1.8 ruby if present
+
+    sudo apt-get remove ruby1.8
 
 Download and compile it:
 
@@ -207,7 +211,7 @@ Make sure to update username/password in config/database.yml.
     sudo -u git -H bundle install --deployment --without development test mysql
 
 
-## Initialise Database and Activate Advanced Features
+## Initialize Database and Activate Advanced Features
 
     sudo -u git -H bundle exec rake gitlab:setup RAILS_ENV=production
 
@@ -216,7 +220,7 @@ Make sure to update username/password in config/database.yml.
 
 Download the init script (will be /etc/init.d/gitlab):
 
-    sudo curl --output /etc/init.d/gitlab https://raw.github.com/gitlabhq/gitlabhq/5-2-stable/lib/support/init.d/gitlab
+    sudo cp lib/support/init.d/gitlab /etc/init.d/gitlab
     sudo chmod +x /etc/init.d/gitlab
 
 Make GitLab start on boot:
@@ -257,7 +261,7 @@ If you can't or don't want to use Nginx as your web server, have a look at the
 
 Download an example site config:
 
-    sudo curl --output /etc/nginx/sites-available/gitlab https://raw.github.com/gitlabhq/gitlabhq/5-2-stable/lib/support/nginx/gitlab
+    sudo cp lib/support/nginx/gitlab /etc/nginx/sites-available/gitlab
     sudo ln -s /etc/nginx/sites-available/gitlab /etc/nginx/sites-enabled/gitlab
 
 Make sure to edit the config file to match your setup:

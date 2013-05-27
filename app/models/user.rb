@@ -367,4 +367,8 @@ class User < ActiveRecord::Base
       nil
     end
   end
+
+  def ldap_user?
+    extern_uid && provider == 'ldap'
+  end
 end

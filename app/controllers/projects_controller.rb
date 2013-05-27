@@ -34,12 +34,12 @@ class ProjectsController < ProjectResourceController
   end
 
   def update
-    status = ::Projects::UpdateContext.new(project, current_user, params).execute
+    status = ::Projects::UpdateContext.new(@project, current_user, params).execute
 
     respond_to do |format|
       if status
         flash[:notice] = 'Project was successfully updated.'
-        format.html { redirect_to edit_project_path(project), notice: 'Project was successfully updated.' }
+        format.html { redirect_to edit_project_path(@project), notice: 'Project was successfully updated.' }
         format.js
       else
         format.html { render action: "edit" }
@@ -104,7 +104,7 @@ class ProjectsController < ProjectResourceController
     }
 
     respond_to do |format|
-      format.json { render :json => @suggestions }
+      format.json { render json: @suggestions }
     end
   end
 
