@@ -1122,7 +1122,10 @@ class EventNotificationMailer < ActionMailer::Base
       @commits       = CommitDecorator.decorate_collection result[:commits]
       @commit        = result[:commit]
       @diffs         = result[:diffs]
+
       @suppress_diff = result[:diffs].size > Commit::DIFF_SAFE_SIZE
+      @suppress_diff ||= result[:lines_count] > Commit::DIFF_SAFE_LINES_COUNT
+
       @refs_are_same = result[:same]
       @line_notes    = []
 

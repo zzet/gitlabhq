@@ -1,7 +1,7 @@
 - if @suppress_diff
   .alert.alert-block
     %p
-      %strong Warning! Large commit with more than #{Commit::DIFF_SAFE_SIZE} files changed.
+      %strong Warning! Large commit with more than #{Commit::DIFF_SAFE_SIZE} files changed or contain more than #{Commit::DIFF_SAFE_LINES_COUNT} lines of code.
     %p To prevent performance issue we rejected diff information.
 
 %p{style: "color:gray"}
