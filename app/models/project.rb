@@ -48,6 +48,7 @@ class Project < ActiveRecord::Base
   has_one :last_event, class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
   has_one :gitlab_ci_service, dependent: :destroy
   has_one :campfire_service, dependent: :destroy
+  has_one :hipchat_service, dependent: :destroy
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
@@ -250,7 +251,7 @@ class Project < ActiveRecord::Base
   end
 
   def available_services_names
-    %w(gitlab_ci campfire)
+    %w(gitlab_ci campfire hipchat)
   end
 
   def gitlab_ci?
@@ -440,5 +441,29 @@ class Project < ActiveRecord::Base
 
   def forked?
     !(forked_project_link.nil? || forked_project_link.forked_from_project.nil?)
+  end
+
+  def rename_repo
+    old_path_with_namespace = File.join(namespace_dir, path_was)
+    new_path_with_namespace = File.join(namespace_dir, path)
+
+    if gitlab_shell.mv_repository(old_path_with_namespace, new_path_with_namespace)
+      # If repository moved successfully we need to remove old satellite
+      # and send update instructions to users.
+      # However we cannot allow rollback since we moved repository
+      # So we basically we mute exceptions in next actions
+      begin
+        gitlab_shell.rm_satellites(old_path_with_namespace)
+        send_move_instructions
+      rescue
+        # Returning false does not rolback after_* transaction but gives
+        # us information about failing some of tasks
+        false
+      end
+    else
+      # if we cannot move namespace directory we should rollback
+      # db changes in order to prevent out of sync between db and fs
+      raise Exception.new('repository cannot be renamed')
+    end
   end
 end

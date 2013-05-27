@@ -12,6 +12,7 @@ class ProjectObserver < BaseObserver
 
   def after_update(project)
     project.send_move_instructions if project.namespace_id_changed?
+    project.rename_repo if project.path_changed?
     if project.git_protocol_enabled_changed?
       if project.git_protocol_enabled
         log_info("#{project.owner.name} granted public access via git protocol for project \"#{project.name_with_namespace}\"")
