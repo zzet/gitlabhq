@@ -1,7 +1,7 @@
 class Gitlab::Event::Notification::Builder::UsersProject < Gitlab::Event::Notification::Builder::Base
 
   class << self
-    def can_build?(subscription, event_data)
+    def can_build?(subscription, event)
       return false if team_already_have?(event)
 
       super

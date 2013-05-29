@@ -1,4 +1,4 @@
-class Gitlab::Event::Notifications::Factory
+class Gitlab::Event::Notification::Factory
 
   class << self
     def build(subscription, event)
@@ -13,12 +13,13 @@ class Gitlab::Event::Notifications::Factory
 
     def create_notifications(event)
       if can_create_notifications?(event)
+        notifications = []
         subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
 
         subscriptions.each do |subscription|
           # Not send notification about changes to changes author
           # TODO. Rewrite in future with check by Entity type
-          notifications = self.build(subscription, event)
+          notifications += build(subscription, event)
         end
 
         notifications.each do |notification|

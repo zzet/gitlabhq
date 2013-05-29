@@ -8,9 +8,9 @@ class Gitlab::Event::Notification::Builder::Base
       super
     end
 
-    def can_buld?(subscription, event)
+    def can_build?(subscription, event)
       (subscription.user != event.author) || user_subscribed_on_own_changes?(event)
-   end
+    end
 
     def build(subscription, event)
       subscription.notifications.create(event: event, subscriber: subscription.user)
@@ -19,7 +19,7 @@ class Gitlab::Event::Notification::Builder::Base
     private
 
     def user_subscribed_on_own_changes?(event)
-      event.author.notification_setting && event.author.notification_setting.own_changes)
+      event.author.notification_setting && event.author.notification_setting.own_changes
     end
   end
 end
