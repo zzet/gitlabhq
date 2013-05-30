@@ -22,6 +22,9 @@ class CommitLoadContext < BaseContext
 
       begin
         result[:suppress_diff] = true if commit.diffs.size > Commit::DIFF_SAFE_SIZE && !params[:force_show_diff]
+        # TODO: Rewrite it after merging upstream
+        lines_count = commit.diffs.inject(0) { |sum, diff| diff.diff.lines.count }
+        result[:suppress_diff] ||= lines_count > Commit::DIFF_SAFE_LINES_COUNT
       rescue Grit::Git::GitTimeout
         result[:suppress_diff] = true
         result[:status] = :huge_commit
