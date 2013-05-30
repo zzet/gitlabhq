@@ -7,7 +7,6 @@ class Event::Subscription::Notification < ActiveRecord::Base
 
   validates :subscriber,   presence: true
   validates :event,        presence: true
-  validates :subscription, presence: true
 
   scope :pending, -> { where(notification_state: :new) }
   scope :instantaneous, -> { pending.where(notification_interval: 0) }
