@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Event::Notification::Builder::UsersProject do
+describe Gitlab::Event::Notification::Creator::UsersProject do
   before do
     ActiveRecord::Base.observers.disable :all
 
