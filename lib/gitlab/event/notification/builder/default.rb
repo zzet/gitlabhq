@@ -4,7 +4,7 @@ class Gitlab::Event::Notification::Builder::Default
   end
 
   def build(subscription, event)
-    subscription.notifications.create(event: event, subscriber: subscription.user)
+    [subscription.notifications.create(event: event, subscriber: subscription.user)]
   end
 
   private
