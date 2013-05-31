@@ -77,7 +77,7 @@ class CommitDecorator < ApplicationDecorator
     options[:type] ||= :path
     source_name = send "#{options[:source]}_name".to_sym
     source_email = send "#{options[:source]}_email".to_sym
-    source_email = "notification_tester@example.com"
+
     text = if options[:avatar]
             avatar = h.image_tag h.gravatar_icon(source_email, options[:size]), class: "avatar #{"s#{options[:size]}" if options[:size]}", width: options[:size], alt: ""
             %Q{#{avatar} <span class="commit-#{options[:source]}-name">#{source_name}</span>}
