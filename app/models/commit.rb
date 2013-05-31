@@ -97,6 +97,8 @@ class Commit
                            project.repo.diff(last.id, first.id) rescue []
                          end
 
+        result[:lines_count] = result[:diffs].inject(0) { |sum, diff| diff.diff.lines.count } if result[:diffs]
+
         result[:commit] = Commit.new(first)
       end
 

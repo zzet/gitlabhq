@@ -69,12 +69,15 @@ class CommitDecorator < ApplicationDecorator
   # Otherwise it will link to the person email as specified in the commit.
   #
   # options:
+  #  type: one of :url or :path (default - :path)
   #  source: one of :author or :committer
   #  avatar: true will prepend the avatar image
   #  size:   size of the avatar image in px
   def person_link(options = {})
+    options[:type] ||= :path
     source_name = send "#{options[:source]}_name".to_sym
     source_email = send "#{options[:source]}_email".to_sym
+    source_email = "notification_tester@example.com"
     text = if options[:avatar]
             avatar = h.image_tag h.gravatar_icon(source_email, options[:size]), class: "avatar #{"s#{options[:size]}" if options[:size]}", width: options[:size], alt: ""
             %Q{#{avatar} <span class="commit-#{options[:source]}-name">#{source_name}</span>}
@@ -87,7 +90,7 @@ class CommitDecorator < ApplicationDecorator
     if user.nil?
       h.mail_to(source_email, text.html_safe, class: "commit-#{options[:source]}-link")
     else
-      h.link_to(text.html_safe, h.user_path(user), class: "commit-#{options[:source]}-link")
+      h.link_to(text.html_safe, h.send("user_#{options[:type]}", user), class: "commit-#{options[:source]}-link")
     end
   end
 end
