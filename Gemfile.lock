@@ -560,8 +560,8 @@ DEPENDENCIES
   gitlab_meta (= 5.0)
   gitlab_omniauth-ldap (= 1.0.2)
   gon
-  grape
-  grape-entity
+  grape (~> 0.4.1)
+  grape-entity (~> 0.3.0)
   growl
   guard-rspec
   guard-spinach

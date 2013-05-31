@@ -1,10 +1,18 @@
+# Select Version to Install
+Make sure you view this installation guide from the branch (version) of GitLab you would like to install. In most cases
+this should be the highest numbered stable branch (example shown below). 
+
+![capture](https://f.cloud.github.com/assets/1192780/564911/2f9f3e1e-c5b7-11e2-9f89-98e527d1adec.png)
+
+If this is unclear check the [GitLab Blog](http://blog.gitlab.org/) for installation guide links by version.
+
 # Important notes
 
 This installation guide was created for and tested on **Debian/Ubuntu** operating systems. Please read [`doc/install/requirements.md`](./requirements.md) for hardware and operating system requirements.
 
 This is the official installation guide to set up a production server. To set up a **development installation** or for many other installation options please consult [the installation section in the readme](https://github.com/gitlabhq/gitlabhq#installation).
 
-The following steps have been known to work. Please **use caution when you deviate** from this guide. Make sure you don't violate any assumptions GitLab makes about its environment.
+The following steps have been known to work. Please **use caution when you deviate** from this guide. Make sure you don't violate any assumptions GitLab makes about its environment. For example many people run into permission problems because they changed the location of directories or run services as the wrong user.
 
 If you find a bug/error in this guide please **submit a pull request** following the [contributing guide](../../CONTRIBUTING.md).
 
@@ -234,18 +242,20 @@ Check if GitLab and its environment are configured correctly:
 
     sudo -u git -H bundle exec rake gitlab:env:info RAILS_ENV=production
 
+## Start Your GitLab Instance
+
+    sudo service gitlab start
+    # or
+    sudo /etc/init.d/gitlab restart
+
+## Double-check Application Status
+
 To make sure you didn't miss anything run a more thorough check with:
 
     sudo -u git -H bundle exec rake gitlab:check RAILS_ENV=production
 
 If all items are green, then congratulations on successfully installing GitLab!
 However there are still a few steps left.
-
-## Start Your GitLab Instance
-
-    sudo service gitlab start
-    # or
-    sudo /etc/init.d/gitlab restart
 
 
 # 7. Nginx
