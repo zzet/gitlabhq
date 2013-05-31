@@ -1,6 +1,11 @@
 require 'sidekiq/web'
 
 Gitlab::Application.routes.draw do
+  # Mounting Visual email testing
+  if Rails.env.development? || Rails.env.staging?
+    mount EventNotificationMailPreview => 'event_notifications_preview'
+  end
+
   #
   # Search
   #
