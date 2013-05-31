@@ -1,5 +1,12 @@
+- if @suppress_diff
+  .alert.alert-block
+    %p
+      %strong Warning! Large commit with more than #{Commit::DIFF_SAFE_SIZE} files changed or contain more than #{Commit::DIFF_SAFE_LINES_COUNT} lines of code.
+    %p To prevent performance issue we rejected diff information.
+
 %p{style: "color:gray"}
   Showing #{pluralize(diffs.count, "changed file")}
+
 %table
   - diffs.each_with_index do |diff, i|
     %tr
@@ -26,40 +33,40 @@
             *
             = diff.new_path
 
-- diffs.each_with_index do |diff, i|
-  - next if diff.diff.empty?
-  - file = (@commit.tree / diff.new_path)
-  - file = (@commit.prev_commit.tree / diff.old_path) unless file
-  - next unless file
-  %br
-  %table{id: "diff-#{i}", cellspacing: '0', cellpadding: '0', style: "border:1px solid #ccc; color: #444; width:100%"}
-    %tr
-      %td{colspan: 3, style: "padding:5px 5px 5px 10px;color:#555;border-bottom:1px solid #ccc;background:#eee;"}
-        - if diff.deleted_file
-          %span{style: "font-size:0.8em"}
-            = diff.old_path
+- unless @suppress_diff
+  - diffs.each_with_index do |diff, i|
+    - next if diff.diff.empty?
+    - file = (@commit.tree / diff.new_path)
+    - file = (@commit.prev_commit.tree / diff.old_path) unless file
+    - next unless file
+    %br
+    %table{id: "diff-#{i}", cellspacing: '0', cellpadding: '0', style: "border:1px solid #ccc; color: #444; width:100%"}
+      %tr
+        %td{colspan: 3, style: "padding:5px 5px 5px 10px;color:#555;border-bottom:1px solid #ccc;background:#eee;"}
+          - if diff.deleted_file
+            %span{style: "font-size:0.8em"}
+              = diff.old_path
+              - if @commit.prev_commit
+                = link_to project_tree_url(@project, tree_join(@commit.prev_commit_id, diff.new_path)), {style: 'color:#474d57;font-weight:bold'} do
+                  View file @
+                  %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:smaller"}
+                    = @commit.short_id(6)
+          - else
+            %span= diff.new_path
+            - if diff.a_mode && diff.b_mode && diff.a_mode != diff.b_mode
+              %span.file-mode= "#{diff.a_mode} → #{diff.b_mode}"
 
-          - if @commit.prev_commit
-            = link_to project_tree_url(@project, tree_join(@commit.prev_commit_id, diff.new_path)), {style: 'color:#474d57;font-weight:bold'} do
+            = link_to project_tree_url(@project, tree_join(@commit.id, diff.new_path)), {style: 'color:#474d57;font-size:12px'} do
               View file @
-              %span{style: "font-size:0.7em"}
+              %span{style: "font-family:monospace;"}
                 = @commit.short_id(6)
-        - else
-          %span= diff.new_path
-          - if diff.a_mode && diff.b_mode && diff.a_mode != diff.b_mode
-            %span.file-mode= "#{diff.a_mode} → #{diff.b_mode}"
 
-          = link_to project_tree_url(@project, tree_join(@commit.id, diff.new_path)), {style: 'color:#474d57;font-size:12px'} do
-            View file @
-            %span{style: "font-family:monospace;"}
-              = @commit.short_id(6)
-
-    %tr
-      %td{colspan: 3, style: "overflow:auto;overflow-y:hidden; color:#333; background:#fff; max-width:1024px;"}
-        -# Skipp all non non-supported blobs
-        - next unless file.respond_to?('text?')
-        - if file.text?
-          = render "event_notification_mailer/text_file", diff: diff, index: i
-        - else
-          %p
-            No preview for this file type
+      %tr
+        %td{colspan: 3, style: "overflow:auto;overflow-y:hidden; color:#333; background:#fff; max-width:1024px;"}
+          -# Skipp all non non-supported blobs
+          - next unless file.respond_to?('text?')
+          - if file.text?
+            = render "event_notification_mailer/text_file", diff: diff, index: i
+          - else
+            %p
+              No preview for this file type

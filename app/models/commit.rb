@@ -7,6 +7,7 @@ class Commit
   # Used to prevent 500 error on huge commits by suppressing diff
   #
   DIFF_SAFE_SIZE = 100
+  DIFF_SAFE_LINES_COUNT = 600
 
   attr_accessor :commit, :head, :refs
 
@@ -77,6 +78,7 @@ class Commit
       result = {
         commits: [],
         diffs: [],
+        lines_count: nil,
         commit: nil,
         same: false
       }
