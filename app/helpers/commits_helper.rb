@@ -153,9 +153,11 @@ module CommitsHelper
   #
   # options:
   #  source: one of :author or :committer
+  #  type: one of :url or :path (default - :path)
   #  avatar: true will prepend the avatar image
   #  size:   size of the avatar image in px
   def commit_person_link(commit, options = {})
+    options[:type] ||= :path
     source_name = commit.send "#{options[:source]}_name".to_sym
     source_email = commit.send "#{options[:source]}_email".to_sym
     text = if options[:avatar]
@@ -170,7 +172,7 @@ module CommitsHelper
     if user.nil?
       mail_to(source_email, text.html_safe, class: "commit-#{options[:source]}-link")
     else
-      link_to(text.html_safe, user_path(user), class: "commit-#{options[:source]}-link")
+      link_to(text.html_safe, send("user_#{options[:type]}", user), class: "commit-#{options[:source]}-link")
     end
   end
 end
