@@ -31,11 +31,6 @@ set :ssh_options, :forward_agent => true
 default_run_options[:pty] = true
 
 namespace :deploy do
-  desc "Load seed data for email preview"
-  task :load_notifications_seeds, :roles => :db do
-    run "cd #{current_path}; RAILS_ENV=#{rails_env} bundle exec rake db:seed:notifications;"
-  end
-
   desc "Symlinks the database.yml"
   task :symlink_db, :roles => :app do
     run "ln -nfs #{release_path}/config/database.yml.undev #{release_path}/config/database.yml"

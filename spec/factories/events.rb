@@ -8,4 +8,11 @@ FactoryGirl.define do
     source_id 1
     source_type "Issue"
   end
+
+  factory :created_group_group_event, :class => 'Event' do
+    author
+    action :created
+    data "MyText"
+    source { Group.create }
+  end
 end
