@@ -158,6 +158,12 @@ end
 gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
 
+group :development, :staging, :test do
+  # Visual email testing
+  gem "mail_view", "~> 1.0.3"
+  gem 'factory_girl_rails'
+end
+
 group :development, :test do
   gem 'coveralls', require: false
   gem 'rails-dev-tweaks'
@@ -168,7 +174,6 @@ group :development, :test do
   gem "awesome_print"
   gem "database_cleaner"
   gem "launchy"
-  gem 'factory_girl_rails'
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
   gem 'minitest'

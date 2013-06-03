@@ -1109,17 +1109,22 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source_type
     @project = @target = @event.target
     @push_data = JSON.load(@event.data).to_hash
-    @branch = @push_data["ref"]
-    @branch.slice!("refs/heads/")
 
     result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
 
     if result
       @before_commit = @project.repository.commit(@push_data["before"])
+      @branch = @push_data["ref"]
+      @branch.slice!("refs/heads/")
+
       @commits       = result.commits
       @commit        = result.commit
       @diffs         = result.diffs
       @refs_are_same = result.same
+
+      @suppress_diff = result.diffs.size > Commit::DIFF_SAFE_SIZE
+      @suppress_diff ||= result.diffs.inject(0) { |sum, diff| diff.diff.lines.count } > Commit::DIFF_SAFE_LINES_COUNT
+
       @line_notes    = []
 
       mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")

@@ -132,6 +132,6 @@ class UserTeam < ActiveRecord::Base
   end
 
   def admin?(member)
-    member.admin? || user_team_user_relationships.with_user(member).first.group_admin?
+    member.admin? || (user_team_user_relationships.with_user(member).present? && user_team_user_relationships.with_user(member).first.group_admin?)
   end
 end

@@ -1,7 +1,7 @@
 - color = commit_counter.odd? ? '#efefef' : '#f7f7f7'
 %tr{style: "margin: 1px; background: #{color}"}
   %td
-    = link_to commit.short_id(8), project_commit_url(@project, commit), style: "float:left;min-width:65px;font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"an
+    = link_to commit.short_id(8), project_commit_url(@project, commit)
   %td{title: commit.title}
     = truncate(commit.title, length: 70)
   %td
