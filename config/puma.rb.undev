@@ -19,7 +19,7 @@ directory application_path + '/current'
 #
 # The default is “development”.
 #
-environment 'staging'
+environment ENV['RAILS_ENV'] || 'development'
 
 # Daemonize the server into the background. Highly suggest that
 # this be combined with “pidfile” and “stdout_redirect”.
