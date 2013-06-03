@@ -7,35 +7,35 @@
 # note that config/gitlab.yml web path should also be changed
 # ENV['RAILS_RELATIVE_URL_ROOT'] = "/gitlab"
 
-application_path = ENV['PUMA_HOME'] || '/rest/u/apps/gitlab/current'
+application_path = ENV['PUMA_HOME'] || '/rest/u/apps/gitlab'
 
 # The directory to operate out of.
 #
 # The default is the current directory.
 #
-directory application_path
+directory application_path + '/current'
 
 # Set the environment in which the rack's app will run.
 #
 # The default is “development”.
 #
-environment 'staging'
+environment ENV['RAILS_ENV'] || 'development'
 
 # Daemonize the server into the background. Highly suggest that
 # this be combined with “pidfile” and “stdout_redirect”.
 #
 # The default is “false”.
 #
-daemonize true
+daemonize false
 
 # Store the pid of the server in the file at “path”.
 #
-pidfile project_home + "/../../shared/pids/puma.pid"
+pidfile application_path + "/shared/pids/puma.pid"
 
 # Use “path” as the file to store the server info state. This is
 # used by “pumactl” to query and control the server.
 #
-state_path project_home + "/../../shared/pids/puma.state"
+state_path application_path + "/shared/pids/puma.state"
 
 # Redirect STDOUT and STDERR to files specified. The 3rd parameter
 # (“append”) specifies whether the output is appended, the default is
@@ -64,7 +64,7 @@ state_path project_home + "/../../shared/pids/puma.state"
 #
 # bind 'tcp://0.0.0.0:9292'
 #bind "unix://#{application_path}/tmp/sockets/gitlab.socket"
-bind "127.0.0.1:#{(ENV['PUMA_PORT'] || 8001).to_i}" #, backlog: (ENV['UNICORN_BACKLOG'] || 100).to_i
+bind "tcp://127.0.0.1:#{(ENV['PUMA_PORT'] || 8001).to_i}" #, backlog: (ENV['UNICORN_BACKLOG'] || 100).to_i
 
 
 # Instead of “bind 'ssl://127.0.0.1:9292?key=path_to_key&cert=path_to_cert'” you
