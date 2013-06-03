@@ -1112,10 +1112,10 @@ class EventNotificationMailer < ActionMailer::Base
     @branch = @push_data["ref"]
     @branch.slice!("refs/heads/")
 
-    result = Gitlab::Git::Compare.new(@project, @push_data["before"], @push_data["after"])
+    result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
 
     if result
-      #@before_commit = CommitDecorator.decorate(@project.repository.commit(@push_data["before"]))
+      @before_commit = @project.repository.commit(@push_data["before"])
       @commits       = result.commits
       @commit        = result.commit
       @diffs         = result.diffs
