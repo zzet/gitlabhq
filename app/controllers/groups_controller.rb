@@ -15,6 +15,7 @@ class GroupsController < ApplicationController
   def index
     @groups = current_user.authorized_groups
     @groups = @groups.search(params[:name]) if params[:name].present?
+    @groups = @groups.page(params[:page]).per(10)
   end
 
   def new
