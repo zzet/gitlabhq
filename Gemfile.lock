@@ -88,8 +88,6 @@ GEM
     chosen-rails (0.9.8)
       railties (~> 3.0)
       thor (~> 0.14)
-    code_analyzer (0.3.1)
-      sexp_processor
     coderay (1.0.9)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -270,7 +268,7 @@ GEM
       tilt
     method_source (0.8.1)
     mime-types (1.23)
-    minitest (5.0.3)
+    minitest (4.7.4)
     modernizr (2.6.2)
       sprockets (~> 2.0)
     multi_json (1.7.5)
@@ -595,7 +593,6 @@ DEPENDENCIES
   rack-mini-profiler
   rails (= 3.2.13)
   rails-dev-tweaks
-  rails_best_practices
   raphael-rails!
   rb-fsevent
   rb-inotify

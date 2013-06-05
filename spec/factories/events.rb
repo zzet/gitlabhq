@@ -8,4 +8,12 @@ FactoryGirl.define do
     source_id 1
     source_type "Issue"
   end
+
+  factory :push_event, :class => 'Event' do
+    author
+    action :pushed
+    data { "{\"repository\": \"any\"}" }
+    source_id nil
+    source_type "Push_summary"
+  end
 end

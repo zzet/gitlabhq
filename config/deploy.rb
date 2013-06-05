@@ -22,6 +22,7 @@ set :asset_env,      "RAILS_GROUPS=assets RAILS_RELATIVE_URL_ROOT=#{mount_point.
 
 set :application, "gitlab"
 set :rvm_type, :system
+set :rvm_ruby_string, 'ruby-1.9.3-p194'
 
 set :scm, :git
 set :repository, "gitorious@git.undev.cc:infrastructure/gitlab.git"

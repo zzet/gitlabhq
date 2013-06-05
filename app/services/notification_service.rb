@@ -2,7 +2,7 @@ class NotificationService
   class << self
 
     def create_notifications(event)
-      Gitlab::Event::Notifications.create_notifications(event)
+      Gitlab::Event::Notification::Factory.create_notifications(event)
     end
 
     def process_notification(notification)

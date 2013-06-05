@@ -138,7 +138,7 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
 
-  gem 'rails_best_practices'
+  #gem 'rails_best_practices'
 
   # Docs generator
   gem "sdoc"
@@ -176,7 +176,7 @@ group :development, :test do
   gem "launchy"
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
-  gem 'minitest'
+  gem 'minitest', '~> 4.7'
 
   # Generate Fake data
   gem "ffaker"

@@ -1,5 +1,5 @@
 module Projects
-  class CreateContext < BaseContext
+  class CreateContext < Projects::BaseContext
     def initialize(user, params)
       @current_user, @params = user, params.dup
     end

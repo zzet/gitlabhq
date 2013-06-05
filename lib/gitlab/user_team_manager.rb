@@ -12,6 +12,9 @@ module Gitlab
           team.user_team_project_relationships.create(project_id: project.id, greatest_access: access)
           update_team_users_access_in_project(team, project, :added)
         end
+
+        # TODO
+        # resend delayed notifications Team-Project
       end
 
       def resign(team, project)
@@ -20,6 +23,8 @@ module Gitlab
         team.user_team_project_relationships.with_project(project).destroy_all
 
         update_team_users_access_in_project(team, project, :deleted)
+        # TODO
+        # resend delayed notifications Team-Project
       end
 
       def update_team_user_membership(team, member, options)
@@ -172,7 +177,9 @@ module Gitlab
         team = find_entity(team, UserTeam)
 
         relationship = team.user_team_group_relationships.with_group(group)
-        relationship.update_all(greatest_access: access)
+        relationship.each do |rel|
+          rel.update_attributes(greatest_access: access)
+        end
 
         if rebuild_flag
           group.projects.each do |project|

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130522141856) do
+ActiveRecord::Schema.define(:version => 20130530101139) do
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -61,8 +61,9 @@ ActiveRecord::Schema.define(:version => 20130522141856) do
     t.integer  "target_id"
     t.string   "target_type"
     t.text     "data"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.integer  "parent_event_id"
   end
 
   create_table "file_tokens", :force => true do |t|
