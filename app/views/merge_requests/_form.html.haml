@@ -13,7 +13,7 @@
         .mr_branch_box
           %h5.cgray From (Head Branch)
           .body
-            .padded= f.select(:source_branch, @repository.heads.map(&:name), { include_blank: "Select branch" }, {class: 'chosen span4'})
+            .padded= f.select(:source_branch, @repository.branch_names, { include_blank: "Select branch" }, {class: 'chosen span4'})
         .mr_source_commit
 
       .span2
@@ -22,7 +22,7 @@
         .mr_branch_box
           %h5.cgray To (Base Branch)
           .body
-            .padded= f.select(:target_branch, @repository.heads.map(&:name), { include_blank: "Select branch" }, {class: 'chosen span4'})
+            .padded= f.select(:target_branch, @repository.branch_names, { include_blank: "Select branch" }, {class: 'chosen span4'})
         .mr_target_commit
 
   %fieldset
@@ -40,7 +40,7 @@
             = f.label :assignee_id do
               %i.icon-user
               Assign to
-            .input= f.select(:assignee_id, @project.users.all.collect {|p| [ p.name, p.id ] }, { include_blank: "Select user" }, {class: 'chosen span3'})
+            .input= f.select(:assignee_id, @project.users.alphabetically.collect {|p| [ p.name, p.id ] }, { include_blank: "Select user" }, {class: 'chosen span3'})
           .left
             = f.label :milestone_id do
               %i.icon-time

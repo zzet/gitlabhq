@@ -78,7 +78,7 @@ class GroupsController < ApplicationController
 
   def team_members
     @group.add_users_to_project_teams(params[:user_ids], params[:project_access])
-    redirect_to people_group_path(@group), notice: 'Users was successfully added.'
+    redirect_to people_group_path(@group), notice: 'Users were successfully added.'
   end
 
   def edit
@@ -101,8 +101,7 @@ class GroupsController < ApplicationController
   end
 
   def destroy
-    @group.truncate_teams
-    @group.destroy
+    ::Groups::RemoveContext.new(group, current_user).execute
 
     redirect_to root_path, notice: 'Group was removed.'
   end

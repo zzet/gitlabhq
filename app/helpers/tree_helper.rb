@@ -3,26 +3,20 @@ module TreeHelper
   # their corresponding partials
   #
   # contents - A Grit::Tree object for the current tree
-  def render_tree(contents)
+  def render_tree(tree)
     # Render Folders before Files/Submodules
-    folders, files = contents.partition { |v| v.kind_of?(Grit::Tree) }
+    folders, files, submodules = tree.trees, tree.blobs, tree.submodules
 
     tree = ""
 
     # Render folders if we have any
     tree += render partial: 'tree/tree_item', collection: folders, locals: {type: 'folder'} if folders.present?
 
-    files.each do |f|
-      html = if f.respond_to?(:url)
-               # Object is a Submodule
-               render partial: 'tree/submodule_item', object: f
-             else
-               # Object is a Blob
-               render partial: 'tree/tree_item', object: f, locals: {type: 'file'}
-             end
+    # Render files if we have any
+    tree += render partial: 'tree/blob_item', collection: files, locals: {type: 'file'} if files.present?
 
-      tree += html if html.present?
-    end
+    # Render submodules if we have any
+    tree += render partial: 'tree/submodule_item', collection: submodules if submodules.present?
 
     tree.html_safe
   end
@@ -70,28 +64,29 @@ module TreeHelper
     end
   end
 
-  # Breadcrumb links for a Project and, if applicable, a tree path
-  def breadcrumbs
-    return unless @project && @ref
+  def tree_breadcrumbs(tree, max_links = 2)
+    if tree.path
+      part_path = ""
+      parts = tree.path.split("\/")
 
-    # Add the root project link and the arrow icon
-    crumbs = content_tag(:li) do
-      content_tag(:span, nil, class: 'arrow') +
-      link_to(@project.name, project_commits_path(@project, @ref))
-    end
+      yield('..', nil) if parts.count > max_links
 
-    if @path
-      parts = @path.split('/')
+      parts.each do |part|
+        part_path = File.join(part_path, part) unless part_path.empty?
+        part_path = part if part_path.empty?
 
-      parts.each_with_index do |part, i|
-        crumbs += content_tag(:span, '/', class: 'divider')
-        crumbs += content_tag(:li) do
-          # The text is just the individual part, but the link needs all the parts before it
-          link_to part, project_commits_path(@project, tree_join(@ref, parts[0..i].join('/')))
-        end
+        next unless parts.last(2).include?(part) if parts.count > max_links
+        yield(part, tree_join(tree.ref, part_path))
       end
     end
+  end
 
-    crumbs.html_safe
+  def up_dir_path tree
+    file = File.join(tree.path, "..")
+    tree_join(tree.ref, file)
+  end
+
+  def leave_edit_message
+    "Leave edit mode?\nAll unsaved changes will be lost."
   end
 end

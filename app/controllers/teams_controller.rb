@@ -27,7 +27,8 @@ class TeamsController < ApplicationController
   end
 
   def destroy
-    user_team.destroy
+    ::Teams::RemoveContext.new(current_user, user_team).execute
+
     redirect_to dashboard_path
   end
 

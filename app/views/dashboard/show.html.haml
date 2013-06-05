@@ -1,5 +1,5 @@
 - if @has_authorized_projects
-  .projects
+  .dashboard
     .activities.span8
       = render 'activities'
     .side.span4
@@ -7,6 +7,3 @@
 
 - else
   = render "zero_authorized_projects"
-
-:javascript
-  dashboardPage();

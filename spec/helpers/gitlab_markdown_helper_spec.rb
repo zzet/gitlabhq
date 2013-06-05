@@ -4,10 +4,10 @@ describe GitlabMarkdownHelper do
   include ApplicationHelper
   include IssuesHelper
 
-  let!(:project) { create(:project) }
+  let!(:project) { create(:project_with_code) }
 
   let(:user)          { create(:user, username: 'gfm') }
-  let(:commit)        { CommitDecorator.decorate(project.repository.commit) }
+  let(:commit)        { project.repository.commit }
   let(:issue)         { create(:issue, project: project) }
   let(:merge_request) { create(:merge_request, project: project) }
   let(:snippet)       { create(:snippet, project: project) }
@@ -370,7 +370,7 @@ describe GitlabMarkdownHelper do
       @wiki.stub(:content).and_return('wiki content')
     end
 
-    it "should use Gitlab Flavored Markdown for markdown files" do
+    it "should use GitLab Flavored Markdown for markdown files" do
       @wiki.stub(:format).and_return(:markdown)
 
       helper.should_receive(:markdown).with('wiki content')

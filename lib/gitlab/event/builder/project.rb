@@ -147,9 +147,6 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         end
 
       when ::UsersProject
-        team_events = ::Event.where(target_id: target.id, target_type: target.class, created_at: (Time.now - 5.minutes)..Time.now)
-        temp_data[:team_echo] = true if team_events.any?
-
         target = source.project
 
         case meta[:action]

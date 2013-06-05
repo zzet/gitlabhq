@@ -70,7 +70,8 @@ class Ability
     def project_report_rules
       project_guest_rules + [
         :download_code,
-        :write_snippet
+        :write_snippet,
+        :fork_project
       ]
     end
 

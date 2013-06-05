@@ -1,6 +1,13 @@
 /**
  * Notes
  */
+
+@-webkit-keyframes target-note {
+  from { background:#fffff0; }
+  50% { background:#ffffd3; }
+  to { background:#fffff0; }
+}
+
 ul.notes {
   display: block;
   list-style: none;
@@ -89,6 +96,11 @@ ul.notes {
     .note-header {
       padding-bottom: 5px;
     }
+  }
+
+  .note:target {
+    -webkit-animation:target-note 2s linear;
+    background: #fffff0;
   }
 
   // paint top or bottom borders depending on notes direction
@@ -213,7 +225,17 @@ ul.notes {
 .reply-btn {
   @extend .btn-primary;
 }
-.file .content tr.line_holder:hover > td { background: $hover !important; }
+.file .content tr.line_holder:hover {
+  &> td.line_content {
+    background: $hover !important;
+    border-color: darken($hover, 10%) !important;
+  }
+  &> td.new_line,
+  &> td.old_line {
+    background: darken($hover, 4%) !important;
+    border-color: darken($hover, 10%) !important;
+  }
+}
 .file .content tr.line_holder:hover > td .line_note_link {
   opacity: 1.0;
   filter: alpha(opacity=100);

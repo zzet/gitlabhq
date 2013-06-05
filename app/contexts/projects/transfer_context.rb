@@ -1,5 +1,5 @@
 module Projects
-  class TransferContext < BaseContext
+  class TransferContext < Projects::BaseContext
     def execute(role = :default)
       namespace_id = params[:project].delete(:namespace_id)
       allowed_transfer = can?(current_user, :change_namespace, project) || role == :admin
@@ -27,6 +27,9 @@ module Projects
             end
           end
         end
+
+        receive_delayed_notifications
+
       end
 
     rescue ProjectTransferService::TransferError => ex

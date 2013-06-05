@@ -60,7 +60,7 @@ class User < ActiveRecord::Base
   #
 
   # Namespace for personal projects
-  has_one :namespace,                 dependent: :destroy, foreign_key: :owner_id,    class_name: Namespace, conditions: 'type IS NULL'
+  has_one :namespace, dependent: :destroy, foreign_key: :owner_id, class_name: "Namespace", conditions: 'type IS NULL'
 
   # Namespaces (owned groups and own namespace)
   has_many :namespaces, foreign_key: :owner_id
@@ -69,9 +69,13 @@ class User < ActiveRecord::Base
   has_many :keys, dependent: :destroy
 
   # Groups
-  has_many :groups,         class_name: Group, foreign_key: :owner_id
+  has_many :groups, class_name: "Group", foreign_key: :owner_id
 
   # Projects
+  has_many :personal_projects,        through: :namespace, source: :projects
+  has_many :projects,                 through: :users_projects
+  has_many :own_projects,             foreign_key: :creator_id, class_name: Project
+  has_many :owned_projects,           through: :namespaces, source: :projects
   has_many :users_projects,           dependent: :destroy
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
@@ -100,11 +104,6 @@ class User < ActiveRecord::Base
   has_many :subscriprions,            dependent: :destroy, class_name: Event::Subscription, as: :target
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
-
-  has_many :personal_projects,        through: :namespace, source: :projects
-  has_many :projects,                 through: :users_projects
-  has_many :own_projects,             foreign_key: :creator_id
-  has_many :owned_projects,           through: :namespaces, source: :projects
 
   has_many :file_tokens
 
@@ -211,6 +210,19 @@ class User < ActiveRecord::Base
     username
   end
 
+  def with_defaults
+    tap do |u|
+      u.projects_limit = Gitlab.config.gitlab.default_projects_limit
+      u.can_create_group = Gitlab.config.gitlab.default_can_create_group
+      u.can_create_team = Gitlab.config.gitlab.default_can_create_team
+    end
+  end
+
+  # TODO. Check this
+  def notification
+    @notification ||= Notification.new(self)
+  end
+
   def generate_password
     if self.force_random_password
       self.password = self.password_confirmation = Devise.friendly_token.first(8)
@@ -228,6 +240,10 @@ class User < ActiveRecord::Base
   def owned_groups
    @group_ids = groups.pluck(:id) + team_groups.pluck(:id)
    Group.where(id: @group_ids)
+  end
+
+  def owned_teams
+    own_teams
   end
 
   def owned_teams
@@ -313,9 +329,13 @@ class User < ActiveRecord::Base
     MergeRequest.cared(self)
   end
 
+  def projects_limit_left
+    projects_limit - owned_projects.count
+  end
+
   def projects_limit_percent
     return 100 if projects_limit.zero?
-    (personal_projects.count.to_f / projects_limit) * 100
+    (owned_projects.count.to_f / projects_limit) * 100
   end
 
   def recent_push project_id = nil
@@ -341,5 +361,27 @@ class User < ActiveRecord::Base
 
   def name_with_username
     "#{name} (#{username})"
+  end
+
+  def tm_of(project)
+    project.team_member_by_id(self.id)
+  end
+
+  def already_forked? project
+    !!fork_of(project)
+  end
+
+  def fork_of project
+    links = ForkedProjectLink.where(forked_from_project_id: project, forked_to_project_id: personal_projects)
+
+    if links.any?
+      links.first.forked_to_project
+    else
+      nil
+    end
+  end
+
+  def ldap_user?
+    extern_uid && provider == 'ldap'
   end
 end

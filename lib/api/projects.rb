@@ -1,4 +1,4 @@
-module Gitlab
+module API
   # Projects API
   class Projects < Grape::API
     before { authenticate! }
@@ -274,7 +274,7 @@ module Gitlab
       #   hook_id (required) - The ID of hook to delete
       # Example Request:
       #   DELETE /projects/:id/hooks/:hook_id
-      delete ":id/hooks" do
+      delete ":id/hooks/:hook_id" do
         authorize! :admin_project, user_project
         required_attributes! [:hook_id]
 
@@ -284,95 +284,6 @@ module Gitlab
         rescue
           # ProjectHook can raise Error if hook_id not found
         end
-      end
-
-      # Get a project repository branches
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      # Example Request:
-      #   GET /projects/:id/repository/branches
-      get ":id/repository/branches" do
-        present user_project.repo.heads.sort_by(&:name), with: Entities::RepoObject, project: user_project
-      end
-
-      # Get a single branch
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   branch (required) - The name of the branch
-      # Example Request:
-      #   GET /projects/:id/repository/branches/:branch
-      get ":id/repository/branches/:branch" do
-        @branch = user_project.repo.heads.find { |item| item.name == params[:branch] }
-        not_found!("Branch does not exist") if @branch.nil?
-        present @branch, with: Entities::RepoObject, project: user_project
-      end
-
-      # Protect a single branch
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   branch (required) - The name of the branch
-      # Example Request:
-      #   PUT /projects/:id/repository/branches/:branch/protect
-      put ":id/repository/branches/:branch/protect" do
-        @branch = user_project.repo.heads.find { |item| item.name == params[:branch] }
-        not_found! unless @branch
-        protected = user_project.protected_branches.find_by_name(@branch.name)
-
-        unless protected
-          user_project.protected_branches.create(name: @branch.name)
-        end
-
-        present @branch, with: Entities::RepoObject, project: user_project
-      end
-
-      # Unprotect a single branch
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   branch (required) - The name of the branch
-      # Example Request:
-      #   PUT /projects/:id/repository/branches/:branch/unprotect
-      put ":id/repository/branches/:branch/unprotect" do
-        @branch = user_project.repo.heads.find { |item| item.name == params[:branch] }
-        not_found! unless @branch
-        protected = user_project.protected_branches.find_by_name(@branch.name)
-
-        if protected
-          protected.destroy
-        end
-
-        present @branch, with: Entities::RepoObject, project: user_project
-      end
-
-      # Get a project repository tags
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      # Example Request:
-      #   GET /projects/:id/repository/tags
-      get ":id/repository/tags" do
-        present user_project.repo.tags.sort_by(&:name).reverse, with: Entities::RepoObject
-      end
-
-      # Get a project repository commits
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   ref_name (optional) - The name of a repository branch or tag, if not given the default branch is used
-      # Example Request:
-      #   GET /projects/:id/repository/commits
-      get ":id/repository/commits" do
-        authorize! :download_code, user_project
-
-        page = params[:page] || 0
-        per_page = (params[:per_page] || 20).to_i
-        ref = params[:ref_name] || user_project.try(:default_branch) || 'master'
-
-        commits = user_project.repository.commits(ref, nil, per_page, page * per_page)
-        present CommitDecorator.decorate(commits), with: Entities::RepoCommit
       end
 
       # Get a project snippets
@@ -479,30 +390,6 @@ module Gitlab
         present @snippet.content
       end
 
-      # Get a raw file contents
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   sha (required) - The commit or branch name
-      #   filepath (required) - The path to the file to display
-      # Example Request:
-      #   GET /projects/:id/repository/commits/:sha/blob
-      get ":id/repository/commits/:sha/blob" do
-        authorize! :download_code, user_project
-        required_attributes! [:filepath]
-
-        ref = params[:sha]
-
-        commit = user_project.repository.commit ref
-        not_found! "Commit" unless commit
-
-        tree = Tree.new commit.tree, ref, params[:filepath]
-        not_found! "File" unless tree.try(:tree)
-
-        content_type tree.mime_type
-        present tree.data
-      end
-
       # Get a specific project's keys
       #
       # Example Request:
@@ -529,8 +416,8 @@ module Gitlab
       #   POST /projects/:id/keys
       post ":id/keys" do
         attrs = attributes_for_keys [:title, :key]
-        key = user_project.deploy_keys.new attrs
-        if key.save
+        key = DeployKey.new attrs
+        if key.valid? && user_project.deploy_keys << key
           present key, with: Entities::SSHKey
         else
           not_found!
@@ -543,9 +430,8 @@ module Gitlab
       #   DELETE /projects/:id/keys/:id
       delete ":id/keys/:key_id" do
         key = user_project.deploy_keys.find params[:key_id]
-        key.delete
+        key.destroy
       end
-
     end
   end
 end

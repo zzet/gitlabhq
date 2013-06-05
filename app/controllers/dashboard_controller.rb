@@ -34,8 +34,11 @@ class DashboardController < ApplicationController
                   @projects
                 end
 
+    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
     @projects = @projects.search(params[:search]) if params[:search].present?
     @projects = @projects.page(params[:page]).per(30)
+
+    @labels = Project.where(id: @projects.map(&:id)).tags_on(:labels)
   end
 
   # Get authored or assigned open merge requests
@@ -65,7 +68,7 @@ class DashboardController < ApplicationController
   end
 
   def event_filter
-    filters = cookies['event_filter'].split(',') if cookies['event_filter']
+    filters = cookies['event_filter'].split(',') if cookies['event_filter'].present?
     @event_filter ||= EventFilter.new(filters)
   end
 end

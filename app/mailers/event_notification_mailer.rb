@@ -507,6 +507,21 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Group '#{@group["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
+  def deleted_user_team_group_relationship_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+
+    data = JSON.load(@event.data).to_hash
+
+    @group = Group.find_by_id(data["group_id"])
+    @team = UserTeam.find_by_id(data["user_team_id"])
+
+    if @group && @team
+      mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was resigned from #{@group.name} group by #{@user.name} [resigned]")
+    end
+  end
+
   def deleted_group_project_email(notification)
     @notification = notification
     @event = @notification.event
@@ -910,6 +925,40 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@project.path_with_namespace} project by #{@user.name} [assigned]")
   end
 
+  def created_user_team_project_relationship_user_team_project_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utpr = @source = @event.source
+    @propect = @utpr.project
+    @team = @utpr.user_team
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@project.path_with_namespace} project by #{@user.name} [assigned]")
+  end
+
+  def updated_user_team_group_relationship_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utgr = @source = @event.source
+    @group = @utgr.group
+    @team = @utgr.user_team
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} assignation to #{@group.name} group was updated by #{@user.name} [assigned]")
+  end
+
+
+  def created_user_team_group_relationship_user_team_group_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utgr = @source = @event.source
+    @group = @utgr.group
+    @team = @utgr.user_team
+
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} group by #{@user.name} [assigned]")
+  end
+
   def assigned_group_user_team_group_relationship_email(notification)
     @notification = notification
     @event = @notification.event
@@ -918,7 +967,7 @@ class EventNotificationMailer < ActionMailer::Base
     @group = @target = @event.target
     @team = @utgr.user_team
 
-    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} project by #{@user.name} [assigned]")
+    mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@group.name} group by #{@user.name} [assigned]")
   end
 
   def joined_user_team_user_team_group_relationship_email(notification)
@@ -1109,24 +1158,22 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source_type
     @project = @target = @event.target
     @push_data = JSON.load(@event.data).to_hash
-    @branch = @push_data["ref"]
-    @branch.slice!("refs/heads/")
 
-    result = Commit.compare(@project, @push_data["before"], @push_data["after"])
+    result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
 
     if result
-      @before_commit = CommitDecorator.decorate(@project.repository.commit(@push_data["before"]))
+      @before_commit = @project.repository.commit(@push_data["before"])
       @branch = @push_data["ref"]
       @branch.slice!("refs/heads/")
 
-      @commits       = CommitDecorator.decorate_collection result[:commits]
-      @commit        = result[:commit]
-      @diffs         = result[:diffs]
+      @commits       = result.commits
+      @commit        = result.commit
+      @diffs         = result.diffs
+      @refs_are_same = result.same
 
-      @suppress_diff = result[:diffs].size > Commit::DIFF_SAFE_SIZE
-      @suppress_diff ||= result[:lines_count] > Commit::DIFF_SAFE_LINES_COUNT
+      @suppress_diff = result.diffs.size > Commit::DIFF_SAFE_SIZE
+      @suppress_diff ||= result.diffs.inject(0) { |sum, diff| diff.diff.lines.count } > Commit::DIFF_SAFE_LINES_COUNT
 
-      @refs_are_same = result[:same]
       @line_notes    = []
 
       mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")

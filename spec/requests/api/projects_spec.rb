@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-describe Gitlab::API do
+describe API::API do
   include ApiHelpers
+  before(:each) { enable_observers }
 
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }
   let(:admin) { create(:admin) }
-  let!(:project) { create(:project, namespace: user.namespace ) }
+  let!(:project) { create(:project_with_code, creator_id: user.id) }
   let!(:hook) { create(:project_hook, project: project, url: "http://example.com") }
   let!(:snippet) { create(:snippet, author: user, project: project, title: 'example') }
   let!(:users_project) { create(:users_project, user: user, project: project, project_access: UsersProject::MASTER) }
   let!(:users_project2) { create(:users_project, user: user3, project: project, project_access: UsersProject::DEVELOPER) }
-  let(:key) { create(:key, project: project) }
 
   before { project.team << [user, :reporter] }
 
@@ -173,82 +173,13 @@ describe Gitlab::API do
     end
   end
 
-  describe "GET /projects/:id/repository/branches" do
-    it "should return an array of project branches" do
-      get api("/projects/#{project.id}/repository/branches", user)
-      response.status.should == 200
-      json_response.should be_an Array
-      json_response.first['name'].should == project.repo.heads.sort_by(&:name).first.name
-    end
-  end
-
-  describe "GET /projects/:id/repository/branches/:branch" do
-    it "should return the branch information for a single branch" do
-      get api("/projects/#{project.id}/repository/branches/new_design", user)
-      response.status.should == 200
-
-      json_response['name'].should == 'new_design'
-      json_response['commit']['id'].should == '621491c677087aa243f165eab467bfdfbee00be1'
-      json_response['protected'].should == false
-    end
-
-    it "should return a 404 error if branch is not available" do
-      get api("/projects/#{project.id}/repository/branches/unknown", user)
-      response.status.should == 404
-    end
-  end
-
-  describe "PUT /projects/:id/repository/branches/:branch/protect" do
-    it "should protect a single branch" do
-      put api("/projects/#{project.id}/repository/branches/new_design/protect", user)
-      response.status.should == 200
-
-      json_response['name'].should == 'new_design'
-      json_response['commit']['id'].should == '621491c677087aa243f165eab467bfdfbee00be1'
-      json_response['protected'].should == true
-    end
-
-    it "should return a 404 error if branch not found" do
-      put api("/projects/#{project.id}/repository/branches/unknown/protect", user)
-      response.status.should == 404
-    end
-
-    it "should return success when protect branch again" do
-      put api("/projects/#{project.id}/repository/branches/new_design/protect", user)
-      put api("/projects/#{project.id}/repository/branches/new_design/protect", user)
-      response.status.should == 200
-    end
-  end
-
-  describe "PUT /projects/:id/repository/branches/:branch/unprotect" do
-    it "should unprotect a single branch" do
-      put api("/projects/#{project.id}/repository/branches/new_design/unprotect", user)
-      response.status.should == 200
-
-      json_response['name'].should == 'new_design'
-      json_response['commit']['id'].should == '621491c677087aa243f165eab467bfdfbee00be1'
-      json_response['protected'].should == false
-    end
-
-    it "should return success when unprotect branch" do
-      put api("/projects/#{project.id}/repository/branches/unknown/unprotect", user)
-      response.status.should == 404
-    end
-
-    it "should return success when unprotect branch again" do
-      put api("/projects/#{project.id}/repository/branches/new_design/unprotect", user)
-      put api("/projects/#{project.id}/repository/branches/new_design/unprotect", user)
-      response.status.should == 200
-    end
-  end
-
   describe "GET /projects/:id/members" do
     it "should return project team members" do
       get api("/projects/#{project.id}/members", user)
       response.status.should == 200
       json_response.should be_an Array
       json_response.count.should == 2
-      json_response.first['email'].should == user.email
+      json_response.map { |u| u['email'] }.should include user.email
     end
 
     it "finds team members with query string" do
@@ -467,59 +398,30 @@ describe Gitlab::API do
     end
   end
 
-  describe "DELETE /projects/:id/hooks" do
+  describe "DELETE /projects/:id/hooks/:hook_id" do
     it "should delete hook from project" do
       expect {
-        delete api("/projects/#{project.id}/hooks", user), hook_id: hook.id
+        delete api("/projects/#{project.id}/hooks/#{hook.id}", user)
       }.to change {project.hooks.count}.by(-1)
       response.status.should == 200
     end
 
     it "should return success when deleting hook" do
-      delete api("/projects/#{project.id}/hooks", user), hook_id: hook.id
+      delete api("/projects/#{project.id}/hooks/#{hook.id}", user)
       response.status.should == 200
     end
 
     it "should return success when deleting non existent hook" do
-      delete api("/projects/#{project.id}/hooks", user), hook_id: 42
+      delete api("/projects/#{project.id}/hooks/42", user)
       response.status.should == 200
     end
 
-    it "should return a 400 error if hook id not given" do
+    it "should return a 405 error if hook id not given" do
       delete api("/projects/#{project.id}/hooks", user)
-      response.status.should == 400
+      response.status.should == 405
     end
   end
 
-  describe "GET /projects/:id/repository/tags" do
-    it "should return an array of project tags" do
-      get api("/projects/#{project.id}/repository/tags", user)
-      response.status.should == 200
-      json_response.should be_an Array
-      json_response.first['name'].should == project.repo.tags.sort_by(&:name).reverse.first.name
-    end
-  end
-
-  describe "GET /projects/:id/repository/commits" do
-    context "authorized user" do
-      before { project.team << [user2, :reporter] }
-
-      it "should return project commits" do
-        get api("/projects/#{project.id}/repository/commits", user)
-        response.status.should == 200
-
-        json_response.should be_an Array
-        json_response.first['id'].should == project.repository.commit.id
-      end
-    end
-
-    context "unauthorized user" do
-      it "should not return project commits" do
-        get api("/projects/#{project.id}/repository/commits")
-        response.status.should == 401
-      end
-    end
-  end
 
   describe "GET /projects/:id/snippets" do
     it "should return an array of project snippets" do
@@ -613,80 +515,61 @@ describe Gitlab::API do
     end
   end
 
-  describe "GET /projects/:id/repository/commits/:sha/blob" do
-    it "should get the raw file contents" do
-      get api("/projects/#{project.id}/repository/commits/master/blob?filepath=README.md", user)
-      response.status.should == 200
+  describe :deploy_keys do
+    let(:deploy_keys_project) { create(:deploy_keys_project, project: project) }
+    let(:deploy_key) { deploy_keys_project.deploy_key }
+
+    describe "GET /projects/:id/keys" do
+      before { deploy_key }
+
+      it "should return array of ssh keys" do
+        get api("/projects/#{project.id}/keys", user)
+        response.status.should == 200
+        json_response.should be_an Array
+        json_response.first['title'].should == deploy_key.title
+      end
     end
 
-    it "should return 404 for invalid branch_name" do
-      get api("/projects/#{project.id}/repository/commits/invalid_branch_name/blob?filepath=README.md", user)
-      response.status.should == 404
+    describe "GET /projects/:id/keys/:key_id" do
+      it "should return a single key" do
+        get api("/projects/#{project.id}/keys/#{deploy_key.id}", user)
+        response.status.should == 200
+        json_response['title'].should == deploy_key.title
+      end
+
+      it "should return 404 Not Found with invalid ID" do
+        get api("/projects/#{project.id}/keys/404", user)
+        response.status.should == 404
+      end
     end
 
-    it "should return 404 for invalid file" do
-      get api("/projects/#{project.id}/repository/commits/master/blob?filepath=README.invalid", user)
-      response.status.should == 404
+    describe "POST /projects/:id/keys" do
+      it "should not create an invalid ssh key" do
+        post api("/projects/#{project.id}/keys", user), { title: "invalid key" }
+        response.status.should == 404
+      end
+
+      it "should create new ssh key" do
+        key_attrs = attributes_for :key
+        expect {
+          post api("/projects/#{project.id}/keys", user), key_attrs
+        }.to change{ project.deploy_keys.count }.by(1)
+      end
     end
 
-    it "should return a 400 error if filepath is missing" do
-      get api("/projects/#{project.id}/repository/commits/master/blob", user)
-      response.status.should == 400
-    end
-  end
+    describe "DELETE /projects/:id/keys/:key_id" do
+      before { deploy_key }
 
-  describe "GET /projects/:id/keys" do
-    it "should return array of ssh keys" do
-      project.deploy_keys << key
-      project.save
-      get api("/projects/#{project.id}/keys", user)
-      response.status.should == 200
-      json_response.should be_an Array
-      json_response.first['title'].should == key.title
-    end
-  end
+      it "should delete existing key" do
+        expect {
+          delete api("/projects/#{project.id}/keys/#{deploy_key.id}", user)
+        }.to change{ project.deploy_keys.count }.by(-1)
+      end
 
-  describe "GET /projects/:id/keys/:key_id" do
-    it "should return a single key" do
-      project.deploy_keys << key
-      project.save
-      get api("/projects/#{project.id}/keys/#{key.id}", user)
-      response.status.should == 200
-      json_response['title'].should == key.title
-    end
-
-    it "should return 404 Not Found with invalid ID" do
-      get api("/projects/#{project.id}/keys/404", user)
-      response.status.should == 404
-    end
-  end
-
-  describe "POST /projects/:id/keys" do
-    it "should not create an invalid ssh key" do
-      post api("/projects/#{project.id}/keys", user), { title: "invalid key" }
-      response.status.should == 404
-    end
-
-    it "should create new ssh key" do
-      key_attrs = attributes_for :key
-      expect {
-        post api("/projects/#{project.id}/keys", user), key_attrs
-      }.to change{ project.deploy_keys.count }.by(1)
-    end
-  end
-
-  describe "DELETE /projects/:id/keys/:key_id" do
-    it "should delete existing key" do
-      project.deploy_keys << key
-      project.save
-      expect {
-        delete api("/projects/#{project.id}/keys/#{key.id}", user)
-      }.to change{ project.deploy_keys.count }.by(-1)
-    end
-
-    it "should return 404 Not Found with invalid ID" do
-      delete api("/projects/#{project.id}/keys/404", user)
-      response.status.should == 404
+      it "should return 404 Not Found with invalid ID" do
+        delete api("/projects/#{project.id}/keys/404", user)
+        response.status.should == 404
+      end
     end
   end
 end

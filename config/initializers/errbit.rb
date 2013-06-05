@@ -3,4 +3,5 @@ Airbrake.configure do |config|
   config.host    = 'errbit.undev.cc'
   config.port    = 80
   config.secure  = config.port == 443
+  #config.ignore << /GitlabMailer/
 end

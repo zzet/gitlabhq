@@ -1,4 +1,5 @@
 require 'sidekiq/web'
+require 'api/api'
 
 Gitlab::Application.routes.draw do
   # Mounting Visual email testing
@@ -12,9 +13,8 @@ Gitlab::Application.routes.draw do
   get 'search' => "search#show"
 
   # API
-  require 'api'
-  Gitlab::API.logger Rails.logger
-  mount Gitlab::API => '/api'
+  API::API.logger Rails.logger
+  mount API::API => '/api'
 
   constraint = lambda { |request| request.env["warden"].authenticate? and request.env['warden'].user.admin? }
   constraints constraint do
@@ -88,7 +88,7 @@ Gitlab::Application.routes.draw do
     end
 
     resource :logs, only: [:show]
-    resource :resque, controller: 'resque', only: [:show]
+    resource :background_jobs, controller: 'background_jobs', only: [:show]
 
     resources :projects, constraints: { id: /[a-zA-Z.\/0-9_\-]+/ }, only: [:index, :show] do
       scope module: :projects, constraints: { id: /[a-zA-Z.\/0-9_\-]+/ } do
@@ -185,9 +185,12 @@ Gitlab::Application.routes.draw do
   resources :projects, constraints: { id: /(?:[a-zA-Z.0-9_\-]+\/)?[a-zA-Z.0-9_\-]+/ }, except: [:new, :create, :index], path: "/" do
     member do
       put :transfer
+      post :fork
+      get :autocomplete_sources
     end
 
     resources :blob,    only: [:show], constraints: {id: /.+/}
+    resources :raw,    only: [:show], constraints: {id: /.+/}
     resources :tree,    only: [:show], constraints: {id: /.+/, format: /(html|js)/ }
     resources :edit_tree,    only: [:show, :update], constraints: {id: /.+/}, path: 'edit'
     resources :commit,  only: [:show], constraints: {id: /[[:alnum:]]{6,40}/}
@@ -230,7 +233,13 @@ Gitlab::Application.routes.draw do
       end
     end
 
-    resources :deploy_keys
+    resources :deploy_keys do
+      member do
+        put :enable
+        put :disable
+      end
+    end
+
     resources :protected_branches, only: [:index, :create, :destroy]
 
     resources :refs, only: [] do
@@ -279,16 +288,20 @@ Gitlab::Application.routes.draw do
 
     resources :team, controller: 'team_members', only: [:index]
     resources :milestones, except: [:destroy]
-    resources :labels, only: [:index]
-    resources :issues, except: [:destroy] do
+
+    resources :labels, only: [:index] do
       collection do
-        post  :sort
-        post  :bulk_update
-        get   :search
+        post :generate
       end
     end
 
-    resources :team_members do
+    resources :issues, except: [:destroy] do
+      collection do
+        post  :bulk_update
+      end
+    end
+
+    resources :team_members, except: [:index, :edit] do
       collection do
 
         # Used for import team
