@@ -362,6 +362,30 @@ describe EventNotificationMailer do
       ActionMailer::Base.deliveries.count.should == 1
     end
 
+    it "should send email about assigned team to group with subscriptions on projects only" do
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+
+      project1 = create :project, namespace: group, creator: @another_user
+      project2 = create :project, namespace: group, creator: @another_user
+
+      user1 = create :user
+      user2 = create :user
+
+      Gitlab::UserTeamManager.add_member_into_team(team, user1, UsersProject::MASTER, true)
+      Gitlab::UserTeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
+
+      ActionMailer::Base.deliveries.clear
+      EventHierarchyWorker.reset
+
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
+
+      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+
+
     it "should send email about update relation team to group" do
       params = { greatest_project_access: UsersProject::MASTER }
       Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
