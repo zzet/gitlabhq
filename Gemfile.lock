@@ -168,6 +168,11 @@ GEM
       dotenv (>= 0.7)
       thor (>= 0.13.6)
     formatador (0.2.4)
+    freezing_email (0.0.2)
+      haml
+      mail
+      rails (~> 3.2.0)
+      sinatra
     gemoji (1.2.1)
     gherkin-ruby (0.3.0)
     git (1.2.5)
@@ -276,8 +281,6 @@ GEM
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    mail_view (1.0.3)
-      tilt
     method_source (0.8.1)
     mime-types (1.23)
     modernizr (2.6.2)
@@ -554,6 +557,7 @@ DEPENDENCIES
   ffaker
   font-awesome-sass-rails (~> 3.0.0)
   foreman
+  freezing_email
   gemoji (~> 1.2.1)
   git
   github-linguist (~> 2.3.4)
@@ -581,7 +585,6 @@ DEPENDENCIES
   kaminari (~> 0.14.1)
   launchy
   letter_opener
-  mail_view (~> 1.0.3)
   modernizr (= 2.6.2)
   mysql2
   omniauth (~> 1.1.3)
