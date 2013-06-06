@@ -159,12 +159,7 @@ gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
 
 group :development, :staging, :test do
-  # Visual email testing
-  gem "mail_view", "~> 1.0.3"
   gem 'factory_girl_rails'
-end
-
-group :development, :test do
   gem 'coveralls', require: false
   gem 'rails-dev-tweaks'
   gem 'spinach-rails'
@@ -193,6 +188,7 @@ group :development, :test do
   gem 'poltergeist', '~> 1.3.0'
 
   gem 'spork', '~> 1.0rc'
+  gem "freezing_email"
 end
 
 group :test do

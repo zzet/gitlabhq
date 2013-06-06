@@ -3,6 +3,7 @@ require "spec_helper"
 describe EventNotificationMailer do
   include EmailSpec::Helpers
   include EmailSpec::Matchers
+  include FreezingEmail::Rspec
 
   before do
     @user = create :user

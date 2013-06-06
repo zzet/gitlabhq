@@ -16,4 +16,11 @@ FactoryGirl.define do
     source_id nil
     source_type "Push_summary"
   end
+
+  factory :created_group_group_event, :class => 'Event' do
+    author
+    action :created
+    data "MyText"
+    source { Group.create }
+  end
 end
