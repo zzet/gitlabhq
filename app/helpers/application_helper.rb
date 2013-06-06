@@ -2,6 +2,24 @@ require 'digest/md5'
 require 'uri'
 
 module ApplicationHelper
+  COLOR_SCHEMES = {
+    1 => 'white',
+    2 => 'dark',
+    3 => 'solarized-dark',
+    4 => 'monokai',
+  }
+  COLOR_SCHEMES.default = 'white'
+
+  # Helper method to access the COLOR_SCHEMES
+  #
+  # The keys are the `color_scheme_ids`
+  # The values are the `name` of the scheme.
+  #
+  # The preview images are `name-scheme-preview.png`
+  # The stylesheets should use the css class `.name`
+  def color_schemes
+    COLOR_SCHEMES.freeze
+  end
 
   # Check if a particular controller is the current one
   #
@@ -124,17 +142,7 @@ module ApplicationHelper
   end
 
   def user_color_scheme_class
-    # in case we dont have current_user (ex. in mailer)
-    return 1 unless defined?(current_user)
-
-    case current_user.color_scheme_id
-    when 1 then 'white'
-    when 2 then 'black'
-    when 3 then 'solarized-dark'
-    when 4 then 'monokai'
-    else
-      'white'
-    end
+    COLOR_SCHEMES[current_user.try(:color_scheme_id)]
   end
 
   # Define whenever show last push event
@@ -205,4 +213,17 @@ module ApplicationHelper
   def extra_config
     Gitlab.config.extra
   end
+
+  def public_icon
+    content_tag :i, nil, class: 'icon-globe cblue'
+  end
+
+  def private_icon
+    content_tag :i, nil, class: 'icon-lock cgreen'
+  end
+
+  def git_protocol_icon(git_protocol_enabled)
+    content_tag :i, nil, class: "#{git_protocol_enabled ? "icon-ok" : "icon-off" }"
+  end
+
 end

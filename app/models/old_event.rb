@@ -130,6 +130,14 @@ class OldEvent < ActiveRecord::Base
     target if target_type == "MergeRequest"
   end
 
+  def note_project_snippet?
+    target.noteable_type == "Snippet"
+  end
+
+  def note_target
+    target.noteable
+  end
+
   def action_name
     if closed?
       "closed"
