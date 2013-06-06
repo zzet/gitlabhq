@@ -12,6 +12,8 @@ class Gitlab::EventHierarchyMiddleware
       self["event_action_collector"]
     end
 
+    env["event_action_collector"].reset
+
     status, headers, body = @appl.call(env)
 
     env["event_action_collector"].reset
@@ -98,5 +100,3 @@ class EventHierarchyStorage
     parent_event
   end
 end
-
-
