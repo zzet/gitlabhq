@@ -15,10 +15,22 @@ class Gitlab::Event::Notification::Creator::UserTeamGroupRelationship < Gitlab::
     notifications = []
 
     subscriptions = ::Event::Subscription.by_target(group).by_source_type(event.source_type)
-    subscriptions.each do |subscription|
-      if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+    if subscriptions.any?
+      subscriptions.each do |subscription|
+        if subscriber_can_get_notification?(subscription, event)
+          notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        end
       end
+    else
+      group.projects.each do |project|
+        subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
+        subscriptions.each do |subscription|
+          if subscriber_can_get_notification?(subscription, event)
+            notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+          end
+        end
+      end
+
     end
 
     notifications
