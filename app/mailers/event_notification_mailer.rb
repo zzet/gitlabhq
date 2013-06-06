@@ -522,6 +522,21 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
+  def deleted_user_team_project_relationship_user_team_project_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+
+    data = JSON.load(@event.data).to_hash
+
+    @project = Project.find_by_id(data["ptoject_id"])
+    @team = UserTeam.find_by_id(data["user_team_id"])
+
+    if @project && @team
+      mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was resigned from #{@project.path_with_namespace} group by #{@user.name} [resigned]")
+    end
+  end
+
   def deleted_group_project_email(notification)
     @notification = notification
     @event = @notification.event
