@@ -945,7 +945,7 @@ class EventNotificationMailer < ActionMailer::Base
     @event = @notification.event
     @user = @event.author
     @utpr = @source = @event.source
-    @propect = @utpr.project
+    @project = @utpr.project
     @team = @utpr.user_team
 
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@project.path_with_namespace} project by #{@user.name} [assigned]")
