@@ -191,7 +191,7 @@ group :development, :staging, :test do
   gem "freezing_email"
 end
 
-group :test do
+group :test, :staging do
   gem "simplecov", require: false
   gem "shoulda-matchers", "~> 2.1.0"
   gem 'email_spec'
