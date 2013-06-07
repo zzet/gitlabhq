@@ -176,6 +176,11 @@ group :development, :staging, :test do
   # Generate Fake data
   gem "ffaker"
 
+  gem "freezing_email"
+  gem 'spork', '~> 1.0rc'
+end
+
+group :development, :test do
   # Guard
   gem 'guard-rspec'
   gem 'guard-spinach'
@@ -186,12 +191,9 @@ group :development, :staging, :test do
 
   # PhantomJS driver for Capybara
   gem 'poltergeist', '~> 1.3.0'
-
-  gem 'spork', '~> 1.0rc'
-  gem "freezing_email"
 end
 
-group :test, :staging do
+group :test do
   gem "simplecov", require: false
   gem "shoulda-matchers", "~> 2.1.0"
   gem 'email_spec'
