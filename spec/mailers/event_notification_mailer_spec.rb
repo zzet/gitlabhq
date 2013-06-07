@@ -349,6 +349,9 @@ describe EventNotificationMailer do
       project1 = create :project, namespace: group, creator: @another_user
       project2 = create :project, namespace: group, creator: @another_user
 
+      Event::Subscription.by_user(@user).by_target(project1).count.should == 1
+      Event::Subscription.by_user(@user).by_target(project2).count.should == 1
+
       user1 = create :user
       user2 = create :user
 
