@@ -974,6 +974,17 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} assignation to #{@group.name} group was updated by #{@user.name} [assigned]")
   end
 
+  def created_user_team_user_relationship_user_team_user_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utur = @source = @event.source
+    @added_user = @utur.user
+    @team = @utgr.user_team
+    @projects = @team.projects.with_user(@notification.subscriber)
+
+    mail(bcc: @notification.subscriber.email, subject: "User #{@added_user.name} was added to #{@team.name} team by #{@user.name} [joined]")
+  end
 
   def created_user_team_group_relationship_user_team_group_relationship_email(notification)
     @notification = notification

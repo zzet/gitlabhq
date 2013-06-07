@@ -105,6 +105,7 @@ class Project < ActiveRecord::Base
 
   # Scopes
   scope :without_user, ->(user)  { where("projects.id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
+  scope :with_user, ->(user)  { where(users_projects: { user_id: user } ) }
   scope :without_team, ->(team) { team.projects.present? ? where("projects.id NOT IN (:ids)", ids: team.projects.map(&:id)) : scoped  }
   scope :not_in_group, ->(group) { where("projects.id NOT IN (:ids)", ids: group.project_ids ) }
   scope :in_team, ->(team) { where("projects.id IN (:ids)", ids: team.projects.map(&:id)) }
