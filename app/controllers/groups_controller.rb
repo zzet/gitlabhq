@@ -17,6 +17,9 @@ class GroupsController < ApplicationController
     @groups = @groups.search(params[:name]) if params[:name].present?
   end
 
+  layout 'navless', only: [:new, :create]
+  before_filter :set_title, only: [:new, :create]
+
   def new
     @group = Group.new
   end
@@ -137,5 +140,9 @@ class GroupsController < ApplicationController
     unless can?(current_user, :manage_group, group)
       return render_404
     end
+  end
+
+  def set_title
+    @title = 'New Group'
   end
 end

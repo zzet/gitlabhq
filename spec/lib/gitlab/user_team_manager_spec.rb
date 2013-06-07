@@ -67,7 +67,7 @@ describe Gitlab::UserTeamManager do
     end
   end
 
-  describe "team assign on project" do
+  describe "User team assigned to project" do
     before do
       @user = create :user
       @project = create :project, creator: @user

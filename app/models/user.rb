@@ -77,6 +77,10 @@ class User < ActiveRecord::Base
   has_many :own_projects,             foreign_key: :creator_id, class_name: Project
   has_many :owned_projects,           through: :namespaces, source: :projects
   has_many :users_projects,           dependent: :destroy
+  has_many :master_projects,          through: :users_projects, source: :project,
+                                      conditions: { users_projects: { project_access: UsersProject::MASTER } }
+
+  has_many :snippets,                 dependent: :destroy, foreign_key: :author_id, class_name: "Snippet"
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
   has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
@@ -89,7 +93,6 @@ class User < ActiveRecord::Base
   has_many :user_teams,                      through: :user_team_user_relationships
   has_many :user_team_project_relationships, through: :user_teams
   has_many :team_projects,                   through: :user_team_project_relationships
-
   has_many :user_team_group_relationships,   through: :user_teams, conditions: { user_team_user_relationships: { group_admin: true } }
   has_many :team_groups,                     through: :user_team_group_relationships, source: :group
 
@@ -383,5 +386,9 @@ class User < ActiveRecord::Base
 
   def ldap_user?
     extern_uid && provider == 'ldap'
+  end
+
+  def accessible_deploy_keys
+    DeployKey.in_projects(self.master_projects).uniq
   end
 end

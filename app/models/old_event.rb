@@ -75,7 +75,9 @@ class OldEvent < ActiveRecord::Base
   end
 
   def target_title
-    target.try :title
+    if target && target.respond_to?(:title)
+      target.title
+    end
   end
 
   def push?
@@ -128,6 +130,14 @@ class OldEvent < ActiveRecord::Base
 
   def merge_request
     target if target_type == "MergeRequest"
+  end
+
+  def note_project_snippet?
+    target.noteable_type == "Snippet"
+  end
+
+  def note_target
+    target.noteable
   end
 
   def action_name
