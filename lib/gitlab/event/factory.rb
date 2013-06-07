@@ -30,7 +30,7 @@ module Gitlab
 
           events.each do |event|
             event.parent_event = parent_event if parent_event.present?
-            event.save
+            event.save!
           end
         end
       end

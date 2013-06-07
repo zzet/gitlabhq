@@ -16,7 +16,7 @@ describe EventNotificationMailer do
     ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
   end
 
-  let(:project) { pr = create :project, creator: @another_user, namespace_id: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; pr }
+  let(:project) { pr = create :project, creator: @another_user, path: 'gitlabhq', namespace_id: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; pr }
   let(:group)   { g = create :group, owner: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; g }
   let(:team)    { t = create :user_team, owner: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; t }
   let(:user)    { u = create :user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; u }
@@ -366,6 +366,9 @@ describe EventNotificationMailer do
       project1 = create :project, namespace: group, creator: @another_user
       project2 = create :project, namespace: group, creator: @another_user
 
+      Event::Subscription.by_user(@user).by_target(project1).count.should == 1
+      Event::Subscription.by_user(@user).by_target(project2).count.should == 1
+
       user1 = create :user
       user2 = create :user
 
@@ -438,18 +441,24 @@ describe EventNotificationMailer do
   describe "Push actions mails" do
 
     before do
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+
       @service = GitPushService.new
       @oldrev = 'b98a310def241a6fd9c9a9a3e7934c48e498fe81'
       @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
       @ref = 'refs/heads/master'
       @project = project
+      @project.default_branch = 'master'
+      @project.save
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
     end
 
     describe "Push Events" do
       it "should send email with summary push info "  do
         ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-        @service.execute(project, @another_user, @oldrev, @newrev, @ref)
+        @service.execute(@project, @another_user, @oldrev, @newrev, @ref)
 
         ActionMailer::Base.deliveries.count.should == 1
       end

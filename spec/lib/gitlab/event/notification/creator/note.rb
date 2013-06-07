@@ -5,7 +5,8 @@ describe Gitlab::Event::Notification::Creator::Note do
     ActiveRecord::Base.observers.disable :all
 
     @user = create :user, { email: "dmitriy.zaporozhets@gmail.com" }
-    @project = create :project
+    @project = create :project, path: 'gitlabhq'
+
     @project.team << [@user, 40]
 
     @note = create :note_on_commit, { project: @project }

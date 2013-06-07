@@ -21,7 +21,6 @@ class Gitlab::Event::Notification::Creator::UserTeamGroupRelationship < Gitlab::
           notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
         end
       end
-    else
       group.projects.each do |project|
         subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
         subscriptions.each do |subscription|
@@ -30,7 +29,6 @@ class Gitlab::Event::Notification::Creator::UserTeamGroupRelationship < Gitlab::
           end
         end
       end
-
     end
 
     notifications
