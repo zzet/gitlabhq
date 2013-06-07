@@ -168,6 +168,7 @@ group :development, :staging, :test do
   # Visual email testing
   gem "mail_view", "~> 1.0.3"
   gem 'factory_girl_rails'
+  gem "freezing_email"
 end
 
 group :development, :test do
@@ -187,7 +188,6 @@ group :development, :test do
   # Generate Fake data
   gem "ffaker"
 
-  gem "freezing_email"
   gem 'spork', '~> 1.0rc'
 end
 
