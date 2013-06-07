@@ -429,6 +429,18 @@ class EventNotificationMailer < ActionMailer::Base
   # Commented action
   #
 
+  def commented_commit_project_note_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @note = @source = @event.source
+    @project = @target = @event.target
+    @commit_sha = @note.commit_id
+    @commit = @note.project.repository.commit(@commit_sha)
+
+    mail(bcc: @notification.subscriber.email, subject: "#{@user.name} leave comment on commit in #{@project.path_with_namespace} project [commented]")
+  end
+
   def commented_related_project_note_email(notification)
     @notification = notification
     @event = @notification.event

@@ -66,7 +66,8 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         case meta[:action]
         when :created
           actions << :commented_related if source.noteable.present?
-          actions << :commented if source.noteable.blank?
+          actions << :commented_commit if source.commit_id.present?
+          actions << :commented if source.noteable.blank? && source.commit_id.blank?
         end
 
       when ::MergeRequest
