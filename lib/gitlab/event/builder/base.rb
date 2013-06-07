@@ -39,6 +39,12 @@ class Gitlab::Event::Builder::Base
           if candidates.blank?
             candidates = Event.where(source_id: source.id, source_type: source.class.name,
                                      author_id: user.id, action: action_meta[:action])
+            if candidates.blank?
+              candidates = Event.where(source_id: source.id, source_type: source.class.name,
+                                       target_id: source.id, target_type: source.class.name,
+                                       author_id: user.id).
+                                       where("action not in (?)", [:created, :updated, :deleted])
+            end
           end
 
           candidate = candidates.last
