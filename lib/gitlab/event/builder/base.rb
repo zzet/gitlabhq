@@ -32,13 +32,19 @@ class Gitlab::Event::Builder::Base
         user = event_info[:user] if event_info[:user].present?
 
         if source.present? && user.present?
-          candidates = Event.where(source_id: source.id, source_type: source.class.name,
-                                   target_id: source.id, target_type: source.class.name,
+          candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
+                                   target_id: source.try(:id), target_type: source.class.name,
                                    author_id: user.id, action: action_meta[:action])
 
           if candidates.blank?
-            candidates = Event.where(source_id: source.id, source_type: source.class.name,
+            candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                      author_id: user.id, action: action_meta[:action])
+            if candidates.blank?
+              candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
+                                       target_id: source.try(:id), target_type: source.class.name,
+                                       author_id: user.id).
+                                       where("action not in (?)", [:created, :updated, :deleted])
+            end
           end
 
           candidate = candidates.last

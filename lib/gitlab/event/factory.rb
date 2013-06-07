@@ -32,7 +32,6 @@ module Gitlab
             event.parent_event = parent_event if parent_event.present?
             event.save
           end
-
         end
       end
     end

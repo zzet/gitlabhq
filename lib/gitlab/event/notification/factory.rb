@@ -12,7 +12,6 @@ class Gitlab::Event::Notification::Factory
 
     def can_create_notifications?(event)
       event.deleted_related? || event.deleted_self? || event.push_event? || event.full?
-      # (event.target || event.action.to_sym == :deleted) && ((::Event::Action.push_action?(event.action)) || event.source_type)
     end
 
     def creator_for(event)
