@@ -6,7 +6,7 @@ describe Gitlab::Event::Notification::Creator::UsersProject do
 
     @user = create :user
     @project = create :project
-    @data = GitPushService.new.sample_data(@project, @user).to_json
+    @data = ""
 
     @event = create :push_event, { author: @user, data: @data, target: @project }
     @subscription = create :push_subscription, { user: @user, target: @project }

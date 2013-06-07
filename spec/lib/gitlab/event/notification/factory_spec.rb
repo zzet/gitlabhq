@@ -50,7 +50,8 @@ describe Gitlab::Event::Notification::Factory do
       ActiveRecord::Base.observers.disable :all
 
       @user = create :user
-      @project = create :project
+      @project = create :project, { path: 'gitlabhq' }
+
       @data = GitPushService.new.sample_data(@project, @user).to_json
 
       @event = create :push_event, { author: @user, data: @data, target: @project }

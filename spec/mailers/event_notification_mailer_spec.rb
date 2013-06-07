@@ -14,7 +14,7 @@ describe EventNotificationMailer do
 
     SubscriptionService.subscribe(@user, :all, @user, :all)
 
-    @project = create :project, creator: @user
+    @project = create :project, creator: @user, path: 'gitlabhq'
     @group = create :group, owner: @user
     @user_team = create :user_team, owner: @user
 
