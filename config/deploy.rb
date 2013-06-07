@@ -65,6 +65,10 @@ namespace :deploy do
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "sudo sv reload /etc/sv/*"
   end
+  desc "Generate mails"
+  task :generate_mails, :roles => :app do
+    run "cd #{current_path} && RAILS_ENV=test bundle exec rspec spec/mailers/event_notification_mailer_spec.rb"
+  end
 end
 
 before 'deploy:finalize_update',
@@ -74,4 +78,4 @@ before 'deploy:finalize_update',
   'deploy:symlink_puma'
 #after "deploy:restart", "unicorn:stop"
 #after "deploy:reload"
-after "deploy:update", "deploy:cleanup"
+after "deploy:update", "deploy:cleanup", "deploy:generate_mails"
