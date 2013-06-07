@@ -73,7 +73,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created on #{@target.name} [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created on #{@target.name} [created]")
   end
 
   def created_note_note_email(notification)
@@ -83,7 +83,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created on #{@target.name} in #{@target.project.name} [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created on #{@target.name} in #{@target.project.name} [created]")
   end
 
   def created_project_project_email(notification)
@@ -428,6 +428,18 @@ class EventNotificationMailer < ActionMailer::Base
   #
   # Commented action
   #
+
+  def commented_commit_project_note_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @note = @source = @event.source
+    @project = @target = @event.target
+    @commit_sha = @note.commit_id
+    @commit = @note.project.repository.commit(@commit_sha)
+
+    mail(bcc: @notification.subscriber.email, subject: "#{@user.name} leave comment on commit in #{@project.path_with_namespace} project [commented]")
+  end
 
   def commented_related_project_note_email(notification)
     @notification = notification
