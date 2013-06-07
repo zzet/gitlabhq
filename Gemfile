@@ -144,7 +144,7 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
 
-  #gem 'rails_best_practices'
+  gem 'rails_best_practices'
 
   # Docs generator
   gem "sdoc"
