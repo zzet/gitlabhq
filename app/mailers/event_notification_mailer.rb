@@ -73,7 +73,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created on #{@target.name} [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created on #{@target.name} [created]")
   end
 
   def created_note_note_email(notification)
@@ -83,7 +83,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note #{@source.name} was created on #{@target.name} in #{@target.project.name} [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created on #{@target.name} in #{@target.project.name} [created]")
   end
 
   def created_project_project_email(notification)

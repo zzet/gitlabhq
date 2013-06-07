@@ -93,9 +93,15 @@ describe EventNotificationMailer do
     end
 
     it "should send email about add note on commit in project" do
+      user = create :user, { email: "dmitriy.zaporozhets@gmail.com" }
+      project = create :project, path: 'gitlabhq'
+
+      project.team << [user, 40]
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
       note = create :note, project: project, commit_id: "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a", noteable_type: "Commit"
 
-      ActionMailer::Base.deliveries.each {|m| p m}
       ActionMailer::Base.deliveries.count.should == 2
     end
 
