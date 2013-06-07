@@ -175,6 +175,11 @@ group :development, :staging, :test do
   gem "database_cleaner"
   gem "launchy"
 
+  gem "freezing_email"
+  gem 'spork', '~> 1.0rc'
+end
+
+group :development, :test do
   # Guard
   gem 'guard-rspec'
   gem 'guard-spinach'
@@ -185,9 +190,6 @@ group :development, :staging, :test do
 
   # PhantomJS driver for Capybara
   gem 'poltergeist', '1.1.0'
-
-  gem 'spork', '~> 1.0rc'
-  gem "freezing_email"
 end
 
 group :test do
