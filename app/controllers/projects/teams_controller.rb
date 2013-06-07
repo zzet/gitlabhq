@@ -31,5 +31,4 @@ class Projects::TeamsController < Projects::ApplicationController
   def user_team
     @team ||= UserTeam.find_by_path(params[:id])
   end
-
 end

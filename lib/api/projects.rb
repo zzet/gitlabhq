@@ -22,6 +22,15 @@ module API
         present @projects, with: Entities::Project
       end
 
+      # Get an owned projects list for authenticated user
+      #
+      # Example Request:
+      #   GET /projects/owned
+      get '/owned' do
+        @projects = paginate current_user.owned_projects
+        present @projects, with: Entities::Project
+      end
+
       # Get a single project
       #
       # Parameters:
@@ -30,6 +39,20 @@ module API
       #   GET /projects/:id
       get ":id" do
         present user_project, with: Entities::Project
+      end
+
+      # Get a single project events
+      #
+      # Parameters:
+      #   id (required) - The ID of a project
+      # Example Request:
+      #   GET /projects/:id
+      get ":id/events" do
+        limit = (params[:per_page] || 20).to_i
+        offset = (params[:page] || 0).to_i * limit
+        events = user_project.events.recent.limit(limit).offset(offset)
+
+        present events, with: Entities::Event
       end
 
       # Create new project

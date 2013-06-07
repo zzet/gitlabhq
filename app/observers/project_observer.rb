@@ -30,6 +30,10 @@ class ProjectObserver < BaseObserver
     end
   end
 
+  def before_destroy(project)
+    project.repository.expire_cache unless project.empty_repo?
+  end
+
   def after_destroy(project)
     GitlabShellWorker.perform_async(
       :remove_repository,

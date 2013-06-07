@@ -28,3 +28,5 @@
 //= require ace-src-noconflict/ace
 //= require js-routes
 //= require_tree .
+//= require d3
+//= require underscore

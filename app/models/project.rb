@@ -65,7 +65,7 @@ class Project < ActiveRecord::Base
   has_many :milestones,         dependent: :destroy
   has_many :users_projects,     dependent: :destroy
   has_many :notes,              dependent: :destroy
-  has_many :snippets,           dependent: :destroy
+  has_many :snippets,           dependent: :destroy, class_name: "ProjectSnippet"
   has_many :hooks,              dependent: :destroy, class_name: "ProjectHook"
   has_many :protected_branches, dependent: :destroy
   has_many :file_tokens,        dependent: :destroy
@@ -105,6 +105,7 @@ class Project < ActiveRecord::Base
 
   # Scopes
   scope :without_user, ->(user)  { where("projects.id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
+  scope :with_user, ->(user)  { where(users_projects: { user_id: user } ) }
   scope :without_team, ->(team) { team.projects.present? ? where("projects.id NOT IN (:ids)", ids: team.projects.map(&:id)) : scoped  }
   scope :not_in_group, ->(group) { where("projects.id NOT IN (:ids)", ids: group.project_ids ) }
   scope :in_team, ->(team) { where("projects.id IN (:ids)", ids: team.projects.map(&:id)) }
