@@ -51,23 +51,24 @@ class Gitlab::Event::Notification::Creator::Default
 
   def has_access_for(event, user)
     if event.source.present?
-    entity = event.source
-    has_access = user.admin?
+      entity = event.source
+      has_access = user.admin?
 
-    case entity
-    when Project
-      up = user.projects.find(entity)
-      has_access = has_access || up.present?
-    when Group
-      ug = user.groups.find(entity)
-      has_access = has_access || ug.present?
-    when UserTeam
-      ut = user.user_teams.find(entity)
-      has_access = has_access || ut.present?
-    else
-      has_access = true
+      case entity
+      when Project
+        up = user.projects.find(entity)
+        has_access = has_access || up.present?
+      when Group
+        ug = user.groups.find(entity)
+        has_access = has_access || ug.present?
+      when UserTeam
+        ut = user.user_teams.find(entity)
+        has_access = has_access || ut.present?
+      else
+        has_access = true
+      end
+
+      has_access
     end
-
-    has_access
   end
 end
