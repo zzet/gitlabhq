@@ -421,6 +421,8 @@ class EventNotificationMailer < ActionMailer::Base
     @project = @target = @event.target
     @member = @source.user
     @changes = JSON.load(@event.data)["previous_changes"]
+    @previous_permission = UsersProject.access_roles.key(@changes.first.first)
+    @current_permission = UsersProject.access_roles.key(@changes.first.last)
 
     mail(bcc: @notification.subscriber.email, subject: "Permissions for user #{ @member.name } in project #{@project.path_with_namespace} was updated by #{@user.name} [updated]")
   end
@@ -517,6 +519,21 @@ class EventNotificationMailer < ActionMailer::Base
     @target = data
 
     mail(bcc: @notification.subscriber.email, subject: "Group '#{@group["name"]}' was deleted by #{@user.name} [deleted]")
+  end
+
+  def deleted_user_team_user_relationship_user_team_user_relationship_email((notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+
+    data = JSON.load(@event.data).to_hash
+
+    @user = User.find_by_id(data["user_id"])
+    @team = UserTeam.find_by_id(data["user_team_id"])
+
+    if @user && @team
+      mail(bcc: @notification.subscriber.email, subject: "User #{@user.name} was removed from #{@team.name} team by #{@user.name} [deleted]")
+    end
   end
 
   def deleted_user_team_group_relationship_user_team_group_relationship_email(notification)
@@ -963,6 +980,17 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was assigned to #{@project.path_with_namespace} project by #{@user.name} [assigned]")
   end
 
+  def updated_user_team_user_relationship_user_team_user_relationship_email(notification)
+    @notification = notification
+    @event = @notification.event
+    @user = @event.author
+    @utur = @source = @event.source
+    @user = @utur.user
+    @team = @utur.user_team
+
+    mail(bcc: @notification.subscriber.email, subject: "Team membership in #{@team.name} team for #{@user.name} user was updated by #{@user.name} [updated]")
+  end
+
   def updated_user_team_group_relationship_user_team_group_relationship_email(notification)
     @notification = notification
     @event = @notification.event
@@ -980,7 +1008,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @utur = @source = @event.source
     @added_user = @utur.user
-    @team = @utgr.user_team
+    @team = @utur.user_team
     @projects = @team.projects.with_user(@notification.subscriber)
 
     mail(bcc: @notification.subscriber.email, subject: "User #{@added_user.name} was added to #{@team.name} team by #{@user.name} [joined]")
