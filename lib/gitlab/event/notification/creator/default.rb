@@ -49,7 +49,7 @@ class Gitlab::Event::Notification::Creator::Default
     event.author.notification_setting && event.author.notification_setting.own_changes
   end
 
-  def has_access_for(event, user)
+  def has_access(event, user)
     if event.source.present?
       entity = event.source
       has_access = user.admin?
