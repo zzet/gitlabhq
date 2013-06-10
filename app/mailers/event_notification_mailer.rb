@@ -521,7 +521,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(bcc: @notification.subscriber.email, subject: "Group '#{@group["name"]}' was deleted by #{@user.name} [deleted]")
   end
 
-  def deleted_user_team_user_relationship_user_team_user_relationship_email((notification)
+  def deleted_user_team_user_relationship_user_team_user_relationship_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
