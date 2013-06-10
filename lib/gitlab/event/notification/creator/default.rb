@@ -33,7 +33,6 @@ class Gitlab::Event::Notification::Creator::Default
     case event.target
     when Project
       project = event.target
-      project = event.source
       namespace = project.namespace
 
       if namespace
@@ -48,7 +47,7 @@ class Gitlab::Event::Notification::Creator::Default
       subscriptions = ::Event::Subscription.by_target(subscription_target).by_source_type_hard(subscription_source)
 
       subscriptions.each do |subscription|
-        if build_notification?(subscription, event)
+        if subscriber_can_get_notification?(subscription, event)
           air_subscriptions = ::Event::Subscription.by_user(subscription.user).by_target(event.target).by_source_type_hard(event.source)
           if air_subscriptions.blank?
             subscription.notifications.create(event: event, subscriber: subscription.user)
@@ -70,8 +69,6 @@ class Gitlab::Event::Notification::Creator::Default
       end
     end
   end
-
-
 
   def parent_event_for(event)
     event.parent_event
