@@ -21,7 +21,7 @@ module Gitlab
           if parent_event.blank?
             events.each_with_index do |e, i|
               if e.source == e.target
-                e.save!
+                e.save
                 events.delete_at(i)
               end
             end
@@ -30,7 +30,7 @@ module Gitlab
 
           events.each do |event|
             event.parent_event = parent_event if parent_event.present?
-            event.save!
+            event.save
           end
         end
       end
