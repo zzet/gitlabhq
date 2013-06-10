@@ -119,6 +119,8 @@ Gitlab::Application.routes.draw do
         delete :from_all
         post :on_own_changes
         delete :from_own_changes
+        post :on_adjacent_changes
+        delete :from_adjacent_changes
       end
     end
   end

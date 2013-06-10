@@ -38,3 +38,8 @@
       = link_to "Not notify me about changes I make", from_own_changes_notifications_subscription_path, method: :delete, class: "btn btn-remove"
     - else
       = link_to "Notify me about changes I make", on_own_changes_notifications_subscription_path, method: :post, class: "btn btn-primary"
+
+    - if @notification_setting.adjacent_changes
+      = link_to "Not notify me about all adjacent changes", from_adjacent_changes_notifications_subscription_path, method: :delete, class: "btn btn-remove"
+    - else
+      = link_to "Notify me about all adjacent changes", on_adjacent_changes_notifications_subscription_path, method: :post, class: "btn btn-primary"

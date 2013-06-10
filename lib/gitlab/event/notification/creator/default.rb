@@ -16,7 +16,8 @@ class Gitlab::Event::Notification::Creator::Default
   end
 
   def subscriber_can_get_notification?(subscription, event)
-    subscription.user.active? &&
+    has_access(event, subscription.user) &&
+      subscription.user.active? &&
       (user_not_actor?(subscription.user, event) || user_subscribed_on_own_changes?(event)) &&
       no_notification_on_event?(event, subscription)
   end
@@ -46,5 +47,27 @@ class Gitlab::Event::Notification::Creator::Default
 
   def user_subscribed_on_own_changes?(event)
     event.author.notification_setting && event.author.notification_setting.own_changes
+  end
+
+  def has_access_for(event, user)
+    if event.source.present?
+    entity = event.source
+    has_access = user.admin?
+
+    case entity
+    when Project
+      up = user.projects.find(entity)
+      has_access = has_access || up.present?
+    when Group
+      ug = user.groups.find(entity)
+      has_access = has_access || ug.present?
+    when UserTeam
+      ut = user.user_teams.find(entity)
+      has_access = has_access || ut.present?
+    else
+      has_access = true
+    end
+
+    has_access
   end
 end
