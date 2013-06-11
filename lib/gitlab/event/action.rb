@@ -1,8 +1,6 @@
 module Gitlab
   module Event
     class Action
-      cattr_accessor :current_user
-
       class << self
 
         def trigger(action, source, user = nil, data = nil, detailed_event = "")
@@ -16,6 +14,10 @@ module Gitlab
           event << ".#{detailed_event}" unless detailed_event.blank?
 
           ActiveSupport::Notifications.instrument event, {source: source, user: user, data: data}
+        end
+
+        def current_user
+          Thread.current[:current_user]
         end
 
       end
