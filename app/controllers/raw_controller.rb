@@ -3,9 +3,9 @@ class RawController < ProjectResourceController
   include ExtractsPath
 
   # Authorize
-  before_filter :authorize_read_project!
-  before_filter :authorize_code_access!
-  before_filter :require_non_empty_project
+  #before_filter :authorize_read_project!
+  #before_filter :authorize_code_access!
+  #before_filter :require_non_empty_project
 
   skip_before_filter :authenticate_user!, :reject_blocked, :set_current_user_for_observers, :add_abilities, if: :file_auth_token_present?
 
