@@ -985,10 +985,11 @@ class EventNotificationMailer < ActionMailer::Base
     @event = @notification.event
     @user = @event.author
     @utur = @source = @event.source
-    @user = @utur.user
+    @updated_user = @utur.user
     @team = @utur.user_team
+    @changes = JSON.load(@event.data)["previous_changes"]
 
-    mail(bcc: @notification.subscriber.email, subject: "Team membership in #{@team.name} team for #{@user.name} user was updated by #{@user.name} [updated]")
+    mail(bcc: @notification.subscriber.email, subject: "Team membership in #{@team.name} team for #{@updated_user.name} user was updated by #{@user.name} [updated]")
   end
 
   def updated_user_team_group_relationship_user_team_group_relationship_email(notification)
