@@ -9,10 +9,9 @@ class Projects::TokensController < Projects::ApplicationController
     file_token.generate_token!
 
     if file_token.save
-      redirect_to project_blob_path(@project.path_with_namespace, @id, file_auth_token: file_token.token)
+      redirect_to project_raw_path(@project.path_with_namespace, @id, file_auth_token: file_token.token)
     else
-      redirect_to project_blob_path(@project.path_with_namespace, @id)
+      redirect_to project_raw_path(@project.path_with_namespace, @id)
     end
   end
-
 end
