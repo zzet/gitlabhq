@@ -1,35 +1,64 @@
 .tab-pane#members-list
   %fieldset
-  - if @group.users.any?
-    = form_tag project_teams_update_admin_group_path(@group), id: "new_team_member", class: "bulk_import", method: :put  do
-      %table.zebra-striped
-        %thead
-          %tr
-            %th Name
-            %th Username
-            %th Project Access:
+    .ui-box
+      %h5.title
+        Add user to Group projects:
+      .ui-box-body.form-holder
+        %p.light
+          Read more about project permissions
+          %strong= link_to "here", help_permissions_path, class: "vlink"
 
-        - @group.users.each do |user|
-          - next unless user
-          %tr{class: "user_#{user.id}"}
-            %td.name= link_to user.name, admin_user_path(user)
-            %td.username= link_to user.username, admin_user_path(user)
-            %td.projects_access
-              - user.authorized_projects.in_namespace(@group).each do |project|
-                - u_p = user.users_projects.in_project(project).first
-                - next unless u_p
-                %span
-                  = project.name_with_namespace
-                  = link_to "(#{ u_p.project_access_human })", edit_admin_project_member_path(project, user)
-        %tr
-          %td{colspan: 2, class: "input"}= select_tag :user_ids, options_from_collection_for_select(@users , :id, :name), multiple: true, data: {placeholder: 'Select users'}, class: 'chosen span5'
-          %td= select_tag :project_access, options_for_select(Project.access_options), {class: "project-access-select chosen span3"}
+        = form_tag project_teams_update_admin_group_path(@group), id: "new_team_member", class: "bulk_import", method: :put  do
+          %div
+            = users_select_tag(:user_ids, multiple: true)
+          %div.prepend-top-10
+            = select_tag :project_access, options_for_select(Project.access_options), {class: "project-access-select chosen span2"}
+          %hr
+          = submit_tag 'Add user to projects in group', class: "btn btn-create"
+    .ui-box
+      %h5.title
+        Users from Group projects
+        %small
+          (#{@group.users.count})
+      %ul.well-list
+        - @group.users.sort_by(&:name).each do |user|
+          %li{class: dom_class(user)}
+            %strong
+              = link_to user.name, admin_user_path(user)
+            %span.pull-right.light
+              = pluralize user.authorized_projects.in_namespace(@group).count, 'project'
 
-        %tr
-          %td= submit_tag 'Add user to projects in group', class: "btn btn-primary"
-          %td{colspan: 2}
-            Read more about project permissions
-            %strong= link_to "here", help_permissions_path, class: "vlink"
 
-  - else
-    %legend Group is empty
+  -#- if @group.users.any?
+    -#= form_tag project_teams_update_admin_group_path(@group), id: "new_team_member", class: "bulk_import", method: :put  do
+      -#%table.zebra-striped
+        -#%thead
+          -#%tr
+            -#%th Name
+            -#%th Username
+            -#%th Project Access:
+
+        -#- @group.users.each do |user|
+          -#- next unless user
+          -#%tr{class: "user_#{user.id}"}
+            -#%td.name= link_to user.name, admin_user_path(user)
+            -#%td.username= link_to user.username, admin_user_path(user)
+            -#%td.projects_access
+              -#- user.authorized_projects.in_namespace(@group).each do |project|
+                -#- u_p = user.users_projects.in_project(project).first
+                -#- next unless u_p
+                -#%span
+                  -#= project.name_with_namespace
+                  -#= link_to "(#{ u_p.project_access_human })", edit_admin_project_member_path(project, user)
+        -#%tr
+          -#%td{colspan: 2, class: "input"}= select_tag :user_ids, options_from_collection_for_select(@users , :id, :name), multiple: true, data: {placeholder: 'Select users'}, class: 'chosen span5'
+          -#%td= select_tag :project_access, options_for_select(Project.access_options), {class: "project-access-select chosen span3"}
+
+        -#%tr
+          -#%td= submit_tag 'Add user to projects in group', class: "btn btn-primary"
+          -#%td{colspan: 2}
+            -#Read more about project permissions
+            -#%strong= link_to "here", help_permissions_path, class: "vlink"
+
+  -#- else
+    -#%legend Group is empty

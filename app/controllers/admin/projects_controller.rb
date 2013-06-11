@@ -17,7 +17,7 @@ class Admin::ProjectsController < Admin::ApplicationController
     @repository = @project.repository
     @users = User.active
     @users = @users.not_in_project(@project) if @project.users.present?
-    @users = @users.all
+    #@users = @users.all
     check_git_protocol
   end
 
