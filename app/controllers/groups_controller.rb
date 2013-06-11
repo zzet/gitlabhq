@@ -1,8 +1,6 @@
 class GroupsController < ApplicationController
   respond_to :html
-  layout 'group', except: [:new, :create, :index]
-
-  before_filter :group, except: [:new, :create, :index]
+  before_filter :group, except: [:new, :create]
 
   # Authorize
   before_filter :authorize_read_group!, except: [:new, :create, :index]
@@ -17,7 +15,8 @@ class GroupsController < ApplicationController
     @groups = @groups.search(params[:name]) if params[:name].present?
   end
 
-  layout 'navless', only: [:new, :create]
+  layout :determine_layout
+
   before_filter :set_title, only: [:new, :create]
 
   def new
@@ -145,5 +144,13 @@ class GroupsController < ApplicationController
 
   def set_title
     @title = 'New Group'
+  end
+
+  def determine_layout
+    if [:new, :create].include?(action_name.to_sym)
+      'navless'
+    else
+      'group'
+    end
   end
 end
