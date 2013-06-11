@@ -9,5 +9,6 @@ class BlobController < ProjectResourceController
 
   def show
     @blob = Gitlab::Git::Blob.new(@repository, @commit.id, @ref, @path)
+    @file_token = FileToken.for_project(@project).find_by_file(@path)
   end
 end

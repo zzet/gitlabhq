@@ -29,7 +29,7 @@ class Teams::MembersController < Teams::ApplicationController
   end
 
   def destroy
-    ::Teams::Users::UpdateRelationContext.new(@current_user, user_team, team_member).execute
+    ::Teams::Users::RemoveRelationContext.new(@current_user, user_team, team_member).execute
     redirect_to team_path(user_team), notice: "Member #{team_member.name} was successfully removed from Team of users."
   end
 
