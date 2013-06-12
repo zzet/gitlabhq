@@ -10,7 +10,7 @@ describe EventNotificationMailer do
 
     ActiveRecord::Base.observers.enable :all
 
-    Gitlab::Event::Action.current_user = @another_user
+    Thread.current[:current_user] = @another_user
 
     ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
   end

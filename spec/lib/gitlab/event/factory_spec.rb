@@ -9,6 +9,10 @@ describe Gitlab::Event::Factory do
     Gitlab::Event::Factory.should respond_to :create_events
   end
 
+  before do
+    Thread.current[:current_user] = @another_user
+  end
+
   #
   # Issue events
   #
@@ -17,7 +21,6 @@ describe Gitlab::Event::Factory do
     before do
       @user = create :user
 
-      Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
       #Issue.observers.enable :activity_observer
 
@@ -131,7 +134,6 @@ describe Gitlab::Event::Factory do
       @project = create :project, creator: @user
       @user_team = create :user_team, owner: @another_user
 
-      Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
       #User.observers.enable :activity_observer
     end
@@ -435,7 +437,6 @@ describe Gitlab::Event::Factory do
       @user = create :user
       @group = create(:group, owner: @user)
 
-      Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
       #Group.observers.enable :activity_observer
     end
@@ -582,7 +583,6 @@ describe Gitlab::Event::Factory do
     before do
       @user = create :user
 
-      Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
       #MergeRequest.observers.enable :activity_observer
 
@@ -677,7 +677,6 @@ describe Gitlab::Event::Factory do
     before do
       @user = create :user
 
-      Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
       #UserTeam.observers.enable :activity_observer
 
@@ -917,7 +916,6 @@ describe Gitlab::Event::Factory do
     before do
       @user = create :user
 
-      Gitlab::Event::Action.current_user = @user
       ActiveRecord::Base.observers.disable :all
       #Project.observers.enable :activity_observer
 
