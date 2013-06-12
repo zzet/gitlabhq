@@ -399,6 +399,31 @@ describe EventNotificationMailer do
       ActionMailer::Base.deliveries.count.should == 1
     end
 
+    it "should send email about update member into team on assigned team to group" do
+      SubscriptionService.subscribe(@user, :all, :group, :all)
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+
+      project1 = create :project, namespace: group, creator: @another_user
+      project2 = create :project, namespace: group, creator: @another_user
+
+      user1 = create :user
+      user2 = create :user
+      user3 = create :user
+
+      params = { user_ids: "#{user1.id}, #{user2.id}, #{user3.id}", default_project_access: UsersProject::MASTER, group_admin: false }
+      ::Teams::Users::CreateRelationContext.new(@another_user, team, nil, params).execute
+
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { team_member: { permission: 20, group_admin: 1 } }
+      ::Teams::Users::UpdateRelationContext.new(@another_user, team, user3, params).execute
+
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
     it "should send email about assigned team to group with subscriptions on projects only" do
       SubscriptionService.subscribe(@user, :all, :project, :all)
 
