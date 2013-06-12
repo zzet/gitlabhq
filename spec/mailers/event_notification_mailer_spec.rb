@@ -422,6 +422,13 @@ describe EventNotificationMailer do
       ::Teams::Users::UpdateRelationContext.new(@another_user, team, user3, params).execute
 
       ActionMailer::Base.deliveries.count.should == 1
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { team_member: { permission: 30, group_admin: 1 } }
+      ::Teams::Users::UpdateRelationContext.new(@another_user, team, user3, params).execute
+
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about assigned team to group with subscriptions on projects only" do
