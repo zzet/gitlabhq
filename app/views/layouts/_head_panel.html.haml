@@ -18,6 +18,9 @@
         - if defined?(current_entity) && current_entity.kind_of?(Watchable)
           = render "shared/watch_button", current_entity: current_entity
         %li
+          = link_to "skype:?chat&blob=eGjOvcNshTTHGKuUXYWojG-ohpbm4aQTUCOdlfp3EG5hzZjWJZX1NbHAC-wb4UWj1BjWNOcR5xl6Kt8r5fAybXOAXyIV7xX17sZCXY7Q3mQzduTFym1PR1eGAeQIHLUMbu69eq9iqDsYelz9rxp1FYj0JEfdk1dPEbLaqB22rBqHtTqjLWU5D1Hk9Sqjmj1dhysUvfQYpDVCPSCr5pD_HJvtGlB-", title: "Чат багрепортинга", class: 'has_bottom_tooltip', 'data-original-title' => 'Чат багрепортинга' do
+            %i.icon-circle-question-mark
+        %li
           = link_to public_root_path, title: "Public area", class: 'has_bottom_tooltip', 'data-original-title' => 'Public area' do
             %i.icon-globe
         -#%li
