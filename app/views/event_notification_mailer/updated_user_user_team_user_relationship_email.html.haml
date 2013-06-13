@@ -8,9 +8,9 @@
   - @changes.each do |key, values|
     %tr
       %td= key
-      - if permission_key?(key)
-        %td UsersProject.access_roles.key(values.last)
-        %td UsersProject.access_roles.key(values.first)
+      - if permission_key?(key.to_s)
+        %td= UsersProject.access_roles.key(values.last)
+        %td= UsersProject.access_roles.key(values.first)
       - else
         %td= values.last
         %td= values.first
