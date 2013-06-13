@@ -1,6 +1,11 @@
 module Teams
   module Projects
     class CreateRelationContext < Teams::BaseContext
+
+      def initialize(user, team, params = {})
+        @current_user, @project, @team, @params = user, team, params.dup
+      end
+
       def execute
         project_ids = params[:project_ids]
         access = params[:greatest_project_access]

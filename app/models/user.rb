@@ -274,6 +274,11 @@ class User < ActiveRecord::Base
     Project.where(id: @project_ids)
   end
 
+  def known_projects
+    @project_ids ||= (owned_projects.pluck(:id) + projects.pluck(:id) + Project.public_only.pluck(:id)).uniq
+    Project.where(id: @project_ids)
+  end
+
   def authorized_teams
     ateams = UserTeam.scoped
     unless self.admin?

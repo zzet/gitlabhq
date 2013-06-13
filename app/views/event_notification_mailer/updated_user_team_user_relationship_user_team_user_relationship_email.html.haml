@@ -14,6 +14,10 @@ was changed by
     - @changes.each do |key, values|
       %tr
         %td= key
-        %td= values.last
-        %td= values.first
+        - if permission_key?(key.to_s)
+          %td= UsersProject.access_roles.key(values.last)
+          %td= UsersProject.access_roles.key(values.first)
+        - else
+          %td= values.last
+          %td= values.first
   %br

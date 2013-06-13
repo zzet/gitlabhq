@@ -16,8 +16,14 @@ module Projects
           old_namespace = project.namespace
           project.transfer(namespace)
 
-          old_namespace.user_teams.each do |team|
-            Gitlab::UserTeamManager.resign(team, project)
+          if old_namespace.type == "Group"
+            old_namespace.user_teams.each do |team|
+              Gitlab::UserTeamManager.resign(team, project)
+            end
+          else
+            project.user_teams.each do |team|
+              Gitlab::UserTeamManager.resign(team, project)
+            end
           end
 
           if namespace.type == "Group"
