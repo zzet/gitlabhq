@@ -98,8 +98,7 @@ class GroupsController < ApplicationController
   end
 
   def destroy
-    @group.truncate_teams
-    @group.destroy
+    ::Groups::RemoveContext.new(current_user, group).execute
 
     redirect_to root_path, notice: 'Group was removed.'
   end

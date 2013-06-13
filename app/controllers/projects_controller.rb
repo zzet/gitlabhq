@@ -34,7 +34,7 @@ class ProjectsController < ProjectResourceController
   end
 
   def update
-    status = ::Projects::UpdateContext.new(@project, current_user, params).execute
+    status = ::Projects::UpdateContext.new(current_user, project, params).execute
 
     respond_to do |format|
       if status
@@ -49,7 +49,7 @@ class ProjectsController < ProjectResourceController
   end
 
   def transfer
-    ::Projects::TransferContext.new(project, current_user, params).execute
+    ::Projects::TransferContext.new(current_user, project, params).execute
   end
 
   def show
@@ -72,8 +72,7 @@ class ProjectsController < ProjectResourceController
   def destroy
     return access_denied! unless can?(current_user, :remove_project, project)
 
-    project.team.truncate
-    project.destroy
+    ::Projects::RemoveContext.new(current_user, project, params).execute
 
     respond_to do |format|
       format.html { redirect_to root_path }
@@ -81,7 +80,7 @@ class ProjectsController < ProjectResourceController
   end
 
   def fork
-    @forked_project = ::Projects::ForkContext.new(project, current_user).execute
+    @forked_project = ::Projects::ForkContext.new(current_user, project).execute
 
     respond_to do |format|
       format.html do
@@ -104,7 +103,7 @@ class ProjectsController < ProjectResourceController
     }
 
     respond_to do |format|
-      format.json { render :json => @suggestions }
+      format.json { render json: @suggestions }
     end
   end
 
