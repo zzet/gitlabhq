@@ -116,7 +116,7 @@ class Project < ActiveRecord::Base
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
   scope :public_via_http, -> { where(public: true) }
   scope :public_via_git, -> { where(git_protocol_enabled: true) }
-  scope :public_only, -> { where(arel_table[:public].eq(true).or(arel_table[:git_protocol_enabled].eq(true))) }
+  scope :public_only, -> { public_via_http }
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
 
