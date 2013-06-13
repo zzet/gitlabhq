@@ -178,7 +178,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @group = @source = @event.source
     @target = @event.target
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Group #{@source.name} was updated by #{@user.name} [updated]")
   end
@@ -253,7 +253,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @project = @source = @event.source
     @target = @event.target
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Project #{@source.name} was updated by #{@user.name} [updated]")
   end
@@ -264,7 +264,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source
     @target = @event.target
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Project #{@source.name} was updated by #{@user.name} in #{@target.name} group [updated]")
   end
@@ -325,7 +325,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @updated_user = @source = @event.source
     @target = @event.target
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "User #{@updated_user.name} was updated by #{@user.name} [updated]")
   end
@@ -336,7 +336,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @team = @source = @event.source
     @target = @event.target
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Team #{@team.name} was updated by #{@user.name} [updated]")
   end
@@ -348,7 +348,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @team = @event.target
     @project = @source.project
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Default project access rules for team #{@team.name} were updated by #{@user.name} [updated]")
   end
@@ -372,7 +372,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @project = @event.target
     @team = @source.user_team
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Default project access rules for team #{@team.name} was updated by #{@user.name} [updated]")
   end
@@ -384,7 +384,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @team = @event.target
     @member = @source.user
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Membership settings for user #{@member.name} in team #{@team.name} was updated by #{@user.name} [updated]")
   end
@@ -396,7 +396,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @member = @event.target
     @team = @source.user_team
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Membership settings for user #{@member.name} in team #{@team.name} was updated by #{@user.name} [updated]")
   end
@@ -408,7 +408,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @member = @target = @event.target
     @project = @source.project
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
 
     mail(bcc: @notification.subscriber.email, subject: "Permissions for user #{ @member.name } in project #{@project.path_with_namespace} was updated by #{@user.name} [updated]")
   end
@@ -420,7 +420,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @project = @target = @event.target
     @member = @source.user
-    @changes = JSON.load(@event.data)["previous_changes"]
+    @changes = JSON.load(@event.data).to_hash["previous_changes"]
     @previous_permission = UsersProject.access_roles.key(@changes.first.first)
     @current_permission = UsersProject.access_roles.key(@changes.first.last)
 
