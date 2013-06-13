@@ -25,7 +25,6 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :updated
           changes = source.changes
 
-          #actions << :ownership_changed if source.creator_id_changed? && source.creator_id != changes[:creator_id].first
           actions << :transfer if source.namespace_id_changed? && (source.namespace_id != changes[:namespace_id].first)
 
           if project_changes_exists?(changes)
@@ -66,8 +65,9 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
 
         case meta[:action]
         when :created
-          actions << :commented_related if source.noteable.present?
-          actions << :commented if source.noteable.blank?
+          actions << :commented_commit if source.commit_id.present?
+          actions << :commented_related if source.noteable.present? && source.commit_id.blank?
+          actions << :commented if source.noteable.blank? && source.commit_id.blank?
         end
 
       when ::MergeRequest
@@ -147,9 +147,6 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         end
 
       when ::UsersProject
-        team_events = ::Event.where(target_id: target.id, target_type: target.class, created_at: (Time.now - 5.minutes)..Time.now)
-        temp_data[:team_echo] = true if team_events.any?
-
         target = source.project
 
         case meta[:action]

@@ -12,14 +12,15 @@ describe MergeRequestObserver do
 
   before { subject.stub(:current_user).and_return(some_user) }
   before { subject.stub(notification: mock('NotificationService').as_null_object) }
+  before(:each) { enable_observers }
+
 
   subject { MergeRequestObserver.instance }
 
   describe '#after_create' do
-
-    it 'is called when a merge request is created' do
-      subject.should_receive(:after_create)
-      create(:merge_request, project: create(:project))
+    it 'trigger notification service' do
+      subject.should_receive(:notification)
+      subject.after_create(mr_mock)
     end
   end
 

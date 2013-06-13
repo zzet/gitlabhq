@@ -16,6 +16,10 @@ describe ActivityObserver do
     return test_info
   end
 
+  before do
+    Thread.current[:current_user] = @user
+  end
+
 
   #
   # Observe Key changes
@@ -27,7 +31,6 @@ describe ActivityObserver do
       Key.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -77,7 +80,6 @@ describe ActivityObserver do
       Issue.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -128,7 +130,6 @@ describe ActivityObserver do
       MergeRequest.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -179,7 +180,6 @@ describe ActivityObserver do
       Milestone.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -230,7 +230,6 @@ describe ActivityObserver do
       Group.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -280,7 +279,6 @@ describe ActivityObserver do
       Note.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -329,7 +327,6 @@ describe ActivityObserver do
       Project.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -380,7 +377,6 @@ describe ActivityObserver do
       ProtectedBranch.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -431,7 +427,6 @@ describe ActivityObserver do
       Service.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -482,7 +477,6 @@ describe ActivityObserver do
       Snippet.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -533,7 +527,6 @@ describe ActivityObserver do
       User.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -584,7 +577,6 @@ describe ActivityObserver do
       UserTeam.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -635,7 +627,6 @@ describe ActivityObserver do
       UserTeamProjectRelationship.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -686,7 +677,6 @@ describe ActivityObserver do
       UserTeamUserRelationship.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -736,7 +726,6 @@ describe ActivityObserver do
       UsersProject.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -787,7 +776,6 @@ describe ActivityObserver do
       ProjectHook.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -837,7 +825,6 @@ describe ActivityObserver do
       SystemHook.observers.enable :activity_observer
 
       @user = create :user
-      Gitlab::Event::Action.current_user = @user
 
       @project = create :project, creator: @user
     end
@@ -874,58 +861,5 @@ describe ActivityObserver do
       data[:name].should match(/deleted/)
       data[:data][:source].should be_kind_of ::SystemHook
     end
-
   end
-
-
-  #
-  # Observe Wiki changes
-  #
-
-  describe "Wiki events" do
-    before do
-      ActiveRecord::Base.observers.disable :all
-      Wiki.observers.enable :activity_observer
-
-      @user = create :user
-      Gitlab::Event::Action.current_user = @user
-
-      @project = create :project, creator: @user
-    end
-
-    it "Should generate :created event" do
-
-      data = notification_data_for(/gitlab/) do
-        @wiki = create(:wiki, project: @project)
-      end
-
-      data[:name].should match(/created/)
-      data[:data][:source].should be_kind_of ::Wiki
-    end
-
-    it "Should generate :updated event" do
-      @wiki = create(:wiki, project: @project)
-
-      data = notification_data_for(/gitlab/) do
-        @wiki.title = "#{@wiki.title}_updated"
-        @wiki.save
-      end
-
-      data[:name].should match(/updated/)
-      data[:data][:source].should be_kind_of ::Wiki
-    end
-
-    it "Should generate :deleted event" do
-      @wiki = create(:wiki, project: @project)
-
-      data = notification_data_for(/gitlab/) do
-        @wiki.destroy
-      end
-
-      data[:name].should match(/deleted/)
-      data[:data][:source].should be_kind_of ::Wiki
-    end
-
-  end
-
 end

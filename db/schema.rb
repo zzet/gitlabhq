@@ -11,13 +11,21 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130506001109) do
+ActiveRecord::Schema.define(:version => 20130530101139) do
+
+  create_table "deploy_keys_projects", :force => true do |t|
+    t.integer  "deploy_key_id", :null => false
+    t.integer  "project_id",    :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
 
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+    t.boolean  "adjacent_changes"
   end
 
   create_table "event_subscription_notifications", :force => true do |t|
@@ -53,8 +61,9 @@ ActiveRecord::Schema.define(:version => 20130506001109) do
     t.integer  "target_id"
     t.string   "target_type"
     t.text     "data"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.integer  "parent_event_id"
   end
 
   create_table "file_tokens", :force => true do |t|
@@ -67,6 +76,15 @@ ActiveRecord::Schema.define(:version => 20130506001109) do
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
   end
+
+  create_table "forked_project_links", :force => true do |t|
+    t.integer  "forked_to_project_id",   :null => false
+    t.integer  "forked_from_project_id", :null => false
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
+  end
+
+  add_index "forked_project_links", ["forked_to_project_id"], :name => "index_forked_project_links_on_forked_to_project_id", :unique => true
 
   create_table "issues", :force => true do |t|
     t.string   "title"
@@ -96,11 +114,10 @@ ActiveRecord::Schema.define(:version => 20130506001109) do
     t.text     "key"
     t.string   "title"
     t.string   "identifier"
-    t.integer  "project_id"
+    t.string   "type"
   end
 
   add_index "keys", ["identifier"], :name => "index_keys_on_identifier"
-  add_index "keys", ["project_id"], :name => "index_keys_on_project_id"
   add_index "keys", ["user_id"], :name => "index_keys_on_user_id"
 
   create_table "merge_requests", :force => true do |t|
@@ -235,6 +252,8 @@ ActiveRecord::Schema.define(:version => 20130506001109) do
     t.datetime "updated_at",                     :null => false
     t.boolean  "active",      :default => false, :null => false
     t.string   "project_url"
+    t.string   "subdomain"
+    t.string   "room"
   end
 
   add_index "services", ["project_id"], :name => "index_services_on_project_id"
@@ -242,12 +261,14 @@ ActiveRecord::Schema.define(:version => 20130506001109) do
   create_table "snippets", :force => true do |t|
     t.string   "title"
     t.text     "content"
-    t.integer  "author_id",  :null => false
-    t.integer  "project_id", :null => false
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "author_id",                    :null => false
+    t.integer  "project_id"
+    t.datetime "created_at",                   :null => false
+    t.datetime "updated_at",                   :null => false
     t.string   "file_name"
     t.datetime "expires_at"
+    t.boolean  "private",    :default => true, :null => false
+    t.string   "type"
   end
 
   add_index "snippets", ["created_at"], :name => "index_snippets_on_created_at"
@@ -347,11 +368,12 @@ ActiveRecord::Schema.define(:version => 20130506001109) do
   add_index "users", ["username"], :name => "index_users_on_username"
 
   create_table "users_projects", :force => true do |t|
-    t.integer  "user_id",                       :null => false
-    t.integer  "project_id",                    :null => false
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
-    t.integer  "project_access", :default => 0, :null => false
+    t.integer  "user_id",                           :null => false
+    t.integer  "project_id",                        :null => false
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+    t.integer  "project_access",     :default => 0, :null => false
+    t.integer  "notification_level", :default => 3, :null => false
   end
 
   add_index "users_projects", ["project_access"], :name => "index_users_projects_on_project_access"
@@ -366,18 +388,5 @@ ActiveRecord::Schema.define(:version => 20130506001109) do
     t.string   "type",       :default => "ProjectHook"
     t.integer  "service_id"
   end
-
-  create_table "wikis", :force => true do |t|
-    t.string   "title"
-    t.text     "content"
-    t.integer  "project_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-    t.string   "slug"
-    t.integer  "user_id"
-  end
-
-  add_index "wikis", ["project_id"], :name => "index_wikis_on_project_id"
-  add_index "wikis", ["slug"], :name => "index_wikis_on_slug"
 
 end

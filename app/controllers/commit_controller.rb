@@ -8,10 +8,14 @@ class CommitController < ProjectResourceController
   before_filter :require_non_empty_project
 
   def show
-    result = CommitLoadContext.new(project, current_user, params).execute
+    result = Projects::Commits::LoadContext.new(project, current_user, params).execute
 
     @commit = result[:commit]
-    git_not_found! unless @commit
+    
+    if @commit.nil?
+      git_not_found!
+      return
+    end
 
     @suppress_diff = result[:suppress_diff]
 

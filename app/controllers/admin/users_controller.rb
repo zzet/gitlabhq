@@ -29,7 +29,7 @@ class Admin::UsersController < Admin::ApplicationController
 
 
   def new
-    @admin_user = User.new({ projects_limit: Gitlab.config.gitlab.default_projects_limit }, as: :admin)
+    @admin_user = User.new.with_defaults
   end
 
   def edit
@@ -84,6 +84,8 @@ class Admin::UsersController < Admin::ApplicationController
         format.html { redirect_to [:admin, admin_user], notice: 'User was successfully updated.' }
         format.json { head :ok }
       else
+        # restore username to keep form action url.
+        admin_user.username = params[:id]
         format.html { render action: "edit" }
         format.json { render json: admin_user.errors, status: :unprocessable_entity }
       end

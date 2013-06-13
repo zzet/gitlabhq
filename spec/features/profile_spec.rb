@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe "Profile account page" do
+  before(:each) { enable_observers }
   let(:user) { create(:user) }
 
   before do
@@ -12,7 +13,8 @@ describe "Profile account page" do
       Gitlab.config.gitlab.stub(:signup_enabled).and_return(true)
       visit account_profile_path
     end
-    #it { page.should have_content("Remove account") }
+
+    it { page.should have_content("Remove account") }
 
     it "should delete the account", js: true do
       expect { click_link "Delete account" }.to change {User.count}.by(-1)

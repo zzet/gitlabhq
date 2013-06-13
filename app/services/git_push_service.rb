@@ -31,10 +31,13 @@ class GitPushService
       project.update_merge_requests(oldrev, newrev, ref, @user)
       project.execute_hooks(@push_data.dup)
       project.execute_services(@push_data.dup)
+      Rails.cache.delete(project.repository.cache_key(:branch_names))
     end
 
-    project.execute_hooks(@push_data.dup) if push_tag?(ref, oldrev)
-
+    if push_tag?(ref, oldrev)
+      project.execute_hooks(@push_data.dup)
+      Rails.cache.delete(project.repository.cache_key(:tag_names))
+    end
   end
 
   # This method provide a sample data
@@ -111,7 +114,7 @@ class GitPushService
         data[:commits] << {
           id: commit.id,
           message: commit.safe_message,
-          timestamp: commit.date.xmlschema,
+          timestamp: commit.committed_date.xmlschema,
           url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{commit.id}",
           author: {
             name: commit.author_name,

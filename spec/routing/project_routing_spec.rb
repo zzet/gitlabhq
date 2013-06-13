@@ -55,6 +55,7 @@ end
 
 #      projects POST   /projects(.:format)     projects#create
 #   new_project GET    /projects/new(.:format) projects#new
+#  fork_project POST   /:id/fork(.:format)     projects#fork
 #  wall_project GET    /:id/wall(.:format)     projects#wall
 # files_project GET    /:id/files(.:format)    projects#files
 #  edit_project GET    /:id/edit(.:format)     projects#edit
@@ -70,12 +71,20 @@ describe ProjectsController, "routing" do
     get("/projects/new").should route_to('projects#new')
   end
 
+  it "to #fork" do
+    post("/gitlabhq/fork").should route_to('projects#fork', id: 'gitlabhq')
+  end
+
   it "to #wall" do
     get("/gitlabhq/wall").should route_to('walls#show', project_id: 'gitlabhq')
   end
 
   it "to #edit" do
     get("/gitlabhq/edit").should route_to('projects#edit', id: 'gitlabhq')
+  end
+
+  it "to #autocomplete_sources" do
+    get('/gitlabhq/autocomplete_sources').should route_to('projects#autocomplete_sources', id: "gitlabhq")
   end
 
   it "to #show" do
@@ -192,7 +201,11 @@ describe RefsController, "routing" do
 
   it "to #logs_tree" do
     get("/gitlabhq/refs/stable/logs_tree").should             route_to('refs#logs_tree', project_id: 'gitlabhq', id: 'stable')
+    get("/gitlabhq/refs/feature%2345/logs_tree").should             route_to('refs#logs_tree', project_id: 'gitlabhq', id: 'feature#45')
+    get("/gitlabhq/refs/feature%2B45/logs_tree").should             route_to('refs#logs_tree', project_id: 'gitlabhq', id: 'feature+45')
     get("/gitlabhq/refs/stable/logs_tree/foo/bar/baz").should route_to('refs#logs_tree', project_id: 'gitlabhq', id: 'stable', path: 'foo/bar/baz')
+    get("/gitlabhq/refs/feature%2345/logs_tree/foo/bar/baz").should route_to('refs#logs_tree', project_id: 'gitlabhq', id: 'feature#45', path: 'foo/bar/baz')
+    get("/gitlabhq/refs/feature%2B45/logs_tree/foo/bar/baz").should route_to('refs#logs_tree', project_id: 'gitlabhq', id: 'feature+45', path: 'foo/bar/baz')
     get("/gitlab/gitlabhq/refs/stable/logs_tree/files.scss").should route_to('refs#logs_tree', project_id: 'gitlab/gitlabhq', id: 'stable', path: 'files.scss')
   end
 end
@@ -249,13 +262,37 @@ end
 #      project_snippet GET    /:project_id/snippets/:id(.:format)      snippets#show
 #                      PUT    /:project_id/snippets/:id(.:format)      snippets#update
 #                      DELETE /:project_id/snippets/:id(.:format)      snippets#destroy
-describe SnippetsController, "routing" do
+describe Project::SnippetsController, "routing" do
   it "to #raw" do
-    get("/gitlabhq/snippets/1/raw").should route_to('snippets#raw', project_id: 'gitlabhq', id: '1')
+    get("/gitlabhq/snippets/1/raw").should route_to('projects/snippets#raw', project_id: 'gitlabhq', id: '1')
   end
 
-  it_behaves_like "RESTful project resources" do
-    let(:controller) { 'snippets' }
+  it "to #index" do
+    get("/gitlabhq/snippets").should route_to("projects/snippets#index", project_id: 'gitlabhq')
+  end
+
+  it "to #create" do
+    post("/gitlabhq/snippets").should route_to("projects/snippets#create", project_id: 'gitlabhq')
+  end
+
+  it "to #new" do
+    get("/gitlabhq/snippets/new").should route_to("projects/snippets#new", project_id: 'gitlabhq')
+  end
+
+  it "to #edit" do
+    get("/gitlabhq/snippets/1/edit").should route_to("projects/snippets#edit", project_id: 'gitlabhq', id: '1')
+  end
+
+  it "to #show" do
+    get("/gitlabhq/snippets/1").should route_to("projects/snippets#show", project_id: 'gitlabhq', id: '1')
+  end
+
+  it "to #update" do
+    put("/gitlabhq/snippets/1").should route_to("projects/snippets#update", project_id: 'gitlabhq', id: '1')
+  end
+
+  it "to #destroy" do
+    delete("/gitlabhq/snippets/1").should route_to("projects/snippets#destroy", project_id: 'gitlabhq', id: '1')
   end
 end
 
@@ -274,7 +311,7 @@ describe HooksController, "routing" do
   end
 end
 
-# project_commit GET    /:project_id/commit/:id(.:format) commit#show {:id=>/[[:alnum:]]{6,40}/, :project_id=>/[^\/]+/}
+# project_commit GET    /:project_id/commit/:id(.:format) commit#show {id: /[[:alnum:]]{6,40}/, project_id: /[^\/]+/}
 describe CommitController, "routing" do
   it "to #show" do
     get("/gitlabhq/commit/4246fb").should route_to('commit#show', project_id: 'gitlabhq', id: '4246fb')
@@ -308,6 +345,7 @@ end
 #                          DELETE /:project_id/team_members/:id(.:format)      team_members#destroy
 describe TeamMembersController, "routing" do
   it_behaves_like "RESTful project resources" do
+    let(:actions)    { [:new, :create, :update, :destroy] }
     let(:controller) { 'team_members' }
   end
 end
@@ -344,16 +382,8 @@ end
 #                            PUT    /:project_id/issues/:id(.:format)         issues#update
 #                            DELETE /:project_id/issues/:id(.:format)         issues#destroy
 describe IssuesController, "routing" do
-  it "to #sort" do
-    post("/gitlabhq/issues/sort").should route_to('issues#sort', project_id: 'gitlabhq')
-  end
-
   it "to #bulk_update" do
     post("/gitlabhq/issues/bulk_update").should route_to('issues#bulk_update', project_id: 'gitlabhq')
-  end
-
-  it "to #search" do
-    get("/gitlabhq/issues/search").should route_to('issues#search', project_id: 'gitlabhq')
   end
 
   it_behaves_like "RESTful project resources" do
@@ -377,7 +407,7 @@ describe NotesController, "routing" do
   end
 end
 
-# project_blame GET    /:project_id/blame/:id(.:format) blame#show {:id=>/.+/, :project_id=>/[^\/]+/}
+# project_blame GET    /:project_id/blame/:id(.:format) blame#show {id: /.+/, project_id: /[^\/]+/}
 describe BlameController, "routing" do
   it "to #show" do
     get("/gitlabhq/blame/master/app/models/project.rb").should route_to('blame#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
@@ -385,7 +415,7 @@ describe BlameController, "routing" do
   end
 end
 
-# project_blob GET    /:project_id/blob/:id(.:format) blob#show {:id=>/.+/, :project_id=>/[^\/]+/}
+# project_blob GET    /:project_id/blob/:id(.:format) blob#show {id: /.+/, project_id: /[^\/]+/}
 describe BlobController, "routing" do
   it "to #show" do
     get("/gitlabhq/blob/master/app/models/project.rb").should route_to('blob#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
@@ -394,7 +424,7 @@ describe BlobController, "routing" do
   end
 end
 
-# project_tree GET    /:project_id/tree/:id(.:format) tree#show {:id=>/.+/, :project_id=>/[^\/]+/}
+# project_tree GET    /:project_id/tree/:id(.:format) tree#show {id: /.+/, project_id: /[^\/]+/}
 describe TreeController, "routing" do
   it "to #show" do
     get("/gitlabhq/tree/master/app/models/project.rb").should route_to('tree#show', project_id: 'gitlabhq', id: 'master/app/models/project.rb')
@@ -402,9 +432,9 @@ describe TreeController, "routing" do
   end
 end
 
-# project_compare_index GET    /:project_id/compare(.:format)             compare#index {:id=>/[^\/]+/, :project_id=>/[^\/]+/}
-#                       POST   /:project_id/compare(.:format)             compare#create {:id=>/[^\/]+/, :project_id=>/[^\/]+/}
-#       project_compare        /:project_id/compare/:from...:to(.:format) compare#show {:from=>/.+/, :to=>/.+/, :id=>/[^\/]+/, :project_id=>/[^\/]+/}
+# project_compare_index GET    /:project_id/compare(.:format)             compare#index {id: /[^\/]+/, project_id: /[^\/]+/}
+#                       POST   /:project_id/compare(.:format)             compare#create {id: /[^\/]+/, project_id: /[^\/]+/}
+#       project_compare        /:project_id/compare/:from...:to(.:format) compare#show {from: /.+/, to: /.+/, id: /[^\/]+/, project_id: /[^\/]+/}
 describe CompareController, "routing" do
   it "to #index" do
     get("/gitlabhq/compare").should route_to('compare#index', project_id: 'gitlabhq')
@@ -420,9 +450,15 @@ describe CompareController, "routing" do
   end
 end
 
-describe GraphController, "routing" do
+describe NetworkController, "routing" do
   it "to #show" do
-    get("/gitlabhq/graph/master").should route_to('graph#show', project_id: 'gitlabhq', id: 'master')
-    get("/gitlabhq/graph/master.json").should route_to('graph#show', project_id: 'gitlabhq', id: 'master', format: "json")
+    get("/gitlabhq/network/master").should route_to('network#show', project_id: 'gitlabhq', id: 'master')
+    get("/gitlabhq/network/master.json").should route_to('network#show', project_id: 'gitlabhq', id: 'master', format: "json")
+  end
+end
+
+describe GraphsController, "routing" do
+  it "to #show" do
+    get("/gitlabhq/graphs/master").should route_to('graphs#show', project_id: 'gitlabhq', id: 'master')
   end
 end

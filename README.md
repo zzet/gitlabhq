@@ -12,25 +12,25 @@
 
 * powered by Ruby on Rails
 * completely free and open source (MIT license)
-* used by 10.000 organizations to keep their code secure
+* used by more than 10.000 organizations to keep their code secure
 
 ### Code status
 
-* [![build status](http://ci.gitlab.org/projects/1/status?ref=master)](http://ci.gitlab.org/projects/1?ref=master) ci.gitlab.org (master branch)
+* [![build status](http://ci.gitlab.org/projects/1/status.png?ref=master)](http://ci.gitlab.org/projects/1?ref=master) on ci.gitlab.org (master branch)
 
-* [![build status](https://secure.travis-ci.org/gitlabhq/gitlabhq.png)](https://travis-ci.org/gitlabhq/gitlabhq) travis-ci.org (master branch)
+* [![build status](https://secure.travis-ci.org/gitlabhq/gitlabhq.png)](https://travis-ci.org/gitlabhq/gitlabhq) on travis-ci.org (master branch)
 
 * [![Code Climate](https://codeclimate.com/github/gitlabhq/gitlabhq.png)](https://codeclimate.com/github/gitlabhq/gitlabhq)
 
-* [![Dependency Status](https://gemnasium.com/gitlabhq/gitlabhq.png)](https://gemnasium.com/gitlabhq/gitlabhq)
+* [![Dependency Status](https://gemnasium.com/gitlabhq/gitlabhq.png)](https://gemnasium.com/gitlabhq/gitlabhq) this button can be yellow (small updates are available) but must not be red (a security fix or an important update is available)
 
 * [![Coverage Status](https://coveralls.io/repos/gitlabhq/gitlabhq/badge.png?branch=master)](https://coveralls.io/r/gitlabhq/gitlabhq)
 
 ### Resources
 
-* GitLab.org community site: [Homepage](http://gitlab.org) [Screenshots](http://gitlab.org/screenshots/) [Blog](http://blog.gitlab.org/) [Demo](http://demo.gitlabhq.com/users/sign_in)
+* GitLab.org community site: [Homepage](http://gitlab.org) | [Screenshots](http://gitlab.org/screenshots/) | [Blog](http://blog.gitlab.org/) | [Demo](http://demo.gitlabhq.com/users/sign_in)
 
-* GitLab.com commercial services: [Homepage](http://www.gitlab.com/) [GitLab Cloud](http://www.gitlab.com/cloud/) [Subscription](http://www.gitlab.com/subscription/) [Consultancy](http://www.gitlab.com/consultancy/) [Blog](http://blog.gitlab.com/)
+* GitLab.com commercial services: [Homepage](http://www.gitlab.com/) | [Subscription](http://www.gitlab.com/subscription/) | [Consultancy](http://www.gitlab.com/consultancy/) | [GitLab Cloud](http://www.gitlab.com/cloud/) | [Blog](http://blog.gitlab.com/)
 
 * GitLab CI: [Readme](https://github.com/gitlabhq/gitlab-ci/blob/master/README.md) of the GitLab open-source continuous integration server
 
@@ -38,57 +38,71 @@
 
 * Ubuntu/Debian**
 * ruby 1.9.3
-* MySQL
+* MySQL or PostgreSQL
 * git
 * gitlab-shell
 * redis
 
-** More details are in the [requirements doc](https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/requirements.md)
+** More details are in the [requirements doc](doc/install/requirements.md)
 
 ### Installation
 
-#### For production
+#### Official production installation
 
-Follow the installation guide for production server.
+* [Installation guide for a production server](doc/install/installation.md)
 
-* [Installation guide for latest stable release (5.0)](https://github.com/gitlabhq/gitlabhq/blob/5-0-stable/doc/install/installation.md) - **Recommended**
 
-* [Installation guide for the current master branch (5.1)](https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/installation.md)
+#### Official development installation
 
-#### For development
+If you want to contribute, please first read our [Contributing Guidelines](https://github.com/gitlabhq/gitlabhq/blob/master/CONTRIBUTING.md) and then we suggest you to use the Vagrant virtual machine project to get an environment working with all dependencies.
 
-If you want to contribute, please first read our [Contributing Guidelines](https://github.com/gitlabhq/gitlabhq/blob/master/CONTRIBUTING.md) and then we suggest you to use the Vagrant virtual machine project to get an environment working sandboxed and with all dependencies.
+* [Vagrant virtual machine for development](https://github.com/gitlabhq/gitlab-vagrant-vm)
 
-* [Vagrant virtual machine](https://github.com/gitlabhq/gitlab-vagrant-vm)
 
-#### Unsupported installation methods
+#### Unsupported production installation
 
 * [GitLab recipes](https://github.com/gitlabhq/gitlab-recipes) for setup on different platforms
 
 * [Unofficial installation guides](https://github.com/gitlabhq/gitlab-public-wiki/wiki/Unofficial-Installation-Guides)
 
+* [BitNami one-click installers](http://bitnami.com/stack/gitlab)
+
+* [TurnKey Linux virtual appliance](http://www.turnkeylinux.org/gitlab)
 
 
-### Starting
+### New versions and upgrading
 
-1. The Installation guide contains instructions to download an init script and run that on boot. With the init script you can also start GitLab
+Each month on the 22nd a new version is released together with an upgrade guide.
 
-        sudo service gitlab start
+* [Upgrade guides](doc/update)
 
-  or
+* [Changelog](CHANGELOG)
 
-        sudo /etc/init.d/gitlab restart
+* Features that will be in the next release are listed on [the feedback and suggestions forum with the status "started"](http://feedback.gitlab.com/forums/176466-general/status/796456).
 
-2. Start it with [Foreman](https://github.com/ddollar/foreman) in development mode
 
-        bundle exec foreman start -p 3000
+### Run in production mode
 
- or start it manually
+The Installation guide contains instructions on how to download an init script and run it automatically on boot. You can also start the init script manually:
 
-        bundle exec rails s
-        bundle exec rake sidekiq:start
+    sudo service gitlab start
 
-### Running the tests
+or by directly calling the script
+
+     sudo /etc/init.d/gitlab start
+
+### Run in development mode
+
+Start it with [Foreman](https://github.com/ddollar/foreman)
+
+    bundle exec foreman start -p 3000
+
+or start each component separately
+
+    bundle exec rails s
+    bundle exec rake sidekiq:start
+
+### Run the tests
 
 * Seed the database
 
@@ -99,49 +113,44 @@ If you want to contribute, please first read our [Contributing Guidelines](https
 
         bundle exec rake gitlab:test
 
-* Rspec unit and functional tests
+* [RSpec](http://rspec.info/) unit and functional tests
 
         bundle exec rake spec
 
-* Spinach integration tests
+* [Spinach](https://github.com/codegram/spinach) integration tests
 
         bundle exec rake spinach
 
-### Getting help
-
-* [Troubleshooting guide](https://github.com/gitlabhq/gitlab-public-wiki/wiki/Trouble-Shooting-Guide)
-
-* [Support forum](https://groups.google.com/forum/#!forum/gitlabhq)
-
-* [Feedback and suggestions forum](http://gitlab.uservoice.com/forums/176466-general)
-
-* [Support subscription](http://www.gitlab.com/subscription/)
-
-* [Consultancy](http://www.gitlab.com/consultancy/)
-
-### New versions and upgrading
-
-Each month on the 22th a new version is released together with an upgrade guide.
-
-* [Upgrade guides](https://github.com/gitlabhq/gitlabhq/wiki)
-
-* [Changelog](https://github.com/gitlabhq/gitlabhq/blob/master/CHANGELOG)
-
-* [Roadmap](https://github.com/gitlabhq/gitlabhq/blob/master/ROADMAP.md)
 
 ### GitLab interfaces
 
-* [GitLab API](https://github.com/gitlabhq/gitlabhq/blob/master/doc/api/README.md)
+* [GitLab API](doc/api/README.md)
 
-* [Rake tasks](https://github.com/gitlabhq/gitlabhq/tree/master/doc/raketasks)
+* [Rake tasks](doc/raketasks)
 
-* [Directory structure](https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/structure.md)
+* [Directory structure](doc/install/structure.md)
 
-* [Databases](https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/databases.md)
+* [Databases](doc/install/databases.md)
+
+
+### Getting help
+
+* [Maintenance policy](MAINTENANCE.md) specifies what versions are supported.
+
+* [Troubleshooting guide](https://github.com/gitlabhq/gitlab-public-wiki/wiki/Trouble-Shooting-Guide) contains solutions to common problems.
+
+* [Support forum](https://groups.google.com/forum/#!forum/gitlabhq) and [Stack Overflow](http://stackoverflow.com/questions/tagged/gitlab) are the best places to ask questions. For example you can use it if you have questions about: permission denied errors, invisible repos, can't clone/pull/push or with web hooks that don't fire. Please search for similar issues before posting your own, there's a good chance somebody else had the same issue you have now and has resolved it. There are a lot of helpful GitLab users there who may be able to help you quickly. If your particular issue turns out to be a bug, it will find its way from there to a fix.
+
+* [Feedback and suggestions forum](http://feedback.gitlab.com) is the place to propose and discuss new features for GitLab.
+
+* [Contributing guide](https://github.com/gitlabhq/gitlabhq/blob/master/CONTRIBUTING.md) describes how to submit pull requests and issues. Pull requests and issues not in line with the guidelines in this document will be closed.
+
+* [Support subscription](http://www.gitlab.com/subscription/) connects you to the knowledge of GitLab experts that will resolve your issues and answer your questions.
+
+* [Consultancy](http://www.gitlab.com/consultancy/) allows you hire GitLab experts for installations, upgrades and customizations.
+
 
 ### Getting in touch
-
-* [Contributing guide](https://github.com/gitlabhq/gitlabhq/blob/master/CONTRIBUTING.md)
 
 * [Core team](https://github.com/gitlabhq?tab=members)
 

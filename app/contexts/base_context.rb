@@ -1,8 +1,8 @@
 class BaseContext
-  attr_accessor :project, :current_user, :params
+  attr_accessor :current_user, :params
 
   def initialize(project, user, params)
-    @project, @current_user, @params = project, user, params.dup
+    @current_user, @params = user, params.dup
   end
 
   def abilities
@@ -16,5 +16,11 @@ class BaseContext
   def can?(object, action, subject)
     abilities.allowed?(object, action, subject)
   end
-end
 
+  def receive_delayed_notifications
+    notifications = Event::Subscription::Notification.delayed
+    notifications.each do |notification|
+      Sidekiq::Client.enqueue_to(:mail_notifications, MailNotificationWorker, notification.id)
+    end
+  end
+end
