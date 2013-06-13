@@ -228,4 +228,8 @@ module ApplicationHelper
   def git_protocol_icon(git_protocol_enabled)
     content_tag :i, nil, class: "#{git_protocol_enabled ? "icon-ok" : "icon-off" }"
   end
+
+  def permission_key?(key)
+    %w(greatest_access permission project_access).include?(key)
+  end
 end
