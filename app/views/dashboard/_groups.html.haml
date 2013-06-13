@@ -19,6 +19,10 @@
           %span.last_activity
             %strong Owner:
             %span= group.owner_name
+    %li
+      = link_to groups_path do
+        View all &rarr;
+
     - if groups.blank?
       %li
         %h3.nothing_here_message You have no groups yet.

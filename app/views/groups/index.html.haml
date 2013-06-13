@@ -4,11 +4,6 @@
 %hr
 .row
   .span12
-    = form_tag groups_path, method: :get, class: 'form-inline' do
-      = text_field_tag :name, params[:name], class: "xlarge"
-      = button_tag type: 'submit', class: 'btn' do
-        %i.icon-search
-
     %ul.well-list
       - @groups.each do |group|
         %li.clearfix{id: "group#{group.id}"}
@@ -45,3 +40,4 @@
                   - if tm
                     = tm.project_access_human
 
+    = paginate @groups, theme: "admin"
