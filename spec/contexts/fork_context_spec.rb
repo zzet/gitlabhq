@@ -47,7 +47,7 @@ describe Projects::ForkContext do
   end
 
   def fork_project(from_project, user, fork_success = true)
-    context = Projects::ForkContext.new(from_project, user)
+    context = Projects::ForkContext.new(user, from_project)
     shell = mock("gitlab_shell")
     shell.stub(fork_repository: fork_success)
     context.stub(gitlab_shell: shell)

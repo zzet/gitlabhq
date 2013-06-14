@@ -1,9 +1,5 @@
 module Projects
-  class CreateContext < Projects::BaseContext
-    def initialize(user, params)
-      @current_user, @params = user, params.dup
-    end
-
+  class CreateContext < ::BaseContext
     def execute
       # get namespace id
       namespace_id = params.delete(:namespace_id)

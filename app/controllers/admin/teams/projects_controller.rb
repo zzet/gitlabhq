@@ -6,6 +6,8 @@ class Admin::Teams::ProjectsController < Admin::Teams::ApplicationController
   end
 
   def create
+    redirect_to :back if params[:project_ids].blank?
+
     ::Teams::Projects::CreateRelationContext.new(current_user, user_team, params).execute
 
     redirect_to admin_team_path(user_team), notice: 'Team of users was successfully assgned to projects.'
