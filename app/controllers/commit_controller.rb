@@ -11,7 +11,7 @@ class CommitController < ProjectResourceController
     result = Projects::Commits::LoadContext.new(project, current_user, params).execute
 
     @commit = result[:commit]
-    
+
     if @commit.nil?
       git_not_found!
       return

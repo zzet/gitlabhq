@@ -141,6 +141,8 @@ Gitlab::Application.routes.draw do
     scope module: :profiles do
       resources :subscriptions
     end
+
+    resource :password
   end
 
   resources :keys
