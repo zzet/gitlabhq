@@ -8,6 +8,8 @@ class TreeController < ProjectResourceController
   before_filter :require_non_empty_project
 
   def show
+    @file_token = FileToken.for_project(@project).find_by_file(@path)
+
     respond_to do |format|
       format.html
       # Disable cache so browser history works

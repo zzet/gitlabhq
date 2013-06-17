@@ -35,7 +35,6 @@
       - unless @snippet.new_record?
         .pull-right= link_to 'Destroy', snippet_path(@snippet), confirm: 'Removed snippet cannot be restored! Are you sure?', method: :delete, class: "btn pull-right danger delete-snippet", id: "destroy_snippet_#{@snippet.id}"
 
-
 :javascript
   var editor = ace.edit("editor");
   $(".snippet-form-holder form").submit(function(){

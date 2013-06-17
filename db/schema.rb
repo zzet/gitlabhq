@@ -39,6 +39,17 @@ ActiveRecord::Schema.define(:version => 20130614132337) do
   add_index "events", ["target_id"], :name => "index_events_on_target_id"
   add_index "events", ["target_type"], :name => "index_events_on_target_type"
 
+  create_table "file_tokens", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "project_id"
+    t.string   "token"
+    t.string   "file"
+    t.datetime "last_usage_at"
+    t.integer  "usage_count"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
   create_table "forked_project_links", :force => true do |t|
     t.integer  "forked_to_project_id",   :null => false
     t.integer  "forked_from_project_id", :null => false
