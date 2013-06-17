@@ -1,6 +1,6 @@
 module Teams
   module Users
-    class CreateRelationContext < Teams::Users::BaseContext
+    class CreateRelationContext < Teams::BaseContext
       def execute
         unless params[:user_ids].blank?
           user_ids = params[:user_ids].split(',')

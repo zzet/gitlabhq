@@ -11,7 +11,7 @@ class Teams::MembersController < Teams::ApplicationController
   end
 
   def create
-    ::Teams::Users::CreateRelationContext.new(@current_user, user_team, team_member, params).execute
+    ::Teams::Users::CreateRelationContext.new(@current_user, user_team, params).execute
 
     redirect_to team_members_path(user_team), notice: 'Members were successfully added into Team of users.'
   end

@@ -138,6 +138,7 @@ Gitlab::Application.routes.draw do
       put :reset_private_token
       put :update_username
     end
+
     scope module: :profiles do
       resources :subscriptions
     end
