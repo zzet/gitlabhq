@@ -57,7 +57,7 @@ class TeamsController < ApplicationController
   def merge_requests
     projects
     @merge_requests = MergeRequest.of_user_team(user_team)
-    @merge_requests = FilterContext.new(@merge_requests, params).execute
+    @merge_requests = FilterContext.new(@current_user, @merge_requests, params).execute
     @merge_requests = @merge_requests.recent.page(params[:page]).per(20)
   end
 
@@ -65,7 +65,7 @@ class TeamsController < ApplicationController
   def issues
     projects
     @issues = Issue.of_user_team(user_team)
-    @issues = FilterContext.new(@issues, params).execute
+    @issues = FilterContext.new(@current_user, @issues, params).execute
     @issues = @issues.recent.page(params[:page]).per(20)
     @issues = @issues.includes(:author, :project)
   end
