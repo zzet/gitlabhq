@@ -81,9 +81,7 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 
   def destroy
-    @group.truncate_teams
-
-    @group.destroy
+    ::Groups::RemoveContext.new(current_user, group).execute
 
     redirect_to admin_groups_path, notice: 'Group was successfully deleted.'
   end
