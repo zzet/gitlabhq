@@ -1,6 +1,6 @@
 class SearchController < ApplicationController
   def show
-    result = SearchContext.new(params).execute
+    result = SearchContext.new(@current_user, params).execute
 
     @projects       = result[:projects]
     @merge_requests = result[:merge_requests]
