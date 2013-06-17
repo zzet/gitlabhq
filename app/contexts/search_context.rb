@@ -2,14 +2,14 @@ class SearchContext < BaseContext
   attr_accessor :current_user, :params
 
   def initialize(user, params)
-    @current_user, @project_ids, @params = user, project_ids, params.dup
+    @current_user, @params = user, params.dup
   end
 
   def execute
     project_id = params[:project_id]
     group_id = params[:group_id]
 
-    projects = current_user.authorized_projects
+    projects = current_user.known_projects
 
     if group_id.present?
       @group = Group.find(group_id)
@@ -23,7 +23,7 @@ class SearchContext < BaseContext
 
     return result unless query.present?
 
-    result[:projects] = projects.search(query).limit(10)
+    result[:projects] = projects.search(query)
 
     # Search inside singe project
     project = projects.first if projects.length == 1
@@ -31,8 +31,8 @@ class SearchContext < BaseContext
     if params[:search_code].present?
       result[:blobs] = project.repository.search_files(query, params[:repository_ref]) unless project.empty_repo?
     else
-      result[:merge_requests] = MergeRequest.where(project_id: project_ids).search(query).limit(10)
-      result[:issues] = Issue.where(project_id: project_ids).search(query).limit(10)
+      result[:merge_requests] = MergeRequest.where(project_id: projects).search(query).limit(10)
+      result[:issues] = Issue.where(project_id: projects).search(query).limit(10)
       result[:wiki_pages] = []
     end
 
