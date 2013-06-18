@@ -13,6 +13,8 @@ module Users
         user.user_teams.find_each do |membership|
           return false unless membership.destroy
         end
+
+        receive_delayed_notifications
       end
     end
   end
