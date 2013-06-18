@@ -59,6 +59,4 @@ class ActivityFeed
     opts = {user: @user, filter_conditions: conditions }
     self.class.events(prepared_events, opts)
   end
-
-
 end

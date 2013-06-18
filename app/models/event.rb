@@ -49,7 +49,7 @@ class Event < ActiveRecord::Base
 
   scope :recent,          -> { order("created_at DESC") }
   scope :with_target,     ->(target) { where(target_id: target, target_type: target.class.name) }
-  scope :with_push,       -> { where(source_type: "PushSummary") }
+  scope :with_push,       -> { where(source_type: "Push") }
 
   scope :watched_by_user, ->(user) { u.notifications.includes(:event) }
 
@@ -67,7 +67,7 @@ class Event < ActiveRecord::Base
   scope :issue_type_event,          -> { with_source_or_target_type(:issue) }
   scope :merge_request_type_events, -> { with_source_or_target_type(:merge_request) }
   scope :note_type_events,          -> { with_source_or_target_type(:note) }
-  scope :code_type_events,          -> { with_source_or_target_type(:push_summary) }
+  scope :code_type_events,          -> { with_source_or_target_type(:push) }
 
   scope :sorted_by_activity,        -> { order("created_at DESC") }
 
