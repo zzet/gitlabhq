@@ -1,10 +1,10 @@
-- too_big = diff.diff.lines.count > 1000
+- too_big = diff.diff.lines.count > Commit::DIFF_SAFE_LINES_COUNT
 - if too_big
   %a.supp_diff_link Diff suppressed. Click to show
 
 %table.text-file{class: "#{'hide' if too_big}"}
   - each_diff_line(diff, index) do |line, type, line_code, line_new, line_old|
-    %tr.line_holder{ id: line_code }
+    %tr.line_holder{ id: line_code, class: "#{type}" }
       - if type == "match"
         %td.old_line= "..."
         %td.new_line= "..."

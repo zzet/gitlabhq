@@ -10,3 +10,7 @@
     = link_to event.target
   - else
     = event.target
+.event-body
+  .event-note
+    - if event.target.respond_to?(:title)
+      = event.target.title

@@ -1,6 +1,12 @@
 module GraphHelper
-  def join_with_space(ary)
-    ary.collect{|r|r.name}.join(" ") unless ary.nil?
+  def get_refs(commit)
+    refs = ""
+    refs += commit.refs.collect{|r|r.name}.join(" ") if commit.refs
+
+    # append note count
+    refs += "[#{@graph.notes[commit.id]}]" if @graph.notes[commit.id] > 0
+
+    refs
   end
 
   def parents_zip_spaces(parents, parent_spaces)

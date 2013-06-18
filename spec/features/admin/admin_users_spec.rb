@@ -20,26 +20,30 @@ describe "Admin::Users" do
 
   describe "GET /admin/users/new" do
     before do
-      @password = "123ABC"
       visit new_admin_user_path
       fill_in "user_name", with: "Big Bang"
       fill_in "user_username", with: "bang"
       fill_in "user_email", with: "bigbang@mail.com"
-      fill_in "user_password", with: @password
-      fill_in "user_password_confirmation", with: @password
     end
 
     it "should create new user" do
-      expect { click_button "Save" }.to change {User.count}.by(1)
+      expect { click_button "Create user" }.to change {User.count}.by(1)
+    end
+
+    it "should apply defaults to user" do
+      click_button "Create user"
+      user = User.last
+      user.projects_limit.should == Gitlab.config.gitlab.default_projects_limit
+      user.can_create_group.should == Gitlab.config.gitlab.default_can_create_group
+      user.can_create_team.should == Gitlab.config.gitlab.default_can_create_team
     end
 
     it "should create user with valid data" do
-      click_button "Save"
+      click_button "Create user"
       user = User.last
       user.name.should ==  "Big Bang"
       user.email.should == "bigbang@mail.com"
     end
-
   end
 
   describe "GET /admin/users/:id" do
@@ -71,7 +75,7 @@ describe "Admin::Users" do
         fill_in "user_name", with: "Big Bang"
         fill_in "user_email", with: "bigbang@mail.com"
         check "user_admin"
-        click_button "Save"
+        click_button "Save changes"
       end
 
       it "should show page with  new data" do

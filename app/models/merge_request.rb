@@ -25,8 +25,6 @@ class MergeRequest < ActiveRecord::Base
   include Issuable
   include Watchable
 
-  BROKEN_DIFF = "--broken-diff"
-
   attr_accessible :title, :assignee_id, :target_branch, :source_branch, :milestone_id,
     :author_id_of_changes, :state_event
 
@@ -113,6 +111,15 @@ class MergeRequest < ActiveRecord::Base
     if target_branch == source_branch
       errors.add :branch_conflict, "You can not use same branch for source and target branches"
     end
+
+    if opened? || reopened?
+      similar_mrs = self.project.merge_requests.where(source_branch: source_branch, target_branch: target_branch).opened
+      similar_mrs = similar_mrs.where('id not in (?)', self.id) if self.id
+
+      if similar_mrs.any?
+        errors.add :base, "There is already an open merge request for this branches"
+      end
+    end
   end
 
   def reload_code
@@ -129,22 +136,18 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def diffs
-    st_diffs || []
+    load_diffs(st_diffs) || []
   end
 
   def reloaded_diffs
     if opened? && unmerged_diffs.any?
-      self.st_diffs = unmerged_diffs
+      self.st_diffs = dump_diffs(unmerged_diffs)
       self.save
     end
-
-  rescue Grit::Git::GitTimeout
-    self.st_diffs = [BROKEN_DIFF]
-    self.save
   end
 
   def broken_diffs?
-    diffs == [BROKEN_DIFF]
+    diffs == broken_diffs
   end
 
   def valid_diffs?
@@ -152,11 +155,7 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def unmerged_diffs
-    # Only show what is new in the source branch compared to the target branch, not the other way around.
-    # The linex below with merge_base is equivalent to diff with three dots (git diff branch1...branch2)
-    # From the git documentation: "git diff A...B" is equivalent to "git diff $(git-merge-base A B) B"
-    common_commit = project.repo.git.native(:merge_base, {}, [target_branch, source_branch]).strip
-    diffs = project.repo.diff(common_commit, source_branch)
+    project.repository.diffs_between(source_branch, target_branch)
   end
 
   def last_commit
@@ -164,15 +163,15 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def merge_event
-    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::MERGED).last
+    self.project.old_events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::MERGED).last
   end
 
   def closed_event
-    self.project.events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::CLOSED).last
+    self.project.old_events.where(target_id: self.id, target_type: "MergeRequest", action: OldEvent::CLOSED).last
   end
 
   def commits
-    st_commits || []
+    load_commits(st_commits || [])
   end
 
   def probably_merged?
@@ -182,16 +181,15 @@ class MergeRequest < ActiveRecord::Base
 
   def reloaded_commits
     if opened? && unmerged_commits.any?
-      self.st_commits = unmerged_commits
+      self.st_commits = dump_commits(unmerged_commits)
       save
     end
     commits
   end
 
   def unmerged_commits
-    self.project.repo.
+    self.project.repository.
       commits_between(self.target_branch, self.source_branch).
-      map {|c| Commit.new(c)}.
       sort_by(&:created_at).
       reverse
   end
@@ -232,5 +230,35 @@ class MergeRequest < ActiveRecord::Base
 
   def last_commit_short_sha
     @last_commit_short_sha ||= last_commit.sha[0..10]
+  end
+
+  private
+
+  def dump_commits(commits)
+    commits.map(&:to_hash)
+  end
+
+  def load_commits(array)
+    array.map { |hash| Commit.new(Gitlab::Git::Commit.new(hash)) }
+  end
+
+  def dump_diffs(diffs)
+    if diffs == broken_diffs
+      broken_diffs
+    elsif diffs.respond_to?(:map)
+      diffs.map(&:to_hash)
+    end
+  end
+
+  def load_diffs(raw)
+    if raw == broken_diffs
+      broken_diffs
+    elsif raw.respond_to?(:map)
+      raw.map { |hash| Gitlab::Git::Diff.new(hash) }
+    end
+  end
+
+  def broken_diffs
+    [Gitlab::Git::Diff::BROKEN_DIFF]
   end
 end

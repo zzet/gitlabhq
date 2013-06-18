@@ -19,7 +19,7 @@ class ProjectMilestones < Spinach::FeatureSteps
   end
 
   And 'I submit new milestone "v2.3"' do
-    fill_in "milestone_title", :with => "v2.3"
+    fill_in "milestone_title", with: "v2.3"
     click_button "Create milestone"
   end
 
@@ -32,9 +32,9 @@ class ProjectMilestones < Spinach::FeatureSteps
 
   And 'project "Shop" has milestone "v2.2"' do
     project = Project.find_by_name("Shop")
-    milestone = create(:milestone, :title => "v2.2", :project => project)
+    milestone = create(:milestone, title: "v2.2", project: project)
 
-    3.times { create(:issue, :project => project, :milestone => milestone) }
+    3.times { create(:issue, project: project, milestone: milestone) }
   end
 
   Given 'the milestone has open and closed issues' do
@@ -51,11 +51,5 @@ class ProjectMilestones < Spinach::FeatureSteps
 
   Then "I should see 3 issues" do
     page.should have_selector('.milestone-issue-filter .well-list li', count: 4)
-    page.should have_selector('.milestone-issue-filter .well-list li.hide', count: 1)
-  end
-
-  Then "I should see 4 issues" do
-    page.should have_selector('.milestone-issue-filter .well-list li', count: 4)
-    page.should_not have_selector('.milestone-issue-filter .well-list li.hide')
   end
 end

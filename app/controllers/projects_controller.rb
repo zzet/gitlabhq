@@ -7,7 +7,8 @@ class ProjectsController < ProjectResourceController
   before_filter :authorize_admin_project!, only: [:edit, :update, :destroy, :transfer]
   before_filter :require_non_empty_project, only: [:blob, :tree, :graph]
 
-  layout 'application', only: [:new, :create]
+  layout 'navless', only: [:new, :create, :fork]
+  before_filter :set_title, only: [:new, :create]
 
   def new
     @project = Project.new
@@ -34,12 +35,12 @@ class ProjectsController < ProjectResourceController
   end
 
   def update
-    status = ::Projects::UpdateContext.new(project, current_user, params).execute
+    status = ::Projects::UpdateContext.new(current_user, project, params).execute
 
     respond_to do |format|
       if status
         flash[:notice] = 'Project was successfully updated.'
-        format.html { redirect_to edit_project_path(project), notice: 'Project was successfully updated.' }
+        format.html { redirect_to edit_project_path(@project), notice: 'Project was successfully updated.' }
         format.js
       else
         format.html { render action: "edit" }
@@ -49,7 +50,7 @@ class ProjectsController < ProjectResourceController
   end
 
   def transfer
-    ::Projects::TransferContext.new(project, current_user, params).execute
+    ::Projects::TransferContext.new(current_user, project, params).execute
   end
 
   def show
@@ -73,11 +74,38 @@ class ProjectsController < ProjectResourceController
   def destroy
     return access_denied! unless can?(current_user, :remove_project, project)
 
-    project.team.truncate
-    project.destroy
+    ::Projects::RemoveContext.new(current_user, project, params).execute
 
     respond_to do |format|
       format.html { redirect_to root_path }
+    end
+  end
+
+  def fork
+    @forked_project = ::Projects::ForkContext.new(current_user, project).execute
+
+    respond_to do |format|
+      format.html do
+        if @forked_project.saved? && @forked_project.forked?
+          redirect_to(@forked_project, notice: 'Project was successfully forked.')
+        else
+          @title = 'Fork project'
+          render action: "fork"
+        end
+      end
+      format.js
+    end
+  end
+
+  def autocomplete_sources
+    @suggestions = {
+      emojis: Emoji.names,
+      issues: @project.issues.select([:id, :title, :description]),
+      members: @project.users.select([:username, :name]).order(:username)
+    }
+
+    respond_to do |format|
+      format.json { render json: @suggestions }
     end
   end
 
@@ -85,5 +113,11 @@ class ProjectsController < ProjectResourceController
 
   def check_git_protocol
     @git_protocol_enabled ||= Gitlab.config.gitlab.git_daemon_enabled
+  end
+
+  private
+
+  def set_title
+    @title = 'New Project'
   end
 end

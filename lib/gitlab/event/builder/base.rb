@@ -29,6 +29,41 @@ class Gitlab::Event::Builder::Base
       end
     end
 
+    def find_parent_event(action, data)
+      collector = EventHierarchyWorker.collector
+      parent_event = collector.events.parent(action, data)
+
+      if parent_event.present?
+        event_info = parent_event[:data]
+        action_meta = parse_action(parent_event[:name])
+        source = event_info[:source] if event_info[:source].present?
+        user = event_info[:user] if event_info[:user].present?
+
+        if source.present? && user.present? && source.respond_to?(:id)
+          candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
+                                   target_id: source.try(:id), target_type: source.class.name,
+                                   author_id: user.id, action: action_meta[:action])
+
+          if candidates.blank?
+            candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
+                                     author_id: user.id, action: action_meta[:action])
+            if candidates.blank?
+              candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
+                                       target_id: source.try(:id), target_type: source.class.name,
+                                       author_id: user.id).
+                                       where("action not in (?)", [:created, :updated, :deleted])
+            end
+          end
+
+          candidate = candidates.last
+
+          return nil if candidate && candidate.notifications.where(notification_state: :delivered).any?
+          return candidate
+        end
+      end
+      nil
+    end
+
     private
 
     def parse_action(action)

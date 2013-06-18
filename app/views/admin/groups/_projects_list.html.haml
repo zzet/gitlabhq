@@ -1,36 +1,49 @@
 .tab-pane#projects-list
   %fieldset
-    - if @group_projects.any?
-      %table
-        %thead
-          %tr
-            %th Project name
-            %th Path
-            %th Users
-            %th.cred Danger Zone!
-        - @group_projects.each do |project|
-          %tr
-            %td
+    .ui-box
+      %h5.title
+        Projects
+        %small
+          (#{@group.projects.count})
+      %ul.well-list
+        - @group.projects.sort_by(&:name).each do |project|
+          %li
+            %strong
               = link_to project.name_with_namespace, [:admin, project]
-            %td
+            %span.pull-right.light
               %span.monospace= project.path_with_namespace + ".git"
-            %td= project.users.count
-            %td.bgred
-              = link_to 'Transfer project to global namespace', remove_project_admin_group_path(@group, project_id: project.id), confirm: 'Remove project from group and move to global namespace. Are you sure?', method: :delete, class: "btn btn-remove small"
-    - else
-      %legend Group is empty
 
-  = form_tag project_update_admin_group_path(@group), class: "bulk_import", method: :put  do
-    %fieldset
-      %legend Move projects to group
-      .alert
-        You can move only projects with existing repos
-        %br
-        Group projects will be moved in group directory and will not be accessible by old path
-      .clearfix
-        = label_tag :project_ids do
-          Projects
-        .input
-          = select_tag :project_ids, options_from_collection_for_select(@projects , :id, :name_with_namespace), multiple: true, data: {placeholder: 'Select projects'}, class: 'chosen span5'
-      .form-actions
-        = submit_tag 'Add', class: "btn btn-primary"
+    -#- if @group_projects.any?
+      -#%table
+        -#%thead
+          -#%tr
+            -#%th Project name
+            -#%th Path
+            -#%th Users
+            -#%th.cred Danger Zone!
+        -#- @group_projects.each do |project|
+          -#%tr
+            -#%td
+              -#= link_to project.name_with_namespace, [:admin, project]
+            -#%td
+              -#%span.monospace= project.path_with_namespace + ".git"
+            -#%td= project.users.count
+            -#%td.bgred
+              -#= link_to 'Transfer project to global namespace', remove_project_admin_group_path(@group, project_id: project.id), confirm: 'Remove project from group and move to global namespace. Are you sure?', method: :delete, class: "btn btn-remove small"
+    -#- else
+      -#%legend Group is empty
+
+  -#= form_tag project_update_admin_group_path(@group), class: "bulk_import", method: :put  do
+    -#%fieldset
+      -#%legend Move projects to group
+      -#.alert
+        -#You can move only projects with existing repos
+        -#%br
+        -#Group projects will be moved in group directory and will not be accessible by old path
+      -#.clearfix
+        -#= label_tag :project_ids do
+          -#Projects
+        -#.input
+          -#= select_tag :project_ids, options_from_collection_for_select(@projects , :id, :name_with_namespace), multiple: true, data: {placeholder: 'Select projects'}, class: 'chosen span5'
+      -#.form-actions
+        -#= submit_tag 'Add', class: "btn btn-primary"

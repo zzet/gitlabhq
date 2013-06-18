@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe UsersProjectObserver do
+  before(:each) { enable_observers }
+
   let(:user) { create(:user) }
   let(:project) { create(:project) }
   subject { UsersProjectObserver.instance }
@@ -9,6 +11,13 @@ describe UsersProjectObserver do
   describe "#after_commit" do
     it "should called when UsersProject created" do
       subject.should_receive(:after_commit)
+      create(:users_project)
+    end
+
+    it "should send email to user" do
+      subject.should_receive(:notification)
+      OldEvent.stub(create: true)
+
       create(:users_project)
     end
 

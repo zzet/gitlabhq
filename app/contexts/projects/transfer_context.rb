@@ -1,5 +1,5 @@
 module Projects
-  class TransferContext < BaseContext
+  class TransferContext < Projects::BaseContext
     def execute(role = :default)
       namespace_id = params[:project].delete(:namespace_id)
       allowed_transfer = can?(current_user, :change_namespace, project) || role == :admin
@@ -16,8 +16,14 @@ module Projects
           old_namespace = project.namespace
           project.transfer(namespace)
 
-          old_namespace.user_teams.each do |team|
-            Gitlab::UserTeamManager.resign(team, project)
+          if old_namespace.type == "Group"
+            old_namespace.user_teams.each do |team|
+              Gitlab::UserTeamManager.resign(team, project)
+            end
+          else
+            project.user_teams.each do |team|
+              Gitlab::UserTeamManager.resign(team, project)
+            end
           end
 
           if namespace.type == "Group"
@@ -27,6 +33,9 @@ module Projects
             end
           end
         end
+
+        receive_delayed_notifications
+
       end
 
     rescue ProjectTransferService::TransferError => ex

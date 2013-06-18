@@ -2,8 +2,8 @@ class Push < ActiveRecord::Base
   include Watchable
 
   attr_accessible :after, :before, :commits_count, :data,
-                  :project, :user,
-                  :project_id, :ref, :user_id
+    :project, :user,
+    :project_id, :ref, :user_id
 
   belongs_to :project
   belongs_to :user
@@ -63,22 +63,23 @@ class Push < ActiveRecord::Base
   # }
   #
   def load_push_data(limit)
-    push_commits = project.repository.commits_between(before, after)
+    begin
+      push_commits = project.repository.commits_between(before, after)
 
-    # Total commits count
-    push_commits_count = push_commits.size
+      # Total commits count
+      push_commits_count = push_commits.size
 
-    # Get latest 20 commits ASC
-    push_commits_limited = push_commits.last(limit)
+      # Get latest 20 commits ASC
+      push_commits_limited = push_commits.last(limit)
 
-    # Hash to be passed as post_receive_data
-    data = {
-      before: before,
-      after: after,
-      ref: ref,
-      user_id: user.id,
-      user_name: user.name,
-      repository: {
+      # Hash to be passed as post_receive_data
+      data = {
+        before: before,
+        after: after,
+        ref: ref,
+        user_id: user.id,
+        user_name: user.name,
+        repository: {
         name: project.name,
         url: project.url_to_repo,
         description: project.description,
@@ -86,24 +87,27 @@ class Push < ActiveRecord::Base
       },
       commits: [],
       total_commits_count: push_commits_count
-    }
-
-    # For performance purposes maximum 20 latest commits
-    # will be passed as post receive hook data.
-    #
-    push_commits_limited.each do |commit|
-      data[:commits] << {
-        id: commit.id,
-        message: commit.safe_message,
-        timestamp: commit.date.xmlschema,
-        url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{commit.id}",
-        author: {
-          name: commit.author_name,
-          email: commit.author_email
-        }
       }
-    end
 
-    data
+      # For performance purposes maximum 20 latest commits
+      # will be passed as post receive hook data.
+      #
+      push_commits_limited.each do |commit|
+        data[:commits] << {
+          id: commit.id,
+          message: commit.safe_message,
+          timestamp: commit.date.xmlschema,
+          url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{commit.id}",
+          author: {
+            name: commit.author_name,
+            email: commit.author_email
+          }
+        }
+      end
+
+      data
+    rescue Exception => ex
+      raise RuntimeError, "Can't process push recive data. \r\n#{ex.message}\r\n#{ex.backtrace.join("\r\n")}"
+    end
   end
 end

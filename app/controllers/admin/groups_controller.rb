@@ -75,14 +75,13 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 
   def project_teams_update
-    @group.add_users_to_project_teams(params[:user_ids], params[:project_access])
-    redirect_to [:admin, @group], notice: 'Users was successfully added.'
+    @group.add_users_to_project_teams(params[:user_ids].split(','), params[:project_access])
+
+    redirect_to [:admin, @group], notice: 'Users were successfully added.'
   end
 
   def destroy
-    @group.truncate_teams
-
-    @group.destroy
+    ::Groups::RemoveContext.new(current_user, group).execute
 
     redirect_to admin_groups_path, notice: 'Group was successfully deleted.'
   end

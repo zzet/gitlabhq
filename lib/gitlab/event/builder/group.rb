@@ -34,19 +34,21 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
 
       when :project
         # TODO. refactoring
-        target = source.group if source.group.present?
+        if source.group.present?
+          target = source.group
 
-        case meta[:action]
-        when :created
-          actions << :added if source.group == target
-        when :updated
-          changes = source.changes
+          case meta[:action]
+          when :created
+            actions << :added if source.group == target
+          when :updated
+            changes = source.changes
 
-          # TODO. refactor
-          actions << :added if source.namespace_id_changed? && source.namespace_id != changes[:namespace_id].first && source.namespace == target
-          actions << :transfer if source.namespace_id_changed? && source.namespace_id != changes[:namespace_id].first && ::Group.find_by_id(changes["namespace_id"]).present?
-        when :deleted
-          actions << :deleted
+            # TODO. refactor
+            actions << :added   if source.namespace_id_changed? && source.namespace_id != changes[:namespace_id].first && source.namespace == target
+            actions << :removed if source.namespace_id_changed? && source.namespace_id != changes[:namespace_id].first && source.namespace != target #::Group.find_by_id(changes["namespace_id"]).present?
+          when :deleted
+            actions << :deleted
+          end
         end
 
       when :user_team_group_relationship

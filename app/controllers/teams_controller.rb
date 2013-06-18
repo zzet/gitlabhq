@@ -6,7 +6,9 @@ class TeamsController < ApplicationController
 
   before_filter :user_team, except: [:new, :create]
 
-  layout 'user_team', except: [:new, :create]
+  layout :determine_layout
+
+  before_filter :set_title, only: [:new, :create]
 
   def show
     projects
@@ -15,7 +17,7 @@ class TeamsController < ApplicationController
 
   def edit
     projects
-    @avaliable_projects = current_user.admin? ? Project.without_team(user_team) : current_user.owned_projects.without_team(user_team)
+    @avaliable_projects = current_user.owned_projects.without_team(user_team)
   end
 
   def update
@@ -27,7 +29,8 @@ class TeamsController < ApplicationController
   end
 
   def destroy
-    user_team.destroy
+    ::Teams::RemoveContext.new(current_user, user_team).execute
+
     redirect_to dashboard_path
   end
 
@@ -54,7 +57,7 @@ class TeamsController < ApplicationController
   def merge_requests
     projects
     @merge_requests = MergeRequest.of_user_team(user_team)
-    @merge_requests = FilterContext.new(@merge_requests, params).execute
+    @merge_requests = FilterContext.new(@current_user, @merge_requests, params).execute
     @merge_requests = @merge_requests.recent.page(params[:page]).per(20)
   end
 
@@ -62,7 +65,7 @@ class TeamsController < ApplicationController
   def issues
     projects
     @issues = Issue.of_user_team(user_team)
-    @issues = FilterContext.new(@issues, params).execute
+    @issues = FilterContext.new(@current_user, @issues, params).execute
     @issues = @issues.recent.page(params[:page]).per(20)
     @issues = @issues.includes(:author, :project)
   end
@@ -75,5 +78,17 @@ class TeamsController < ApplicationController
 
   def user_team
     @team ||= current_user.authorized_teams.find_by_path(params[:id])
+  end
+
+  def set_title
+    @title = 'New Team'
+  end
+
+  def determine_layout
+    if [:new, :create].include?(action_name.to_sym)
+      'navless'
+    else
+      'user_team'
+    end
   end
 end

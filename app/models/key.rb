@@ -18,7 +18,6 @@ class Key < ActiveRecord::Base
   include Watchable
 
   belongs_to :user
-  belongs_to :project
 
   has_many :events, as: :source
   has_many :subscriptions, through: :user, source: :subscriprions
@@ -29,7 +28,7 @@ class Key < ActiveRecord::Base
   before_validation :strip_white_space
 
   validates :title, presence: true, length: { within: 0..255 }
-  validates :key, presence: true, length: { within: 0..5000 }, format: { with: /ssh-.{3} / }, uniqueness: true
+  validates :key, presence: true, length: { within: 0..5000 }, format: { with: /\Assh-.*\Z/ }, uniqueness: true
   validate :fingerprintable_key
 
   delegate :name, :email, to: :user, prefix: true
@@ -39,7 +38,7 @@ class Key < ActiveRecord::Base
   available_in_activity_feed false
 
   def strip_white_space
-    self.key = self.key.strip unless self.key.blank?
+    self.key = key.strip unless key.blank?
   end
 
   def fingerprintable_key
@@ -57,20 +56,12 @@ class Key < ActiveRecord::Base
     errors.add(:key, "can't be fingerprinted") if $?.exitstatus != 0
   end
 
-  def is_deploy_key
-    project.present?
-  end
-
   # projects that has this key
   def projects
-    if is_deploy_key
-      [project]
-    else
-      user.authorized_projects
-    end
+    user.authorized_projects
   end
 
   def shell_id
-    "key-#{self.id}"
+    "key-#{id}"
   end
 end

@@ -17,8 +17,7 @@ class ActivityObserver < ActiveRecord::Observer
           :user_team_user_relationship,
           :users_project,   # +
           :project_hook,    # +
-          :system_hook,     # +
-          :wiki             # +
+          :system_hook
 
   def after_create(model)
     Gitlab::Event::Action.trigger :created, model
@@ -33,10 +32,16 @@ class ActivityObserver < ActiveRecord::Observer
   end
 
   def after_update(model)
-    Gitlab::Event::Action.trigger :updated, model
+    Gitlab::Event::Action.trigger :updated, model unless project_system_update?(model)
   end
 
   def before_destroy(model)
     Gitlab::Event::Action.trigger :deleted, model
+  end
+
+  def project_system_update?(model)
+    return false unless model.is_a? ::Project
+    return false if model.changes.count != 2
+    return true if model.changes[:last_activity_at].present?
   end
 end

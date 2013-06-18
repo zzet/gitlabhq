@@ -20,7 +20,7 @@ class GitPushService
     push = Push.create(project: project, user: user, before: oldrev, after: newrev, ref: ref)
     @push_data = push.push_data
 
-    Gitlab::Event::Action.trigger :pushed, "Push_summary", user, { project_id: project.id, push_data: @push_data, source: :repository }
+    #Gitlab::Event::Action.trigger :pushed, "Push_summary", user, { project_id: project.id, push_data: @push_data, source: :repository }
 
     create_push_event
 
@@ -32,10 +32,13 @@ class GitPushService
       project.update_merge_requests(oldrev, newrev, ref, user)
       project.execute_hooks(@push_data.dup)
       project.execute_services(@push_data.dup)
+      Rails.cache.delete(project.repository.cache_key(:branch_names))
     end
 
-    project.execute_hooks(@push_data.dup) if push_tag?(ref, oldrev)
-
+    if push_tag?(ref, oldrev)
+      project.execute_hooks(@push_data.dup)
+      Rails.cache.delete(project.repository.cache_key(:tag_names))
+    end
   end
 
   # This method provide a sample data
