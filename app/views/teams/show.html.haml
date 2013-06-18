@@ -11,9 +11,36 @@
       %p.nothing_here_message Projects activity will be displayed here
     .loading.hide
   .side.span4
-    - if @team.description.present?
-      .description-block
-        = @team.description
+    .light-well
+      - if can? current_user, :manage_user_team, @team
+        .dropdown.pull-right
+          %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+            %i.icon-plus-sign-alt
+            %b.caret
+          %ul.dropdown-menu
+            %li.divider
+              = link_to new_team_member_path(@team), title: "New Team Member" do
+                %i.icon-plus
+                New Team Member
+            %li
+              = link_to edit_team_path(@team), title: "Assign project" do
+                %i.icon-plus
+                Assign Project
+
+      = render "shared/watch_button", current_entity: @team
+
+      %h3.page_title
+        = @team.name
+      - if @team.description.present?
+        %p.light= @project.description
+
+      %hr
+      %p
+      %p Members count: #{@team.members.count }
+      %p Projects count: #{@team.projects.count}
+      %p Created on: #{@team.created_at.stamp('Aug 22, 2013')}
+      %p Owner: #{link_to @team.owner_name, @team.owner}
+
     = render "projects", projects: @projects
     .prepend-top-20
       = link_to team_path(@team, { format: :atom, private_token: current_user.private_token }), title: "Feed" do

@@ -7,6 +7,7 @@
     .loading.hide
   .span3
     .light-well
+
       .dropdown.pull-right
         %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
           %i.icon-plus-sign-alt
@@ -29,6 +30,8 @@
             %li
               = link_to new_project_team_member_path(@project), title: "New Team member" do
                 Team member
+
+      = render "shared/watch_button", current_entity: @project
 
       %h3.page_title
         = @project.name
