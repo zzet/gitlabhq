@@ -16,10 +16,6 @@ class Teams::MembersController < Teams::ApplicationController
     redirect_to team_members_path(user_team), notice: 'Members were successfully added into Team of users.'
   end
 
-  def edit
-    team_member
-  end
-
   def update
     if ::Teams::Users::UpdateRelationContext.new(@current_user, user_team, team_member, params).execute
       redirect_to team_members_path(user_team), notice: "Membership for #{team_member.name} was successfully updated in Team of users."
