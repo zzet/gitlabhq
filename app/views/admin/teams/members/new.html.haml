@@ -13,10 +13,10 @@
     .input
       = select_tag :user_ids, options_from_collection_for_select(@users , :id, :name_with_username), multiple: true, data: {placeholder: 'Select users'}, class: 'chosen span5'
   .clearfix.group-description-holder
-    = label_tag :default_project_access do
+    = label_tag :permission do
       Default permission in projects
     .input
-      = select_tag :default_project_access, options_for_select(Project.access_options), {class: "project-access-select chosen span3" }
+      = select_tag :permission, options_for_select(Project.access_options), {class: "project-access-select chosen span3" }
   .clearfix
     = label_tag :group_admin do
       Is team admin
