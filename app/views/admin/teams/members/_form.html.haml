@@ -1,4 +1,4 @@
-= form_for(@member, as: :team_member, url: admin_team_member_path(@team, @member)) do |f|
+= form_tag admin_team_member_path(@team, @member), id: :team_member, method: :put do
   - if @member.errors.any?
     .alert.alert-error
       %ul
@@ -8,7 +8,7 @@
   .clearfix
     = label_tag :permission, "Default access for Team projects:"
     .input
-      = f.select :permission, options_for_select(UserTeam.access_roles, @team.default_projects_access(@member)), {}, class: "project-access-select chosen span3"
+      = select_tag :permission, options_for_select(UserTeam.access_roles, @team.default_projects_access(@member)), class: "project-access-select chosen span3"
   .clearfix
     = label_tag :group_admin, "Team admin?"
     .input
