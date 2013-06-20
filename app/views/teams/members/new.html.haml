@@ -12,8 +12,8 @@
 
   %h6 2. Set access level for them
   .clearfix
-    = label_tag :project_access, "Project Access"
-    .input= select_tag :default_project_access, options_for_select(Project.access_options), class: "project-access-select chosen"
+    = label_tag :permission, "Project Access"
+    .input= select_tag :permission, options_for_select(Project.access_options), class: "project-access-select chosen"
 
   .clearfix
     = label_tag :group_admin do
