@@ -17,7 +17,7 @@ class Teams::MembersController < Teams::ApplicationController
   end
 
   def update
-    if ::Teams::Users::UpdateRelationContext.new(@current_user, user_team, team_member, params).execute
+    if ::Teams::Users::UpdateRelationContext.new(@current_user, user_team, team_member, params[:team_member]).execute
       redirect_to team_members_path(user_team), notice: "Membership for #{team_member.name} was successfully updated in Team of users."
     else
       render :edit
