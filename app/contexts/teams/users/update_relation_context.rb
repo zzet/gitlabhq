@@ -5,7 +5,7 @@ module Teams
 
         options = {
           default_projects_access: params[:permission],
-          group_admin: params[:group_admin]
+          group_admin: params[:group_admin] || 0
         }
 
         result = @team.update_membership(@user, options)
