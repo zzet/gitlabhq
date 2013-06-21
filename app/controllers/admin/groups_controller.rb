@@ -12,15 +12,7 @@ class Admin::GroupsController < Admin::ApplicationController
     @members = @group.users
     @teams = @group.user_teams
 
-    @projects = Project.scoped
-    @projects = @projects.not_in_group(@group) if @group.projects.present?
-    @projects = @projects.all
-    @projects.reject!(&:empty_repo?)
-
-    @users = User.active
     @available_teams = group.user_teams.any? ? UserTeam.where("id not in (?)", group.user_teams) : UserTeam.scoped
-
-    session[:redirect_to] = admin_group_path(@group)
   end
 
   def new

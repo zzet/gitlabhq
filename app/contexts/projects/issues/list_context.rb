@@ -9,7 +9,7 @@ module Projects
         @issues = case params[:status]
                   when issues_filter[:all] then @project.issues
                   when issues_filter[:closed] then @project.issues.closed
-                  when issues_filter[:to_me] then @project.issues.assigned(current_user)
+                  when issues_filter[:to_me] then @project.issues.assigned_to(current_user)
                   when issues_filter[:by_me] then @project.issues.authored(current_user)
                   else @project.issues.opened
                   end
