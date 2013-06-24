@@ -2,14 +2,13 @@
 
 .event_filter
   = event_filter_link EventFilter.group, 'Group'
+  = event_filter_link EventFilter.project, 'Project'
+  = event_filter_link EventFilter.user_team, 'Team'
+  = event_filter_link EventFilter.code, 'Push events'
+  = event_filter_link EventFilter.note, 'Comments'
   = event_filter_link EventFilter.issue, 'Issues'
   = event_filter_link EventFilter.merge_request, 'Merge Requests'
-  = event_filter_link EventFilter.milestone, 'Milestone'
-  = event_filter_link EventFilter.project, 'Project'
-  = event_filter_link EventFilter.protected_branch, 'Protected branches'
-  = event_filter_link EventFilter.snippet, 'Snippet'
-  = event_filter_link EventFilter.user, 'User'
-  = event_filter_link EventFilter.user_team, 'Team'
+  -#= event_filter_link EventFilter.milestone, 'Milestone'
 
 - if @events.any?
   .content_list

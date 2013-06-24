@@ -30,6 +30,8 @@ class Gitlab::Event::Builder::Milestone < Gitlab::Event::Builder::Base
       actions.each do |act|
         events << ::Event.new(action: act,
                               source: source, data: temp_data, author: user, target: target)
+      end
+
       events
     end
   end

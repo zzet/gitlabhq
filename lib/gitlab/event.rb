@@ -1,5 +1,4 @@
-class Gitlab::Event
-
+class ::Gitlab::Event
   class << self
 
     def create_events(action, data)
