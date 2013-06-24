@@ -558,7 +558,7 @@ class EventNotificationMailer < ActionMailer::Base
 
     data = JSON.load(@event.data).to_hash
 
-    @project = Project.find_by_id(data["ptoject_id"])
+    @project = Project.find_by_id(data["project_id"])
     @team = UserTeam.find_by_id(data["user_team_id"])
 
     if @project && @team

@@ -42,7 +42,7 @@ module Projects
       end
     end
 
-    def transfer_to(project, new_namespace)
+    def transfer_to(new_namespace)
       begin
         old_path = project.path_with_namespace
         new_path = File.join(new_namespace.try(:path) || '', project.path)

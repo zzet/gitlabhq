@@ -12,7 +12,7 @@
   .clearfix
     = label_tag :group_admin, "Team admin?"
     .input
-      = f.check_box :group_admin
+      = check_box_tag :group_admin, 1, @team.admin?(@member)
 
   %br
   .actions
