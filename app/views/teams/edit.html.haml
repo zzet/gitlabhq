@@ -5,14 +5,22 @@
         = link_to 'Projects', '#tab-projects', 'data-toggle' => 'tab'
       %li
         = link_to 'Edit Team', '#tab-edit', 'data-toggle' => 'tab'
-      %li
-        = link_to 'Remove', '#tab-remove', 'data-toggle' => 'tab'
+      - if can? current_user, :admin_user_team, @team
+        %li
+          = link_to 'Remove', '#tab-remove', 'data-toggle' => 'tab'
 
   .span9
     .tab-content
       .tab-pane.active#tab-projects
         .ui-box.projects-table
           %h5.title Projects
+          = form_tag team_projects_path(@team), id: "assign_projects", class: "bulk_import", method: :post  do
+            %table.headless
+              %tr
+                %td= select_tag :project_ids, options_from_collection_for_select(@avaliable_projects , :id, :name_with_namespace), multiple: true, data: {placeholder: 'Select projects'}, class: 'chosen span4'
+                %td= select_tag :greatest_project_access, options_for_select(UserTeam.access_roles), {class: "project-access-select chosen" }
+                %td= submit_tag 'Add Project', class: "btn btn-create", id: :assign_projects_to_team
+
           %ul.well-list
             - @projects.each do |project|
               %li
@@ -24,14 +32,6 @@
                 .pull-right
                   = link_to 'Edit max access', edit_team_project_path(@team, project), class: "btn btn-small"
                   = link_to 'Relegate', team_project_path(@team, project), confirm: 'Remove project from team and move to global namespace. Are you sure?', method: :delete, class: "btn btn-remove small"
-        .form-holder
-          = form_tag team_projects_path(@team), id: "assign_projects", class: "bulk_import", method: :post  do
-            %table.headless
-              %tr
-                %td= select_tag :project_ids, options_from_collection_for_select(@avaliable_projects , :id, :name_with_namespace), multiple: true, data: {placeholder: 'Select projects'}, class: 'chosen span4'
-                %td= select_tag :greatest_project_access, options_for_select(UserTeam.access_roles), {class: "project-access-select chosen" }
-                %td= submit_tag 'Add Project', class: "btn btn-create", id: :assign_projects_to_team
-
 
       .tab-pane#tab-edit
         .ui-box

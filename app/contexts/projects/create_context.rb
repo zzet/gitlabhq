@@ -1,14 +1,21 @@
 module Projects
-  class CreateContext < BaseContext
-    def initialize(user, params)
-      @current_user, @params = user, params.dup
-    end
-
+  class CreateContext < ::BaseContext
     def execute
       # get namespace id
       namespace_id = params.delete(:namespace_id)
 
-      @project = Project.new(params)
+      # Load default feature settings
+      default_features = Gitlab.config.gitlab.default_projects_features
+
+      default_opts = {
+        issues_enabled: default_features.issues,
+        wiki_enabled: default_features.wiki,
+        wall_enabled: default_features.wall,
+        snippets_enabled: default_features.snippets,
+        merge_requests_enabled: default_features.merge_requests
+      }
+
+      @project = Project.new(default_opts.merge(params))
 
       # Parametrize path for project
       #
@@ -32,13 +39,6 @@ module Projects
         @project.namespace_id = current_user.namespace_id
       end
 
-      # Disable less important features by default
-      @project.issues_enabled         = Gitlab.config.gitlab.default_projects_features.issues
-      @project.wiki_enabled           = Gitlab.config.gitlab.default_projects_features.wiki
-      @project.wall_enabled           = Gitlab.config.gitlab.default_projects_features.wall
-      @project.snippets_enabled       = Gitlab.config.gitlab.default_projects_features.snippets
-      @project.merge_requests_enabled = Gitlab.config.gitlab.default_projects_features.merge_requests
-
       @project.creator = current_user
 
       # Import project from cloneable resource
@@ -47,6 +47,7 @@ module Projects
         if shell.import_repository(@project.path_with_namespace, @project.import_url)
           # We should create satellite for imported repo
           @project.satellite.create unless @project.satellite.exists?
+          @project.imported = true
           true
         else
           @project.errors.add(:import_url, 'cannot clone repo')

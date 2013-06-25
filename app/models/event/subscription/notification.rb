@@ -7,23 +7,28 @@ class Event::Subscription::Notification < ActiveRecord::Base
 
   validates :subscriber,   presence: true
   validates :event,        presence: true
-  validates :subscription, presence: true
 
   scope :pending, -> { where(notification_state: :new) }
+  scope :delayed, -> { where(notification_state: :delayed) }
   scope :instantaneous, -> { pending.where(notification_interval: 0) }
 
   state_machine :notification_state, initial: :new do
     state :new
+    state :delayed
     state :processing
     state :delivered
     state :failed
 
     event :process do
-      transition [:new, :failed] => :processing
+      transition [:new, :delayed, :failed] => :processing
     end
 
     event :deliver do
       transition [:processing] => :delivered
+    end
+
+    event :delay do
+      transition [:new, :failed] => :delayed
     end
 
     event :failing do

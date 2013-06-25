@@ -19,6 +19,7 @@
 #  issues_tracker         :string(255)      default("gitlab"), not null
 #  issues_tracker_id      :string(255)
 #  snippets_enabled       :boolean          default(TRUE), not null
+#  last_activity_at       :datetime
 #
 
 require 'spec_helper'
@@ -35,11 +36,12 @@ describe Project do
     it { should have_many(:milestones).dependent(:destroy) }
     it { should have_many(:users_projects).dependent(:destroy) }
     it { should have_many(:notes).dependent(:destroy) }
-    it { should have_many(:snippets).dependent(:destroy) }
-    it { should have_many(:deploy_keys).dependent(:destroy) }
+    it { should have_many(:snippets).class_name('ProjectSnippet').dependent(:destroy) }
+    it { should have_many(:deploy_keys_projects).dependent(:destroy) }
+    it { should have_many(:deploy_keys) }
     it { should have_many(:hooks).dependent(:destroy) }
-    it { should have_many(:wikis).dependent(:destroy) }
     it { should have_many(:protected_branches).dependent(:destroy) }
+    it { should have_one(:forked_project_link).dependent(:destroy) }
   end
 
   describe "Mass assignment" do
@@ -59,10 +61,6 @@ describe Project do
     it { should ensure_length_of(:path).is_within(0..255) }
     it { should ensure_length_of(:description).is_within(0..2000) }
     it { should validate_presence_of(:creator) }
-    it { should ensure_inclusion_of(:issues_enabled).in_array([true, false]) }
-    it { should ensure_inclusion_of(:wall_enabled).in_array([true, false]) }
-    it { should ensure_inclusion_of(:merge_requests_enabled).in_array([true, false]) }
-    it { should ensure_inclusion_of(:wiki_enabled).in_array([true, false]) }
     it { should ensure_length_of(:issues_tracker_id).is_within(0..255) }
 
     it "should not allow new projects beyond user limits" do
@@ -96,6 +94,7 @@ describe Project do
   end
 
   describe "last_activity methods" do
+    before { enable_observers }
     let(:project)    { create(:project) }
     let(:last_event) { double(project_id: project.id, created_at: Time.now) }
 
@@ -109,7 +108,7 @@ describe Project do
     describe 'last_activity_date' do
       it 'returns the creation date of the project\'s last event if present' do
         last_activity_event = create(:event, project: project)
-        project.last_activity_date.to_s(:db).should == last_event.created_at.to_s(:db)
+        project.last_activity_at.to_i.should == last_event.created_at.to_i
       end
 
       it 'returns the project\'s last update date if it has no events' do
@@ -119,7 +118,7 @@ describe Project do
   end
 
   describe :update_merge_requests do
-    let(:project) { create(:project) }
+    let(:project) { create(:project_with_code) }
 
     before do
       @merge_request = create(:merge_request, project: project)
@@ -189,10 +188,6 @@ describe Project do
     it "should return valid repo" do
       project.repository.should be_kind_of(Repository)
     end
-
-    it "should return nil" do
-      Project.new(path: "empty").repository.should be_nil
-    end
   end
 
   describe :issue_exists? do
@@ -233,7 +228,7 @@ describe Project do
 
     it "should be true for projects with external issues tracker if issues enabled" do
       ext_project.can_have_issues_tracker_id?.should be_true
-    end 
+    end
 
     it "should be false for projects with internal issue tracker if issues enabled" do
       project.can_have_issues_tracker_id?.should be_false
@@ -246,5 +241,16 @@ describe Project do
       project.can_have_issues_tracker_id?.should be_false
       ext_project.can_have_issues_tracker_id?.should be_false
     end
+  end
+
+  describe :open_branches do
+    let(:project) { create(:project_with_code) }
+
+    before do
+      project.protected_branches.create(name: 'master')
+    end
+
+    it { project.open_branches.map(&:name).should include('bootstrap') }
+    it { project.open_branches.map(&:name).should_not include('master') }
   end
 end

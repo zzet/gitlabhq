@@ -22,6 +22,7 @@ set :asset_env,      "RAILS_GROUPS=assets RAILS_RELATIVE_URL_ROOT=#{mount_point.
 
 set :application, "gitlab"
 set :rvm_type, :system
+set :rvm_ruby_string, 'ruby-1.9.3-p194'
 
 set :scm, :git
 set :repository, "gitorious@git.undev.cc:infrastructure/gitlab.git"
@@ -57,12 +58,17 @@ namespace :deploy do
     run "ln -nfs #{release_path}/config/unicorn.rb.undev #{release_path}/config/unicorn.rb"
   end
 
+  desc "Symlinks the unicorn.rb"
+  task :symlink_puma, :roles => :app do
+    run "ln -nfs #{release_path}/config/puma.rb.undev #{release_path}/config/puma.rb"
+  end
+
   desc <<-DESC
     Send a USR2 to the unicorn process to restart for zero downtime deploys.
       runit expects 2 to tell it to send the USR2 signal to the process.
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
-    run "sudo sv reload /etc/sv/*"
+    run "sudo sv reload /etc/sv/gitlab-*"
   end
 end
 
@@ -70,7 +76,7 @@ before 'deploy:finalize_update',
   'deploy:symlink_db',
   'deploy:symlink_gitlab',
   'deploy:symlink_resque',
-  'deploy:symlink_unicorn'
+  'deploy:symlink_puma'
 #after "deploy:restart", "unicorn:stop"
 #after "deploy:reload"
 after "deploy:update", "deploy:cleanup"

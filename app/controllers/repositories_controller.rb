@@ -17,7 +17,7 @@ class RepositoriesController < ProjectResourceController
   end
 
   def stats
-    @stats = Gitlab::GitStats.new(@repository.raw, @repository.root_ref)
+    @stats = Gitlab::Git::Stats.new(@repository.raw, @repository.root_ref)
     @graph = @stats.graph
   end
 
@@ -27,7 +27,9 @@ class RepositoriesController < ProjectResourceController
     end
 
 
-    file_path = @repository.archive_repo(params[:ref])
+    storage_path = Rails.root.join("tmp", "repositories")
+
+    file_path = @repository.archive_repo(params[:ref], storage_path)
 
     if file_path
       # Send file to user

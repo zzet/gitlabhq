@@ -6,33 +6,28 @@
           = "..."
         %td{style: "font-size:12px;color:#666;border:none;background:#eee;margin:0px;padding:0px 5px;border-right:1px solid #ccc;text-align:right;min-width:35px;max-width:35px;width:35px"}
           = "..."
-        %td{style: "font-size:12px;border:none;margin:0px;padding:0px;min-height:18px;color:#888;background:#fafafa"} 
-          %pre
-            %code
-              = line
+        %td{style: "font-size:12px;border:none;margin:0px;padding:0px;min-height:18px;color:#888;background:#fafafa"}
+          = " #{line}"
       - else
-        %td{style: "font-size:12px;color:#666;border:none;background:#eee;margin:0px;padding:0px 5px;border-right:1px solid #ccc;text-align:right;min-width:35px;max-width:35px;width:35px"}
+        %td{style: "font-size:12px;color:#666;border:none;background:#eee;margin:0px;padding:0px 5px;border-right:1px solid #ccc;text-align:right;min-width:35px;max-width:35px;width:35px"}<
           = raw(type == "new" ? "&nbsp;" : line_old)
-        %td{style: "font-size:12px;color:#666;border:none;background:#eee;margin:0px;padding:0px 5px;border-right:1px solid #ccc;text-align:right;min-width:35px;max-width:35px;width:35px"}
+        %td{style: "font-size:12px;color:#666;border:none;background:#eee;margin:0px;padding:0px 5px;border-right:1px solid #ccc;text-align:right;min-width:35px;max-width:35px;width:35px"}<
           = raw(type == "old" ? "&nbsp;" : line_new)
         - if type == "new"
           %td{style: "background:#CFD;font-size:12px;min-height:18px;margin:0px;padding:0px;border:none"}
-            %pre
-              %code
-                :preserve
-                  #{diff_line_content(line)}
+            %pre{style: "border:none; margin:0px;padding:0px"}
+              :preserve
+                #{diff_line_content(line)}
         - elsif type == "old"
           %td{style: "background:#FDD;font-size:12px;border:none;margin:0px;padding:0px;min-height:18px"}
-            %pre
-              %code
-                :preserve
-                  #{diff_line_content(line)}
+            %pre{style: "border:none; margin:0px;padding:0px"}
+              :preserve
+                #{diff_line_content(line)}
         - else
           %td{style: "line-height:18px;font-size:12px;min-height:18px;margin:0px;padding:0px;border:none"}
-            %pre
-              %code
-                :preserve
-                  #{diff_line_content(line)}
+            %pre{style: "border:none; margin:0px;padding:0px"}
+              :preserve
+                #{diff_line_content(line)}
 
     - if @reply_allowed
       - comments = @line_notes.select { |n| n.line_code == line_code }.sort_by(&:created_at)

@@ -10,6 +10,7 @@ class Event < ActiveRecord::Base
   belongs_to :author, class_name: User
   belongs_to :target, polymorphic: true
   belongs_to :source, polymorphic: true
+  belongs_to :parent_event, class_name: Event
 
   has_many :notifications,  dependent: :destroy,     class_name: Event::Subscription::Notification
   has_many :subscriptions,  dependent: :destroy, through: :notifications, class_name: Event::Subscription

@@ -75,7 +75,9 @@ class OldEvent < ActiveRecord::Base
   end
 
   def target_title
-    target.try :title
+    if target && target.respond_to?(:title)
+      target.title
+    end
   end
 
   def push?
@@ -128,6 +130,14 @@ class OldEvent < ActiveRecord::Base
 
   def merge_request
     target if target_type == "MergeRequest"
+  end
+
+  def note_project_snippet?
+    target.noteable_type == "Snippet"
+  end
+
+  def note_target
+    target.noteable
   end
 
   def action_name
@@ -200,7 +210,7 @@ class OldEvent < ActiveRecord::Base
 
   # Max 20 commits from push DESC
   def commits
-    @commits ||= repository.present? ? data[:commits].map { |commit| repository.commit(commit[:id]) }.reverse : []
+    @commits ||= data[:commits].reverse #@commits ||= repository.present? ? data[:commits].map { |commit| repository.commit(commit[:id]) }.reverse : []
   end
 
   def commits_count
@@ -221,26 +231,8 @@ class OldEvent < ActiveRecord::Base
     end
   end
 
-  def repository
-    project.repository
-  end
-
-  def parent_commit
-    repository.commit(commit_from)
-  rescue => ex
-    nil
-  end
-
-  def last_commit
-    repository.commit(commit_to)
-  rescue => ex
-    nil
-  end
-
   def push_with_commits?
-    md_ref? && commits.any? && parent_commit && last_commit
-  rescue Grit::NoSuchPathError
-    false
+    md_ref? && commits.any? && commit_from && commit_to
   end
 
   def last_push_to_non_root?

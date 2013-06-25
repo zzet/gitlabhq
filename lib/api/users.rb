@@ -1,4 +1,4 @@
-module Gitlab
+module API
   # Users API
   class Users < Grape::API
     before { authenticate! }
@@ -12,6 +12,7 @@ module Gitlab
         @users = User.scoped
         @users = @users.active if params[:active].present?
         @users = @users.search(params[:search]) if params[:search].present?
+        @users = paginate @users
         present @users, with: Entities::User
       end
 
@@ -112,7 +113,7 @@ module Gitlab
         user = User.find_by_id(params[:id])
 
         if user
-          user.destroy
+          Users::RemoveContext.new(current_user, user).execute
         else
           not_found!
         end
@@ -173,7 +174,7 @@ module Gitlab
       delete "keys/:id" do
         begin
           key = current_user.keys.find params[:id]
-          key.delete
+          key.destroy
         rescue
         end
       end

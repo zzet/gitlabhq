@@ -1,6 +1,4 @@
 class IssueObserver < BaseObserver
-  cattr_accessor :current_user
-
   def after_close(issue, transition)
     create_note(issue)
   end

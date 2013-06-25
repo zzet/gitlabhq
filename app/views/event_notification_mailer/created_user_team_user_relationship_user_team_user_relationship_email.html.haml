@@ -1,0 +1,8 @@
+User
+= link_to @added_user.name, user_url(@added_user.username)
+was added to
+= link_to @team.name, team_url(@team.path)
+by
+= link_to @user.name, user_url(@user.username)
+%br
+After it user was added to projects, which assigned on Team.

@@ -1,5 +1,7 @@
 class ProjectObserver < BaseObserver
   def after_create(project)
+    return true if project.forked? || project.imported?
+
     GitlabShellWorker.perform_async(
       :add_repository,
       project.path_with_namespace
@@ -10,6 +12,7 @@ class ProjectObserver < BaseObserver
 
   def after_update(project)
     project.send_move_instructions if project.namespace_id_changed?
+    project.rename_repo if project.path_changed?
     if project.git_protocol_enabled_changed?
       if project.git_protocol_enabled
         log_info("#{project.owner.name} granted public access via git protocol for project \"#{project.name_with_namespace}\"")
@@ -25,6 +28,10 @@ class ProjectObserver < BaseObserver
         )
       end
     end
+  end
+
+  def before_destroy(project)
+    project.repository.expire_cache unless project.empty_repo?
   end
 
   def after_destroy(project)

@@ -4,7 +4,7 @@ module Gitlab
 
       START  = "#!idiff-start!#"
       FINISH = "#!idiff-finish!#"
-    
+
       def processing diff_arr
         indexes = _indexes_of_changed_lines diff_arr
 
@@ -21,8 +21,9 @@ module Gitlab
             end
           end
           first_token = first_line[0..first_the_same_symbols][1..-1]
-          diff_arr[index+1].sub!(first_token, first_token + START)
-          diff_arr[index+2].sub!(first_token, first_token + START)
+          start = first_token + START
+          diff_arr[index+1].sub!(first_token, first_token => start)
+          diff_arr[index+2].sub!(first_token, first_token => start)
           last_the_same_symbols = 0
           (1..max_length + 1).each do |i|
             last_the_same_symbols = -i
@@ -60,8 +61,6 @@ module Gitlab
         line.gsub!(FINISH, "</span>")
         line
       end
-    
     end
-
   end
 end
