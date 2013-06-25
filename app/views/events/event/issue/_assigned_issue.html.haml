@@ -7,7 +7,7 @@
     %strong= gfm truncate(event.data["title"])
   to
   - if event.source.assignee
-    %strong= link_to truncate(event.source.assigne.name), user_path(event.source.assignee)
+    %strong= link_to truncate(event.source.assignee.name), user_path(event.source.assignee)
   - else
     %strong= gfm truncate(event.data["title"])
   in

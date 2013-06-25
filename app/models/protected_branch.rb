@@ -26,7 +26,7 @@ class ProtectedBranch < ActiveRecord::Base
 
   actions_to_watch [:created, :updated, :deleted]
   actions_sources [watchable_name]
-  available_in_activity_feed true, actions: [:created, :deleted]
+  available_in_activity_feed false
 
   def commit
     project.repository.commit(self.name)

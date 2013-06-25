@@ -40,8 +40,8 @@ class ActivityFeed
         unless filter_conditions.include? source
           source_param = source.to_s.camelize
           actions_param = actions(source)
-          query_param = event[:source_type].eq(source_param).and(event[:action].in(actions_param))
-#          if user.respond_to? "authorized_#{source.to_s}s"
+          query_param = event[:source_type].eq(source_param).and(event[:action].in(actions_param)).and(event[:parent_event_id].eq(nil))
+          #if user.respond_to? "authorized_#{source.to_s}s"
             #query_param = query_param.and(event[:source_id].in(user.send("authorized_#{source.to_s}s").pluck(:id)))
           #end
           query_params << query_param
