@@ -1,0 +1,16 @@
+- if event #.proper?
+  %div.event-item
+    %span.cgray.pull-right
+      #{time_ago_in_words(event.created_at)} ago.
+
+    = cache event do
+      = image_tag gravatar_icon(event.author_email), class: "avatar s24"
+      = render "events/event/#{event.target_type.underscore}/#{event.action}_#{event.source_type.underscore}", event: event
+      .clearfix
+
+      -#- if event.push?
+      -#- elsif event.note?
+        -#= render "events/event/note", event: event
+      -#- else
+        -#= render "events/event/common", event: event
+

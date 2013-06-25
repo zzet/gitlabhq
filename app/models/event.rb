@@ -19,6 +19,10 @@ class Event < ActiveRecord::Base
   validates :author,  presence: true
   validates :source,  presence: true, unless: -> { action && (deleted_event? || push_event?) }
 
+  delegate :name, :email, to: :author, prefix: true, allow_nil: true
+  delegate :title, to: :issue, prefix: true, allow_nil: true
+  delegate :title, to: :merge_request, prefix: true, allow_nil: true
+
   # Custom validators
   def push_event?
     return false unless Event::Action.push_action?(action)

@@ -35,15 +35,15 @@ module EventsHelper
       EventFilter.group => "icon-user",
       EventFilter.issue => "icon-comments",
       EventFilter.merge_request => "icon-check",
-      EventFilter.milestone => "icon-check",
+      #EventFilter.milestone => "icon-check",
       EventFilter.project => "icon-check",
-      EventFilter.protected_branch => "icon-check",
+      #EventFilter.protected_branch => "icon-check",
       EventFilter.snippet => "icon-check",
       EventFilter.user => "icon-user",
-      EventFilter.user_team => "icon-user"
+      EventFilter.user_team => "icon-user",
       #EventFilter.push     => "icon-upload-alt",
       #EventFilter.merged   => "icon-check",
-      #EventFilter.comments => "icon-comments",
+      #EventFilter.note => "icon-comments"
       #EventFilter.team     => "icon-user",
     }
   end
