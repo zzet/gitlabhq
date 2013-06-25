@@ -41,17 +41,15 @@ Spork.prefork do
     config.include FactoryGirl::Syntax::Methods
     config.include Devise::TestHelpers, type: :controller
 
+    config.include TestEnv
+
     # If you're not using ActiveRecord, or you'd prefer not to run each of your
     # examples within a transaction, remove the following line or assign false
     # instead of true.
     config.use_transactional_fixtures = false
 
     config.before do
-      # Use tmp dir for FS manipulations
-      temp_repos_path = Rails.root.join('tmp', 'test-git-base-path')
-      Gitlab.config.gitlab_shell.stub(repos_path: temp_repos_path)
-      FileUtils.rm_rf temp_repos_path
-      FileUtils.mkdir_p temp_repos_path
+      TestEnv.init(observers: false)
     end
   end
 end

@@ -15,6 +15,7 @@ class Event::Action
 
         # Project specific
         :commented_related,
+        :commented_commit,
 
         # Git specific
         :pushed,

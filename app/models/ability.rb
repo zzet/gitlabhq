@@ -7,7 +7,8 @@ class Ability
       when "Project" then project_abilities(user, subject)
       when "Issue" then issue_abilities(user, subject)
       when "Note" then note_abilities(user, subject)
-      when "Snippet" then snippet_abilities(user, subject)
+      when "ProjectSnippet" then project_snippet_abilities(user, subject)
+      when "PersonalSnippet" then personal_snippet_abilities(user, subject)
       when "MergeRequest" then merge_request_abilities(user, subject)
       when "Group", "Namespace" then group_abilities(user, subject)
       when "UserTeam" then user_team_abilities(user, subject)
@@ -40,8 +41,12 @@ class Ability
       elsif team.reporters.include?(user)
         rules << project_report_rules
 
-      elsif team.guests.include?(user) || project.public?
+      elsif team.guests.include?(user)
         rules << project_guest_rules
+      end
+
+      if project.public?
+        rules << public_project_rules
       end
 
       if project.owner == user || user.admin?
@@ -51,13 +56,30 @@ class Ability
       rules.flatten
     end
 
+    def public_project_rules
+      [
+        :download_code,
+        :fork_project,
+        :read_project,
+        :read_wiki,
+        :read_issue,
+        :read_milestone,
+        :read_project_snippet,
+        :read_team_member,
+        :read_merge_request,
+        :read_note,
+        :write_issue,
+        :write_note
+      ]
+    end
+
     def project_guest_rules
       [
         :read_project,
         :read_wiki,
         :read_issue,
         :read_milestone,
-        :read_snippet,
+        :read_project_snippet,
         :read_team_member,
         :read_merge_request,
         :read_note,
@@ -70,7 +92,8 @@ class Ability
     def project_report_rules
       project_guest_rules + [
         :download_code,
-        :write_snippet
+        :fork_project,
+        :write_project_snippet
       ]
     end
 
@@ -86,11 +109,11 @@ class Ability
       rules = project_dev_rules << [
         :push_code_to_protected_branches,
         :modify_issue,
-        :modify_snippet,
+        :modify_project_snippet,
         :modify_merge_request,
         :admin_issue,
         :admin_milestone,
-        :admin_snippet,
+        :admin_project_snippet,
         :admin_team_member,
         :admin_merge_request,
         :admin_note,
@@ -128,7 +151,7 @@ class Ability
       rules = []
 
       # Only group owner and administrators can manage team
-      if team.owner == user || team.admin?(user) || user.admin?
+      if user.admin? || team.owner == user || team.admin?(user)
         rules << [ :manage_user_team ]
       end
 
@@ -139,8 +162,7 @@ class Ability
       rules.flatten
     end
 
-
-    [:issue, :note, :snippet, :merge_request].each do |name|
+    [:issue, :note, :project_snippet, :personal_snippet, :merge_request].each do |name|
       define_method "#{name}_abilities" do |user, subject|
         if subject.author == user
           [

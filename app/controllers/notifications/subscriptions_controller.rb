@@ -2,8 +2,8 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
   before_filter :load_entity, only: [:create, :destroy]
 
   def create
-    SubscriptionService.subscribe(@current_user, :all, @entity, :all) if @entity
-    SubscriptionService.subscribe(@current_user, :all, params[:category], :new) if @category.blank? && params[:category].present?
+    SubscriptionService.subscribe(@current_user, :all, @entity, @source)             if @entity
+    SubscriptionService.subscribe(@current_user, :all, params[:category], @source)   if @category.blank? && params[:category].present?
 
     respond_to do |format|
       format.json { head :created }
@@ -43,9 +43,33 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
     end
   end
 
+  def on_adjacent_changes
+    @current_user.notification_setting.adjacent_changes = true
+
+    @current_user.notification_setting.save
+
+    respond_to do |format|
+      format.json { head :created }
+      format.html { redirect_to profile_subscriptions_path }
+    end
+  end
+
+  def from_adjacent_changes
+    @current_user.notification_setting.adjacent_changes = false
+
+    @current_user.notification_setting.save
+
+    SubscriptionService.unsubscribe_from_adjacent_sources(@current_user)
+
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { redirect_to profile_subscriptions_path }
+    end
+  end
+
   def destroy
-    SubscriptionService.unsubscribe(@current_user, :all, @entity, :all) if @entity
-    SubscriptionService.unsubscribe(@current_user, :all, params[:category], :new) if @category
+    SubscriptionService.unsubscribe(@current_user, :all, @entity, @source)           if @entity
+    SubscriptionService.unsubscribe(@current_user, :all, params[:category], @source) if @category
 
     respond_to do |format|
       format.json { head :no_content }
@@ -59,6 +83,11 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
     if params[:entity]
       @entity ||= params[:entity][:type].camelize.constantize.find params[:entity][:id]
     end
+
+    @source ||= :all
+
+    @source = params[:source].to_sym.downcase if params[:source]
+    @source = :new                            if params[:category]
 
     if params[:category]
       @category ||= Event::Subscription.by_user(@current_user).by_target_category(params[:category])

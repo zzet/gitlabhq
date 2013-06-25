@@ -1,8 +1,6 @@
 class GroupsController < ApplicationController
   respond_to :html
-  layout 'group', except: [:new, :create, :index]
-
-  before_filter :group, except: [:new, :create, :index]
+  before_filter :group, except: [:new, :create]
 
   # Authorize
   before_filter :authorize_read_group!, except: [:new, :create, :index]
@@ -16,6 +14,10 @@ class GroupsController < ApplicationController
     @groups = current_user.authorized_groups
     @groups = @groups.search(params[:name]) if params[:name].present?
   end
+
+  layout :determine_layout
+
+  before_filter :set_title, only: [:new, :create]
 
   def new
     @group = Group.new
@@ -47,14 +49,14 @@ class GroupsController < ApplicationController
   # Get authored or assigned open merge requests
   def merge_requests
     @merge_requests = current_user.cared_merge_requests.of_group(@group)
-    @merge_requests = FilterContext.new(@merge_requests, params).execute
+    @merge_requests = FilterContext.new(@current_user, @merge_requests, params).execute
     @merge_requests = @merge_requests.recent.page(params[:page]).per(20)
   end
 
   # Get only assigned issues
   def issues
     @issues = current_user.assigned_issues.of_group(@group)
-    @issues = FilterContext.new(@issues, params).execute
+    @issues = FilterContext.new(@current_user, @issues, params).execute
     @issues = @issues.recent.page(params[:page]).per(20)
     @issues = @issues.includes(:author, :project)
 
@@ -77,8 +79,8 @@ class GroupsController < ApplicationController
   end
 
   def team_members
-    @group.add_users_to_project_teams(params[:user_ids], params[:project_access])
-    redirect_to people_group_path(@group), notice: 'Users was successfully added.'
+    @group.add_users_to_project_teams(params[:user_ids].split(','), params[:project_access])
+    redirect_to people_group_path(@group), notice: 'Users were successfully added.'
   end
 
   def edit
@@ -101,8 +103,7 @@ class GroupsController < ApplicationController
   end
 
   def destroy
-    @group.truncate_teams
-    @group.destroy
+    ::Groups::RemoveContext.new(current_user, group).execute
 
     redirect_to root_path, notice: 'Group was removed.'
   end
@@ -137,6 +138,18 @@ class GroupsController < ApplicationController
   def authorize_admin_group!
     unless can?(current_user, :manage_group, group)
       return render_404
+    end
+  end
+
+  def set_title
+    @title = 'New Group'
+  end
+
+  def determine_layout
+    if [:new, :create].include?(action_name.to_sym)
+      'navless'
+    else
+      'group'
     end
   end
 end

@@ -16,18 +16,21 @@ class Groups::TeamsController < Groups::ApplicationController
   end
 
   def create
-    Gitlab::UserTeamManager.assign_to_group(team, group, params[:greatest_project_access])
+    ::Teams::Groups::CreateRelationContext.new(current_user, team, group, params).execute
+
     flash[:notice] = "Team successful added to group"
     redirect_back_or_default(action: :index)
   end
 
   def update
-    Gitlab::UserTeamManager.update_team_user_access_in_group(team, group, params[:greatest_project_access], params[:rebuild_permissions])
+    ::Teams::Groups::UpdateRelationContext.new(current_user, team, group, params).execute
+
     redirect_to :back
   end
 
   def destroy
-    Gitlab::UserTeamManager.resign_from_group(team, group)
+    ::Teams::Groups::RemoveRelationContext.new(current_user, team, group).execute
+
     flash[:notice] = "Team successful removed from group"
     redirect_to :back
   end

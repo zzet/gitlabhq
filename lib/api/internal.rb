@@ -1,4 +1,4 @@
-module Gitlab
+module API
   # Internal access API
   class Internal < Grape::API
     namespace 'internal' do
@@ -22,17 +22,18 @@ module Gitlab
         key = Key.find(params[:key_id])
         project = Project.find_with_namespace(project_path)
         git_cmd = params[:action]
+        return false unless project
 
 
-        if key.is_deploy_key
-          project == key.project && git_cmd == 'git-upload-pack'
+        if key.is_a? DeployKey
+          key.projects.include?(project) && git_cmd == 'git-upload-pack'
         else
           user = key.user
 
           return false if user.blocked?
 
           action = case git_cmd
-                   when 'git-upload-pack'
+                   when 'git-upload-pack', 'git-upload-archive'
                      then :download_code
                    when 'git-receive-pack'
                      then
@@ -57,7 +58,7 @@ module Gitlab
 
       get "/check" do
         {
-          api_version: Gitlab::API.version,
+          api_version: API.version,
           gitlab_version: Gitlab::VERSION,
           gitlab_rev: Gitlab::REVISION,
         }

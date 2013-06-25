@@ -1,4 +1,4 @@
-module Gitlab
+module API
   # groups API
   class Groups < Grape::API
     before { authenticate! }
@@ -65,12 +65,13 @@ module Gitlab
         authenticated_as_admin!
         @group = Group.find(params[:id])
         project = Project.find(params[:project_id])
-        if project.transfer(@group)
+        transfer_result = Projects::TransferContext.new(current_user, project, @group).execute
+        if transfer_result
           present @group
         else
           not_found!
         end
-      end 
+      end
     end
   end
 end

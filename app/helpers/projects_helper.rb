@@ -25,7 +25,7 @@ module ProjectsHelper
     author_html =  ""
 
     # Build avatar image tag
-    author_html << image_tag(gravatar_icon(author.try(:email)), width: 16, class: "lil_av") if opts[:avatar]
+    author_html << image_tag(gravatar_icon(author.try(:email)), width: 16, class: "avatar avatar-inline s16") if opts[:avatar]
 
     # Build name span tag
     author_html << content_tag(:span, sanitize(author.name), class: 'author')
@@ -43,5 +43,41 @@ module ProjectsHelper
     else
       project.name
     end
+  end
+
+  def remove_project_message(project)
+    "You are going to remove #{project.name_with_namespace}.\n Removed project CANNOT be restored!\n Are you ABSOLUTELY sure?"
+  end
+
+  def project_nav_tabs
+    @nav_tabs ||= get_project_nav_tabs(@project, current_user)
+  end
+
+  def project_nav_tab?(name)
+    project_nav_tabs.include? name
+  end
+
+  private
+
+  def get_project_nav_tabs(project, current_user)
+    nav_tabs = [:home]
+
+    if project.repo_exists? && can?(current_user, :download_code, project)
+      nav_tabs << [:files, :commits, :network, :graphs]
+    end
+
+    if project.repo_exists? && project.merge_requests_enabled
+      nav_tabs << :merge_requests
+    end
+
+    if can?(current_user, :admin_project, project)
+      nav_tabs << :settings
+    end
+
+    [:issues, :wiki, :wall, :snippets].each do |feature|
+      nav_tabs << feature if project.send :"#{feature}_enabled"
+    end
+
+    nav_tabs.flatten
   end
 end

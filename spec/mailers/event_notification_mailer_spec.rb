@@ -10,63 +10,51 @@ describe EventNotificationMailer do
 
     ActiveRecord::Base.observers.enable :all
 
-    Gitlab::Event::Action.current_user = @another_user
+    Thread.current[:current_user] = @another_user
 
-    SubscriptionService.subscribe(@user, :all, @user, :all)
-
-    @project = create :project, creator: @user
-    @group = create :group, owner: @user
-    @user_team = create :user_team, owner: @user
-
-    ActionMailer::Base.deliveries.clear
+    ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
   end
+
+  let(:project) { pr = create :project, creator: @another_user, path: 'gitlabhq', namespace_id: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; pr }
+  let(:group)   { g = create :group, owner: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; g }
+  let(:team)    { t = create :user_team, owner: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; t }
+  let(:user)    { u = create :user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; u }
 
   describe "Project mails" do
     before do
       SubscriptionService.subscribe(@user, :all, :project, :all)
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
     end
 
     it "should send email about create project" do
-      project = create :project, creator: @another_user
-      ActionMailer::Base.deliveries.should_not be_blank
+      params = { project: attributes_for(:project) }
+      Projects::CreateContext.new(@another_user, params).execute
+      ActionMailer::Base.deliveries.should be_blank
     end
 
     it "should send email about update project" do
-      project = create :project, creator: @another_user
+      params = { project: attributes_for(:project) }
+      Projects::UpdateContext.new(project, @another_user, params).execute
 
-      ActionMailer::Base.deliveries.clear
-
-      project.name = "#{project.name}_updated"
-      project.save
-
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about destroy project" do
-      project = create :project, creator: @another_user
+      ::Projects::RemoveContext.new(project, @another_user).execute
 
-      ActionMailer::Base.deliveries.clear
-
-      project.destroy
-
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about create issue in project" do
-      project = create :project, creator: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       issue = create :issue, project: project
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update issue in project" do
-      project = create :project, creator: @another_user
       issue = create :issue, project: project
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
       issue.title = "#{issue.title}_updated"
       issue.save
@@ -75,20 +63,15 @@ describe EventNotificationMailer do
     end
 
     it "should send email about create milestone in project" do
-      project = create :project, creator: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       milestone = create :milestone, project: project
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update milestone in project" do
-      project = create :project, creator: @another_user
       milestone = create :milestone, project: project
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
       milestone.title = "#{milestone.title}_updated"
       milestone.save
@@ -97,53 +80,52 @@ describe EventNotificationMailer do
     end
 
     it "should send email about add note in project" do
-      project = create :project, creator: @another_user
+      params = { note: attributes_for(:note) }
+      Projects::Notes::CreateContext.new(project, @another_user, params).execute
 
-      ActionMailer::Base.deliveries.clear
-
-      note = create :note, project: project
-
-      ActionMailer::Base.deliveries.should be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about add note in project with noteable" do
-      project = create :project, creator: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       note = create :note, project: project, noteable: project
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+    it "should send email about add note on commit in project" do
+      user = create :user, { email: "dmitriy.zaporozhets@gmail.com" }
+      project = create :project, path: 'gitlabhq'
+
+      project.team << [user, 40]
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      note = create :note, project: project, commit_id: "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a", noteable_type: "Commit"
+
+      ActionMailer::Base.deliveries.count.should == 2
     end
 
     it "should send email about update note in project" do
-      project = create :project, creator: @another_user
       note = create :note, project: project, noteable: project
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
       note.note = "#{note.note}_updated"
       note.save
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.should be_blank
     end
 
-
     it "should send email about create merge request in project" do
-      project = create :project, creator: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       merge_request = create :merge_request, project: project
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update merge request in project" do
-      project = create :project, creator: @another_user
       merge_request = create :merge_request, project: project
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
       merge_request.title = "#{merge_request.title}_updated"
       merge_request.save
@@ -152,91 +134,70 @@ describe EventNotificationMailer do
     end
 
     it "should send email about create protected branch in project" do
-      project = create :project, creator: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       protected_branch = create :protected_branch, project: project, name: "master"
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about create service in project" do
-      project = create :project, creator: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       service = create :service, project: project
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about create snippet in project" do
-      project = create :project, creator: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       snippet = create :snippet, project: project, author: @another_user
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about add web_hook in project" do
-      project = create :project, creator: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       project_hook = create :project_hook, project: project
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about project transfer from user namespace to group" do
-      project = create :project, creator: @another_user
-      group = create :group, owner: @another_user
+      params = { project: attributes_for(:project) }
+      project = Projects::CreateContext.new(@another_user, params).execute
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-       project.namespace = group
-       project.save
+      params = { project: { namespace_id: group.id }}
+      ::Projects::TransferContext.new(project, @another_user, params).execute
 
-       ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about project transfer from group to group" do
       old_group = create :group, owner: @another_user
       new_group = create :group, owner: @another_user
-      project = create :project, creator: @another_user, namespace: old_group
+      project_in_group = create :project, creator: @another_user, namespace_id: old_group.id
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-       project.namespace = new_group
-       project.save
+      params = { project: { namespace_id: new_group.id }}
+      ::Projects::TransferContext.new(project_in_group, @another_user, params).execute
 
-       ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about project transfer from user to global namespace" do
-      project = create :project, creator: @another_user
+      params = { project: { namespace_id: Namespace.global_id }}
+      ::Projects::TransferContext.new(project, @another_user, params).execute
 
-      ActionMailer::Base.deliveries.clear
-
-       project.namespace_id = Namespace.global_id
-       project.save
-
-       ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about project transfer from group to global namespace" do
-      group = create :group, owner: @another_user
-      project = create :project, creator: @another_user, namespace_id: group.id
+      project_in_group = create :project, creator: @another_user, namespace_id: group.id
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-       project.namespace_id = Namespace.global_id
-       project.save
+      params = { project: { namespace_id: Namespace.global_id }}
+      ::Projects::TransferContext.new(project_in_group, @another_user, params).execute
 
-       ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
   end
 
@@ -246,43 +207,50 @@ describe EventNotificationMailer do
     end
 
     it "should send email about create group" do
-      group = create :group, owner: @another_user
-      ActionMailer::Base.deliveries.should_not be_blank
+      new_group = create :group, owner: @another_user
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update group" do
-      group = create :group, owner: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       group.name = "#{group.name}_updated"
       group.save
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about destroy group" do
-      group = create :group, owner: @another_user
+      ::Groups::RemoveContext.new(group, @another_user).execute
 
-      ActionMailer::Base.deliveries.clear
-
-      group.destroy
-
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about create project in group" do
-      group = create :group, owner: @another_user
+      params = { project: attributes_for(:project), namespace_id: group.id }
 
-      ActionMailer::Base.deliveries.clear
+      ::Projects::CreateContext.new(@another_user, params).execute
 
-      project = create :project, creator: @another_user, namespace: group
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+    it "should send email about update project in group" do
+      SubscriptionService.subscribe(@user, :all, group, :project)
+      project.namespace = group
+      project.save
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { project: attributes_for(:project) }
+      Projects::UpdateContext.new(project, @another_user, params).execute
 
       ActionMailer::Base.deliveries.should_not be_blank
     end
 
-    it "should send email about update project in group" do
+    it "should send emails without dublicates about update project in group" do
       group = create :group, owner: @another_user
+
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+      SubscriptionService.subscribe(@user, :all, group, :project)
+
       project = create :project, creator: @another_user, namespace: group
 
       ActionMailer::Base.deliveries.clear
@@ -290,69 +258,74 @@ describe EventNotificationMailer do
       project.name = "#{project.name}_updated"
       project.save
 
-      ActionMailer::Base.deliveries.should be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about delete project in group" do
-      group = create :group, owner: @another_user
-      project = create :project, creator: @another_user, namespace: group
+      project.namespace = group
+      project.save
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      project.destroy
+      ::Projects::RemoveContext.new(project, @another_user).execute
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about transfer project between group" do
       old_group = create :group, owner: @another_user
       new_group = create :group, owner: @another_user
-      project = create :project, creator: @another_user, namespace: old_group
+      project_in_group = create :project, creator: @another_user, namespace_id: old_group.id
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      project.namespace = new_group
-      project.save
+      params = { project: { namespace_id: new_group.id }}
+      ::Projects::TransferContext.new(project_in_group, @another_user, params).execute
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
 
     it "should send email about assigned team to group" do
-      group = create :group, owner: @another_user
-      team = create :user_team, owner: @another_user
+      team
+      group
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      Gitlab::UserTeamManager.assign_to_group(team, group, UsersProject::MASTER)
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update relation team to group" do
-      group = create :group, owner: @another_user
-      team = create :user_team, owner: @another_user
-      Gitlab::UserTeamManager.assign_to_group(team, group, UsersProject::MASTER)
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      utgr = group.user_team_group_relationships.find_by_user_team_id(team.id)
-      utgr.greatest_access = UsersProject::DEVELOPER
-      utgr.save
+      params = { greatest_project_access: UsersProject::REPORTER, rebuild_flag: false }
+      Teams::Groups::UpdateRelationContext.new(@another_user, team, group, params).execute
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { greatest_project_access: UsersProject::DEVELOPER, rebuild_flag: true }
+      Teams::Groups::UpdateRelationContext.new(@another_user, team, group, params).execute
+
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about resign team from group" do
-      group = create :group, owner: @another_user
-      team = create :user_team, owner: @another_user
-      Gitlab::UserTeamManager.assign_to_group(team, group, UsersProject::MASTER)
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      Gitlab::UserTeamManager.resign_from_group(team, group)
+      Teams::Groups::RemoveRelationContext.new(@another_user, team, group).execute
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
   end
 
@@ -362,66 +335,153 @@ describe EventNotificationMailer do
     end
 
     it "should send email about create team" do
-      team = create :user_team, owner: @another_user
-      ActionMailer::Base.deliveries.should_not be_blank
+      new_team = create :user_team, owner: @another_user
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update team" do
-      team = create :user_team, owner: @another_user
-
-      ActionMailer::Base.deliveries.clear
-
       team.name = "#{team.name}_updated"
       team.save
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about destroy team" do
-      team = create :user_team, owner: @another_user
+      ::Teams::RemoveContext.new(team, @another_user).execute
 
-      ActionMailer::Base.deliveries.clear
-
-      team.destroy
-
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about assigned team to group" do
-      group = create :group, owner: @another_user
-      team = create :user_team, owner: @another_user
+      SubscriptionService.subscribe(@user, :all, :group, :all)
+      SubscriptionService.subscribe(@user, :all, :project, :all)
 
-      ActionMailer::Base.deliveries.clear
+      project1 = create :project, namespace: group, creator: @another_user
+      project2 = create :project, namespace: group, creator: @another_user
 
-      Gitlab::UserTeamManager.assign_to_group(team, group, UsersProject::MASTER)
+      user1 = create :user
+      user2 = create :user
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      Gitlab::UserTeamManager.add_member_into_team(team, user1, UsersProject::MASTER, true)
+      Gitlab::UserTeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
+
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+    it "should send email about add new member into team on assigned team to group" do
+      SubscriptionService.subscribe(@user, :all, :group, :all)
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+
+      project1 = create :project, namespace: group, creator: @another_user
+      project2 = create :project, namespace: group, creator: @another_user
+
+      user1 = create :user
+      user2 = create :user
+      user3 = create :user
+
+      params = { user_ids: "#{user1.id}, #{user2.id}", default_project_access: UsersProject::MASTER, group_admin: false }
+      ::Teams::Users::CreateRelationContext.new(@another_user, team, nil, params).execute
+
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { user_ids: user3.id.to_s, default_project_access: UsersProject::MASTER, group_admin: false }
+      ::Teams::Users::CreateRelationContext.new(@another_user, team, nil, params).execute
+      Gitlab::UserTeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
+
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+    it "should send email about update member into team on assigned team to group" do
+      SubscriptionService.subscribe(@user, :all, :group, :all)
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+
+      project1 = create :project, namespace: group, creator: @another_user
+      project2 = create :project, namespace: group, creator: @another_user
+
+      user1 = create :user
+      user2 = create :user
+      user3 = create :user
+
+      params = { user_ids: "#{user1.id}, #{user2.id}, #{user3.id}", default_project_access: UsersProject::MASTER, group_admin: false }
+      ::Teams::Users::CreateRelationContext.new(@another_user, team, nil, params).execute
+
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { team_member: { permission: 20, group_admin: 1 } }
+      ::Teams::Users::UpdateRelationContext.new(@another_user, team, user3, params).execute
+
+      ActionMailer::Base.deliveries.count.should == 1
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { team_member: { permission: 30, group_admin: 1 } }
+      ::Teams::Users::UpdateRelationContext.new(@another_user, team, user3, params).execute
+
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+    it "should send email about assigned team to group with subscriptions on projects only" do
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+
+      project1 = create :project, namespace: group, creator: @another_user
+      project2 = create :project, namespace: group, creator: @another_user
+
+      Event::Subscription.by_user(@user).by_target(project1).count.should == 1
+      Event::Subscription.by_user(@user).by_target(project2).count.should == 1
+
+      user1 = create :user
+      user2 = create :user
+
+      Gitlab::UserTeamManager.add_member_into_team(team, user1, UsersProject::MASTER, true)
+      Gitlab::UserTeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
+
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update relation team to group" do
-      group = create :group, owner: @another_user
-      team = create :user_team, owner: @another_user
-      Gitlab::UserTeamManager.assign_to_group(team, group, UsersProject::MASTER)
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      utgr = group.user_team_group_relationships.find_by_user_team_id(team.id)
-      utgr.greatest_access = UsersProject::DEVELOPER
-      utgr.save
+      params = { greatest_project_access: UsersProject::REPORTER, rebuild_flag: false }
+      Teams::Groups::UpdateRelationContext.new(@another_user, team, group, params).execute
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      params = { greatest_project_access: UsersProject::DEVELOPER, rebuild_flag: true }
+      Teams::Groups::UpdateRelationContext.new(@another_user, team, group, params).execute
+
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about resign team from group" do
-      group = create :group, owner: @another_user
-      team = create :user_team, owner: @another_user
-      Gitlab::UserTeamManager.assign_to_group(team, group, UsersProject::MASTER)
+      params = { greatest_project_access: UsersProject::MASTER }
+      Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
 
-      ActionMailer::Base.deliveries.clear
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      Gitlab::UserTeamManager.resign_from_group(team, group)
+      Teams::Groups::RemoveRelationContext.new(@another_user, team, group).execute
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
   end
 
@@ -431,44 +491,47 @@ describe EventNotificationMailer do
     end
 
     it "should send email about create user" do
-      user = create :user
-      ActionMailer::Base.deliveries.should_not be_blank
+      new_user = create :user
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update user" do
-      user = create :user
-
-      ActionMailer::Base.deliveries.clear
-
       user.name = "#{user.name}_updated"
       user.save
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about self key add" do
-      key = create :key, user: @user
+      key = create :key, user: user
 
-      ActionMailer::Base.deliveries.should_not be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
   end
 
   describe "Push actions mails" do
 
     before do
+      SubscriptionService.subscribe(@user, :all, :project, :all)
+
       @service = GitPushService.new
       @oldrev = 'b98a310def241a6fd9c9a9a3e7934c48e498fe81'
       @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
       @ref = 'refs/heads/master'
+      @project = project
+      @project.default_branch = 'master'
+      @project.save
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
     end
 
     describe "Push Events" do
       it "should send email with summary push info "  do
-        ActionMailer::Base.deliveries.clear
+        ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
         @service.execute(@project, @another_user, @oldrev, @newrev, @ref)
 
-        ActionMailer::Base.deliveries.should_not be_blank
+        ActionMailer::Base.deliveries.count.should == 1
       end
     end
   end

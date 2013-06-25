@@ -14,9 +14,9 @@
             = text_field_tag :name, params[:name], class: "span2"
 
         .control-group
-          = label_tag :namespace_id, 'Namespace:', class: 'control-label'
+          = label_tag :owner_id, 'Owner:', class: 'control-label'
           .controls
-            = select_tag :namespace_id, namespaces_options(params[:namespace_id], :all), class: "chosen span2", prompt: "Any"
+            = users_select_tag :owner_id, selected: params[:owner_id], class: 'input-large'
         .control-group
           = label_tag :public_only, 'Public Only', class: 'control-label'
           .controls
@@ -47,25 +47,19 @@
         - @projects.each do |project|
           %li
             - if project.public
-              %i.icon-share
+              = public_icon
             - else
-              %i.icon-lock.cgreen
+              = private_icon
             - if @git_protocol_enabled
               %span.cblue
-              - if project.git_protocol_enabled
-                %i.icon-ok
-              - else
-                %i.icon-off
-
+                = private_icon(project.git_protocol_enabled)
             = link_to project.name_with_namespace, [:admin, project]
             .pull-right
               = link_to project_path(project), id: "view_#{dom_id(project)}", class: "btn btn-small" do
                 %i.icon-list-alt
                 Public page
               = link_to 'Edit', edit_project_path(project), id: "edit_#{dom_id(project)}", class: "btn btn-small"
-              = link_to 'Destroy', [project], confirm: "REMOVE #{project.name}? Are you sure?", method: :delete, class: "btn btn-small btn-remove"
+              = link_to 'Destroy', [project], confirm: remove_project_message(project), method: :delete, class: "btn btn-small btn-remove"
         - if @projects.blank?
           %p.nothing_here_message 0 projects matches
-        - else
-          %li.bottom
-            = paginate @projects, theme: "gitlab"
+    = paginate @projects, theme: "gitlab"
