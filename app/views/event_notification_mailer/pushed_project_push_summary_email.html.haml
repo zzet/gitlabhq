@@ -28,7 +28,7 @@
         = truncate(@before_commit.title, length: 70)
     %tr{style: 'margin: 1px; background: #efefef;'}
       %th{align: :left, colspan:2}
-        = link_to 'Compare it', project_compare_url(@event.target, @before_commit, @commits.last)
+        = link_to 'Compare it', project_compare_url(@event.target, from: @before_commit, to: @commits.last)
 
 - if @commits.present?
   %br
