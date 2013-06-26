@@ -83,7 +83,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created on #{@target.project.name} [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created in #{@target.project.name} [created]")
   end
 
   def created_project_project_email(notification)
@@ -1229,6 +1229,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source_type
     @project = @target = @event.target
+    @repository = @project.repository
     @push_data = JSON.load(@event.data).to_hash
 
     result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
