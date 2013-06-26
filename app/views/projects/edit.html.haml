@@ -62,6 +62,18 @@
                             %em Any
                             user will have #{link_to "Guest", help_permissions_path} permissions on the repository.
 
+                        = f.label :public, class: 'control-label' do
+                          %span Git protocol access
+                        .controls
+                          = f.check_box :git_protocol_enabled
+                          %span.descr
+                            If checked, this project can be cloned
+                            %em without any
+                            authentication.
+                            It will also be listed on the #{link_to "public access directory", public_root_path}.
+                            %em Any
+                            user will have #{link_to "Guest", help_permissions_path} permissions on the repository.
+
                   %fieldset.features
                     %legend
                       Labels:
