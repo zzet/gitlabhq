@@ -16,9 +16,9 @@ module Projects
         begin
           Project.transaction do
             #First save the DB entries as they can be rolled back if the repo fork fails
-            from_project.build_forked_from_project_link(forked_to_from_project_id: from_project.id, forked_from_from_project_id: @project.id)
+            from_project.build_forked_project_link(forked_to_project_id: from_project.id, forked_from_project_id: @project.id)
             if from_project.save
-              from_project.users_from_projects.create(from_project_access: Usersfrom_project::MASTER, user: current_user)
+              from_project.users_projects.create(from_project_access: UsersProject::MASTER, user: current_user)
             end
             #Now fork the repo
             unless gitlab_shell.fork_repository(@project.path_with_namespace, from_project.namespace.path)
