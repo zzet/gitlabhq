@@ -83,7 +83,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created on #{@target.name} in #{@target.project.name} [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created in #{@target.project.name} [created]")
   end
 
   def created_project_project_email(notification)
@@ -467,10 +467,10 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @note = @source = @event.source
+    @merge_request = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@target.name} merge request [commented]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@merge_request.title} merge request [commented]")
   end
 
   def commented_issue_note_email(notification)
@@ -557,7 +557,7 @@ class EventNotificationMailer < ActionMailer::Base
 
     data = JSON.load(@event.data).to_hash
 
-    @project = Project.find_by_id(data["ptoject_id"])
+    @project = Project.find_by_id(data["project_id"])
     @team = UserTeam.find_by_id(data["user_team_id"])
 
     if @project && @team
@@ -1225,6 +1225,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source_type
     @project = @target = @event.target
     @push_data = @event.data
+    @repository = @project.repository
 
     result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
 

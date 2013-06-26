@@ -25,7 +25,7 @@ set :rvm_type, :system
 set :rvm_ruby_string, 'ruby-1.9.3-p194'
 
 set :scm, :git
-set :repository, "gitorious@git.undev.cc:infrastructure/gitlab.git"
+set :repository, "git://git.undev.cc/infrastructure/gitlab.git"
 
 set :use_sudo, false
 set :ssh_options, :forward_agent => true
@@ -68,7 +68,7 @@ namespace :deploy do
       runit expects 2 to tell it to send the USR2 signal to the process.
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
-    run "sudo sv reload /etc/sv/gitlab-*"
+    run "sudo sv stop /etc/sv/gitlab-*"
   end
 end
 

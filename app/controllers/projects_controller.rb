@@ -50,7 +50,8 @@ class ProjectsController < ProjectResourceController
   end
 
   def transfer
-    ::Projects::TransferContext.new(current_user, project, params).execute
+    new_namespace = Namespace.find_by_id(params[:project][:namespace_id])
+    ::Projects::TransferContext.new(current_user, project, new_namespace).execute
   end
 
   def show

@@ -1,5 +1,5 @@
 = form_tag admin_team_member_path(@team, @member), method: :put do
-  -if @member.errors.any?
+  - if @member.errors.any?
     .alert.alert-error
       %ul
         - @member.errors.full_messages.each do |msg|
@@ -8,11 +8,11 @@
   .clearfix
     %label Default access for Team projects:
     .input
-      = select_tag :default_project_access, options_for_select(UserTeam.access_roles, @team.default_projects_access(@member)), class: "project-access-select chosen span3"
+      = select_tag :permission, options_for_select(UserTeam.access_roles, @team.default_projects_access(@member)), class: "project-access-select chosen span3"
   .clearfix
     %label Team admin?
     .input
-      = check_box_tag :group_admin, true, @team.admin?(@member)
+      = check_box_tag :group_admin, 1, @team.admin?(@member)
 
   %br
   .actions
