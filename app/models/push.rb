@@ -1,9 +1,10 @@
 class Push < ActiveRecord::Base
   include Watchable
 
-  attr_accessible :after, :before, :commits_count, :data,
-    :project, :user,
-    :project_id, :ref, :user_id
+  attr_accessible :after, :before,
+                  :commits_count, :data,
+                  :project, :user,
+                  :project_id, :ref, :user_id
 
   belongs_to :project
   belongs_to :user
