@@ -1,5 +1,9 @@
 class Gitlab::Event::Builder::Snippet < Gitlab::Event::Builder::Base
   class << self
+    def prioritet
+      2
+    end
+
     def can_build?(action, data)
       known_action = known_action? action, ::Snippet.available_actions
       known_source = known_source? data, ::Snippet.watched_sources
