@@ -1,5 +1,9 @@
 class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
   class << self
+    def prioritet
+      3
+    end
+
 
     def can_build?(action, data)
       known_action = known_action? action, ::MergeRequest.available_actions
