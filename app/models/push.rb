@@ -1,14 +1,13 @@
 class Push < ActiveRecord::Base
   include Watchable
 
-  attr_accessible :after, :before,
+  attr_accessible :after, :before, :ref,
                   :commits_count, :data,
-                  :project, :user,
-                  :project_id, :ref, :user_id
+                  :project, :project_id,
+                  :user, :user_id
 
   belongs_to :project
   belongs_to :user
-  has_many :commits
 
   validate :project, presence: true
   validate :user,    presence: true
@@ -18,6 +17,12 @@ class Push < ActiveRecord::Base
   actions_to_watch [:pushed, :created_branch, :deleted_branch, :created_tag, :deleted_tag]
   actions_sources [watchable_name]
   available_in_activity_feed true, actions: [:pushed, :created_branch, :deleted_branch, :created_tag, :deleted_tag]
+
+  store :data
+
+  def commits
+    @commits ||= data[:commits].reverse #@commits ||= repository.present? ? data[:commits].map { |commit| repository.commit(commit[:id]) }.reverse : []
+  end
 
   def to_branch?
     ref =~ /^refs\/heads/ || before =~ /^00000/
@@ -41,6 +46,30 @@ class Push < ActiveRecord::Base
 
   def push_data(limit = 20)
     data ||= load_push_data(limit)
+  end
+
+  def tag?
+    ref["refs/tags"]
+  end
+
+  def branch?
+    ref["refs/heads"]
+  end
+
+  def ref_name
+    if tag?
+      tag_name
+    else
+      branch_name
+    end
+  end
+
+  def branch_name
+    @branch_name ||= ref.gsub("refs/heads/", "")
+  end
+
+  def tag_name
+    @tag_name ||= ref.gsub("refs/tags/", "")
   end
 
   protected

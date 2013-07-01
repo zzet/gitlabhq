@@ -6,7 +6,7 @@ module Projects
           team = UserTeam.find(params[:team_id])
           access = params[:greatest_project_access]
           params[:project_ids] = [project.id]
-          Teams::Projects::CreateRelationContext.new(current_user, team, params).execute
+          ::Teams::Projects::CreateRelationContext.new(current_user, team, params).execute
         end
       end
     end
