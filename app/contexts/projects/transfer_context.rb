@@ -25,6 +25,8 @@ module Projects
               old_namespace.user_teams
             when User, NilClass, String
               project.user_teams
+            else
+              []
             end.each { |team| Gitlab::UserTeamManager.resign(team, project) }
 
             # Assign group teams to projects in group
