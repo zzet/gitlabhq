@@ -83,7 +83,7 @@ class EventNotificationMailer < ActionMailer::Base
     @source = @event.source
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created on #{@target.name} in #{@target.project.name} [created]")
+    mail(bcc: @notification.subscriber.email, subject: "New note was created in #{@target.project.name} [created]")
   end
 
   def created_project_project_email(notification)
@@ -450,7 +450,9 @@ class EventNotificationMailer < ActionMailer::Base
     @note = @source = @event.source
     @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@project.path_with_namespace} project wall [commented]")
+    if @note && @project
+      mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@project.path_with_namespace} project wall [commented]")
+    end
   end
 
   def commented_project_note_email(notification)
@@ -467,10 +469,12 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
-    @target = @event.target
+    @note = @source = @event.source
+    @merge_request = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@target.name} merge request [commented]")
+    if @merge_request && @user
+      mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@merge_request.title} merge request [commented]")
+    end
   end
 
   def commented_issue_note_email(notification)
@@ -1225,12 +1229,14 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @source = @event.source_type
     @project = @target = @event.target
+    @repository = @project.repository
     @push_data = JSON.load(@event.data).to_hash
 
     result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
 
     if result
       @before_commit = @project.repository.commit(@push_data["before"])
+      @after_commit = @project.repository.commit(@push_data["after"])
       @branch = @push_data["ref"]
       @branch.slice!("refs/heads/")
 

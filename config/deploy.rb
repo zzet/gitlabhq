@@ -63,7 +63,7 @@ namespace :deploy do
       runit expects 2 to tell it to send the USR2 signal to the process.
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
-    run "sudo sv stop /etc/sv/gitlab-*"
+    run "sudo sv restart /etc/sv/gitlab-*"
   end
   desc "Generate mails"
   task :generate_mails, :roles => :app do

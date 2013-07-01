@@ -1,5 +1,9 @@
 class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
   class << self
+    def prioritet
+      3
+    end
+
 
     def can_build?(action, data)
       known_action = known_action? action, ::MergeRequest.available_actions
@@ -39,9 +43,11 @@ class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
         if target.is_a? ::MergeRequest
           case meta[:action]
           when :created
-            actions << :added
+            actions << :commented
           when :updated
+            actions << :updated
           when :deleted
+            actions << :deleted
           end
         end
       end

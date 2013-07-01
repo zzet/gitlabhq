@@ -1,5 +1,9 @@
 class Gitlab::Event::Builder::Note < Gitlab::Event::Builder::Base
   class << self
+    def prioritet
+      2
+    end
+
     def can_build?(action, data)
       known_action = known_action? action, ::Note.available_actions
       known_source = data.is_a? ::Note

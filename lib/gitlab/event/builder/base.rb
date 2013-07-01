@@ -5,7 +5,7 @@ class Gitlab::Event::Builder::Base
       # In production class cache :)
       Dir[File.dirname(__FILE__) << "/**/*.rb"].each {|f| load f} if super.blank?
 
-      super
+      super.sort {|x,y| x.prioritet <=> y.prioritet}
     end
 
     def can_build?(action, data)
@@ -13,6 +13,10 @@ class Gitlab::Event::Builder::Base
     end
 
     def build(action, target, user, data)
+      raise NotImplementedError
+    end
+
+    def prioritet
       raise NotImplementedError
     end
 
