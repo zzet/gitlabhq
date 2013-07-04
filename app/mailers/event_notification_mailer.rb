@@ -450,7 +450,9 @@ class EventNotificationMailer < ActionMailer::Base
     @note = @source = @event.source
     @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@project.path_with_namespace} project wall [commented]")
+    if @note && @project
+      mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@project.path_with_namespace} project wall [commented]")
+    end
   end
 
   def commented_project_note_email(notification)
@@ -470,7 +472,9 @@ class EventNotificationMailer < ActionMailer::Base
     @note = @source = @event.source
     @merge_request = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@merge_request.title} merge request [commented]")
+    if @merge_request && @user
+      mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@merge_request.title} merge request [commented]")
+    end
   end
 
   def commented_issue_note_email(notification)
@@ -1232,6 +1236,7 @@ class EventNotificationMailer < ActionMailer::Base
 
     if result
       @before_commit = @project.repository.commit(@push_data["before"])
+      @after_commit = @project.repository.commit(@push_data["after"])
       @branch = @push_data["ref"]
       @branch.slice!("refs/heads/")
 

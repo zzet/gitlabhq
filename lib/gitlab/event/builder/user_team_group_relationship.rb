@@ -1,5 +1,9 @@
 class Gitlab::Event::Builder::UserTeamGroupRelationship < Gitlab::Event::Builder::Base
   class << self
+    def prioritet
+      0
+    end
+
     def can_build?(action, data)
       known_action = known_action? action, ::UserTeamGroupRelationship.available_actions
       known_source = data.is_a? ::UserTeamGroupRelationship

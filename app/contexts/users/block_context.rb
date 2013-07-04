@@ -5,17 +5,17 @@ module Users
         user.block
 
         # Remove user from all projects and
-        user.users_projects.find_each do |membership|
-          return false unless membership.destroy
-        end
-
-        # Remove user from all projects and
         user.user_teams.find_each do |membership|
           return false unless membership.destroy
         end
 
-        receive_delayed_notifications
+        # Remove user from all projects and
+        user.users_projects.find_each do |membership|
+          return false unless membership.destroy
+        end
       end
+
+      receive_delayed_notifications
     end
   end
 end

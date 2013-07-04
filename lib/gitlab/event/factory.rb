@@ -22,14 +22,13 @@ module Gitlab
             events.each_with_index do |e, i|
               if e.source == e.target
                 e.save
-                events.delete_at(i)
               end
             end
             parent_event = Gitlab::Event::Builder::Base.find_parent_event(action, data)
           end
 
           events.each do |event|
-            event.parent_event = parent_event if parent_event.present?
+            event.parent_event = parent_event if parent_event.present? && (event != parent_event)
             event.save
           end
         end
