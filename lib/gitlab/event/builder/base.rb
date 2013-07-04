@@ -59,7 +59,7 @@ class Gitlab::Event::Builder::Base
           candidate = candidates.last
 
           return nil if candidate && candidate.notifications.where(notification_state: [:delivered, :new]).any?
-          return candidate.parent_event if candidate.parent_event.present? && level > 1
+          return candidate.parent_event if candidate && candidate.parent_event.present? && level > 1
           return candidate
         end
       end
