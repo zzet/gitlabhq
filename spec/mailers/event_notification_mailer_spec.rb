@@ -146,7 +146,7 @@ describe EventNotificationMailer do
     end
 
     it "should send email about create snippet in project" do
-      snippet = create :snippet, project: project, author: @another_user
+      snippet = create :project_snippet, project: project, author: @another_user
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -163,8 +163,7 @@ describe EventNotificationMailer do
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      params = { project: { namespace_id: group.id }}
-      ::Projects::TransferContext.new(project, @another_user, params).execute
+      ::Projects::TransferContext.new(@another_user, project, group).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -176,15 +175,13 @@ describe EventNotificationMailer do
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      params = { project: { namespace_id: new_group.id }}
-      ::Projects::TransferContext.new(project_in_group, @another_user, params).execute
+      ::Projects::TransferContext.new(@another_user, project_in_group, new_group).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about project transfer from user to global namespace" do
-      params = { project: { namespace_id: Namespace.global_id }}
-      ::Projects::TransferContext.new(project, @another_user, params).execute
+      ::Projects::TransferContext.new(@another_user, project, Namespace.global_id).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -194,8 +191,7 @@ describe EventNotificationMailer do
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      params = { project: { namespace_id: Namespace.global_id }}
-      ::Projects::TransferContext.new(project_in_group, @another_user, params).execute
+      ::Projects::TransferContext.new(@another_user, project_in_group, Namespace.global_id).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -219,7 +215,7 @@ describe EventNotificationMailer do
     end
 
     it "should send email about destroy group" do
-      ::Groups::RemoveContext.new(group, @another_user).execute
+      ::Groups::RemoveContext.new(@another_user, group).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -240,7 +236,7 @@ describe EventNotificationMailer do
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
       params = { project: attributes_for(:project) }
-      Projects::UpdateContext.new(project, @another_user, params).execute
+      Projects::UpdateContext.new(@another_user, project, params).execute
 
       ActionMailer::Base.deliveries.should_not be_blank
     end
@@ -267,7 +263,7 @@ describe EventNotificationMailer do
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      ::Projects::RemoveContext.new(project, @another_user).execute
+      ::Projects::RemoveContext.new(@another_user, project).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -279,8 +275,7 @@ describe EventNotificationMailer do
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      params = { project: { namespace_id: new_group.id }}
-      ::Projects::TransferContext.new(project_in_group, @another_user, params).execute
+      ::Projects::TransferContext.new(@another_user, project_in_group, new_group).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -347,7 +342,7 @@ describe EventNotificationMailer do
     end
 
     it "should send email about destroy team" do
-      ::Teams::RemoveContext.new(team, @another_user).execute
+      ::Teams::RemoveContext.new(@another_user, team).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -384,16 +379,16 @@ describe EventNotificationMailer do
       user2 = create :user
       user3 = create :user
 
-      params = { user_ids: "#{user1.id}, #{user2.id}", default_project_access: UsersProject::MASTER, group_admin: false }
-      ::Teams::Users::CreateRelationContext.new(@another_user, team, nil, params).execute
+      params = { user_ids: "#{user1.id}, #{user2.id}", permission: UsersProject::MASTER, group_admin: false }
+      ::Teams::Users::CreateRelationContext.new(@another_user, team, params).execute
 
       params = { greatest_project_access: UsersProject::MASTER }
       Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
-      params = { user_ids: user3.id.to_s, default_project_access: UsersProject::MASTER, group_admin: false }
-      ::Teams::Users::CreateRelationContext.new(@another_user, team, nil, params).execute
+      params = { user_ids: user3.id.to_s, permission: UsersProject::MASTER, group_admin: false }
+      ::Teams::Users::CreateRelationContext.new(@another_user, team, params).execute
       Gitlab::UserTeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
 
       ActionMailer::Base.deliveries.count.should == 1
@@ -410,8 +405,8 @@ describe EventNotificationMailer do
       user2 = create :user
       user3 = create :user
 
-      params = { user_ids: "#{user1.id}, #{user2.id}, #{user3.id}", default_project_access: UsersProject::MASTER, group_admin: false }
-      ::Teams::Users::CreateRelationContext.new(@another_user, team, nil, params).execute
+      params = { user_ids: [user1.id, user2.id, user3.id], permission: UsersProject::MASTER, group_admin: false }
+      ::Teams::Users::CreateRelationContext.new(@another_user, team, params).execute
 
       params = { greatest_project_access: UsersProject::MASTER }
       Teams::Groups::CreateRelationContext.new(@another_user, team, group, params).execute

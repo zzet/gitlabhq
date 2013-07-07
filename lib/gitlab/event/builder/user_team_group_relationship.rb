@@ -11,7 +11,7 @@ class Gitlab::Event::Builder::UserTeamGroupRelationship < Gitlab::Event::Builder
     end
 
     def build(action, source, user, data)
-      meta = parse_action(action)
+      meta = Gitlab::Event::Action.parse(action)
       temp_data = data.attributes
       actions = []
       target = source

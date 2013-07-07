@@ -1,14 +1,14 @@
 class Gitlab::Event::Hierarchy::Storage
   def initialize
-    @events = []
+    RequestStore.store[:events_hierarchy_store] ||= []
   end
 
   def events
-    @events ||= []
+    RequestStore.store[:events_hierarchy_store] ||= []
   end
 
   def clear
-    @events.clear
+    RequestStore.store[:events_hierarchy_store].clear
   end
 
   def put args
@@ -33,7 +33,9 @@ class Gitlab::Event::Hierarchy::Storage
 
   def lvl_to_put?(lvl, arg)
     if lvl.any?
-      return lvl.first[:name] == arg[:name]
+      lvl_meta = Gitlab::Event::Action.parse(lvl.first[:name])
+      arg_meta = Gitlab::Event::Action.parse(arg[:name])
+      return lvl_meta == arg_meta ? true : lvl_meta[:details] == arg_meta[:details]
     end
   end
 
