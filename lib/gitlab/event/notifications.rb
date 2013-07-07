@@ -11,13 +11,8 @@ class Gitlab::Event::Notifications
 
         mail_method = "#{action}_#{target}_#{source}_email"
 
-        ::Event::Subscription::Notification.transaction do
-
-          stored_notification.process
-          stored_notification.save
-
+        if stored_notification.process
           begin
-
             if EventNotificationMailer.respond_to?(mail_method)
               EventNotificationMailer.send(mail_method, stored_notification).deliver!
             else
@@ -26,12 +21,11 @@ class Gitlab::Event::Notifications
 
             stored_notification.deliver
             stored_notification.notified_at = Time.zone.now
+            stored_notification.save
           rescue Exception => ex
             stored_notification.failing
             raise RuntimeError, "Can't send notification. Email error in #{mail_method}. \r\n#{ex.message}\r\n#{ex.backtrace.join("\r\n")}"
           end
-
-          stored_notification.save
         end
 
       else
