@@ -91,6 +91,7 @@ gem "acts-as-taggable-on"
 gem 'slim'
 gem 'sinatra', require: nil
 gem 'sidekiq'
+gem 'sidekiq-benchmark'
 
 # HTTP requests
 gem "httparty"

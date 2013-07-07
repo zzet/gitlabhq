@@ -1,5 +1,6 @@
 class PostReceive
   include Sidekiq::Worker
+  include Sidekiq::Benchmark::Worker
   include Gitlab::Identifier
 
   sidekiq_options queue: :post_receive
@@ -29,10 +30,16 @@ class PostReceive
       return false
     end
 
-    GitPushService.new.execute(project, user, oldrev, newrev, ref)
+    benchmark.execute_git_push do
+      GitPushService.new.execute(project, user, oldrev, newrev, ref)
+    end
+    benchmark.finish
   end
 
   def log(message)
-    Gitlab::GitLogger.error("POST-RECEIVE: #{message}")
+    benchmark.log_data do
+      Gitlab::GitLogger.error("POST-RECEIVE: #{message}")
+    end
+    benchmark.finish
   end
 end
