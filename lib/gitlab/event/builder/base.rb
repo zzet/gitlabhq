@@ -21,7 +21,7 @@ class Gitlab::Event::Builder::Base
     end
 
     def known_action?(action, available_actions)
-      meta = parse_action(action)
+      meta = Gitlab::Event::Action.parse(action)
       available_actions.include? meta[:action]
     end
 
@@ -31,44 +31,39 @@ class Gitlab::Event::Builder::Base
 
       if parent_event.present?
         event_info = parent_event[:data]
-        action_meta = parse_action(parent_event[:name])
+        action_meta = Gitlab::Event::Action.parse(parent_event[:name])
         source = event_info[:source] if event_info[:source].present?
         user = event_info[:user] if event_info[:user].present?
+
+        level = 0
 
         if source.present? && user.present? && source.respond_to?(:id)
           candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                    target_id: source.try(:id), target_type: source.class.name,
                                    author_id: user.id, action: action_meta[:action])
+          level = 1
 
           if candidates.blank?
             candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                      author_id: user.id, action: action_meta[:action])
+            level = 2
             if candidates.blank?
               candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                        target_id: source.try(:id), target_type: source.class.name,
                                        author_id: user.id).
                                        where("action not in (?)", [:created, :updated, :deleted])
+              level = 3
             end
           end
 
           candidate = candidates.last
 
           return nil if candidate && candidate.notifications.where(notification_state: [:delivered, :new]).any?
+          return candidate.parent_event if candidate && candidate.parent_event.present? && level > 1
           return candidate
         end
       end
       nil
-    end
-
-    private
-
-    def parse_action(action)
-      info = action.split "."
-      info.shift # Shift "gitlab"
-      {
-        action: info.shift.to_sym,
-        details: info
-      }
     end
   end
 end

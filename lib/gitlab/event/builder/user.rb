@@ -12,7 +12,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
     end
 
     def build(action, source, user, data)
-      meta = parse_action(action)
+      meta = Gitlab::Event::Action.parse(action)
       changes = source.changes
       temp_data = data.attributes
 

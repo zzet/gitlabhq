@@ -52,7 +52,7 @@ class Event::Subscription < ActiveRecord::Base
   scope :by_source_type, ->(source_type) do
     source_type = source_type.to_s.camelize
     est = self.arel_table
-    where(est[:source_type].eq(source_type).or(est[:source_category].in([source_type.downcase, :all]))).uniq_by_target #.limit(1)
+    where(est[:source_type].eq(source_type).or(est[:source_category].in([source_type.downcase, :new, :all]))).uniq_by_target #.limit(1)
   end
 
   scope :by_source_type_hard, ->(source_type) do

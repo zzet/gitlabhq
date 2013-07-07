@@ -1,60 +1,14 @@
-class Gitlab::EventHierarchyMiddleware
-
-  def initialize(appl)
-    @appl = appl
-  end
-
-  def call(env)
-
-    env["event_action_collector"] = ::EventHierarchyWorker
-
-    def env.event_action_collector
-      self["event_action_collector"]
-    end
-
-    env["event_action_collector"].reset
-
-    status, headers, body = @appl.call(env)
-
-    env["event_action_collector"].reset
-
-    [status, headers, body]
-  end
-end
-
-class EventHierarchyCollector
+class Gitlab::Event::Hierarchy::Storage
   def initialize
-    @events = EventHierarchyStorage.new
-  end
-
-  def << args
-    if args.is_a? Array
-      args.each { |arg| events.put arg }
-    else
-      events.put args
-    end
+    RequestStore.store[:events_hierarchy_store] ||= []
   end
 
   def events
-    @events
-  end
-
-  def reset
-    @events.clear
-  end
-end
-
-class EventHierarchyStorage
-  def initialize
-    @events = []
-  end
-
-  def events
-    @events ||= []
+    RequestStore.store[:events_hierarchy_store] ||= []
   end
 
   def clear
-    @events.clear
+    RequestStore.store[:events_hierarchy_store].clear
   end
 
   def put args
@@ -79,7 +33,9 @@ class EventHierarchyStorage
 
   def lvl_to_put?(lvl, arg)
     if lvl.any?
-      return lvl.first[:name] == arg[:name]
+      lvl_meta = Gitlab::Event::Action.parse(lvl.first[:name])
+      arg_meta = Gitlab::Event::Action.parse(arg[:name])
+      return lvl_meta == arg_meta ? true : lvl_meta[:details] == arg_meta[:details]
     end
   end
 
