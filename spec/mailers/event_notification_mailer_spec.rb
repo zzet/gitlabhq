@@ -34,13 +34,13 @@ describe EventNotificationMailer do
 
     it "should send email about update project" do
       params = { project: attributes_for(:project) }
-      Projects::UpdateContext.new(project, @another_user, params).execute
+      Projects::UpdateContext.new(@another_user, project, params).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about destroy project" do
-      ::Projects::RemoveContext.new(project, @another_user).execute
+      ::Projects::RemoveContext.new(@another_user, project).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -81,7 +81,7 @@ describe EventNotificationMailer do
 
     it "should send email about add note in project" do
       params = { note: attributes_for(:note) }
-      Projects::Notes::CreateContext.new(project, @another_user, params).execute
+      Projects::Notes::CreateContext.new(@another_user, project, params).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
