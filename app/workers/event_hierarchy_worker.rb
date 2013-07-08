@@ -13,7 +13,7 @@ class EventHierarchyWorker
     end
 
     def collector
-      @collector ||= EventHierarchyCollector.new
+      @collector ||= Gitlab::Event::Hierarchy::Collector.new
     end
   end
 end

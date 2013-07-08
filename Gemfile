@@ -78,6 +78,9 @@ gem  "asciidoctor"
 # Servers
 gem "puma", '~> 2.0.1'
 
+#
+gem 'request_store'
+
 # State machine
 gem "state_machine"
 

@@ -11,7 +11,7 @@ class Gitlab::Event::Builder::Key < Gitlab::Event::Builder::Base
     end
 
     def build(action, source, user, data)
-      meta = parse_action(action)
+      meta = Gitlab::Event::Action.parse(action)
       meta[:action]
       target = source
 

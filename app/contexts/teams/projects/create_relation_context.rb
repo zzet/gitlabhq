@@ -5,8 +5,10 @@ module Teams
         project_ids = params[:project_ids]
         access = params[:greatest_project_access]
 
-        allowed_project_ids = current_user.owned_projects.map(&:id)
-        project_ids.select! { |id| allowed_project_ids.include?(id.to_i) }
+        unless current_user.admin?
+          allowed_project_ids = (current_user.own_projects.pluck(:id) + current_user.owned_projects.pluck(:id)).uniq
+          project_ids.select! { |id| allowed_project_ids.include?(id.to_i) }
+        end
 
         project_ids.each do |project|
           Gitlab::UserTeamManager.assign(team, project, access)

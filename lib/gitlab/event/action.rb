@@ -1,6 +1,5 @@
 class Gitlab::Event::Action
   class << self
-
     def trigger(action, source, user = nil, data = nil, detailed_event = "")
       data = source if data.blank?
       source_name = source
@@ -18,5 +17,13 @@ class Gitlab::Event::Action
       Thread.current[:current_user]
     end
 
+    def parse(action)
+      info = action.split "."
+      info.shift # Shift "gitlab"
+      {
+        action: info.shift.to_sym,
+        details: info
+      }
+    end
   end
 end

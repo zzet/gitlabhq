@@ -62,7 +62,7 @@
                             %em Any
                             user will have #{link_to "Guest", help_permissions_path} permissions on the repository.
 
-                        = f.label :public, class: 'control-label' do
+                        = f.label :git_protocol_enabled, class: 'control-label' do
                           %span Git protocol access
                         .controls
                           = f.check_box :git_protocol_enabled

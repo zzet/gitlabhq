@@ -32,11 +32,6 @@ set :ssh_options, :forward_agent => true
 default_run_options[:pty] = true
 
 namespace :deploy do
-  desc "Load seed data for email preview"
-  task :load_notifications_seeds, :roles => :db do
-    run "cd #{current_path}; RAILS_ENV=#{rails_env} bundle exec rake db:seed:notifications;"
-  end
-
   desc "Symlinks the database.yml"
   task :symlink_db, :roles => :app do
     run "ln -nfs #{release_path}/config/database.yml.undev #{release_path}/config/database.yml"
@@ -68,7 +63,7 @@ namespace :deploy do
       runit expects 2 to tell it to send the USR2 signal to the process.
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
-    run "sudo sv stop /etc/sv/gitlab-*"
+    run "sudo sv restart /etc/sv/gitlab-*"
   end
 end
 

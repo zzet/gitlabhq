@@ -11,7 +11,7 @@ class Gitlab::Event::Builder::Push < Gitlab::Event::Builder::Base
     end
 
     def build(action, source, user, data)
-      meta = parse_action(action)
+      meta = Gitlab::Event::Action.parse(action)
       actions = []
 
       target = ::Project.find(data[:project_id])

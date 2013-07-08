@@ -30,7 +30,7 @@ class Event < ActiveRecord::Base
   end
 
   def deleted_event?
-     [:deleted, :resigned].include? action.to_sym
+     [:deleted, :resigned, :reassigned].include? action.to_sym
   end
 
   # For Hash only
