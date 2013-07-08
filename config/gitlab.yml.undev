@@ -38,7 +38,7 @@ production: &base
     signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
     # Default project features settings
     default_projects_features:
-      issues: true
+      issues: false
       merge_requests: true
       wiki: false
       wall: false
@@ -170,7 +170,7 @@ staging:
     signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
 
     default_projects_features:
-      issues: true
+      issues: false
       merge_requests: true
       wiki: false
       wall: false
