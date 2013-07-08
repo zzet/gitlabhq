@@ -78,6 +78,8 @@ class TeamsController < ApplicationController
 
   def user_team
     @team ||= current_user.authorized_teams.find_by_path(params[:id])
+    raise ActiveRecord::RecordNotFound if @team.nil?
+    @team
   end
 
   def set_title
