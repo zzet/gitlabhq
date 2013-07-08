@@ -16,6 +16,8 @@ module Projects
       }
 
       @project = Project.new(default_opts.merge(params))
+      @project.public = true
+      @project.git_protocol_enabled = false
 
       # Parametrize path for project
       #
