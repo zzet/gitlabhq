@@ -170,7 +170,7 @@ staging:
     signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
 
     default_projects_features:
-      issues: false
+      issues: true
       merge_requests: true
       wiki: false
       wall: false
