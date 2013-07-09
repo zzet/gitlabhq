@@ -391,7 +391,7 @@ class User < ActiveRecord::Base
   end
 
   def accessible_deploy_keys
-    DeployKey.in_projects(self.master_projects).uniq
+    DeployKey.in_projects(self.known_projects).uniq
   end
 
   def created_by
