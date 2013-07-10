@@ -1,5 +1,7 @@
 class Gitlab::Event::Notification::Creator::Project < Gitlab::Event::Notification::Creator::Default
   def create(event)
+    notifications = []
+
     case event.action.to_sym
     when :transfer
       notifications << create_project_move_notifications(event)
