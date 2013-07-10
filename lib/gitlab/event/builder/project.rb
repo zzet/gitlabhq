@@ -29,7 +29,10 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :updated
           changes = source.changes
 
-          actions << :transfer if source.namespace_id_changed? && (source.namespace_id != changes[:namespace_id].first)
+          if source.namespace_id_changed? && (source.namespace_id != changes[:namespace_id].first)
+            actions << :transfer
+            temp_data[:owner_changes] = changes
+          end
 
           if project_changes_exists?(changes)
             temp_data[:previous_changes] = changes
