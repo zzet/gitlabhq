@@ -41,6 +41,13 @@ class Gitlab::Event::Builder::Base
           candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                    target_id: source.try(:id), target_type: source.class.name,
                                    author_id: user.id, action: action_meta[:action])
+
+          if candidates.blank? && (source.is_a?(::Project) && action_meta[:action] == "updated")
+            candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
+                                     target_id: source.try(:id), target_type: source.class.name,
+                                     author_id: user.id, action: :transfer)
+          end
+
           level = 1
 
           if candidates.blank?
