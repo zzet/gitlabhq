@@ -839,7 +839,7 @@ class EventNotificationMailer < ActionMailer::Base
 
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "[#{@old_owner.path}/#{@project.path}] Project was moved from #{@old_owner.path} to #{@new_owner.path} namespace [transfered]")
+    mail(bcc: @notification.subscriber.email, subject: "[#{@old_owner.path}/#{@project.path}] Project was moved from '#{@old_owner.path}' to '#{@new_owner.path}' namespace [transfered]")
   end
 
   def transfer_user_team_user_team_email(notification)

@@ -27,4 +27,48 @@ class Gitlab::Event::Notification::Creator::Project < Gitlab::Event::Notificatio
 
     notifications
   end
+
+  def create_recent_notifications(event)
+    @owner_changes = JSON.load(@event.data).to_hash["owner_changes"]["namespace_id"]
+    @old_owner = Namespace.find(@owner_changes.first)
+    @new_owner = Namespace.find(@owner_changes.last)
+
+    if @old_owner.type == "Group"
+      create_group_notifications(@old_owner, event)
+      create_team_notifications(@old_owner, event)
+    end
+    if @new_owner.type == "Group"
+      create_group_notifications(@new_owner, event)
+      create_team_notifications(@new_owner, event)
+    end
+  end
+
+  def create_group_notifications(group, event)
+    notifications = []
+
+    subscriptions = ::Event::Subscription.by_target(group).by_source_type(event.source_type)
+    subscriptions.each do |subscription|
+      if subscriber_can_get_notification?(subscription, event)
+        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+      end
+    end
+
+    notifications
+  end
+
+  def create_teams_notifications(group, event)
+    notifications = []
+
+    teams = group.user_teams
+    teams.each do |team|
+      subscriptions = ::Event::Subscription.by_target(team).by_source_type(event.source_type)
+      subscriptions.each do |subscription|
+        if subscriber_can_get_notification?(subscription, event)
+          notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        end
+      end
+    end
+
+    notifications
+  end
 end
