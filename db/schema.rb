@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130614132337) do
+ActiveRecord::Schema.define(:version => 20130711082151) do
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(:version => 20130614132337) do
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
     t.boolean  "adjacent_changes"
+    t.boolean  "brave"
   end
 
   create_table "event_subscription_notifications", :force => true do |t|
