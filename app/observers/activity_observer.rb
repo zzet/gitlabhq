@@ -31,16 +31,28 @@ class ActivityObserver < ActiveRecord::Observer
   end
 
   def after_update(model)
-    Gitlab::Event::Action.trigger :updated, model unless project_system_update?(model)
+    Gitlab::Event::Action.trigger :updated, model unless updated_by_system?(model)
   end
 
   def before_destroy(model)
     Gitlab::Event::Action.trigger :deleted, model
   end
 
+  def updated_by_system?(model)
+    project_system_update?(model) || user_system_update?(model)
+  end
+
   def project_system_update?(model)
     return false unless model.is_a? ::Project
     return false if model.changes.count != 2
     return true if model.changes[:last_activity_at].present?
+    false
+  end
+
+  def user_system_update?(model)
+    return false unless model.is_a? ::User
+    return false if model.changes.count != 4
+    return true if model.changes[:last_sign_in_at].present?
+    false
   end
 end
