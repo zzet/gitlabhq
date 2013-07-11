@@ -14,7 +14,7 @@ class Gitlab::Event::Action
     end
 
     def current_user
-      RequestStore.store[:current_user] = current_user
+      RequestStore.store[:current_user]
     end
 
     def parse(action)
