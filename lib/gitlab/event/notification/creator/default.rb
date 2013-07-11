@@ -19,7 +19,7 @@ class Gitlab::Event::Notification::Creator::Default
 
   def subscriber_can_get_notification?(subscription, event)
     #has_access(event, subscription.user) &&
-    subscription.user.active? &&
+    subscription.user.active? && check_event_for_brave(subscription, event) &&
       (user_not_actor?(subscription.user, event) || user_subscribed_on_own_changes?(event)) &&
       no_notification_on_event?(event, subscription)
   end
