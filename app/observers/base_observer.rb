@@ -4,6 +4,6 @@ class BaseObserver < ActiveRecord::Observer
   end
 
   def current_user
-    Thread.current[:current_user]
+    RequestStore.store[:current_user] = current_user
   end
 end

@@ -2,7 +2,7 @@ module API
   # MergeRequest API
   class MergeRequests < Grape::API
     before { authenticate! }
-    before { Thread.current[:current_user] = current_user }
+    before { RequestStore.store[:current_user] = current_user }
 
     resource :projects do
       helpers do
