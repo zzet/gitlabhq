@@ -27,11 +27,14 @@ class Gitlab::Event::Notification::Creator::Default
   private
 
   def create_adjacent_notifications(event)
+
     subscription_target = nil
     subscription_source = nil
 
     case event.target
     when Project
+      return if event.action.to_sym == :transfer
+
       project = event.target
       namespace = project.namespace
 
