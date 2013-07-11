@@ -4,15 +4,12 @@ module Users
       User.transaction do
         user.block
 
-        # Remove user from all projects and
-        user.user_teams.find_each do |membership|
-          return false unless membership.destroy
+        # Remove user from all teams
+        user.user_teams.find_each do |team|
+          Gitlab::UserTeamManager.remove_member_from_team(team, user)
         end
 
-        # Remove user from all projects and
-        user.users_projects.find_each do |membership|
-          return false unless membership.destroy
-        end
+        UsersProject.with_user(user).destroy_all
       end
 
       receive_delayed_notifications

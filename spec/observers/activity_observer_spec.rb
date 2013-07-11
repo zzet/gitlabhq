@@ -17,7 +17,7 @@ describe ActivityObserver do
   end
 
   before do
-    Thread.current[:current_user] = @user
+    RequestStore.store[:current_user] = current_user
   end
 
 

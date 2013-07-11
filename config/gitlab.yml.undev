@@ -39,7 +39,7 @@ production: &base
     # Default project features settings
     default_projects_features:
       issues: false
-      merge_requests: false
+      merge_requests: true
       wiki: false
       wall: false
       snippets: false
@@ -171,7 +171,7 @@ staging:
 
     default_projects_features:
       issues: false
-      merge_requests: false
+      merge_requests: true
       wiki: false
       wall: false
       snippets: false

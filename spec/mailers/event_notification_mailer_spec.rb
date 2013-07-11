@@ -10,7 +10,7 @@ describe EventNotificationMailer do
 
     ActiveRecord::Base.observers.enable :all
 
-    Thread.current[:current_user] = @another_user
+    RequestStore.store[:current_user] = current_user
 
     ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
   end

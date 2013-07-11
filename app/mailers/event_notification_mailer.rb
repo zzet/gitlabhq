@@ -1,7 +1,7 @@
 class EventNotificationMailer < ActionMailer::Base
   layout 'event_notification_email'
   helper :application, :commits, :tree, :gitlab_markdown
-  default from: "Gitlab messeger <#{Gitlab.config.gitlab.email_from}>",
+  default from: "Gitlab messenger <#{Gitlab.config.gitlab.email_from}>",
           return_path: Gitlab.config.gitlab.email_from
 
   default_url_options[:host]     = Gitlab.config.gitlab.host
@@ -831,10 +831,15 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event = @notification.event
     @user = @event.author
-    @source = @event.source
+    @project = @source = @event.source
+
+    @owner_changes = JSON.load(@event.data).to_hash["owner_changes"]["namespace_id"]
+    @old_owner = Namespace.find(@owner_changes.first)
+    @new_owner = Namespace.find(@owner_changes.last)
+
     @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Project owner of #{@source.name} project was changed by #{@user.name} [transfered]")
+    mail(bcc: @notification.subscriber.email, subject: "[#{@old_owner.path}/#{@project.path}] Project was moved from '#{@old_owner.path}' to '#{@new_owner.path}' namespace [transfered]")
   end
 
   def transfer_user_team_user_team_email(notification)
