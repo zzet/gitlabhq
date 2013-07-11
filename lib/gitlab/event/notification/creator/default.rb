@@ -24,6 +24,17 @@ class Gitlab::Event::Notification::Creator::Default
       no_notification_on_event?(event, subscription)
   end
 
+  def check_event_for_brave(subscription, event)
+    return true if ["Note", "MergeRequest", "Push_summary"].include?(event.source_type)
+
+    subscriber = subscription.user
+    settings = subscriber.notification_setting
+
+    return false if settings.blank?
+    return true if settings.brave
+    false
+  end
+
   private
 
   def create_adjacent_notifications(event)
