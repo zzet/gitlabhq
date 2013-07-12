@@ -2,7 +2,7 @@ module API
   # Issues API
   class Issues < Grape::API
     before { authenticate! }
-    before { Thread.current[:current_user] = current_user }
+    before { RequestStore.store[:current_user] = current_user }
 
     resource :issues do
       # Get currently authenticated user's issues

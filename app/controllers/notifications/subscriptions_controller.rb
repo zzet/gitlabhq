@@ -21,6 +21,29 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
     redirect_to profile_subscriptions_path
   end
 
+  def on_brave
+    @current_user.notification_setting.brave = true
+
+    @current_user.notification_setting.save
+
+    respond_to do |format|
+      format.json { head :created }
+      format.html { redirect_to profile_subscriptions_path }
+    end
+  end
+
+  def from_brave
+    @current_user.notification_setting.brave = false
+
+    @current_user.notification_setting.save
+
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { redirect_to profile_subscriptions_path }
+    end
+  end
+
+
   def on_own_changes
     @current_user.notification_setting.own_changes = true
 

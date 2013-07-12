@@ -50,6 +50,7 @@ class ApplicationController < ActionController::Base
 
   def set_current_user_for_thread
     Thread.current[:current_user] = current_user
+    RequestStore.store[:current_user] = current_user
   end
 
   def abilities

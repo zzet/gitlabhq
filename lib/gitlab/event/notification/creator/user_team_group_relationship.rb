@@ -47,4 +47,9 @@ class Gitlab::Event::Notification::Creator::UserTeamGroupRelationship < Gitlab::
 
     notifications
   end
+
+  def subscriber_can_get_notification?(subscription, event)
+    return false if event.parent_event.present? && event.parent_event.action.to_sym == :transfer
+    super(subscription, event)
+  end
 end

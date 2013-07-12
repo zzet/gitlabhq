@@ -10,7 +10,7 @@ describe Gitlab::Event::Factory do
   end
 
   before do
-    Thread.current[:current_user] = @another_user
+    RequestStore.store[:current_user] = current_user
   end
 
   #
