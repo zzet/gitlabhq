@@ -33,6 +33,36 @@ class OldEventToNewEventMigrator
     end
   end
 
+  def remove_uanactual_events
+    Event.where(action: :updated, source_type: "User").destroy_all
+  end
+
+  def convert_our_events
+    Event.find_each do |event|
+      if event.data.is_a? String
+        data = JSON.load(event.data).to_hash
+        data.symbolize_keys!
+        event.data = data
+      end
+
+      event.save
+    end
+  end
+
+  def symbolize_data(data)
+    data.each do |k, v|
+      data[k] = case v
+                when Hash
+                  v.symbolize_keys!
+                when Array
+                  v.each {|a| a.symbolize_keys!; symbolize_data(a)}
+                else
+                  v
+                end
+    end
+    data
+  end
+
   def migrate_merge_request_event(merge_request_event)
     # Related to project event
     if [1, 2, 3, 7].include?(merge_request_event.action)
