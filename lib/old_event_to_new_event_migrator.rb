@@ -5,12 +5,15 @@ class OldEventToNewEventMigrator
 
   def migrate!
     OldEvent.find_each do |oe|
-      case oe.target_type
-      when "MergeRequest"
-        migrate_merge_request_event(oe)
-      when "Issue"
-      when "Note"
-      else
+      if no_new_event(oe)
+        case oe.target_type
+        when "MergeRequest"
+          migrate_merge_request_event(oe)
+        when "Issue"
+          migrate_issue_event(oe)
+        when "Note"
+        else
+        end
       end
       #when 1
       # CREATED
@@ -42,10 +45,31 @@ class OldEventToNewEventMigrator
       if event.data.is_a? String
         data = JSON.load(event.data).to_hash
         data.symbolize_keys!
-        event.data = data
+        event.data = symbolize_data(data)
+        event.save
       end
+    end
+  end
 
-      event.save
+  def move_push_event_data_to_push_model
+    Event.where(source_type: "Push_summary").find_each do |event|
+      data = JSON.load(event.data).to_hash
+
+      data.symbolize_keys!
+      data = symbolize_data(data)
+
+      push = Push.new(
+        before: data[:before],
+        after: data[:after],
+        ref: data[:ref],
+        data: data,
+        project_id: event.target_id,
+        user_id: data[:user_id])
+
+        push.save
+        event.source = push
+        event.data = push.attributes
+        event.save
     end
   end
 
@@ -71,128 +95,69 @@ class OldEventToNewEventMigrator
 
       case merge_request_event.action
       when 1
-        action = :opened
+        action = :created
       when 3
         action = :closed
       when 4
         action = :reopened
       end
 
-      Gitlab::Event.create_events(name, data)
-      create_event(merge_request_event, action)
+      create_event(merge_request_event, action, merge_request_event.target)
     end
   end
 
   def migrate_issue_event(issue_event)
     # Related to project event
-    if [1, 3, 4].include?(action)
+    if [1, 3, 4].include?(issue_event.action)
 
       action = nil
 
       case issue_event.action
       when 1
-        action = :opened
+        action = :created
       when 3
         action = :closed
       when 4
         action = :reopened
       end
 
-      Event.create(
-        author_id: issue_event.author_id,
-        action: action,
-        source_id: issue_event.target_id,
-        source_type: issue_event.target_type,
-        target_id: issue_event.target_id,
-        target_type: issue_event.target_type,
-        data: "", # :(
-        created_at: issue_event.created_at,
-        updated_at: issue_event.updated_at
-      )
-    end
-
-    # Related to issue event
-    if [3, 4].include?(issue_event.action)
-
-      action = nil
-
-      case issue_event.action
-      when 3
-        action = :closed
-      when 4
-        action = :reopened
-      end
-
-      Event.create(
-        author_id: issue_event.author_id,
-        action: action,
-        source_id: issue_event.target_id,
-        source_type: issue_event.target_type,
-        target_id: issue_event.project_id,
-        target_type: "Project",
-        data: "", # :(
-        created_at: issue_event.created_at,
-        updated_at: issue_event.updated_at
-      )
+      create_event(issue_event, action, issue_event.target)
     end
   end
 
-  def migrate_merge_request_event(merge_request_event)
-    # Related to project event
-    if [1, 3, 4].include?(action)
+  def create_event(or_event, action, source)
+    begin
+      user = User.find(or_event.author_id)
+      data = {source: source, user: user, data: source}
+      action = "gitlab.#{action}.#{source.class.name}".underscore.downcase
 
-      action = nil
+      events = Gitlab::Event::Factory.build(action, data)
 
-      case issue_event.action
-      when 1
-        action = :opened
-      when 3
-        action = :closed
-      when 4
-        action = :reopened
-      end
+      if events.any?
+        parent_event = Gitlab::Event::EventBuilder::Base.find_parent_event(action, data)
 
-      create_event(merge_request_event, action)
-    end
-
-    # Related to issue event
-    if [3, 4, 7].include?(issue_event.action)
-
-      action = nil
-
-      case issue_event.action
-      when 3
-        action = :closed
-      when 4
-        action = :reopened
-      when 7
-        action = :merged
-      end
-
-      create_event(issue_event, action)
-    end
-  end
-
-  def create_event(event, action, data)
-    events = Gitlab::Event::Factory.build(action, data)
-
-    if events.any?
-      parent_event = Gitlab::Event::Builder::Base.find_parent_event(action, data)
-
-      if parent_event.blank?
-        events.each_with_index do |e, i|
-          if e.source == e.target
-            e.save
-            events.delete_at(i)
+        if parent_event.blank?
+          events.each_with_index do |e, i|
+            if e.source == e.target
+              e.created_at = or_event.created_at
+              e.save
+              events.delete_at(i)
+            end
           end
+          parent_event = Gitlab::Event::EventBuilder::Base.find_parent_event(action, data)
         end
-        parent_event = Gitlab::Event::Builder::Base.find_parent_event(action, data)
-      end
 
-      events.each do |event|
-        event.parent_event = parent_event if parent_event.present?
-        event.save
+        events.each do |event|
+          event.parent_event = parent_event if parent_event.present?
+          event.created_at = or_event.created_at
+          event.save
+        end
       end
     end
+  end
+
+  def no_new_event(old_event)
+    return false if old_event.target.nil?
+    Event.where(source_type: old_event.target_type, source_id: old_event.target_id, created_at: old_event.created_at).blank?
   end
 end

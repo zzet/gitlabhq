@@ -8,7 +8,7 @@ class Gitlab::Event::Action
       user = current_user if user.blank?
 
       event = "gitlab.#{action}.#{source_name}".downcase
-      event << ".#{detailed_event}" unless detailed_event.blank?
+      event << ".#{detailed_event}" if detailed_event.present?
 
       ActiveSupport::Notifications.instrument event, {source: source, user: user, data: data}
     end

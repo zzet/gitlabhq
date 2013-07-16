@@ -1,12 +1,12 @@
-class Gitlab::Event::Builder::UsersProject < Gitlab::Event::Builder::Base
+class Gitlab::Event::EventBuilder::UserTeamGroupRelationship < Gitlab::Event::EventBuilder::Base
   class << self
     def prioritet
-      2
+      0
     end
 
     def can_build?(action, data)
-      known_action = known_action? action, ::UsersProject.available_actions
-      known_source = known_source? data, ::UsersProject.watched_sources
+      known_action = known_action? action, ::UserTeamGroupRelationship.available_actions
+      known_source = data.is_a? ::UserTeamGroupRelationship
       known_source && known_action
     end
 
@@ -19,14 +19,13 @@ class Gitlab::Event::Builder::UsersProject < Gitlab::Event::Builder::Base
       when :created
         actions << :created
       when :updated
-        temp_data["previous_changes"] = source.changes
         actions << :updated
+        temp_data[:previous_changes] = source.changes
       when :deleted
         actions << :deleted
       end
 
-      ::Event.new(action: meta[:action],
-                  source: source, data: temp_data, author: user, target: target)
+      ::Event.new(action: meta[:action], source: source, data: temp_data.to_json, author: user, target: target)
     end
   end
 end

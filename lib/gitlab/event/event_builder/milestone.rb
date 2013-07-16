@@ -1,4 +1,4 @@
-class Gitlab::Event::Builder::Milestone < Gitlab::Event::Builder::Base
+class Gitlab::Event::EventBuilder::Milestone < Gitlab::Event::EventBuilder::Base
   class << self
     def prioritet
       2

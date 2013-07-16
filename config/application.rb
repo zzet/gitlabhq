@@ -23,12 +23,12 @@ module Gitlab
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
 
     # Activate observers that should always be running.
-    config.active_record.observers = :old_activity_observer,
-                                     :activity_observer,
-                                     :event_observer,
-                                     :notification_observer,
-                                     :project_activity_cache_observer,
-                                     :issue_observer,
+    # config.active_record.observers = :old_activity_observer,
+                                     #:activity_observer,
+                                     #:event_observer,
+                                     #:notification_observer,
+                                     #:project_activity_cache_observer,
+    config.active_record.observers = :issue_observer,
                                      :key_observer,
                                      :merge_request_observer,
                                      :note_observer,

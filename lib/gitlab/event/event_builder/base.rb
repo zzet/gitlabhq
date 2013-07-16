@@ -1,4 +1,4 @@
-class Gitlab::Event::Builder::Base
+class Gitlab::Event::EventBuilder::Base
 
   class << self
     def descendants

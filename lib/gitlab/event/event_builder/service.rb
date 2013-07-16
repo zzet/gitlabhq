@@ -1,12 +1,12 @@
-class Gitlab::Event::Builder::ProjectHook < Gitlab::Event::Builder::Base
+class Gitlab::Event::EventBuilder::Service < Gitlab::Event::EventBuilder::Base
   class << self
     def prioritet
       2
     end
 
     def can_build?(action, data)
-      known_action = known_action? action, ::ProjectHook.available_actions
-      known_source = known_source? data, ::ProjectHook.watched_sources
+      known_action = known_action? action, ::Service.available_actions
+      known_source = known_source? data, ::Service.watched_sources
       known_source && known_action
     end
 

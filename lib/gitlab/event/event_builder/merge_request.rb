@@ -1,4 +1,4 @@
-class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
+class Gitlab::Event::EventBuilder::MergeRequest < Gitlab::Event::EventBuilder::Base
   class << self
     def prioritet
       3

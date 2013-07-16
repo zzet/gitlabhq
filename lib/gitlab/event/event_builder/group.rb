@@ -1,4 +1,4 @@
-class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
+class Gitlab::Event::EventBuilder::Group < Gitlab::Event::EventBuilder::Base
   class << self
     def prioritet
       5

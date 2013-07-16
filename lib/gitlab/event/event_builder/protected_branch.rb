@@ -1,4 +1,4 @@
-class Gitlab::Event::Builder::ProtectedBranch < Gitlab::Event::Builder::Base
+class Gitlab::Event::EventBuilder::ProtectedBranch < Gitlab::Event::EventBuilder::Base
   class << self
     def prioritet
       2
