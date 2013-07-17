@@ -438,7 +438,15 @@ class EventNotificationMailer < ActionMailer::Base
     @note = @source = @event.source
     @project = @target = @event.target
     @commit_sha = @note.commit_id
-    @commit = @note.project.repository.commit(@commit_sha)
+
+    key = "#{@user.id}-#{@project.id}-#{@commit_sha}"
+
+    @commit = Rails.cache.fetch(key)
+
+    if @commit.nil?
+      @commit = @note.project.repository.commit(@commit_sha)
+      Rails.cache.write(key, @commit, expires_in: 1.hour)
+    end
 
     mail(bcc: @notification.subscriber.email, subject: "#{@user.name} leave comment on commit in #{@project.path_with_namespace} project [commented]")
   end
@@ -1237,7 +1245,14 @@ class EventNotificationMailer < ActionMailer::Base
     @repository = @project.repository
     @push_data = JSON.load(@event.data).to_hash
 
-    result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
+    key = "#{@user.id}-#{@project.id}-#{@push_data["before"]}-#{@push_data["after"]}"
+
+    result = Rails.cache.fetch(key)
+
+    if result.nil?
+      result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
+      Rails.cache.write(key, result, expires_in: 1.hour)
+    end
 
     if result
       @before_commit = @project.repository.commit(@push_data["before"])
