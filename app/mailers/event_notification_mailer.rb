@@ -2,7 +2,7 @@ class EventNotificationMailer < ActionMailer::Base
   layout 'event_notification_email'
   helper :application, :commits, :tree, :gitlab_markdown
   default from: "Gitlab messenger <#{Gitlab.config.gitlab.email_from}>",
-          return_path: Gitlab.config.gitlab.email_from
+    return_path: Gitlab.config.gitlab.email_from
 
   default_url_options[:host]     = Gitlab.config.gitlab.host
   default_url_options[:protocol] = Gitlab.config.gitlab.protocol
@@ -1255,8 +1255,23 @@ class EventNotificationMailer < ActionMailer::Base
     end
 
     if result
-      @before_commit = @project.repository.commit(@push_data["before"])
-      @after_commit = @project.repository.commit(@push_data["after"])
+
+      before_key = "#{key}-#{@push_data["before"]}"
+      @before_commit = Rails.cache.fetch(before_key)
+
+      if @before_commit.nil?
+        @before_commit = @project.repository.commit(@push_data["before"])
+        Rails.cache.write(before_key, @before_commit, expires_in: 1.hour)
+      end
+
+      after_key = "#{key}-#{@push_data["after"]}"
+      @after_commit = Rails.cache.fetch(after_key)
+
+      if @after_commit.nil?
+        @after_commit = @project.repository.commit(@push_data["after"])
+        Rails.cache.write(after_key, @after_commit, expires_in: 1.hour)
+      end
+
       @branch = @push_data["ref"]
       @branch.slice!("refs/heads/")
 
