@@ -96,7 +96,19 @@ class OldEventToNewEventMigrator
   end
 
   def migrate_push_event(push_event)
+    data = push_event.data
 
+    push = Push.new(
+      before: data[:before],
+      after: data[:after],
+      ref: data[:ref],
+      data: data,
+      project_id: push_event.project_id,
+      user_id: data[:user_id])
+
+      push.save
+
+      create_event(push_event, :pushed, push)
   end
 
   def migrate_merge_request_event(merge_request_event)
