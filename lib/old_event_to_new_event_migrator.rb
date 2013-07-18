@@ -13,6 +13,14 @@ class OldEventToNewEventMigrator
           migrate_issue_event(oe)
         when "Note"
         else
+          case oe.action
+          when 5
+            migrate_push_event(oe)
+          when 8
+            migrate_joined_event(oe)
+          when 9
+            migrate_left_event(oe)
+          end
         end
       end
       #when 1
@@ -87,6 +95,10 @@ class OldEventToNewEventMigrator
     data
   end
 
+  def migrate_push_event(push_event)
+
+  end
+
   def migrate_merge_request_event(merge_request_event)
     # Related to project event
     if [1, 2, 3, 7].include?(merge_request_event.action)
@@ -103,6 +115,23 @@ class OldEventToNewEventMigrator
       end
 
       create_event(merge_request_event, action, merge_request_event.target)
+    end
+  end
+
+  def migrate_note_event(note_event)
+    # Related to project event
+    if [6].include?(note_event.action)
+
+      action = nil
+
+      case note_event.action
+      when 6
+        action = :created
+      else
+        return
+      end
+
+      create_event(note_event, action, note_event.target)
     end
   end
 
