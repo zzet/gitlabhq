@@ -1,4 +1,4 @@
 = raw "#{ link_to @user.name, user_url(@user.username)} commented commit #{ link_to @commit.message, project_commit_url(@project, @commit) } in #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project with some message:"
 %br
-%pre
-  = @note.note
+%cite{style: 'color: #666'}
+  = markdown(@note.note)
