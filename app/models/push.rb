@@ -28,6 +28,10 @@ class Push < ActiveRecord::Base
     ref =~ /^refs\/heads/ || before =~ /^00000/
   end
 
+  def refs_action?
+    after =~ /^00000/ || before =~ /^00000/
+  end
+
   def created_branch?
     ref =~ /^refs\/heads/ && before =~ /^00000/
   end

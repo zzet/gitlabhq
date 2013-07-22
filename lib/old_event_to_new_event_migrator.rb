@@ -17,9 +17,11 @@ class OldEventToNewEventMigrator
           when 5
             migrate_push_event(oe)
           when 8
-            migrate_joined_event(oe)
+            p "Skiped JOINED event"
+            #migrate_joined_event(oe)
           when 9
-            migrate_left_event(oe)
+            p "Skiped LEFT event"
+            #migrate_left_event(oe)
           end
         end
       end
@@ -42,6 +44,8 @@ class OldEventToNewEventMigrator
       #when 9
       # LEFT
     end
+
+    remove_uanactual_events
   end
 
   def remove_uanactual_events
@@ -104,9 +108,11 @@ class OldEventToNewEventMigrator
       ref: data[:ref],
       data: data,
       project_id: push_event.project_id,
-      user_id: data[:user_id])
+      user_id: data[:user_id],
+      commits_count: data[:total_commits_count])
 
       push.save
+      p push.errors unless push.errors.blank?
 
       create_event(push_event, :pushed, push)
   end
@@ -172,7 +178,11 @@ class OldEventToNewEventMigrator
       data = {source: source, user: user, data: source}
       action = "gitlab.#{action}.#{source.class.name}".underscore.downcase
 
+      p action
+
       events = Gitlab::Event::Factory.build(action, data)
+
+      p events
 
       if events.any?
         parent_event = Gitlab::Event::EventBuilder::Base.find_parent_event(action, data)
@@ -194,6 +204,9 @@ class OldEventToNewEventMigrator
           event.save
         end
       end
+    rescue Exception => e
+      p e.message
+      p e.backtrace
     end
   end
 

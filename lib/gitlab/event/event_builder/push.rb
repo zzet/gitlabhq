@@ -6,7 +6,7 @@ class Gitlab::Event::EventBuilder::Push < Gitlab::Event::EventBuilder::Base
 
     def can_build?(action, data)
       known_action = known_action? action, [:pushed]
-      known_source = data.is_a? ::Hash
+      known_source = known_source? data, ::Push.watched_sources
       known_source && known_action
     end
 
@@ -14,17 +14,17 @@ class Gitlab::Event::EventBuilder::Push < Gitlab::Event::EventBuilder::Base
       meta = Gitlab::Event::Action.parse(action)
       actions = []
 
-      target = ::Project.find(data[:project_id])
-      push_data = data[:push_data]
-      user = ::User.find(push_data[:user_id])
+      target    = source.project
+      user      = source.user
+      temp_data = source.attributes
 
       case meta[:action]
       when :pushed
-        if refs_exists? push_data
-          actions << :created_branch  if push_data[:ref] =~ /^refs\/heads/ && push_data[:before] =~ /^00000/
-          actions << :deleted_branch  if push_data[:ref] =~ /^refs\/heads/ && push_data[:after]  =~ /^00000/
-          actions << :created_tag     if push_data[:ref] =~ /^refs\/tag/   && push_data[:before] =~ /^00000/
-          actions << :deleted_tag     if push_data[:ref] =~ /^refs\/tag/   && push_data[:after]  =~ /^00000/
+        if source.refs_action?
+          actions << :created_branch  if source.created_branch?
+          actions << :deleted_branch  if source.deleted_branch?
+          actions << :created_tag     if source.created_tag?
+          actions << :deleted_tag     if source.deleted_tag?
         end
 
         actions << :pushed          if actions.blank?
@@ -33,15 +33,11 @@ class Gitlab::Event::EventBuilder::Push < Gitlab::Event::EventBuilder::Base
       events = []
 
       actions.each do |act|
-        events << ::Event.new(action: act, source_type: source, data: push_data.to_json, author: user, target: target)
+        events << ::Event.new(action: act, source: source, data: temp_data, author: user, target: target)
       end
 
       events
 
-    end
-
-    def refs_exists?(push_data)
-      push_data[:after] =~ /^00000/ || push_data[:before] =~ /^00000/
     end
   end
 end
