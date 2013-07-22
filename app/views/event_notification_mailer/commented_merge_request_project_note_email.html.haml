@@ -4,7 +4,8 @@
   - else
     = link_to "New comment", project_merge_request_url(@merge_request.project, @merge_request, anchor: "note_#{@note.id}")
   for Merge Request ##{@merge_request.id}
-  %cite "#{truncate(@merge_request.title, length: 20)}"
+  %cite
+    = link_to truncate(@merge_request.title, length: 20)}, project_merge_request_url(@merge_request.project, @merge_request)
   = raw " in #{ link_to @merge_request.project.path_with_namespace, project_url(@merge_request.project.path_with_namespace) } project with some message:"
   %cite{style: 'color: #666'}
     = markdown(@note.note)
