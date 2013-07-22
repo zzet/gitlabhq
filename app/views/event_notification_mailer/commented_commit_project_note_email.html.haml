@@ -1,7 +1,4 @@
-= raw "#{ link_to @user.name, user_url(@user.username)} write on #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project wall some message:"
+= raw "#{ link_to @user.name, user_url(@user.username)} commented commit #{ link_to @commit.message, project_commit_url(@project, @commit) } in #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project with some message:"
 %br
-- if @commit
-  On commit:
-  = link_to @commit.short_id(8), project_commit_url(@project, @commit)
-%br
-= @note.note
+%pre
+  = @note.note

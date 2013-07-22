@@ -437,29 +437,37 @@ class EventNotificationMailer < ActionMailer::Base
     @user = @event.author
     @note = @source = @event.source
     @project = @target = @event.target
-    @commit_sha = @note.commit_id
 
-    key = "#{@user.id}-#{@project.id}-#{@commit_sha}"
+    if @note.present?
+      @commit_sha = @note.commit_id
 
-    @commit = Rails.cache.fetch(key)
+      key = "#{@user.id}-#{@project.id}-#{@commit_sha}"
 
-    if @commit.nil?
-      @commit = @note.project.repository.commit(@commit_sha)
-      Rails.cache.write(key, @commit, expires_in: 1.hour)
+      @commit = Rails.cache.fetch(key)
+
+      if @commit.nil?
+        @commit = @note.project.repository.commit(@commit_sha)
+        Rails.cache.write(key, @commit, expires_in: 1.hour)
+      end
+
+      headers 'In-Reply-To' => @commit_sha
+
+      mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Commit '#{@commit.message}' commented [#{@commit.short_id}] [commented]")
     end
-
-    mail(bcc: @notification.subscriber.email, subject: "#{@user.name} leave comment on commit in #{@project.path_with_namespace} project [commented]")
   end
 
-  def commented_related_project_note_email(notification)
+  def commented_merge_request_project_note_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
     @note = @source = @event.source
+    @merge_request = @note.noteable
     @project = @target = @event.target
 
+    headers 'In-Reply-To' => "MergeRequest ##{@merge_request.id}"
+
     if @note && @project
-      mail(bcc: @notification.subscriber.email, subject: "New note was created by #{@user.name} in #{@project.path_with_namespace} project wall [commented]")
+      mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge Request '#{@merge_request.title}' commented [commented]")
     end
   end
 
@@ -909,7 +917,9 @@ class EventNotificationMailer < ActionMailer::Base
     @merge_request = @source = @event.source
     @project = @target = @event.target
 
-    mail(bcc: @notification.subscriber.email, subject: "Merge request #{@merge_request.title} was open in #{@project.path_with_namespace} project by #{@user.name} [opened]")
+    headers 'In-Reply-To' => "MergeRequest ##{@merge_request.id}"
+
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request '#{@merge_request.title}' was opened [opened]")
   end
 
   def opened_project_issue_email(notification)
@@ -1184,7 +1194,7 @@ class EventNotificationMailer < ActionMailer::Base
     @branch = @push_data["ref"]
     @branch.slice!("refs/heads/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted branch '#{@branch}' by #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Branch '#{@branch}' was deleted [undev gitlab commits] [pushed]")
   end
 
   def created_branch_project_push_summary_email(notification)
@@ -1200,7 +1210,7 @@ class EventNotificationMailer < ActionMailer::Base
     @branch = @push_data["ref"]
     @branch.slice!("refs/heads/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new branch '#{@branch}' by #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Branch '#{@branch}' was created [undev gitlab commits] [pushed]")
   end
 
   def deleted_tag_project_push_summary_email(notification)
@@ -1216,7 +1226,7 @@ class EventNotificationMailer < ActionMailer::Base
     @tag = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Deleted tag '#{@tag}' by #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Tag '#{@tag}' was deleted [undev gitlab commits] [pushed]")
   end
 
   def created_tag_project_push_summary_email(notification)
@@ -1232,7 +1242,7 @@ class EventNotificationMailer < ActionMailer::Base
     @tag = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
-    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Created new tag '#{@tag}' by #{@user.name} [undev gitlab commits] [pushed]")
+    mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Tag '#{@tag}' was created [undev gitlab commits] [pushed]")
   end
 
   def pushed_project_push_summary_email(notification)
@@ -1285,7 +1295,9 @@ class EventNotificationMailer < ActionMailer::Base
 
       @line_notes    = []
 
-      mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] #{@user.name} [undev gitlab commits] [pushed]")
+      headers "In-Reply-To" => "#{@project.id}-#{@before_commit.id}"
+
+      mail(from: @user.email, bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] [#{@branch}] Push with #{@commits.count} commits [#{@before_commit.short_id}] [undev gitlab commits] [pushed]")
     end
   end
 end
