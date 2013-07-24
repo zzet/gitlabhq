@@ -1,19 +1,8 @@
-New comment
-= "on diff " if @note.for_diff_line?
-for Merge Request ##{@merge_request.id}
-%br
-%cite
-  = raw "  #{link_to truncate(@merge_request.title, length: 20), project_merge_request_url(@merge_request.project, @merge_request)}"
-%br
-= raw "in #{ link_to @merge_request.project.path_with_namespace, project_url(@merge_request.project.path_with_namespace) } project:"
-%br
-%br
----
 %br
 %cite{style: 'color: #666'}
   = markdown(@note.note)
 %br
----
+= "---"
 %br
 %br
 Click
