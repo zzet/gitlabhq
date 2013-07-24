@@ -1,4 +1,16 @@
-= raw "#{ link_to @user.name, user_url(@user.username)} commented commit #{ link_to @commit.message, project_commit_url(@project, @commit) } in #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project with some message:"
+= raw "#{ link_to @user.name, user_url(@user.username)} commented on commit [#{@commit.short_id}]"
+%br
+= raw "  '#{ link_to @commit.message, project_commit_url(@project, @commit) }' in project '#{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) }'"
+%br
+%br
+---
 %br
 %cite{style: 'color: #666'}
   = markdown(@note.note)
+%br
+---
+%br
+%br
+Click
+= link_to_gfm "here", project_commit_url(@note.project, id: @commit.id, anchor: "note_#{@note.id}")
+to view the commit
