@@ -23,9 +23,9 @@
       %th{align: :left}
         Commit before push
       %td{title: @before_commit.title}
-        = link_to @before_commit.short_id(8), project_commit_url(@project, @before_commit)
+        = link_to @before_commit.short_id(10), project_commit_url(@project, @before_commit)
         %br
-        = truncate(@before_commit.title, length: 70)
+        = @before_commit.message
     %tr{style: 'margin: 1px; background: #efefef;'}
       %th{align: :left, colspan:2}
         = link_to 'Compare it', project_compare_url(@event.target, from: @before_commit, to: @commits.last)
