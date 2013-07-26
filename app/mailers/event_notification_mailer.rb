@@ -958,6 +958,24 @@ class EventNotificationMailer < ActionMailer::Base
   #
   # Joined action
   #
+  def created_users_project_users_project_email(notification)
+    case notification.subscription.target
+    when Project
+      EventNotificationMailer.joined_project_users_project_email(notification).deliver!
+    when User
+      EventNotificationMailer.joined_user_users_project_email(notification).deliver!
+    end
+  end
+
+  def deleted_users_project_users_project_email(notification)
+    case notification.subscription.target
+    when Project
+      EventNotificationMailer.left_project_users_project_email(notification).deliver!
+    when User
+      EventNotificationMailer.left_user_users_project_email(notification).deliver!
+    end
+  end
+
 
   def joined_project_users_project_email(notification)
     @notification = notification
@@ -966,6 +984,7 @@ class EventNotificationMailer < ActionMailer::Base
     @up           = @event.source
     @project      = @event.target
     @member       = @up.user
+    @project      = @up.project if @project.is_a? UsersProject
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'joined',
@@ -982,6 +1001,7 @@ class EventNotificationMailer < ActionMailer::Base
     @up           = @event.source
     @project      = @up.project
     @member       = @event.target
+    @member       = @up.user if @member.is_a? UsersProject
 
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'joined',
@@ -1034,8 +1054,9 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     @user         = @event.author
     @up           = JSON.load(@event.data)
-    @project      = @target = @event.target
+    @project      = @event.target
     @member       = User.find(@up["user_id"])
+    @project      = Project.find(@up["project_id"] if @project.is_a? UsersProject
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'left',
@@ -1072,6 +1093,7 @@ class EventNotificationMailer < ActionMailer::Base
     @up           = JSON.load(@event.data)
     @member       = @event.target
     @project      = Project.find(@up["project_id"])
+    @member       = User.find(@up["user_id"] if @member.is_a? UsersProject
 
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'left',
