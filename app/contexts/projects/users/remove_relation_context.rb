@@ -1,6 +1,6 @@
 module Projects
   module Users
-    class CreateRelationContext < Projects::Users::BaseContext
+    class RemoveRelationContext < Projects::Users::BaseContext
       def execute
         team_member_relation.destroy
 
