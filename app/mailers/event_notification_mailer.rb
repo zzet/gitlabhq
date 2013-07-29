@@ -976,6 +976,28 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
+  def updated_users_project_users_project_email(notification)
+    case notification.subscription.target
+    when Project
+      EventNotificationMailer.updated_project_users_project_email(notification).deliver!
+    when User
+      EventNotificationMailer.updated_user_users_project_email(notification).deliver!
+    end
+  end
+
+  def imported_project_project_email(notification)
+    @notification = notification
+    @event        = @notification.event
+    @user         = @event.author
+    @project      = @event.source
+
+    headers 'X-Gitlab-Entity' => 'project',
+            'X-Gitlab-Action' => 'imported',
+            'X-Gitlab-Source' => 'project-user-relationship',
+            'In-Reply-To'     => "project-#{@project.path_with_namespace}-users-import"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Members was imported from another project")
+  end
 
   def joined_project_users_project_email(notification)
     @notification = notification
