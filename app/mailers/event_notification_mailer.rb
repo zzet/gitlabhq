@@ -62,7 +62,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'milestone',
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-milestone-#{@milestone.id}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "New milestone #{@milestone.title} was created on #{@project.path_with_namespace} [created]")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] New milestone #{@milestone.title} was created")
   end
 
   def created_issue_note_email(notification)
@@ -106,7 +106,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'project',
             'In-Reply-To'     => "project-#{@project.path_with_namespace}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "New project '#{@project.path_with_namespace}' created")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Project was created")
   end
 
   def added_project_web_hook_email(notification)
@@ -1694,7 +1694,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'merge_request',
             'In-Reply-To'     => "user-#{@user.username}-merge_request-#{@merge_request.id}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Merge request #{@merge_request.title} was resigned to #{@user.username} user")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Merge request #{@merge_request.title} was reassigned to #{@user.username} user")
   end
 
   #
