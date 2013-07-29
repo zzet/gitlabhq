@@ -1834,7 +1834,7 @@ class EventNotificationMailer < ActionMailer::Base
       subject = if @commits.many?
         "[#{@target.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.title}' to parent commit #{@before_commit.short_id} [undev gitlab commits]"
       else
-        "[#{@target.path_with_namespace}] [#{@branch}] Push with #{@commits.count} commits to parent commit #{@before_commit.short_id} [undev gitlab commits]"
+        "[#{@target.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.short_id} [undev gitlab commits]"
       end
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: subject)
