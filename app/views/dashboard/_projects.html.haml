@@ -23,6 +23,9 @@
           %span.last_activity
             %strong Last activity:
             %span= project_last_activity(project)
+          %span.last_activity
+            %strong Last push:
+            %span= project_last_push(project)
     - if projects.blank?
       %li
         %h3.nothing_here_message There are no projects here.

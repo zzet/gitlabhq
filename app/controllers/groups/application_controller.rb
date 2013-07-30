@@ -12,7 +12,7 @@ class Groups::ApplicationController < ApplicationController
   end
 
   def projects
-    @projects ||= current_user.authorized_projects.where(namespace_id: group.id).sorted_by_activity
+    @projects ||= current_user.authorized_projects.where(namespace_id: group.id).sorted_by_push_date
   end
 
   def project_ids

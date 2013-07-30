@@ -64,7 +64,7 @@ class DashboardController < ApplicationController
   protected
 
   def load_projects
-    @projects = current_user.authorized_projects.sorted_by_activity
+    @projects = current_user.authorized_projects.sorted_by_push_date
   end
 
   def event_filter
