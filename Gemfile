@@ -173,6 +173,7 @@ gem 'airbrake'
 group :development, :staging, :test do
   # Visual email testing
   gem "mail_view", "~> 1.0.3"
+  gem "freezing_email", "~> 0.0.2"
   gem 'factory_girl_rails'
 end
 

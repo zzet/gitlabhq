@@ -16,6 +16,10 @@ Gitlab::Application.routes.draw do
     mount Sidekiq::Web, at: "/admin/sidekiq", as: :sidekiq
   end
 
+  if Rails.env.development? || Rails.env.staging?
+    mount FreezingEmail::Web, at: "/event_notifications_preview", as: :freezing_email
+  end
+
   # Enable Grack support
   mount Grack::Bundle.new({
     git_path:     Gitlab.config.git.bin_path,

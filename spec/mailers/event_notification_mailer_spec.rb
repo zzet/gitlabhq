@@ -3,14 +3,19 @@ require "spec_helper"
 describe EventNotificationMailer do
   include EmailSpec::Helpers
   include EmailSpec::Matchers
+  include FreezingEmail::Rspec
 
   before do
     @user = create :user
+    @user.create_notification_setting
+    @user.notification_setting.brave = true
+    @user.notification_setting.save
+
     @another_user = create :user
 
     ActiveRecord::Base.observers.enable :all
 
-    RequestStore.store[:current_user] = current_user
+    RequestStore.store[:current_user] = @another_user
 
     ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
   end
