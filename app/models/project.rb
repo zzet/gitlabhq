@@ -32,7 +32,7 @@ class Project < ActiveRecord::Base
 
   attr_accessible :name, :path, :description, :default_branch, :issues_tracker, :label_list,
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
-    :wiki_enabled, :git_protocol_enabled, :public, :import_url, :last_activity_at, as: [:default, :admin]
+    :wiki_enabled, :git_protocol_enabled, :public, :import_url, :last_activity_at, :last_pushed_at, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
 
@@ -113,6 +113,7 @@ class Project < ActiveRecord::Base
   scope :in_namespace, ->(namespace) { where(namespace_id: namespace.id) }
   scope :in_group_namespace, -> { joins(:group) }
   scope :sorted_by_activity, -> { order("projects.last_activity_at DESC") }
+  scope :sorted_by_push_date, -> { order("projects.last_pushed_at DESC") }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
   scope :public_via_http, -> { where(public: true) }
@@ -204,6 +205,14 @@ class Project < ActiveRecord::Base
 
   def last_activity_date
     last_activity_at || updated_at
+  end
+
+  def last_push
+    events.where(action: [:pushed, :created_branch, :created_tag, :deleted_branch, :deleted_tag]).last
+  end
+
+  def last_push_date
+    last_pushed_at || created_at
   end
 
   def project_id
