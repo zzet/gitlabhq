@@ -32,7 +32,7 @@ class DashboardController < ApplicationController
                   @projects.joined(current_user)
                 else
                   @projects
-                end
+                end.sorted_by_push_date
 
     @projects = @projects.tagged_with(params[:label]) if params[:label].present?
     @projects = @projects.search(params[:search]) if params[:search].present?
