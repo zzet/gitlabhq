@@ -55,6 +55,7 @@ class Project < ActiveRecord::Base
   has_many :old_events,         dependent: :destroy, class_name: OldEvent
 
   has_many :events,         as: :source
+  has_many :related_events, as: :target, class_name: Event
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
@@ -127,7 +128,7 @@ class Project < ActiveRecord::Base
 
   class << self
     def abandoned
-      where('projects.last_activity_at < ?', 6.months.ago)
+      where('projects.last_pushed_at < ?', 6.months.ago)
     end
 
     def with_push
@@ -208,7 +209,7 @@ class Project < ActiveRecord::Base
   end
 
   def last_push
-    events.where(action: [:pushed, :created_branch, :created_tag, :deleted_branch, :deleted_tag]).last
+    related_events.where(action: [:pushed, :created_branch, :created_tag, :deleted_branch, :deleted_tag]).last
   end
 
   def last_push_date
