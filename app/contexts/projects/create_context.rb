@@ -64,7 +64,7 @@ module Projects
         if group
           group.user_teams.each do |team|
             access = team.max_project_access_in_group(group)
-            Gitlab::UserTeamManager.assign(team, project, access)
+            Gitlab::UserTeamManager.assign(team, @project, access)
           end
         end
       end
