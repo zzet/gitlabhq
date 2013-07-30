@@ -2,6 +2,6 @@
 %br
 - if @commit
   On commit:
-  = link_to @commit.short_id(8), project_commit_url(@project, @commit)
+  = link_to @commit.short_id(8), project_commit_url(@project, @commit), anchor: "note_#{@note.id}"
 %br
-= @note.note
+= markdown(@note.note)
