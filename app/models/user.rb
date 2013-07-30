@@ -353,7 +353,7 @@ class User < ActiveRecord::Base
   end
 
   def projects_sorted_by_activity
-    authorized_projects.sorted_by_activity
+    authorized_projects.sorted_by_push_date
   end
 
   def several_namespaces?

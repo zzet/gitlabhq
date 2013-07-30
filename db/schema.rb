@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130711082151) do
+ActiveRecord::Schema.define(:version => 20130730103636) do
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -232,10 +232,12 @@ ActiveRecord::Schema.define(:version => 20130711082151) do
     t.boolean  "git_protocol_enabled"
     t.datetime "last_activity_at"
     t.boolean  "imported",               :default => false,    :null => false
+    t.datetime "last_pushed_at"
   end
 
   add_index "projects", ["creator_id"], :name => "index_projects_on_owner_id"
   add_index "projects", ["last_activity_at"], :name => "index_projects_on_last_activity_at"
+  add_index "projects", ["last_pushed_at"], :name => "index_projects_on_last_pushed_at"
   add_index "projects", ["namespace_id"], :name => "index_projects_on_namespace_id"
 
   create_table "protected_branches", :force => true do |t|
@@ -243,6 +245,18 @@ ActiveRecord::Schema.define(:version => 20130711082151) do
     t.string   "name",       :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "pushes", :force => true do |t|
+    t.integer  "project_id"
+    t.string   "ref"
+    t.string   "before"
+    t.string   "after"
+    t.text     "data"
+    t.integer  "user_id"
+    t.integer  "commits_count"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
   end
 
   create_table "services", :force => true do |t|
