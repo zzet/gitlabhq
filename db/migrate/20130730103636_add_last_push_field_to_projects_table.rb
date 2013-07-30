@@ -5,7 +5,7 @@ class AddLastPushFieldToProjectsTable < ActiveRecord::Migration
 
     Project.find_each do |project|
       last_push_date = if project.last_push
-                         project.related_events.where(action: [:pushed, :craeted_branch, :created_tag, :deleted_branch, :deleted_tag]).last.created_at
+                         project.old_events.where(action: 5).last.created_at
                        else
                          project.created_at
                        end
