@@ -8,6 +8,6 @@ set :rvm_ruby_string, 'ruby-1.9.3-p194@gitlab'
 set :db_adapter,     'postgres'
 set :bundle_without, %w[staging development test] + (%w[mysql postgres] - [db_adapter])
 
-role :web, "192.168.249.67"
-role :app, "192.168.249.67"
-role :db,  "192.168.249.67", primary: true
+role :web, "10.40.252.13"
+role :app, "10.40.252.13"
+role :db,  "10.40.252.13", primary: true
