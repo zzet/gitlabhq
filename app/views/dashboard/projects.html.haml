@@ -66,6 +66,9 @@
             .pull-right.light
               %small.light
                 Last activity #{project_last_activity(project)}
+              %br
+              %small.light
+                Last push #{project_last_push(project)}
 
       - if @projects.blank?
         %li

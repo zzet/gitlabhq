@@ -46,6 +46,7 @@ class ActivityObserver < ActiveRecord::Observer
     return false unless model.is_a? ::Project
     return false if model.changes.count != 2
     return true if model.changes[:last_activity_at].present?
+    return true if model.changes[:last_pushed_at].present?
     false
   end
 

@@ -174,6 +174,14 @@ module ApplicationHelper
     end
   end
 
+  def project_last_push project
+    if project.last_pushed_at
+      time_ago_in_words(project.last_pushed_at) + " ago"
+    else
+      "Never"
+    end
+  end
+
   def authbutton(provider, size = 64)
     file_name = "#{provider.to_s.split('_').first}_#{size}.png"
     image_tag("authbuttons/#{file_name}",
