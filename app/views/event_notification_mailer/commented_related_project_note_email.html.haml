@@ -1,3 +1,19 @@
-= raw "#{ link_to @user.name, user_url(@user.username)} write on #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project wall some message:"
+= link_to @user.name, user_url(@user.username)
+write comment on
+- if @note.noteable.is_a? MergeRequest
+  = link_to @note.noteable.title, project_merge_request_url(@merge_request.project, @merge_request)
+  merge request in
+  = link_to @project.path_with_namespace, project_url(@project.path_with_namespace)
+  project
 %br
-= @note.note
+= markdown(@note.note)
+%br
+- if @note.noteable.is_a? MergeRequest
+  = "---"
+  %br
+  Click
+  - if @note.for_diff_line?
+    = link_to "here", diffs_project_merge_request_url(@merge_request.project, @merge_request, anchor: "note_#{@note.id}")
+  - else
+    = link_to "here", project_merge_request_url(@merge_request.project, @merge_request, anchor: "note_#{@note.id}")
+  to view it on Gilab
