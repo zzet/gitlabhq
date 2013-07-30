@@ -1,3 +1,12 @@
 = raw "#{ link_to @user.name, user_url(@user.username)} commented merge request #{ link_to @merge_request.title, project_merge_request_url(@merge_request.project.path_with_namespace, @merge_request.id) } in #{ link_to @merge_request.project.path_with_namespace, project_url(@merge_request.project.path_with_namespace) } project some message:"
 %br
-= @note.note
+= markdown(@note.note)
+%br
+= "---"
+%br
+Click
+- if @note.for_diff_line?
+  = link_to "here", diffs_project_merge_request_url(@merge_request.project, @merge_request, anchor: "note_#{@note.id}")
+- else
+  = link_to "here", project_merge_request_url(@merge_request.project, @merge_request, anchor: "note_#{@note.id}")
+to view it on Gitlab
