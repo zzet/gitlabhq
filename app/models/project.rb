@@ -209,7 +209,7 @@ class Project < ActiveRecord::Base
   end
 
   def last_push
-    related_events.where(action: [:pushed, :created_branch, :created_tag, :deleted_branch, :deleted_tag]).last
+    old_events.where(action: 5).last
   end
 
   def last_push_date
