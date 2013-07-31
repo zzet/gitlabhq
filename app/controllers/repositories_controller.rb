@@ -14,6 +14,9 @@ class RepositoriesController < ProjectResourceController
 
   def tags
     @tags = @repository.tags
+  rescue Errno::EISDIR
+    @repository.raw.git.gc
+    redirect_to tags_project_repository_path(@project)
   end
 
   def stats
