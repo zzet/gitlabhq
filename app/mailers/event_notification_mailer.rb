@@ -46,7 +46,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'group',
             'In-Reply-To'     => "group-#{@group.path}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "New group '#{@group.name}' created")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "New group '#{@group.name}' was created")
   end
 
   # User subscribed on new milestones in project
@@ -122,7 +122,7 @@ class EventNotificationMailer < ActionMailer::Base
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-web-hook-#{@web_hook.id}"
 
     if @web_hook && @project
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] New project web hook added")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] New project web hook was added")
     end
   end
 
@@ -468,7 +468,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'team-project-relationship',
             'In-Reply-To'     => "team-#{@team.path}-project-#{@project.path_with_namespace}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Default project access rules for team '#{@team.name}' were updated")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Default project access rules for team '#{@team.name}' was updated")
   end
 
   def updated_user_team_user_team_group_relationship_email(notification)
@@ -606,7 +606,7 @@ class EventNotificationMailer < ActionMailer::Base
               'X-Gitlab-Source' => 'note',
               'In-Reply-To'     => "project-#{@project.path_with_namespace}-commit-#{@commit_sha}"
 
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Commit '#{@commit.title}' (sha #{@commit.short_id}) commented")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Commit '#{@commit.title}' (sha #{@commit.short_id}) was commented")
     end
   end
 
@@ -624,7 +624,7 @@ class EventNotificationMailer < ActionMailer::Base
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
 
     if @note && @project && @merge_request
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge Request ##{@merge_request.id} '#{@merge_request.title}' commented")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge Request ##{@merge_request.id} '#{@merge_request.title}' was commented")
     end
   end
 
@@ -656,7 +656,7 @@ class EventNotificationMailer < ActionMailer::Base
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
 
     if @note && @project && @merge_request
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge Request ##{@merge_request.id} '#{@merge_request.title}' commented")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge Request ##{@merge_request.id} '#{@merge_request.title}' was commented")
     end
   end
 
