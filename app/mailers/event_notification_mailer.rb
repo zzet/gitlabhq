@@ -197,7 +197,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'user',
             'In-Reply-To'     => "user-#{@new_user.username}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "New user '#{@source.name}' was created")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "New user '#{@new_user.name}' was created")
   end
 
   def created_user_team_user_team_email(notification)
@@ -205,7 +205,6 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     @user         = @event.author
     @team         = @event.source
-    @target       = @event.target
 
     headers 'X-Gitlab-Entity' => 'team',
             'X-Gitlab-Action' => 'created',
@@ -224,7 +223,6 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     @user         = @event.author
     @group        = @event.source
-    @target       = @event.target
     @changes      = JSON.load(@event.data).to_hash["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'group',
@@ -232,7 +230,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'group',
             'In-Reply-To'     => "group-#{@group.path}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Group '#{@source.name}' was updated")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Group '#{@group.name}' was updated")
   end
 
   def updated_group_user_team_group_relationship_email(notification)
@@ -545,7 +543,7 @@ class EventNotificationMailer < ActionMailer::Base
     @event               = @notification.event
     @user                = @event.author
     @upr                 = @event.source
-    @member              = @target = @event.target
+    @member              = @event.target
     @project             = @upr.project
     @changes             = JSON.load(@event.data).to_hash["previous_changes"]
     @previous_permission = UsersProject.access_roles.key(@changes.first.first)
@@ -689,7 +687,7 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     @user         = @event.author
     @key          = @source = JSON.load(@event.data).to_hash
-    @updated_user = @target = @event.target
+    @updated_user = @event.target
 
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'deleted',
@@ -705,13 +703,12 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     data          = JSON.load(@event.data).to_hash
     @user         = @event.author
-    @group        = @source = data
-    @target       = data
+    @group        = data
 
     headers 'X-Gitlab-Entity' => 'group',
             'X-Gitlab-Action' => 'deleted',
             'X-Gitlab-Source' => 'group',
-            'In-Reply-To'     => "group-#{@group.path}"
+            'In-Reply-To'     => "group-#{@group["path"]}"
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Group '#{@group["name"]}' was deleted")
   end
@@ -834,14 +831,16 @@ class EventNotificationMailer < ActionMailer::Base
     data          = JSON.load(@event.data).to_hash
     @user         = @event.author
     @project      = data
-    @namespace    = Namespace.find(data["namespace_id"])
+    @namespace    = Namespace.find_by_id(@project["namespace_id"])
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'deleted',
-            'X-Gitlab-Source' => 'project',
-            'In-Reply-To'     => "project-#{@namespace.path}/#{@project["path"]}"
+    if @namespace
+      headers 'X-Gitlab-Entity' => 'project',
+        'X-Gitlab-Action' => 'deleted',
+        'X-Gitlab-Source' => 'project',
+        'In-Reply-To'     => "project-#{@namespace.path}/#{@project["path"]}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@namespace.path}/#{@project["path"]}] Project was removed")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@namespace.path}/#{@project["path"]}] Project was removed")
+    end
   end
 
   def deleted_project_web_hook_email(notification)
@@ -1719,7 +1718,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'push',
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-push-action-#{@event.created_at}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Branch '#{@branch}' was deleted [undev gitlab commits]")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Branch '#{@branch}' was deleted [undev gitlab commits]")
   end
 
   def created_branch_project_push_summary_email(notification)
@@ -1737,7 +1736,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'push',
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-push-action-#{@event.created_at}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Branch '#{@branch}' was created [undev gitlab commits]")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Branch '#{@branch}' was created [undev gitlab commits]")
   end
 
   def deleted_tag_project_push_summary_email(notification)
@@ -1745,7 +1744,7 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     @user         = @event.author
     @source       = @event.source_type
-    @project      = @target = @event.target
+    @project      = @event.target
     @push_data    = JSON.load(@event.data).to_hash
     @tag          = @push_data["ref"]
     @tag.slice!("refs/tags/")
@@ -1755,7 +1754,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'push',
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-push-action-#{@event.created_at}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Tag '#{@tag}' was deleted [undev gitlab commits]")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Tag '#{@tag}' was deleted [undev gitlab commits]")
   end
 
   def created_tag_project_push_summary_email(notification)
@@ -1763,7 +1762,7 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     @user         = @event.author
     @source       = @event.source_type
-    @project      = @target = @event.target
+    @project      = @event.target
     @push_data    = JSON.load(@event.data).to_hash
     @tag          = @push_data["ref"]
     @tag.slice!("refs/tags/")
@@ -1773,7 +1772,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'push',
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-push-action-#{@event.created_at}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@target.path_with_namespace}] Tag '#{@tag}' was created [undev gitlab commits]")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Tag '#{@tag}' was created [undev gitlab commits]")
   end
 
   def pushed_project_push_summary_email(notification)
@@ -1832,9 +1831,9 @@ class EventNotificationMailer < ActionMailer::Base
               'In-Reply-To'     => "project-#{@project.path_with_namespace}-#{@before_commit.id}"
 
       subject = if @commits.many?
-        "[#{@target.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.title}' to parent commit #{@before_commit.short_id} [undev gitlab commits]"
+        "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.title}' to parent commit #{@before_commit.short_id} [undev gitlab commits]"
       else
-        "[#{@target.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.short_id} [undev gitlab commits]"
+        "[#{@project.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.short_id} [undev gitlab commits]"
       end
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: subject)
