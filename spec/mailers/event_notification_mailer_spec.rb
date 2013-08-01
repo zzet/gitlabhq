@@ -7,10 +7,13 @@ describe EventNotificationMailer do
   before do
     @user = create :user
     @another_user = create :user
+    @another_user.create_notification_setting
+    @another_user.notification_setting.brave = true
+    @another_user.notification_setting.save
 
     ActiveRecord::Base.observers.enable :all
 
-    RequestStore.store[:current_user] = current_user
+    RequestStore.store[:current_user] = @another_user
 
     ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
   end
@@ -122,6 +125,22 @@ describe EventNotificationMailer do
       ActionMailer::Base.deliveries.count.should == 1
     end
 
+    it "should send email about create assigned merge request in project" do
+      merge_request = create :merge_request, project: project, assignee: @user
+
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+    it "should send email about add note in project merge request" do
+      merge_request = create :merge_request, project: project
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      note = create :note, project: project, noteable: merge_request
+
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
     it "should send email about update merge request in project" do
       merge_request = create :merge_request, project: project
 
@@ -131,6 +150,27 @@ describe EventNotificationMailer do
       merge_request.save
 
       ActionMailer::Base.deliveries.should be_blank
+    end
+
+    it "should send email about merge merge request in project" do
+      merge_request = create :merge_request, project: project
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      merge_request.merge
+
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+    it "should send email about merge merge request in project" do
+      merge_request = create :merge_request, project: project
+      merge_request.close
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      merge_request.reopen
+
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about create protected branch in project" do
@@ -528,6 +568,58 @@ describe EventNotificationMailer do
 
         ActionMailer::Base.deliveries.count.should == 1
       end
+    end
+
+    describe "Push Events with create branch" do
+      it "should send email with created branch push info "  do
+        @oldrev = '0000000000000000000000000000000000000000'
+
+        ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+        @service.execute(@project, @another_user, @oldrev, @newrev, @ref)
+
+        ActionMailer::Base.deliveries.count.should == 1
+      end
+    end
+
+    describe "Push Events with create branch" do
+      it "should send email with created tag push info "  do
+        @oldrev = '0000000000000000000000000000000000000000'
+        @ref = 'refs/tags/v2.2.0'
+
+        ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+        @service.execute(@project, @another_user, @oldrev, @newrev, @ref)
+
+        ActionMailer::Base.deliveries.count.should == 1
+      end
+
+    end
+
+    describe "Push Events with create branch" do
+      it "should send email with delete branch push info "  do
+        @newrev = '0000000000000000000000000000000000000000'
+
+        ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+        @service.execute(@project, @another_user, @oldrev, @newrev, @ref)
+
+        ActionMailer::Base.deliveries.count.should == 1
+      end
+    end
+
+    describe "Push Events with create branch" do
+      it "should send email with delete tag push info "  do
+        @newrev = '0000000000000000000000000000000000000000'
+        @ref = 'refs/tags/v2.2.0'
+
+        ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+        @service.execute(@project, @another_user, @oldrev, @newrev, @ref)
+
+        ActionMailer::Base.deliveries.count.should == 1
+      end
+
     end
   end
 end
