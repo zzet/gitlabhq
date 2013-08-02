@@ -70,6 +70,8 @@ module Projects
       end
 
       @project
+
+      receive_delayed_notifications
     rescue => ex
       @project.errors.add(:base, ex.message)
       @project.errors.add(:base, "Can't save project. Please try again later")
