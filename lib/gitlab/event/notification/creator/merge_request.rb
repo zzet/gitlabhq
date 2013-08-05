@@ -2,11 +2,25 @@ class Gitlab::Event::Notification::Creator::MergeRequest < Gitlab::Event::Notifi
   def create(event)
     notifications = super(event)
 
+    notifications << create_notification_for_project_subscriptions(event)
+
     notifications << create_notification_for_assigned(event) if can_create_for_assigned?(event)
   end
 
   def can_create_for_assigned?(event)
     correct_assigned?(event) && no_notification?(event, event.source.assignee)
+  end
+
+  def create_notification_for_project_subscriptions(event)
+    project = event.source.project
+    notifications = []
+
+    subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
+    subscriptions.each do |subscription|
+      if subscriber_can_get_notification?(subscription, event)
+        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+      end
+    end
   end
 
   def create_notification_for_assigned(event)

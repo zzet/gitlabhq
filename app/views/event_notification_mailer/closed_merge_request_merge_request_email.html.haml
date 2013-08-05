@@ -1,0 +1,6 @@
+= raw "#{ link_to @user.name, user_url(@user.username)} close merge request '#{ link_to @merge_request.title, project_merge_request_url(@merge_request.project.path_with_namespace, @merge_request.id) }' in project '#{ link_to @merge_request.project.path_with_namespace, project_url(@merge_request.project.path_with_namespace) }'"
+%br
+%br
+Branches: #{@merge_request.source_branch} &rarr; #{@merge_request.target_branch}
+%br
+Assignee: #{@merge_request.assignee.present? ? @merge_request.assignee_name : "-"}
