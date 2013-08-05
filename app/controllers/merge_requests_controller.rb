@@ -55,7 +55,7 @@ class MergeRequestsController < ProjectResourceController
   end
 
   def update
-    if Projects::MergeRequests::UpdateContext.new(current_user, @project, params).execute
+    if Projects::MergeRequests::UpdateContext.new(current_user, @project, @merge_request, params).execute
       redirect_to [@project, @merge_request], notice: 'Merge request was successfully updated.'
     else
       render action: "edit"
