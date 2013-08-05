@@ -47,11 +47,7 @@ class MergeRequestsController < ProjectResourceController
   end
 
   def create
-    @merge_request = @project.merge_requests.new(params[:merge_request])
-    @merge_request.author = current_user
-
-    if @merge_request.save
-      @merge_request.reload_code
+    if Projects::MergeRequests::CreateContext.new(current_user, @project, params)
       redirect_to [@project, @merge_request], notice: 'Merge request was successfully created.'
     else
       render action: "new"
