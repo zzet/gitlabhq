@@ -7,9 +7,9 @@ describe EventNotificationMailer do
   before do
     @user = create :user
     @another_user = create :user
-    @another_user.create_notification_setting
-    @another_user.notification_setting.brave = true
-    @another_user.notification_setting.save
+    @user.create_notification_setting
+    @user.notification_setting.brave = true
+    @user.notification_setting.save
 
     ActiveRecord::Base.observers.enable :all
 

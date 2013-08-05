@@ -1286,6 +1286,21 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} '#{@merge_request.title}' was opened")
   end
 
+  def closed_project_merge_request_email(notification)
+    @notification  = notification
+    @event         = @notification.event
+    @user          = @event.author
+    @merge_request = @event.source
+    @project       = @event.target
+
+    headers 'X-Gitlab-Entity' => 'project',
+            'X-Gitlab-Action' => 'closed',
+            'X-Gitlab-Source' => 'merge_request',
+            'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} '#{@merge_request.title}' was closed")
+  end
+
   def opened_project_issue_email(notification)
     @notification = notification
     @event = @notification.event
