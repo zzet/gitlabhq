@@ -47,7 +47,7 @@ class MergeRequestsController < ProjectResourceController
   end
 
   def create
-    if Projects::MergeRequests::CreateContext.new(current_user, @project, params)
+    if Projects::MergeRequests::CreateContext.new(current_user, @project, params).execute
       redirect_to [@project, @merge_request], notice: 'Merge request was successfully created.'
     else
       render action: "new"
@@ -55,9 +55,7 @@ class MergeRequestsController < ProjectResourceController
   end
 
   def update
-    if @merge_request.update_attributes(params[:merge_request].merge(author_id_of_changes: current_user.id))
-      @merge_request.reload_code
-      @merge_request.mark_as_unchecked
+    if Projects::MergeRequests::UpdateContext.new(current_user, @project, params).execute
       redirect_to [@project, @merge_request], notice: 'Merge request was successfully updated.'
     else
       render action: "edit"
