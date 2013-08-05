@@ -1,1 +1,1 @@
-= "#{ link_to @user.name, user_url(@user.username) } created new milestone (#{ link_to @milestone.title, project_milestone_url(@project.path_with_namespace, @milestone) }) on #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project"
+= raw "#{ link_to @user.name, user_url(@user.username) } created new milestone (#{ link_to @milestone.title, project_milestone_url(@project.path_with_namespace, @milestone) }) on #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project"

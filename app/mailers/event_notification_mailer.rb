@@ -1936,9 +1936,9 @@ class EventNotificationMailer < ActionMailer::Base
               'In-Reply-To'     => "project-#{@project.path_with_namespace}-#{@before_commit.id}"
 
       subject = if @commits.many?
-        "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.title}' to parent commit #{@before_commit.short_id} [undev gitlab commits]"
-      else
         "[#{@project.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.short_id} [undev gitlab commits]"
+      else
+        "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.title}' to parent commit #{@before_commit.short_id} [undev gitlab commits]"
       end
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: subject)
