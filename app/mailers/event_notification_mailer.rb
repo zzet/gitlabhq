@@ -1286,7 +1286,6 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} '#{@merge_request.title}' was opened")
   end
 
-
   def opened_project_merge_request_email(notification)
     @notification  = notification
     @event         = @notification.event
@@ -1662,6 +1661,21 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "#{@target.name} was assigned to #{@source.name} issue by #{@user.name} [assigned]")
   end
 
+  def opened_project_merge_request_email(notification)
+    @notification  = notification
+    @event         = @notification.event
+    @user          = @event.author
+    @merge_request = @event.source
+    @project       = @event.target
+
+    headers 'X-Gitlab-Entity' => 'project',
+            'X-Gitlab-Action' => 'created',
+            'X-Gitlab-Source' => 'merge_request',
+            'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} '#{@merge_request.title}' was opened")
+  end
+
   def assigned_merge_request_merge_request_email(notification)
     @notification   = notification
     @event          = @notification.event
@@ -1674,7 +1688,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'merge_request',
             'In-Reply-To'     => "user-#{@assigned_user.username}-merge_request-#{@merge_request.id}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "#{@assigned_user.name} was assigned to #{@merge_request.title} merge request")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} '#{@merge_request.title}' was assigned")
   end
 
   def assigned_user_merge_request_email(notification)
