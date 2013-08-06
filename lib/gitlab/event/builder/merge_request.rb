@@ -24,7 +24,7 @@ class Gitlab::Event::Builder::MergeRequest < Gitlab::Event::Builder::Base
 
         case meta[:action]
         when :created
-          actions << :opened
+          actions << :created
         when :updated
           changes = source.changes
 

@@ -1271,7 +1271,7 @@ class EventNotificationMailer < ActionMailer::Base
   # Opened action
   #
 
-  def opened_merge_request_merge_request_email(notification)
+  def created_merge_request_merge_request_email(notification)
     @notification  = notification
     @event         = @notification.event
     @user          = @event.author
