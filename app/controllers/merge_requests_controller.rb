@@ -47,7 +47,8 @@ class MergeRequestsController < ProjectResourceController
   end
 
   def create
-    if Projects::MergeRequests::CreateContext.new(current_user, @project, params).execute
+    @merge_request = Projects::MergeRequests::CreateContext.new(current_user, @project, params).execute
+    if @merge_request.persisted?
       redirect_to [@project, @merge_request], notice: 'Merge request was successfully created.'
     else
       render action: "new"

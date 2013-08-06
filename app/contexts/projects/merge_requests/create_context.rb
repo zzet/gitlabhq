@@ -11,11 +11,8 @@ module Projects
           @merge_request.reload_code
 
           receive_delayed_notifications
-
-          return true
         end
-
-        return false
+        @merge_request
       end
     end
   end
