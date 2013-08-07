@@ -58,6 +58,7 @@ class Gitlab::Event::Builder::Base
               # TODO
               # Make base_actions method to watchable classes
               base_actions = [:created, :updated, :deleted, :opened, :closed, :reopened, :merged]
+
               candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                        target_id: source.try(:id), target_type: source.class.name,
                                        author_id: user.id).
@@ -68,9 +69,11 @@ class Gitlab::Event::Builder::Base
 
           candidate = candidates.last
 
-          return nil if candidate && candidate.notifications.where(notification_state: [:delivered, :new]).any?
-          return candidate.parent_event if candidate && candidate.parent_event.present? && level > 1
-          return candidate
+          if candidate
+            return nil if candidate.notifications.where(notification_state: [:delivered, :new]).any?
+            return candidate.parent_event if candidate.parent_event.present? && level > 1
+            return candidate
+          end
         end
       end
       nil

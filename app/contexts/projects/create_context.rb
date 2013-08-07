@@ -58,14 +58,19 @@ module Projects
       end
 
       if @project.save
-        @project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
-
         group = Group.find_by_id(@project.namespace_id)
         if group
           group.user_teams.each do |team|
             access = team.max_project_access_in_group(group)
             Gitlab::UserTeamManager.assign(team, project, access)
           end
+        end
+
+        master_permission = @project.users_projects.find_by_user_id(current_user)
+        if master_permission.blank?
+          @project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
+        else
+          master_permission.update_attribute(:project_access, UsersProject::MASTER) if master_permission.project_access != UsersProject::MASTER
         end
       end
 

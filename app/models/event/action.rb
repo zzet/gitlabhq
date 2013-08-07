@@ -17,6 +17,7 @@ class Event::Action
         :commented_merge_request,
         :commented_issue,
         :commented_commit,
+        :imported,
 
         # Git specific
         :pushed,

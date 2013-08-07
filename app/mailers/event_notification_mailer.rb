@@ -545,16 +545,19 @@ class EventNotificationMailer < ActionMailer::Base
     @upr                 = @event.source
     @member              = @event.target
     @project             = @upr.project
-    @changes             = JSON.load(@event.data).to_hash["previous_changes"]
-    @previous_permission = UsersProject.access_roles.key(@changes.first.first)
-    @current_permission  = UsersProject.access_roles.key(@changes.first.last)
+    data                 = JSON.load(@event.data)
+    @changes             = data["previous_changes"]
+    unless @changes.blank?
+      @previous_permission = UsersProject.access_roles.key(@changes["project_access"].first)
+      @current_permission  = UsersProject.access_roles.key(@changes["project_access"].last)
 
-    headers 'X-Gitlab-Entity' => 'user',
-            'X-Gitlab-Action' => 'updated',
-            'X-Gitlab-Source' => 'project-user-relationship',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
+      headers 'X-Gitlab-Entity' => 'user',
+              'X-Gitlab-Action' => 'updated',
+              'X-Gitlab-Source' => 'project-user-relationship',
+              'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Permissions for user '#{ @member.name }' in project '#{@project.path_with_namespace}' was updated")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Permissions for user '#{ @member.name }' in project '#{@project.path_with_namespace}' was updated")
+    end
   end
 
   def updated_project_users_project_email(notification)
@@ -562,18 +565,21 @@ class EventNotificationMailer < ActionMailer::Base
     @event                = @notification.event
     @user                 = @event.author
     @upr                  = @event.source
-    @project              = @event.target
-    @member               = @upr.user
-    @changes              = JSON.load(@event.data).to_hash["previous_changes"]
-    @previous_permission  = UsersProject.access_roles.key(@changes.first.first)
-    @current_permission   = UsersProject.access_roles.key(@changes.first.last)
+    data                  = JSON.load(@event.data)
+    @project              = Project.find(data["project_id"])
+    @member               = User.find(data["user_id"])
+    @changes              = data["previous_changes"]
+    unless @changes.blank?
+      @previous_permission  = UsersProject.access_roles.key(@changes["project_access"].first)
+      @current_permission   = UsersProject.access_roles.key(@changes["project_access"].last)
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'updated',
-            'X-Gitlab-Source' => 'project-user-relationship',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
+      headers 'X-Gitlab-Entity' => 'project',
+              'X-Gitlab-Action' => 'updated',
+              'X-Gitlab-Source' => 'project-user-relationship',
+              'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Permissions for user '#{ @member.name }' was updated")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Permissions for user '#{ @member.name }' was updated")
+    end
   end
 
   #
@@ -1077,14 +1083,14 @@ class EventNotificationMailer < ActionMailer::Base
     @up           = JSON.load(@event.data)
     @project      = @event.target
     @member       = User.find(@up["user_id"])
-    @project      = Project.find(@up["project_id"]) if @project.is_a?(UsersProject)
+    @project      = Project.find(@up["project_id"]) if @project.nil? || @project.is_a?(UsersProject)
 
+    if @member && @project
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'left',
             'X-Gitlab-Source' => 'project-user-relationship',
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
 
-    if @member && @project
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] User '#{@member.name}' was removed from project team")
     end
   end
@@ -1114,7 +1120,7 @@ class EventNotificationMailer < ActionMailer::Base
     @up           = JSON.load(@event.data)
     @member       = @event.target
     @project      = Project.find(@up["project_id"])
-    @member       = User.find(@up["user_id"]) if @member.is_a?(UsersProject)
+    @member       = User.find(@up["user_id"]) if @member.nil? || @member.is_a?(UsersProject)
 
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'left',

@@ -40,6 +40,8 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           end
         when :deleted
           actions << :deleted
+        when :imported
+          actions << :imported
         end
       when ::Issue
         target = source.project
