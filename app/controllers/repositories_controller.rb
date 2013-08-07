@@ -4,6 +4,8 @@ class RepositoriesController < ProjectResourceController
   before_filter :authorize_code_access!
   before_filter :require_non_empty_project
 
+  rescue_from Errno::EISDIR, with: :gc_in_repository
+
   def show
     @activities = @repository.commits_with_refs(20)
   end
@@ -14,9 +16,6 @@ class RepositoriesController < ProjectResourceController
 
   def tags
     @tags = @repository.tags
-  rescue Errno::EISDIR
-    @repository.raw.git.gc
-    redirect_to tags_project_repository_path(@project)
   end
 
   def stats
@@ -40,5 +39,12 @@ class RepositoriesController < ProjectResourceController
     else
       render_404
     end
+  end
+
+  private
+
+  def gc_in_repository
+    @repository.raw.git.gc
+    redirect_to tags_project_repository_path(@project)
   end
 end
