@@ -6,7 +6,7 @@ class Admin::Projects::MembersController < Admin::Projects::ApplicationControlle
   end
 
   def update
-    if team_member_relation.update_attributes(params[:team_member])
+    if Projects::Users::UpdateRelationContext.new(@current_user, @project, team_member, params).execute
       redirect_to [:admin, project],  notice: 'Project Access was successfully updated.'
     else
       render action: "edit"
@@ -14,7 +14,7 @@ class Admin::Projects::MembersController < Admin::Projects::ApplicationControlle
   end
 
   def destroy
-    team_member_relation.destroy
+    Projects::Users::RemoveRelationContext.new(@current_user, @project, member, params).execute
 
     redirect_to :back
   end
@@ -24,9 +24,4 @@ class Admin::Projects::MembersController < Admin::Projects::ApplicationControlle
   def team_member
     @member ||= project.users.find_by_username(params[:id])
   end
-
-  def team_member_relation
-    team_member.users_projects.find_by_project_id(project)
-  end
-
 end

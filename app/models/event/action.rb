@@ -14,8 +14,10 @@ class Event::Action
         :transfer,
 
         # Project specific
-        :commented_related,
+        :commented_merge_request,
+        :commented_issue,
         :commented_commit,
+        :imported,
 
         # Git specific
         :pushed,

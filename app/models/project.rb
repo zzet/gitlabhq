@@ -123,7 +123,7 @@ class Project < ActiveRecord::Base
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
 
-  actions_to_watch [:created, :updated, :deleted, :transfer]
+  actions_to_watch [:created, :updated, :deleted, :transfer, :closed, :reopened, :merged, :imported]
   adjacent_targets [:group]
 
   class << self

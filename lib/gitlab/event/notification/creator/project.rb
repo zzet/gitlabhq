@@ -3,8 +3,12 @@ class Gitlab::Event::Notification::Creator::Project < Gitlab::Event::Notificatio
     notifications = []
 
     case event.action.to_sym
+    when :created
+      notifications << create_project_create_notifications(event)
     when :transfer
       notifications << create_project_move_notifications(event)
+    when :imported
+      notifications << create_project_import_notifications(event)
     else
       notifications = super(event)
     end
@@ -13,6 +17,63 @@ class Gitlab::Event::Notification::Creator::Project < Gitlab::Event::Notificatio
   end
 
   private
+
+  def create_project_create_notifications(event)
+    project = event.source
+    notifications = []
+
+    subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
+    subscriptions.each do |subscription|
+      if subscriber_can_get_notification?(subscription, event)
+        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+      end
+    end
+
+    namespace = project.namespace
+    if namespace.is_a? Group
+      subscriptions = ::Event::Subscription.by_target(namespace).by_source_type(event.source_type)
+      subscriptions.each do |subscription|
+        if subscriber_can_get_notification?(subscription, event)
+          notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        end
+      end
+    end
+
+    notifications
+  end
+
+  def create_project_create_notifications(event)
+    project = event.source
+    notifications = []
+
+    subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
+    subscriptions.each do |subscription|
+      if subscriber_can_get_notification?(subscription, event)
+        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+      end
+    end
+
+    namespace = project.namespace
+    if namespace.is_a? Group
+      subscriptions = ::Event::Subscription.by_target(namespace).by_source_type(event.source_type)
+      subscriptions.each do |subscription|
+        if subscriber_can_get_notification?(subscription, event)
+          notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        end
+      end
+    end
+
+    project.users.find_each do |member|
+      subscriptions = ::Event::Subscription.by_target(member).by_source_type(event.source_type)
+      subscriptions.each do |subscription|
+        if subscriber_can_get_notification?(subscription, event)
+          notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        end
+      end
+    end
+
+    notifications
+  end
 
   def create_project_move_notifications(event)
     project = event.source

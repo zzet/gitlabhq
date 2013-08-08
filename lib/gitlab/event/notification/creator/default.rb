@@ -26,6 +26,7 @@ class Gitlab::Event::Notification::Creator::Default
 
   def check_event_for_brave(subscription, event)
     return true if ["Note", "MergeRequest", "Push_summary"].include?(event.source_type)
+    return true if ["Project"].include?(event.source_type) && event.action == "transfer"
 
     subscriber = subscription.user
     settings = subscriber.notification_setting
