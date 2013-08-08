@@ -3,7 +3,7 @@
   %td
     = link_to commit.short_id(8), project_commit_url(@project, commit)
   %td{title: commit.title}
-    = truncate(commit.title, length: 70)
+    = simple_format(commit.message)
   %td
     = commit.committed_date.strftime("%Y-%d-%m %H:%M:%S")
   %td

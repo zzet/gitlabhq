@@ -1,3 +1,3 @@
 = raw "#{ link_to @user.name, user_url(@user.username)} commented note #{ link_to @note.title, project_note_url(@note.project.path_with_namespace, @note.id) } in #{ link_to @note.project.path_with_namespace, project_url(@note.project.path_with_namespace) } project some message:"
 %br
-= @note.note
+= markdown(@note.note)

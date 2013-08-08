@@ -1,7 +1,8 @@
-= raw "#{ link_to @user.name, user_url(@user.username)} write on #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project wall some message:"
-%br
-- if @commit
-  On commit:
-  = link_to @commit.short_id(8), project_commit_url(@project, @commit, anchor: "note_#{@note.id}")
 %br
 = markdown(@note.note)
+%br
+= "---"
+%br
+Click
+= link_to_gfm "here", project_commit_url(@note.project, id: @commit.id, anchor: "note_#{@note.id}")
+to view it on Gitlab

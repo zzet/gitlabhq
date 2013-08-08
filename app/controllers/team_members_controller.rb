@@ -16,9 +16,7 @@ class TeamMembersController < ProjectResourceController
   end
 
   def create
-    users = User.where(id: params[:user_ids].split(','))
-
-    @project.team << [users, params[:project_access]]
+    Projects::Users::CreateRelationContext.new(@current_user, @project, params).execute
 
     if params[:redirect_to]
       redirect_to params[:redirect_to]
@@ -28,18 +26,14 @@ class TeamMembersController < ProjectResourceController
   end
 
   def update
-    @user_project_relation = project.users_projects.find_by_user_id(member)
-    @user_project_relation.update_attributes(params[:team_member])
-
-    unless @user_project_relation.valid?
+    unless Projects::Users::UpdateRelationContext.new(@current_user, @project, member, params).execute
       flash[:alert] = "User should have at least one role"
     end
     redirect_to project_team_index_path(@project)
   end
 
   def destroy
-    @user_project_relation = project.users_projects.find_by_user_id(member)
-    @user_project_relation.destroy
+    Projects::Users::RemoveRelationContext.new(@current_user, @project, member, params).execute
 
     respond_to do |format|
       format.html { redirect_to project_team_index_path(@project) }
@@ -48,8 +42,7 @@ class TeamMembersController < ProjectResourceController
   end
 
   def apply_import
-    giver = Project.find(params[:source_project_id])
-    status = @project.team.import(giver)
+    status = Projects::Users::ImportRelationContext.new(@current_user, @project, params).execute
     notice = status ? "Succesfully imported" : "Import failed"
 
     redirect_to project_team_index_path(project), notice: notice

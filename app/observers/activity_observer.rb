@@ -23,10 +23,17 @@ class ActivityObserver < ActiveRecord::Observer
   end
 
   def after_close(model, transition)
+    EventHierarchyWorker.reset
     Gitlab::Event::Action.trigger :closed, model
   end
 
+  def after_merge(model, transition)
+    EventHierarchyWorker.reset
+    Gitlab::Event::Action.trigger :merged, model
+  end
+
   def after_reopen(model, transition)
+    EventHierarchyWorker.reset
     Gitlab::Event::Action.trigger :reopened, model
   end
 

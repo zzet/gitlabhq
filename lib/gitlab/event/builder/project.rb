@@ -40,6 +40,8 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           end
         when :deleted
           actions << :deleted
+        when :imported
+          actions << :imported
         end
       when ::Issue
         target = source.project
@@ -73,7 +75,10 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         case meta[:action]
         when :created
           actions << :commented_commit if source.commit_id.present?
-          actions << :commented_related if source.noteable.present? && source.commit_id.blank?
+          if source.noteable.present? && source.commit_id.blank?
+            actions << :commented_merge_request if source.noteable.is_a? MergeRequest
+            actions << :commented_issue if source.noteable.is_a? Issue
+          end
           actions << :commented if source.noteable.blank? && source.commit_id.blank?
         end
 
