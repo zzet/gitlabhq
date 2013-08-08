@@ -1001,7 +1001,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'project-user-relationship',
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-users-import"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Members was imported from another project")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Members were imported from another project")
   end
 
   def joined_project_users_project_email(notification)
