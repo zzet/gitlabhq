@@ -44,6 +44,28 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
   end
 
 
+  def on_owner_subscription
+    @current_user.notification_setting.subscribe_if_owner = true
+
+    @current_user.notification_setting.save
+
+    respond_to do |format|
+      format.json { head :created }
+      format.html { redirect_to profile_subscriptions_path }
+    end
+  end
+
+  def from_owner_subscription
+    @current_user.notification_setting.subscribe_if_owner = false
+
+    @current_user.notification_setting.save
+
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { redirect_to profile_subscriptions_path }
+    end
+  end
+
   def on_own_changes
     @current_user.notification_setting.own_changes = true
 

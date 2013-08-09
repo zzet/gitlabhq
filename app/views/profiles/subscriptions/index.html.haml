@@ -46,6 +46,11 @@
     - else
       = link_to "Notify me about changes I make", on_own_changes_notifications_subscription_path, method: :post, class: "btn btn-primary"
 
+    - if @notification_setting.subscribe_if_owner
+      = link_to "Do not sign on my projects that I create", from_owner_ubscription_notifications_subscription_path, method: :delete, class: "btn btn-remove"
+    - else
+      = link_to "Automatically sign me in projects that I create", on_owner_subscription_notifications_subscription_path, method: :post, class: "btn btn-primary"
+
     %br
     %br
     - if @notification_setting.adjacent_changes
