@@ -25,7 +25,7 @@ class Gitlab::Event::Notification::Creator::User < Gitlab::Event::Notification::
       end
     end
 
-    data = JSON.load(event.data["teams"])
+    data = JSON.load(event.data)
 
     teams = data["teams"]
     teams.each do |team|

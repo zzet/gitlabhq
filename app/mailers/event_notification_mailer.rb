@@ -427,6 +427,9 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     @user         = @event.author
     @banned_user  = @event.source
+    data          = JSON.load(@event.data)
+    @teams        = data["teams"].map { |t| UserTeam.find_by_id(t["id"]) }.reject { |t| t.nil? }
+    @projects     = data["projects"].map { |pr| Project.find_by_id(pr["id"]) }.reject { |pr| pr.nil? }
 
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'updated',
