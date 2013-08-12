@@ -25,9 +25,13 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
         case meta[:action]
         when :created
           actions << :created
+        when :blocked
+          actions << :blocked
         when :updated
-          actions << :updated
-          temp_data["previous_changes"] = changes
+          unless changes["state"].last == "blocked"
+            actions << :updated
+            temp_data["previous_changes"] = changes
+          end
         when :deleted
           actions << :deleted
         end

@@ -422,6 +422,20 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "System Hook #{@source.name} was updated by #{@user.name} in #{@target.name} project [updated]")
   end
 
+  def blocked_user_user_email(notification)
+    @notification = notification
+    @event        = @notification.event
+    @user         = @event.author
+    @banned_user  = @event.source
+
+    headers 'X-Gitlab-Entity' => 'user',
+            'X-Gitlab-Action' => 'updated',
+            'X-Gitlab-Source' => 'user',
+            'In-Reply-To'     => "user-#{@banned_user.username}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@updated_user.name}' was banned")
+  end
+
   def updated_user_user_email(notification)
     @notification = notification
     @event        = @notification.event
