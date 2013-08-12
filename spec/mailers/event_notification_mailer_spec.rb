@@ -531,11 +531,22 @@ describe EventNotificationMailer do
     end
 
     it "should send email about update user" do
+
+      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
+
+      user.block
+
+      ActionMailer::Base.deliveries.count.should == 1
+    end
+
+    it "should send email about block user" do
       user.name = "#{user.name}_updated"
       user.save
 
       ActionMailer::Base.deliveries.count.should == 1
     end
+
+
 
     it "should send email about self key add" do
       key = create :key, user: user
