@@ -4,11 +4,11 @@
 User was removed from teams:
 %br
 - @teams.each do |team|
-  = @team.name
+  = team.name
   %br
 %br
 User was removed from projects:
 %br
 - @projects.each do |project|
-  = link_to @project.path_with_namespace, project_url(@project.path_with_namespace)
+  = link_to project.path_with_namespace, project_url(project.path_with_namespace)
   %br
