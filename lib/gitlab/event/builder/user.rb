@@ -30,7 +30,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           temp_data["teams"] = source.user_teams.map { |t| t.attributes }
           temp_data["projects"] = source.projects.map { |pr| pr.attributes }
         when :updated
-          unless changes["state"].last == "blocked"
+          unless ban_action?(changes)
             actions << :updated
             temp_data["previous_changes"] = changes
           end
@@ -86,6 +86,10 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
       end
 
       events
+    end
+
+    def ban_action?(changes)
+      changes["state"] && changes["state"].last == "blocked"
     end
   end
 end
