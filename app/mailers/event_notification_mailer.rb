@@ -433,7 +433,7 @@ class EventNotificationMailer < ActionMailer::Base
             'X-Gitlab-Source' => 'user',
             'In-Reply-To'     => "user-#{@banned_user.username}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@updated_user.name}' was banned")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@banned_user.name}' was banned")
   end
 
   def updated_user_user_email(notification)

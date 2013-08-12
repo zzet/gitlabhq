@@ -27,6 +27,8 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           actions << :created
         when :blocked
           actions << :blocked
+          temp_data["teams"] = source.user_teams.map { |t| t.attributes }
+          temp_data["projects"] = source.projects.map { |pr| pr.attributes }
         when :updated
           unless changes["state"].last == "blocked"
             actions << :updated
