@@ -72,6 +72,10 @@ module Projects
         else
           master_permission.update_attribute(:project_access, UsersProject::MASTER) if master_permission.project_access != UsersProject::MASTER
         end
+
+        if current_user.notification_setting && current_user.notification_setting.subscribe_if_owner
+          SubscriptionService.subscribe(current_user, :all, @project, :all)
+        end
       end
 
       receive_delayed_notifications
