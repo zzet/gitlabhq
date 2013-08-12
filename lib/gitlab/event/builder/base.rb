@@ -57,7 +57,7 @@ class Gitlab::Event::Builder::Base
             if candidates.blank?
               # TODO
               # Make base_actions method to watchable classes
-              base_actions = [:created, :updated, :deleted, :opened, :closed, :reopened, :merged]
+              base_actions = [:created, :updated, :deleted, :opened, :closed, :reopened, :merged, :blocked]
 
               candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                        target_id: source.try(:id), target_type: source.class.name,
