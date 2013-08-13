@@ -97,7 +97,7 @@ class User < ActiveRecord::Base
   has_many :user_team_project_relationships,      through: :user_teams
   has_many :team_projects,                        through: :user_team_project_relationships
   has_many :user_team_group_relationships,        through: :user_teams
-  has_many :master_user_team_group_relationships, through: :user_teams, conditions: { user_team_user_relationships: { group_admin: true } }
+  has_many :master_user_team_group_relationships, through: :user_teams, conditions: { user_team_user_relationships: { group_admin: true } }, source: :user_team_group_relationships
   has_many :team_groups,                          through: :user_team_group_relationships, source: :group
   has_many :master_team_groups,                   through: :master_user_team_group_relationships, source: :group
 
