@@ -32,6 +32,11 @@ class ActivityObserver < ActiveRecord::Observer
     Gitlab::Event::Action.trigger :blocked, model
   end
 
+  def after_activate(model, transition)
+    EventHierarchyWorker.reset
+    Gitlab::Event::Action.trigger :activate, model
+  end
+
   def after_merge(model, transition)
     EventHierarchyWorker.reset
     Gitlab::Event::Action.trigger :merged, model

@@ -27,6 +27,7 @@ class Event::Action
         :deleted_tag,
         :cloned,
         :blocked,
+        :activate,
 
         # Issuable
         :opened,

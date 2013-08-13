@@ -439,6 +439,22 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@banned_user.name}' was banned")
   end
 
+  def activate_user_user_email(notification)
+    @notification   = notification
+    @event          = @notification.event
+    @user           = @event.author
+    @activated_user = @event.source
+
+    headers 'X-Gitlab-Entity' => 'user',
+            'X-Gitlab-Action' => 'updated',
+            'X-Gitlab-Source' => 'user',
+            'In-Reply-To'     => "user-#{@activated_user.username}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@activated_user.name}' was activated")
+  end
+
+
+
   def updated_user_user_email(notification)
     @notification = notification
     @event        = @notification.event
