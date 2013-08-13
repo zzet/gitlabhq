@@ -91,13 +91,15 @@ class User < ActiveRecord::Base
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: MergeRequest
 
   # Teams
-  has_many :own_teams,                       dependent: :destroy, foreign_key: :owner_id, class_name: UserTeam
-  has_many :user_team_user_relationships,    dependent: :destroy
-  has_many :user_teams,                      through: :user_team_user_relationships
-  has_many :user_team_project_relationships, through: :user_teams
-  has_many :team_projects,                   through: :user_team_project_relationships
-  has_many :user_team_group_relationships,   through: :user_teams, conditions: { user_team_user_relationships: { group_admin: true } }
-  has_many :team_groups,                     through: :user_team_group_relationships, source: :group
+  has_many :own_teams,                            dependent: :destroy, foreign_key: :owner_id, class_name: UserTeam
+  has_many :user_team_user_relationships,         dependent: :destroy
+  has_many :user_teams,                           through: :user_team_user_relationships
+  has_many :user_team_project_relationships,      through: :user_teams
+  has_many :team_projects,                        through: :user_team_project_relationships
+  has_many :user_team_group_relationships,        through: :user_teams
+  has_many :master_user_team_group_relationships, through: :user_teams, conditions: { user_team_user_relationships: { group_admin: true } }
+  has_many :team_groups,                          through: :user_team_group_relationships, source: :group
+  has_many :master_team_groups,                   through: :master_user_team_group_relationships, source: :group
 
   # Events
   has_many :events,                   as: :source
@@ -238,7 +240,7 @@ class User < ActiveRecord::Base
 
   # Groups where user is an owner
   def owned_groups
-   @group_ids = groups.pluck(:id) + team_groups.pluck(:id)
+   @group_ids = groups.pluck(:id) + master_team_groups.pluck(:id)
    Group.where(id: @group_ids)
   end
 
@@ -258,6 +260,11 @@ class User < ActiveRecord::Base
       agroups = agroups.where(id: @group_ids)
     end
     agroups
+  end
+
+  def personal_groups
+    @group_ids ||= (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
+    Group.where(id: @group_ids)
   end
 
   def authorized_namespaces
