@@ -4,7 +4,7 @@
 User was removed from teams:
 %br
 - @teams.each do |team|
-  = team.name
+  = link_to team.name, teams_url(team.path)
   %br
 %br
 User was removed from projects:
