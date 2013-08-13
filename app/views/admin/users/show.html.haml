@@ -85,21 +85,29 @@
         .pull-right
     %br
 
-    - if @admin_user.owned_groups.present?
+    - if @groups.any?
       .ui-box
-        %h5.title Owned groups:
+        %h5.title Groups:
         %ul.well-list
-          - @admin_user.groups.each do |group|
+          - @groups.each do |group|
             %li
               %strong= link_to group.name, admin_group_path(group)
+              %span.pull-right.light
+                - if group.owner == @admin_user
+                  %i.icon-wrench
 
-    - if @admin_user.owned_teams.present?
+
+
+    - if @teams.any?
       .ui-box
-        %h5.title Owned teams:
+        %h5.title Teams:
         %ul.well-list
-          - @admin_user.owned_teams.each do |team|
+          - @teams.each do |team|
             %li
               %strong= link_to team.name, admin_team_path(team)
+              %span.pull-right.light
+                - if team.owner == @admin_user
+                  %i.icon-wrench
 
 
   .span6
