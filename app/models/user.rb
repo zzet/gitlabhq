@@ -256,8 +256,7 @@ class User < ActiveRecord::Base
   def authorized_groups
     agroups = Group.scoped
     unless self.admin?
-      @group_ids ||= (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
-      agroups = agroups.where(id: @group_ids)
+      agroups = personal_groups
     end
     agroups
   end
@@ -286,10 +285,14 @@ class User < ActiveRecord::Base
   def authorized_teams
     ateams = UserTeam.scoped
     unless self.admin?
-      @team_ids ||= (user_teams.pluck(:id) + own_teams.pluck(:id)).uniq
-      ateams = ateams.where(id: @team_ids)
+      ateams = personal_teams
     end
     ateams
+  end
+
+  def personal_teams
+    @team_ids ||= (user_teams.pluck(:id) + own_teams.pluck(:id)).uniq
+    UserTeam.where(id: @team_ids)
   end
 
   # Team membership in authorized projects
