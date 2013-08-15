@@ -48,6 +48,8 @@ class UserTeam < ActiveRecord::Base
   scope :without_project, ->(project){ where("user_teams.id NOT IN (:ids)", ids: (a = with_project(project); a.blank? ? 0 : a))}
   scope :created_by, ->(user){ where(owner_id: user) }
 
+  delegate :name, to: :owner, allow_nil: true, prefix: true
+
   actions_to_watch [:created, :updated, :assigned, :reassigned, :deleted, :transfer]
 
   class << self
