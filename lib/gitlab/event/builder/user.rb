@@ -25,9 +25,17 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
         case meta[:action]
         when :created
           actions << :created
+        when :blocked
+          actions << :blocked
+          temp_data["teams"] = source.user_teams.map { |t| t.attributes }
+          temp_data["projects"] = source.projects.map { |pr| pr.attributes }
+        when :activate
+          actions << :activate
         when :updated
-          actions << :updated
-          temp_data["previous_changes"] = changes
+          unless ban_action?(changes)
+            actions << :updated
+            temp_data["previous_changes"] = changes
+          end
         when :deleted
           actions << :deleted
         end
@@ -80,6 +88,10 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
       end
 
       events
+    end
+
+    def ban_action?(changes)
+      changes["state"]
     end
   end
 end

@@ -12,9 +12,36 @@
       %p.nothing_here_message Project activity will be displayed here
     .loading.hide
   .side.span4
-    - if @group.description.present?
-      .description-block
-        = @group.description
+    .light-well
+      .dropdown.pull-right
+        %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+          %i.icon-plus-sign-alt
+          %b.caret
+        %ul.dropdown-menu
+          %li.divider
+          %li
+            = link_to new_group_team_path(@group), title: "Assign team" do
+              %i.icon-plus
+              Assign Team
+          %li
+            = link_to new_project_path(namespace_id: @group.id), title: "New project" do
+              %i.icon-plus
+              New Project
+
+      = render "shared/watch_button", current_entity: @group
+
+      %h3.page_title
+        = @group.name
+      - if @group.description.present?
+        %p.light= @group.description
+
+      %hr
+      %p
+      %p Projects count: #{@group.projects.count}
+      %p Assigned teams: #{@group.user_teams.count }
+      %p Created on: #{@group.created_at.stamp('Aug 22, 2013')}
+      %p Owner: #{link_to @group.owner_name, @group.owner}
+
     = render "projects", projects: @projects
     .prepend-top-20
       = link_to group_path(@group, { format: :atom, private_token: current_user.private_token }), title: "Feed" do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130730103636) do
+ActiveRecord::Schema.define(:version => 20130809102323) do
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -23,10 +23,12 @@ ActiveRecord::Schema.define(:version => 20130730103636) do
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
     t.boolean  "adjacent_changes"
     t.boolean  "brave"
+    t.boolean  "subscribe_if_owner"
+    t.boolean  "subscribe_if_developer"
   end
 
   create_table "event_subscription_notifications", :force => true do |t|

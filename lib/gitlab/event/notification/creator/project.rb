@@ -18,7 +18,7 @@ class Gitlab::Event::Notification::Creator::Project < Gitlab::Event::Notificatio
 
   private
 
-  def create_project_create_notifications(event)
+  def create_project_import_notifications(event)
     project = event.source
     notifications = []
 

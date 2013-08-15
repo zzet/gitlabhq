@@ -1,0 +1,10 @@
+.ui-box
+  %h5.title Teams
+  %ul.well-list
+    - @teams.each do |team|
+      %li
+        = link_to team_path(team), class: dom_class(team) do
+          %strong.well-title= team.name
+          %span.pull-right.light
+            - if team.owner == user
+              %i.icon-wrench

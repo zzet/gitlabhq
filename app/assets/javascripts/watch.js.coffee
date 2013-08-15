@@ -11,6 +11,7 @@ $ ->
           $watch_button.removeClass('watched')
           $watch_button.find('i').removeClass('icon-eye-open').addClass('icon-eye-close')
           $watch_button.attr('data-original-title', 'Watch')
+          $watch_button.find('span').text('Watch')
     else
       $.ajax
         type: "POST",
@@ -23,4 +24,4 @@ $ ->
           if (xhr.readyState == 4 && xhr.status == 201)
             $watch_button.addClass('watched')
             $watch_button.find('i').removeClass('icon-eye-close').addClass('icon-eye-open')
-            $watch_button.attr('data-original-title', 'Unwatch') 
+            $watch_button.find('span').text('Unwatch')
