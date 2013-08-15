@@ -1,0 +1,10 @@
+.ui-box
+  %h5.title Groups
+  %ul.well-list
+    - @groups.each do |group|
+      %li
+        = link_to group_path(group), class: dom_class(group) do
+          %strong.well-title= group.human_name
+          %span.pull-right.light
+            - if group.owner == user
+              %i.icon-wrench

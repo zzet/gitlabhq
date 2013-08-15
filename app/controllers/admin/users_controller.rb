@@ -15,6 +15,12 @@ class Admin::UsersController < Admin::ApplicationController
 
     # Projects he already own or joined
     @projects = admin_user.authorized_projects
+
+    # Groups he already own or joined
+    @groups   = admin_user.personal_groups
+
+    # Teams he already own or joined
+    @teams    = admin_user.personal_teams
   end
 
   def team_update
