@@ -422,6 +422,39 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "System Hook #{@source.name} was updated by #{@user.name} in #{@target.name} project [updated]")
   end
 
+  def blocked_user_user_email(notification)
+    @notification = notification
+    @event        = @notification.event
+    @user         = @event.author
+    @banned_user  = @event.source
+    data          = JSON.load(@event.data)
+    @teams        = data["teams"].map { |t| UserTeam.find_by_id(t["id"]) }.reject { |t| t.nil? }
+    @projects     = data["projects"].map { |pr| Project.find_by_id(pr["id"]) }.reject { |pr| pr.nil? }
+
+    headers 'X-Gitlab-Entity' => 'user',
+            'X-Gitlab-Action' => 'updated',
+            'X-Gitlab-Source' => 'user',
+            'In-Reply-To'     => "user-#{@banned_user.username}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@banned_user.name}' was banned")
+  end
+
+  def activate_user_user_email(notification)
+    @notification   = notification
+    @event          = @notification.event
+    @user           = @event.author
+    @activated_user = @event.source
+
+    headers 'X-Gitlab-Entity' => 'user',
+            'X-Gitlab-Action' => 'updated',
+            'X-Gitlab-Source' => 'user',
+            'In-Reply-To'     => "user-#{@activated_user.username}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@activated_user.name}' was activated")
+  end
+
+
+
   def updated_user_user_email(notification)
     @notification = notification
     @event        = @notification.event
