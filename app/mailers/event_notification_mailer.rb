@@ -652,16 +652,19 @@ class EventNotificationMailer < ActionMailer::Base
     @event          = @notification.event
     @user           = @event.author
     @note           = @event.source
-    @merge_request  = @note.noteable
-    @project        = @event.target
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'commented',
-            'X-Gitlab-Source' => 'note',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
+    if @note && @project
+      @merge_request  = @note.noteable
+      @project        = @event.target
 
-    if @note && @project && @merge_request
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge Request ##{@merge_request.id} '#{@merge_request.title}' was commented")
+      headers 'X-Gitlab-Entity' => 'project',
+        'X-Gitlab-Action' => 'commented',
+        'X-Gitlab-Source' => 'note',
+        'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
+
+      if @merge_request
+        mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge Request ##{@merge_request.id} '#{@merge_request.title}' was commented")
+      end
     end
   end
 
