@@ -10,6 +10,8 @@
       %span.count= current_user.keys.count
   = nav_link(controller: [:subscriptions, :profiles], action: :index) do
     = link_to "Subscriptions", profile_subscriptions_path
+  = nav_link(controller: [:tokens, :profiles], action: :index) do
+    = link_to "File tokens", profile_tokens_path
   = nav_link(path: 'profiles#design') do
     = link_to "Design", design_profile_path
   = nav_link(path: 'profiles#history') do
