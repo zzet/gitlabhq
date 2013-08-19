@@ -31,4 +31,4 @@
           = token.last_usage_at.to_date.to_s(:short)
   %span.span3
     - if can?(current_user, :admin_project, token.project) || current_user == token.user
-      = link_to 'Remove', project_token(token.project, token), confirm: "You are shure?", method: :delete, class: "btn btn-small btn-remove"
+      = link_to 'Remove', project_token_path(token.project, token), confirm: "You are shure?", method: :delete, class: "btn btn-small btn-remove"
