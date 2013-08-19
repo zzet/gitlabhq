@@ -1,0 +1,13 @@
+%h3.page_title
+  Public project files
+  %small share file content with others without authentication
+
+  .pull-right
+    = link_to user_tokens_path(current_user), class: "btn btn-small grouped"  do
+      My public files
+
+%hr
+.row
+  .span12
+    = render 'tokens'
+

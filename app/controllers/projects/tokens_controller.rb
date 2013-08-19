@@ -1,6 +1,10 @@
 class Projects::TokensController < Projects::ApplicationController
   include ExtractsPath
 
+  def index
+    @tokens = FileToken.where(project_id: @project)
+  end
+
   def show
   end
 

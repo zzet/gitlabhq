@@ -340,7 +340,7 @@ Gitlab::Application.routes.draw do
         end
       end
 
-      resources :tokens,  only: [:show, :create]
+      resources :tokens,  only: [:index, :show, :create]
     end
 
     resources :notes, only: [:index, :create, :destroy] do

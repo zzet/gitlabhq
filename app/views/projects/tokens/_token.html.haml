@@ -1,0 +1,37 @@
+%li
+  .token-title
+    = link_to project_raw_path(@project, @id, file_auth_token: token.token) do
+      %h5.inline
+        = truncate(token.file, length: 60)
+
+    = link_to reliable_snippet_path(snippet) do
+    %span.cgray
+      = snippet.file_name
+
+  %small.pull-right.cgray
+    = link_to @project.name_with_namespace, project_path(@project)
+    %span
+      \|
+
+    Created at:
+    - if token.created_at
+      = token.created_at.to_date.to_s(:short)
+    - else
+      Never
+
+    %span
+      \|
+    - if token.last_usage_at?
+      Last usage at:
+      = token.last_usage_at.to_date.to_s(:short)
+    - else
+      Never
+
+
+  -#.snippet-info.prepend-left-20
+    -#= "##{snippet.id}"
+    -#%span.light
+      -#by
+      -#= image_tag gravatar_icon(snippet.author_email), class: "avatar avatar-inline s16"
+      -#= snippet.author_name
+
