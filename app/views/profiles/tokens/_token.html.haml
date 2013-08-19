@@ -28,6 +28,6 @@
         %span
           \|
           Usage count:
-          = token.last_usage_at.to_date.to_s(:short)
+          = token.usage_count
   %span.span1
     = link_to 'Remove', project_token_path(token.project, token), confirm: "You are shure?", method: :delete, class: "btn btn-small btn-remove"

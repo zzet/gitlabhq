@@ -28,7 +28,7 @@
         %span
           \|
           Usage count:
-          = token.last_usage_at.to_date.to_s(:short)
+          = token.usage_count
   %span.span1
     - if can?(current_user, :admin_project, token.project) || current_user == token.user
       = link_to 'Remove', project_token_path(token.project, token), confirm: "You are shure?", method: :delete, class: "btn btn-small btn-remove"
