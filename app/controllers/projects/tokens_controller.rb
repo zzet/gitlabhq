@@ -4,6 +4,7 @@ class Projects::TokensController < Projects::ApplicationController
 
   def index
     @tokens = FileToken.where(project_id: @project)
+    render layout: 'project_resource'
   end
 
   def show
