@@ -1,4 +1,4 @@
-class Projects::TokensController < Profiles::ApplicationController
+class Profiles::TokensController < Profiles::ApplicationController
   def index
     @tokens = FileToken.where(user_id: current_user)
   end
