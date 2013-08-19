@@ -9,7 +9,7 @@ class Projects::TokensController < Projects::ApplicationController
   end
 
   def create
-    file_token = FileToken.new(project_id: @project.id, user_id: current_user.id, file: @path)
+    file_token = FileToken.new(project_id: @project.id, user_id: current_user.id, file: @path, source_ref: @ref)
     file_token.generate_token!
 
     if file_token.save

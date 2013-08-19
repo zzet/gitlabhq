@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130809102323) do
+ActiveRecord::Schema.define(:version => 20130819084549) do
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -78,6 +78,7 @@ ActiveRecord::Schema.define(:version => 20130809102323) do
     t.integer  "usage_count"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
+    t.string   "source_ref"
   end
 
   create_table "forked_project_links", :force => true do |t|
