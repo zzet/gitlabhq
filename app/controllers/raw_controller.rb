@@ -41,6 +41,10 @@ class RawController < ProjectResourceController
       if available_token.blank? || available_token.token != token
         not_found!
       end
+
+      available_token.last_usage_at = DateTime.now
+      available_token.usage_count += 1
+      available_token.save
     else
       authorize_read_project!
       authorize_code_access!
