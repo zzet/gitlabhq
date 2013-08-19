@@ -9,6 +9,12 @@ class Projects::TokensController < Projects::ApplicationController
   def show
   end
 
+  def destroy
+    token = FileToken.find(params[:id])
+    token.destroy
+    redirect_to project_tokens_path(@project)
+  end
+
   def create
     file_token = FileToken.new(project_id: @project.id, user_id: current_user.id, file: @path, source_ref: @ref)
     file_token.generate_token!
