@@ -1,30 +1,34 @@
 %li
-  .token-title
-    = link_to project_raw_path(token.project, "#{token.source_ref}/#{token.file}", file_auth_token: token.token) do
-      %h5.inline
-        = truncate(token.file, length: 60)
+  %span.span9
+    .token-title
+      = link_to project_raw_path(token.project, "#{token.source_ref}/#{token.file}", file_auth_token: token.token) do
+        %h5.inline
+          = truncate(token.file, length: 60)
 
-  %small.pull-right.cgray
-    = link_to @project.name_with_namespace, project_path(@project)
-    %span
-      \|
-
-      Created at:
-      - if token.created_at
-        = token.created_at.to_date.to_s(:short)
-      - else
-        Never
-
-    %span
-      \|
-      Last usage at:
-      - if token.last_usage_at?
-        = token.last_usage_at.to_date.to_s(:short)
-      - else
-        Never
-
-    - if token.usage_count?
+    %small.pull-right.cgray
+      = link_to token.user.name, user_path(token.user.username)
       %span
         \|
-        Usage count:
-        = token.last_usage_at.to_date.to_s(:short)
+
+        Created at:
+        - if token.created_at
+          = token.created_at.to_date.to_s(:short)
+        - else
+          Never
+
+      %span
+        \|
+        Last usage at:
+        - if token.last_usage_at?
+          = token.last_usage_at.to_date.to_s(:short)
+        - else
+          Never
+
+      - if token.usage_count?
+        %span
+          \|
+          Usage count:
+          = token.last_usage_at.to_date.to_s(:short)
+  %span.span3
+    - if can?(current_user, :admin_project, token.project) || current_user == token.user
+      = link_to 'Remove', project_token(token.project, token), confirm: "You are shure?", method: :delete, class: "btn btn-small btn-remove"

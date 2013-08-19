@@ -3,6 +3,4 @@
 - else
   %ul.bordered-list
     - @tokens.each do |token|
-      = render partial: 'token', token: token
-
-= paginate @tokens
+      = render partial: 'token', locals: { token: token }

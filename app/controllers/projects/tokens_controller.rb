@@ -1,5 +1,6 @@
 class Projects::TokensController < Projects::ApplicationController
   include ExtractsPath
+  skip_before_filter :assign_ref_vars, only: [:index, :destroy]
 
   def index
     @tokens = FileToken.where(project_id: @project)

@@ -137,10 +137,12 @@ Gitlab::Application.routes.draw do
       put :update_password
       put :reset_private_token
       put :update_username
+
     end
 
     scope module: :profiles do
       resources :subscriptions
+      resources :tokens,  only: [:index, :destroy]
     end
 
     resource :notifications
@@ -340,7 +342,7 @@ Gitlab::Application.routes.draw do
         end
       end
 
-      resources :tokens,  only: [:index, :show, :create]
+      resources :tokens,  only: [:index, :show, :create, :destroy]
     end
 
     resources :notes, only: [:index, :create, :destroy] do
