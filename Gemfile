@@ -163,12 +163,12 @@ group :development do
   gem 'capistrano'
   gem 'rvm-capistrano'
   gem 'capistrano-ext'
-  gem 'airbrake'
   gem 'capistrano-maintenance'
 end
 
 gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
+gem 'newrelic_rpm'
 
 group :development, :staging, :test do
   # Visual email testing
