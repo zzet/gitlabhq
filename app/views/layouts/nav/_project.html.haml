@@ -9,7 +9,7 @@
 
   - if project_nav_tab? :file_tokens
     = nav_link(controller: %w(tokens)) do
-      = link_to 'File tokens', project_tokens_path(@project)
+      = link_to 'Public links', project_tokens_path(@project)
 
   - if project_nav_tab? :commits
     = nav_link(controller: %w(commit commits compare repositories protected_branches)) do
