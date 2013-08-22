@@ -30,6 +30,20 @@ class Service < ActiveRecord::Base
 
   validates :project_id, presence: true
 
+  state_machine :state, initial: :disabled do
+    event :enable do
+      transition [:disabled] => :enabled
+    end
+
+    event :disable do
+      transition enabled: :disabled
+    end
+
+    state :enabled
+
+    state :disabled
+  end
+
   actions_to_watch [:created, :updated, :deleted]
 
   def activated?

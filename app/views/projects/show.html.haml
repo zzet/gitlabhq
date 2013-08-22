@@ -53,3 +53,9 @@
         %hr
         = link_to @project.gitlab_ci_service.builds_path do
           = image_tag @project.gitlab_ci_service.status_img_path, alt: "build status"
+
+      - if @project.buil_face_service?
+        %hr
+        Build face project:
+        = link_to @project.buil_face_service.project_path do
+          = image_tag @project.gitlab_ci_service.status_img_path, alt: "Last build status"

@@ -38,6 +38,10 @@ module Projects
               end
             end
 
+            if project.build_face_service && project.build_face_service.enabled?
+              project.build_face_service.notify_build_face
+            end
+
             receive_delayed_notifications
           end
         end

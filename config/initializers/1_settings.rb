@@ -77,6 +77,13 @@ Settings.gitlab.default_projects_features['wiki']           = true if Settings.g
 Settings.gitlab.default_projects_features['wall']           = false if Settings.gitlab.default_projects_features['wall'].nil?
 Settings.gitlab.default_projects_features['snippets']       = false if Settings.gitlab.default_projects_features['snippets'].nil?
 
+# Services
+Settings['services'] ||= Settingslogic.new({})
+Settings.services['build_face']             = {}
+Settings.services.build_face['domain']      ||= 'http://build-face.undev.cc'
+Settings.services.build_face['hooks_path']  ||= '/hook'
+
+
 #
 # Gravatar
 #
