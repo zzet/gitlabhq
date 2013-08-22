@@ -81,7 +81,7 @@ Settings.gitlab.default_projects_features['snippets']       = false if Settings.
 Settings['services'] ||= Settingslogic.new({})
 Settings.services['build_face']             ||= {}
 Settings.services.build_face['domain']      ||= 'http://build-face.undev.cc'
-Settings.services.build_face['hooks_path']  ||= '/hook'
+Settings.services.build_face['hooks_path']  ||= '/hooks'
 
 
 #
