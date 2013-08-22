@@ -43,17 +43,17 @@ class Service::BuildFace < Service::Base
 
   end
 
-  def notify_build_face
+  def notify_build_face(action = "created")
     compose_service_hook
 
-    data =  { repository: { id: project.id, name: project.name_with_namespace, url: project.ssh_url_to_repo, description: project.description, homepage: project.http_url_to_repo } }
+    data =  { action: action, repository: { id: project.id, name: project.name_with_namespace, url: project.ssh_url_to_repo, description: project.description, homepage: project.http_url_to_repo } }
 
     service_hook.execute(data)
   end
 
   def compose_service_hook
     hook = service_hook || build_service_hook
-    hook.url = "#{Gitlab.config.services.build_face.domain}/#{GitLab.config.services.build_face.hook_path}"
+    hook.url = "#{Gitlab.config.services.build_face.domain}/#{Gitlab.config.services.build_face.hook_path}"
     hook.save
   end
 
@@ -76,7 +76,7 @@ class Service::BuildFace < Service::Base
   end
 
   def project_path
-    "#{Gitlab.config.services.build_face.domain}/#{project.name_with_namespace}"
+    "#{Gitlab.config.services.build_face.domain}/#{project.path_with_namespace}"
   end
 
   def status_img_path

@@ -7,7 +7,7 @@ module Projects
 
       if project.changes.include?("path")
         if project.build_face_service && project.build_face_service.enabled?
-          project.build_face_service.notify_build_face
+          project.build_face_service.notify_build_face("updated")
         end
       end
     end

@@ -39,7 +39,7 @@ module Projects
             end
 
             if project.build_face_service && project.build_face_service.enabled?
-              project.build_face_service.notify_build_face
+              project.build_face_service.notify_build_face("transfered")
             end
 
             receive_delayed_notifications
