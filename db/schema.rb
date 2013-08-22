@@ -11,7 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130821120354) do
+ActiveRecord::Schema.define(:version => 20130822112034) do
+
+  create_table "deploy_key_service_relationships", :force => true do |t|
+    t.integer  "deploy_key_id"
+    t.integer  "service_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false

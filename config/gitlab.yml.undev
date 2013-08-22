@@ -65,6 +65,13 @@ production: &base
       domain: "http://build-face.undev.cc"
       web_hook_path: "/hooks"
       system_hook_path: "/hooks/gitlab"
+      deploy_keys:
+        production:
+          title: "Build face production"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq3hiE+hNaWsAHGXEWthfwcOznlQJ7n3mvk+oXpSp0JQ1KD4FNf8CodG8XvVXeLYvrbbpW/DSDrdrKRefbhAzdBUVhHDXHwuSafm9eGM3/3VX64osv85MPJZDz/F8iAnCtw8a4uqmHGU5ejU4jadqWnl2ajxlaOKJlnJihJSste1jWdSvwBGLYxnJDHw2bvDobVtmPATxF1/5MFYrBIP9sbreIBhpvPNa1joHyMI5dyTcAMSPHAjZL5amXUbVYsVnhgsmVjlWPG5Kh+1EEDxi+gqsZQ4kqyfsowA5imwlGO1iZbYCbhmfSyIX2O0Vhx0M/iEoVTVVf/aHaHYjGUkGp build-face@undev.ru"
+        staging:
+          title: "Build face staging"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4rEGgT4ABE8DND5JvA0bYTAc9mNIjSVdwdodiWvfoaoibnI0KInfIke8oMMOfXJWXiWHFnta70jqs/RFjGPXDC06Y0lq2EUnIkzy9dwPSKOPXdCUYbDhg4d06o0xNMo6Nz9oO4zHPstRFDMhqAcdXhest4fFGZhtKTONUNXw3Ti6M34+ROwttniFQ3kuita62HBOjq8OYVQrwH7Mxj9AcUTL36OZ9stnotYg1TmmaIaNbANT1Iv89Ud2oMdpEvbQfIkMOw0U7uVLUOsItmaY+GrjJCWoYHn1rvY8iV7t9OoEB+aVmjjpX4407ZiQI7ZvquqWWxR5TXxbLrzLTozhn poweruser@buildface-staging-01"
 
   ## Gravatar
   gravatar:
@@ -163,7 +170,13 @@ development:
       domain: "http://build-face-staging.undev.cc"
       web_hook_path: "/hooks"
       system_hook_path: "/hooks/gitlab"
-
+      deploy_keys:
+        production:
+          title: "Build face production"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq3hiE+hNaWsAHGXEWthfwcOznlQJ7n3mvk+oXpSp0JQ1KD4FNf8CodG8XvVXeLYvrbbpW/DSDrdrKRefbhAzdBUVhHDXHwuSafm9eGM3/3VX64osv85MPJZDz/F8iAnCtw8a4uqmHGU5ejU4jadqWnl2ajxlaOKJlnJihJSste1jWdSvwBGLYxnJDHw2bvDobVtmPATxF1/5MFYrBIP9sbreIBhpvPNa1joHyMI5dyTcAMSPHAjZL5amXUbVYsVnhgsmVjlWPG5Kh+1EEDxi+gqsZQ4kqyfsowA5imwlGO1iZbYCbhmfSyIX2O0Vhx0M/iEoVTVVf/aHaHYjGUkGp build-face@undev.ru"
+        staging:
+          title: "Build face staging"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4rEGgT4ABE8DND5JvA0bYTAc9mNIjSVdwdodiWvfoaoibnI0KInfIke8oMMOfXJWXiWHFnta70jqs/RFjGPXDC06Y0lq2EUnIkzy9dwPSKOPXdCUYbDhg4d06o0xNMo6Nz9oO4zHPstRFDMhqAcdXhest4fFGZhtKTONUNXw3Ti6M34+ROwttniFQ3kuita62HBOjq8OYVQrwH7Mxj9AcUTL36OZ9stnotYg1TmmaIaNbANT1Iv89Ud2oMdpEvbQfIkMOw0U7uVLUOsItmaY+GrjJCWoYHn1rvY8iV7t9OoEB+aVmjjpX4407ZiQI7ZvquqWWxR5TXxbLrzLTozhn poweruser@buildface-staging-01"
 test:
   <<: *base
   issues_tracker:
@@ -199,3 +212,10 @@ staging:
       domain: "http://build-face-staging.undev.cc"
       web_hook_path: "/hooks"
       system_hook_path: "/hooks/gitlab"
+      deploy_keys:
+        production:
+          title: "Build face production"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq3hiE+hNaWsAHGXEWthfwcOznlQJ7n3mvk+oXpSp0JQ1KD4FNf8CodG8XvVXeLYvrbbpW/DSDrdrKRefbhAzdBUVhHDXHwuSafm9eGM3/3VX64osv85MPJZDz/F8iAnCtw8a4uqmHGU5ejU4jadqWnl2ajxlaOKJlnJihJSste1jWdSvwBGLYxnJDHw2bvDobVtmPATxF1/5MFYrBIP9sbreIBhpvPNa1joHyMI5dyTcAMSPHAjZL5amXUbVYsVnhgsmVjlWPG5Kh+1EEDxi+gqsZQ4kqyfsowA5imwlGO1iZbYCbhmfSyIX2O0Vhx0M/iEoVTVVf/aHaHYjGUkGp build-face@undev.ru"
+        staging:
+          title: "Build face staging"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4rEGgT4ABE8DND5JvA0bYTAc9mNIjSVdwdodiWvfoaoibnI0KInfIke8oMMOfXJWXiWHFnta70jqs/RFjGPXDC06Y0lq2EUnIkzy9dwPSKOPXdCUYbDhg4d06o0xNMo6Nz9oO4zHPstRFDMhqAcdXhest4fFGZhtKTONUNXw3Ti6M34+ROwttniFQ3kuita62HBOjq8OYVQrwH7Mxj9AcUTL36OZ9stnotYg1TmmaIaNbANT1Iv89Ud2oMdpEvbQfIkMOw0U7uVLUOsItmaY+GrjJCWoYHn1rvY8iV7t9OoEB+aVmjjpX4407ZiQI7ZvquqWWxR5TXxbLrzLTozhn poweruser@buildface-staging-01"

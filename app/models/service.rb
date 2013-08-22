@@ -22,6 +22,8 @@ class Service < ActiveRecord::Base
 
   belongs_to :project
   has_one :service_hook
+  has_many :deploy_key_service_relationships, dependent: :destroy
+  has_many :deploy_keys, through: :deploy_key_service_relationships
 
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
