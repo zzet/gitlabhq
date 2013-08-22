@@ -63,7 +63,8 @@ production: &base
   services:
     build_face:
       domain: "http://build-face.undev.cc"
-      hook_path: "/hooks"
+      web_hook_path: "/hooks"
+      system_hook_path: "/hooks/gitlab"
 
   ## Gravatar
   gravatar:
@@ -160,7 +161,8 @@ development:
   services:
     build_face:
       domain: "http://build-face-staging.undev.cc"
-      hook_path: "/hooks"
+      web_hook_path: "/hooks"
+      system_hook_path: "/hooks/gitlab"
 
 test:
   <<: *base
@@ -195,4 +197,5 @@ staging:
   services:
     build_face:
       domain: "http://build-face-staging.undev.cc"
-      hook_path: "/hooks"
+      web_hook_path: "/hooks"
+      system_hook_path: "/hooks/gitlab"
