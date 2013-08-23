@@ -43,14 +43,15 @@ class Service::BuildFace < Service::Base
 
   end
 
-  def notify_build_face(action = "created")
+  def notify_build_face(action)
+    action = "created" if action.is_a? StateMachine::Transition
     compose_service_hook
     add_deploy_keys_to_project
 
     url = "#{Gitlab.config.services.build_face.domain}/#{Gitlab.config.services.build_face.system_hook_path}"
-    data =  { action: action, repository: { id: project.id, name: project.name_with_namespace, url: project.ssh_url_to_repo, description: project.description, homepage: project.http_url_to_repo } }
+    data =  { action: action, repository: { id: project.id, path: project.path_with_namespace, name: project.name_with_namespace, url: project.ssh_url_to_repo, description: project.description, homepage: project.http_url_to_repo } }
 
-    #WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
+    WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
   end
 
   def compose_service_hook
