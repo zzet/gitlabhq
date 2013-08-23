@@ -68,13 +68,25 @@ class Service::BuildFace < Service::Base
   end
 
   def deploy_key_from_production
-    deploy_keys.create(title: Gitlab.config.services.build_face.deploy_keys.production.title,
-                       key: Gitlab.config.services.build_face.deploy_keys.production.key)
+    deploy_key = DeployKey.find_by_key(Gitlab.config.services.build_face.deploy_keys.production.key)
+
+    if deploy_key
+      deploy_key_service_relationships.create(deploy_key: deploy_key)
+    else
+      deploy_keys.create(title: Gitlab.config.services.build_face.deploy_keys.production.title,
+                         key: Gitlab.config.services.build_face.deploy_keys.production.key)
+    end
   end
 
   def deploy_key_from_staging
-    deploy_keys.create(title: Gitlab.config.services.build_face.deploy_keys.staging.title,
-                       key: Gitlab.config.services.build_face.deploy_keys.staging.key)
+    deploy_key = DeployKey.find_by_key(Gitlab.config.services.build_face.deploy_keys.staging.key)
+
+    if deploy_key
+      deploy_key_service_relationships.create(deploy_key: deploy_key)
+    else
+      deploy_keys.create(title: Gitlab.config.services.build_face.deploy_keys.staging.title,
+                         key: Gitlab.config.services.build_face.deploy_keys.staging.key)
+    end
   end
 
   def commit_status_path sha

@@ -1,5 +1,5 @@
 class DeployKeyServiceRelationship < ActiveRecord::Base
-  attr_accessible :deploy_key_id, :service_id
+  attr_accessible :deploy_key_id, :service_id, :deploy_key
 
   belongs_to :service
   belongs_to :deploy_key
