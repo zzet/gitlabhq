@@ -343,7 +343,10 @@ Gitlab::Application.routes.draw do
       resources :tokens,  only: [:show, :create]
     end
 
-    resources :notes, only: [:index, :create, :destroy] do
+    resources :notes, only: [:index, :create, :destroy, :update] do
+      member do
+        delete :delete_attachment
+      end
       collection do
         post :preview
       end
