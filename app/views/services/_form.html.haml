@@ -24,9 +24,14 @@
 
 
   .control-group
-    = f.label :active, "Active", class: "control-label"
-    .controls
-      = f.check_box :active
+    - if !@service.respond_to?(:state_event)
+      = f.label :active, "Active", class: "control-label"
+      .controls
+        = f.check_box :active
+    - else
+      = f.label :state_event, "State", class: "control-label"
+      .controls
+        = f.select(:state_event, [@service.state, @service.state_events])
 
   - @service.fields.each do |field|
     - name = field[:name]

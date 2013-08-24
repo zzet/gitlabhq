@@ -60,6 +60,8 @@ production: &base
       issues_url: "http://pm.undev.cc/issues/:id"
       new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
 
+  services:
+
   ## Gravatar
   gravatar:
     enabled: true                 # Use user avatar images from Gravatar.com (default: true)
@@ -152,6 +154,8 @@ production: &base
 development:
   <<: *base
 
+  services:
+
 test:
   <<: *base
   issues_tracker:
@@ -181,3 +185,13 @@ staging:
       project_url: "http://pm.undev.cc/projects/:issues_tracker_id"
       issues_url: "http://pm.undev.cc/issues/:id"
       new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
+
+  services:
+    jenkins:
+      domain: "http://ci01.undev.cc/"
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Jenkins ci01"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtz5bH9EQPHsPAkoPgi8IQGzDru0PGTHyL/srQWVV8jhTlGwdexWSJxtCf2gmxcGgQqals7j7xM0P2CFPi0Grv/8Xv3ZrAPT7BY9Z3aL2O/uwUw8COVRa2GczivZ8okg6rLCiG+4b2rderSJE+lllhnSk7FWLtvDtrS5RBcNeBcLQfZrtgva1Mu6+opzI0uwD4evZwg220DGHOI2LLbLE1e8uBws0JBChlTuCgpLIteYl1S1CJFY0F8+vLdOLMhPwWOVM9wiTqyaoNDX3uk2JGZVEpa25XiF+NVqIWD+7Ugbnj3yf9OfR/hQ/RE/b9vWnvP7mJ5xbycdJnN64dsNVD jenkins@ci01"
+
