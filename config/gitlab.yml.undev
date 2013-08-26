@@ -60,6 +60,8 @@ production: &base
       issues_url: "http://pm.undev.cc/issues/:id"
       new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
 
+  services:
+
   ## Gravatar
   gravatar:
     enabled: true                 # Use user avatar images from Gravatar.com (default: true)
@@ -152,6 +154,8 @@ production: &base
 development:
   <<: *base
 
+  services:
+
 test:
   <<: *base
   issues_tracker:
@@ -181,3 +185,13 @@ staging:
       project_url: "http://pm.undev.cc/projects/:issues_tracker_id"
       issues_url: "http://pm.undev.cc/issues/:id"
       new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
+
+  services:
+    obs:
+      domain: ""
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Nix"
+          key: ""
+
