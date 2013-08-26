@@ -12,6 +12,9 @@ class Service::Jenkins < Service::Base
       transition enabled: :disabled
     end
 
+    after_transition on: :enable, do: :add_deploy_keys_to_project
+    after_transition on: :disabled, do: :remove_deploy_keys_from_project
+
     state :enabled
 
     state :disabled
@@ -41,65 +44,13 @@ class Service::Jenkins < Service::Base
 
   end
 
-  def compose_service_hook
-    hook = service_hook || build_service_hook
-    hook.url = "#{Gitlab.config.services.jenkins.domain}/#{Gitlab.config.services.jenkins.web_hook_path}"
-    hook.save
-  end
-
   def add_deploy_keys_to_project
-    if deploy_keys.count < 2
-      deploy_key_from_production
-      deploy_key_from_cats
-    end
+    add_deploy_key(Gitlab.config.services.jenkins.deploy_keys.production.title, Gitlab.config.services.jenkins.deploy_keys.production.key)
+    add_deploy_key(Gitlab.config.services.jenkins.deploy_keys.ci_61.title, Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
   end
 
-  def deploy_key_from_production
-    deploy_key = DeployKey.find_by_key(Gitlab.config.services.jenkins.deploy_keys.production.key)
-
-    if deploy_key
-      deploy_key_service_relationships.create(deploy_key: deploy_key)
-    else
-      deploy_keys.create(title: Gitlab.config.services.jenkins.deploy_keys.production.title,
-                         key: Gitlab.config.services.jenkins.deploy_keys.production.key)
-    end
-  end
-
-  def deploy_key_from_cats
-    deploy_key = DeployKey.find_by_key(Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
-
-    if deploy_key
-      deploy_key_service_relationships.create(deploy_key: deploy_key)
-    else
-      deploy_keys.create(title: Gitlab.config.services.jenkins.deploy_keys.ci_61.title,
-                         key: Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
-    end
-  end
-
-  def commit_status_path sha
-    project_url + "/builds/#{sha}/status.json?token=#{token}"
-  end
-
-  def commit_status sha
-    response = HTTParty.get(commit_status_path(sha))
-
-    if response.code == 200 and response["status"]
-      response["status"]
-    else
-      :error
-    end
-  end
-
-  def build_page sha
-    project_url + "/builds/#{sha}"
-  end
-
-  def project_path
-    "#{Gitlab.config.services.jenkins.domain}/#{project.path_with_namespace}"
-  end
-
-  def status_img_path
-    "Here"
-    #project_url + "/status.png?ref=" + project.default_branch
+  def remove_deploy_keys_from_project
+    remove_deploy_key(Gitlab.config.services.jenkins.deploy_keys.production.key)
+    remove_deploy_key(Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
   end
 end
