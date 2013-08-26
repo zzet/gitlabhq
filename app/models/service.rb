@@ -77,7 +77,7 @@ class Service < ActiveRecord::Base
     deploy_key = DeployKey.find_by_key(key)
 
     if deploy_key
-      if deploy_keys.where(deploy_key_id: deploy_key).blank?
+      if deploy_key_service_relationships.where(deploy_key_id: deploy_key).blank?
         deploy_key_service_relationships.create(deploy_key: deploy_key)
       end
     else
@@ -88,6 +88,6 @@ class Service < ActiveRecord::Base
   def remove_deploy_key key
     key = DeployKey.find_by_key(key) unless key.is_a? DeployKey
 
-    deploy_keys.where(deploy_key_id: key).destroy_all if key
+    deploy_key_service_relationships.where(deploy_key_id: key).destroy_all if key
   end
 end
