@@ -50,6 +50,7 @@ class Service::Jenkins < Service::Base
   def add_deploy_keys_to_project
     if deploy_keys.count < 2
       deploy_key_from_production
+      deploy_key_from_cats
     end
   end
 
@@ -61,6 +62,17 @@ class Service::Jenkins < Service::Base
     else
       deploy_keys.create(title: Gitlab.config.services.jenkins.deploy_keys.production.title,
                          key: Gitlab.config.services.jenkins.deploy_keys.production.key)
+    end
+  end
+
+  def deploy_key_from_cats
+    deploy_key = DeployKey.find_by_key(Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
+
+    if deploy_key
+      deploy_key_service_relationships.create(deploy_key: deploy_key)
+    else
+      deploy_keys.create(title: Gitlab.config.services.jenkins.deploy_keys.ci_61.title,
+                         key: Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
     end
   end
 
