@@ -77,6 +77,11 @@ Settings.gitlab.default_projects_features['wiki']           = true if Settings.g
 Settings.gitlab.default_projects_features['wall']           = false if Settings.gitlab.default_projects_features['wall'].nil?
 Settings.gitlab.default_projects_features['snippets']       = false if Settings.gitlab.default_projects_features['snippets'].nil?
 
+# Services
+Settings['services'] ||= Settingslogic.new({})
+Settings.services['nix']                   ||= {}
+Settings.services.nix['domain']            ||= ''
+
 #
 # Gravatar
 #

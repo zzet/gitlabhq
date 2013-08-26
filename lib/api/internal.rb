@@ -26,7 +26,7 @@ module API
 
 
         if key.is_a? DeployKey
-          key.projects.include?(project) && git_cmd == 'git-upload-pack'
+          key.for_project?(project) && git_cmd == 'git-upload-pack'
         else
           user = key.user
 
