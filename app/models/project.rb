@@ -327,7 +327,7 @@ class Project < ActiveRecord::Base
     services.each do |service|
 
       # Call service hook only if it is active
-      service.execute(data) if service.active
+      service.execute(data) if service.activated?
     end
   end
 
