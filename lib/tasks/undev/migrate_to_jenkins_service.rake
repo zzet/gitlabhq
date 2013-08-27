@@ -10,6 +10,7 @@ namespace :undev do
      "Andrew8xx8/jenkins-integration-test",
      "backend/blue7",
      "backend/playout",
+     "backend/pyhls",
      "baran-info/baran-info",
      "bloom/bloom",
      "bordeaux/bordeaux",
