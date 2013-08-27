@@ -65,6 +65,11 @@ namespace :deploy do
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "sudo sv restart /etc/service/gitlab-*"
   end
+
+  desc "Migrate to BuildFace service"
+  task :migrate_to_build_face roles: :app do
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} undev:migrate_to_build_face"
+  end
 end
 
 before 'deploy:finalize_update',
@@ -74,4 +79,4 @@ before 'deploy:finalize_update',
   'deploy:symlink_puma'
 #after "deploy:restart", "unicorn:stop"
 #after "deploy:reload"
-after "deploy:update", "deploy:cleanup"
+after "deploy:update", "deploy:cleanup", "deploy:migrate_to_build_face"
