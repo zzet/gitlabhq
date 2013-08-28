@@ -51,6 +51,7 @@ class Project < ActiveRecord::Base
   has_one :hipchat_service, dependent: :destroy
   has_one :build_face_service, dependent: :destroy, class_name: Service::BuildFace
   has_one :jenkins_service, dependent: :destroy, class_name: Service::Jenkins
+  has_one :nix_service, dependent: :destroy, class_name: Service::Nix
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
@@ -253,7 +254,7 @@ class Project < ActiveRecord::Base
   end
 
   def available_services_names
-    %w(gitlab_ci campfire hipchat build_face jenkins)
+    %w(gitlab_ci campfire hipchat build_face jenkins nix)
   end
 
   def gitlab_ci?

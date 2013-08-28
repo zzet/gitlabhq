@@ -82,6 +82,13 @@ production: &base
         ci_61:
           title: "Jenkins ci61"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4ow96YKXiL+uBHy9TAFW9s9hDmYUzIK2T04CQvlzqAdp81RGZIUqznhO9LhDtpXdRWh/ZEeD2dDp/vLScNKwKOTFOrUv8Gc8BzJyPLYH2ra6DtE2KV9fds+Y0GzvN5SYJwBCK54zOmy0mKRki/2OI/JTDNlQjKad0Uf2sQiHeIgE0jkMryUg2gJQXUKcPLGohohj2jIhBaqdqTSn1P5WcMdINZnGGWMKI+xhsyyZgyP5gi3BphPp0RyZoHJUAw/mtsSRnybA9BlrtEmwWSy/V6/53Nuj/isSHzdrYVuTpmSy2YXwDJu4OTERpeppnJhMuWfm4+lWZkXsP6s9o9TYr platform-testing@undev.ru"
+    nix:
+      domain: ""
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Nix"
+          key: ""
 
   ## Gravatar
   gravatar:
@@ -197,6 +204,13 @@ development:
         ci_61:
           title: "Jenkins ci61"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4ow96YKXiL+uBHy9TAFW9s9hDmYUzIK2T04CQvlzqAdp81RGZIUqznhO9LhDtpXdRWh/ZEeD2dDp/vLScNKwKOTFOrUv8Gc8BzJyPLYH2ra6DtE2KV9fds+Y0GzvN5SYJwBCK54zOmy0mKRki/2OI/JTDNlQjKad0Uf2sQiHeIgE0jkMryUg2gJQXUKcPLGohohj2jIhBaqdqTSn1P5WcMdINZnGGWMKI+xhsyyZgyP5gi3BphPp0RyZoHJUAw/mtsSRnybA9BlrtEmwWSy/V6/53Nuj/isSHzdrYVuTpmSy2YXwDJu4OTERpeppnJhMuWfm4+lWZkXsP6s9o9TYr platform-testing@undev.ru"
+    nix:
+      domain: ""
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Nix"
+          key: ""
 
 test:
   <<: *base
@@ -250,3 +264,10 @@ staging:
         ci_61:
           title: "Jenkins ci61"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4ow96YKXiL+uBHy9TAFW9s9hDmYUzIK2T04CQvlzqAdp81RGZIUqznhO9LhDtpXdRWh/ZEeD2dDp/vLScNKwKOTFOrUv8Gc8BzJyPLYH2ra6DtE2KV9fds+Y0GzvN5SYJwBCK54zOmy0mKRki/2OI/JTDNlQjKad0Uf2sQiHeIgE0jkMryUg2gJQXUKcPLGohohj2jIhBaqdqTSn1P5WcMdINZnGGWMKI+xhsyyZgyP5gi3BphPp0RyZoHJUAw/mtsSRnybA9BlrtEmwWSy/V6/53Nuj/isSHzdrYVuTpmSy2YXwDJu4OTERpeppnJhMuWfm4+lWZkXsP6s9o9TYr platform-testing@undev.ru"
+    nix:
+      domain: ""
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Nix"
+          key: ""

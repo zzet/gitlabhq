@@ -90,6 +90,9 @@ Settings.services.jenkins['domain']               ||= 'http://ci01.undev.cc'
 Settings.services.jenkins['web_hooks_path']       ||= '/hooks'
 Settings.services.jenkins['system_hooks_path']    ||= '/hooks/gitlab'
 
+Settings.services['nix']                          ||= {}
+Settings.services.nix['domain']                   ||= ''
+
 #
 # Gravatar
 #
