@@ -72,6 +72,16 @@ production: &base
         staging:
           title: "Build face staging"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4rEGgT4ABE8DND5JvA0bYTAc9mNIjSVdwdodiWvfoaoibnI0KInfIke8oMMOfXJWXiWHFnta70jqs/RFjGPXDC06Y0lq2EUnIkzy9dwPSKOPXdCUYbDhg4d06o0xNMo6Nz9oO4zHPstRFDMhqAcdXhest4fFGZhtKTONUNXw3Ti6M34+ROwttniFQ3kuita62HBOjq8OYVQrwH7Mxj9AcUTL36OZ9stnotYg1TmmaIaNbANT1Iv89Ud2oMdpEvbQfIkMOw0U7uVLUOsItmaY+GrjJCWoYHn1rvY8iV7t9OoEB+aVmjjpX4407ZiQI7ZvquqWWxR5TXxbLrzLTozhn poweruser@buildface-staging-01"
+    jenkins:
+      domain: "http://ci01.undev.cc/"
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Jenkins ci01"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtz5bH9EQPHsPAkoPgi8IQGzDru0PGTHyL/srQWVV8jhTlGwdexWSJxtCf2gmxcGgQqals7j7xM0P2CFPi0Grv/8Xv3ZrAPT7BY9Z3aL2O/uwUw8COVRa2GczivZ8okg6rLCiG+4b2rderSJE+lllhnSk7FWLtvDtrS5RBcNeBcLQfZrtgva1Mu6+opzI0uwD4evZwg220DGHOI2LLbLE1e8uBws0JBChlTuCgpLIteYl1S1CJFY0F8+vLdOLMhPwWOVM9wiTqyaoNDX3uk2JGZVEpa25XiF+NVqIWD+7Ugbnj3yf9OfR/hQ/RE/b9vWnvP7mJ5xbycdJnN64dsNVD jenkins@ci01"
+        ci_61:
+          title: "Jenkins ci61"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4ow96YKXiL+uBHy9TAFW9s9hDmYUzIK2T04CQvlzqAdp81RGZIUqznhO9LhDtpXdRWh/ZEeD2dDp/vLScNKwKOTFOrUv8Gc8BzJyPLYH2ra6DtE2KV9fds+Y0GzvN5SYJwBCK54zOmy0mKRki/2OI/JTDNlQjKad0Uf2sQiHeIgE0jkMryUg2gJQXUKcPLGohohj2jIhBaqdqTSn1P5WcMdINZnGGWMKI+xhsyyZgyP5gi3BphPp0RyZoHJUAw/mtsSRnybA9BlrtEmwWSy/V6/53Nuj/isSHzdrYVuTpmSy2YXwDJu4OTERpeppnJhMuWfm4+lWZkXsP6s9o9TYr platform-testing@undev.ru"
 
   ## Gravatar
   gravatar:
@@ -167,7 +177,7 @@ development:
 
   services:
     build_face:
-      domain: "http://build-face-staging.undev.cc"
+      domain: "http://build-face.undev.cc"
       web_hook_path: "/hooks"
       system_hook_path: "/hooks/gitlab"
       deploy_keys:
@@ -177,6 +187,17 @@ development:
         staging:
           title: "Build face staging"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4rEGgT4ABE8DND5JvA0bYTAc9mNIjSVdwdodiWvfoaoibnI0KInfIke8oMMOfXJWXiWHFnta70jqs/RFjGPXDC06Y0lq2EUnIkzy9dwPSKOPXdCUYbDhg4d06o0xNMo6Nz9oO4zHPstRFDMhqAcdXhest4fFGZhtKTONUNXw3Ti6M34+ROwttniFQ3kuita62HBOjq8OYVQrwH7Mxj9AcUTL36OZ9stnotYg1TmmaIaNbANT1Iv89Ud2oMdpEvbQfIkMOw0U7uVLUOsItmaY+GrjJCWoYHn1rvY8iV7t9OoEB+aVmjjpX4407ZiQI7ZvquqWWxR5TXxbLrzLTozhn poweruser@buildface-staging-01"
+    jenkins:
+      domain: "http://ci01.undev.cc/"
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Jenkins ci01"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtz5bH9EQPHsPAkoPgi8IQGzDru0PGTHyL/srQWVV8jhTlGwdexWSJxtCf2gmxcGgQqals7j7xM0P2CFPi0Grv/8Xv3ZrAPT7BY9Z3aL2O/uwUw8COVRa2GczivZ8okg6rLCiG+4b2rderSJE+lllhnSk7FWLtvDtrS5RBcNeBcLQfZrtgva1Mu6+opzI0uwD4evZwg220DGHOI2LLbLE1e8uBws0JBChlTuCgpLIteYl1S1CJFY0F8+vLdOLMhPwWOVM9wiTqyaoNDX3uk2JGZVEpa25XiF+NVqIWD+7Ugbnj3yf9OfR/hQ/RE/b9vWnvP7mJ5xbycdJnN64dsNVD jenkins@ci01"
+        ci_61:
+          title: "Jenkins ci61"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4ow96YKXiL+uBHy9TAFW9s9hDmYUzIK2T04CQvlzqAdp81RGZIUqznhO9LhDtpXdRWh/ZEeD2dDp/vLScNKwKOTFOrUv8Gc8BzJyPLYH2ra6DtE2KV9fds+Y0GzvN5SYJwBCK54zOmy0mKRki/2OI/JTDNlQjKad0Uf2sQiHeIgE0jkMryUg2gJQXUKcPLGohohj2jIhBaqdqTSn1P5WcMdINZnGGWMKI+xhsyyZgyP5gi3BphPp0RyZoHJUAw/mtsSRnybA9BlrtEmwWSy/V6/53Nuj/isSHzdrYVuTpmSy2YXwDJu4OTERpeppnJhMuWfm4+lWZkXsP6s9o9TYr platform-testing@undev.ru"
+
 test:
   <<: *base
   issues_tracker:
@@ -209,7 +230,7 @@ staging:
 
   services:
     build_face:
-      domain: "http://build-face-staging.undev.cc"
+      domain: "http://build-face.undev.cc"
       web_hook_path: "/hooks"
       system_hook_path: "/hooks/gitlab"
       deploy_keys:
@@ -219,3 +240,13 @@ staging:
         staging:
           title: "Build face staging"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4rEGgT4ABE8DND5JvA0bYTAc9mNIjSVdwdodiWvfoaoibnI0KInfIke8oMMOfXJWXiWHFnta70jqs/RFjGPXDC06Y0lq2EUnIkzy9dwPSKOPXdCUYbDhg4d06o0xNMo6Nz9oO4zHPstRFDMhqAcdXhest4fFGZhtKTONUNXw3Ti6M34+ROwttniFQ3kuita62HBOjq8OYVQrwH7Mxj9AcUTL36OZ9stnotYg1TmmaIaNbANT1Iv89Ud2oMdpEvbQfIkMOw0U7uVLUOsItmaY+GrjJCWoYHn1rvY8iV7t9OoEB+aVmjjpX4407ZiQI7ZvquqWWxR5TXxbLrzLTozhn poweruser@buildface-staging-01"
+    jenkins:
+      domain: "http://ci01.undev.cc/"
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Jenkins ci01"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtz5bH9EQPHsPAkoPgi8IQGzDru0PGTHyL/srQWVV8jhTlGwdexWSJxtCf2gmxcGgQqals7j7xM0P2CFPi0Grv/8Xv3ZrAPT7BY9Z3aL2O/uwUw8COVRa2GczivZ8okg6rLCiG+4b2rderSJE+lllhnSk7FWLtvDtrS5RBcNeBcLQfZrtgva1Mu6+opzI0uwD4evZwg220DGHOI2LLbLE1e8uBws0JBChlTuCgpLIteYl1S1CJFY0F8+vLdOLMhPwWOVM9wiTqyaoNDX3uk2JGZVEpa25XiF+NVqIWD+7Ugbnj3yf9OfR/hQ/RE/b9vWnvP7mJ5xbycdJnN64dsNVD jenkins@ci01"
+        ci_61:
+          title: "Jenkins ci61"
+          key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4ow96YKXiL+uBHy9TAFW9s9hDmYUzIK2T04CQvlzqAdp81RGZIUqznhO9LhDtpXdRWh/ZEeD2dDp/vLScNKwKOTFOrUv8Gc8BzJyPLYH2ra6DtE2KV9fds+Y0GzvN5SYJwBCK54zOmy0mKRki/2OI/JTDNlQjKad0Uf2sQiHeIgE0jkMryUg2gJQXUKcPLGohohj2jIhBaqdqTSn1P5WcMdINZnGGWMKI+xhsyyZgyP5gi3BphPp0RyZoHJUAw/mtsSRnybA9BlrtEmwWSy/V6/53Nuj/isSHzdrYVuTpmSy2YXwDJu4OTERpeppnJhMuWfm4+lWZkXsP6s9o9TYr platform-testing@undev.ru"

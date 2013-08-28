@@ -79,11 +79,16 @@ Settings.gitlab.default_projects_features['snippets']       = false if Settings.
 
 # Services
 Settings['services'] ||= Settingslogic.new({})
+
 Settings.services['build_face']                   ||= {}
 Settings.services.build_face['domain']            ||= 'http://build-face.undev.cc'
 Settings.services.build_face['web_hooks_path']    ||= '/hooks'
 Settings.services.build_face['system_hooks_path'] ||= '/hooks/gitlab'
 
+Settings.services['jenkins']                      ||= {}
+Settings.services.jenkins['domain']               ||= 'http://ci01.undev.cc'
+Settings.services.jenkins['web_hooks_path']       ||= '/hooks'
+Settings.services.jenkins['system_hooks_path']    ||= '/hooks/gitlab'
 
 #
 # Gravatar
