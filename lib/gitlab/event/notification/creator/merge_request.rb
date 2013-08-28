@@ -40,7 +40,7 @@ class Gitlab::Event::Notification::Creator::MergeRequest < Gitlab::Event::Notifi
 
   def create_notification_for_mentioned_users(event, notifications)
     notified_user_ids = notifications.map { |n| n.subscriber_id }
-    user_to_notify = event.source.mentioned_users.reject { |u| notified_user_ids.unclude?(u.id) }
+    user_to_notify = event.source.mentioned_users.reject { |u| notified_user_ids.include?(u.id) }
     user_to_notify.each do |user|
       ::Event::Subscription::Notification.create(event: event, subscriber: user)
     end
