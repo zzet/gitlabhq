@@ -22,6 +22,7 @@ class Service < ActiveRecord::Base
 
   belongs_to :project
   has_one :service_hook
+
   has_many :deploy_key_service_relationships, dependent: :destroy
   has_many :deploy_keys, through: :deploy_key_service_relationships
 
@@ -34,6 +35,20 @@ class Service < ActiveRecord::Base
   has_many :subscribers,    through: :subscriptions
 
   validates :project, presence: true
+
+  state_machine :state, initial: :disabled do
+    event :enable do
+      transition [:disabled] => :enabled
+    end
+
+    event :disable do
+      transition enabled: :disabled
+    end
+
+    state :enabled
+
+    state :disabled
+  end
 
   state_machine :state, initial: :disabled do
     event :enable do

@@ -93,6 +93,9 @@ Settings.services.jenkins['system_hooks_path']    ||= '/hooks/gitlab'
 Settings.services['nix']                          ||= {}
 Settings.services.nix['domain']                   ||= ''
 
+Settings.services['obs']                          ||= {}
+Settings.services.obs['domain']                   ||= ''
+
 #
 # Gravatar
 #

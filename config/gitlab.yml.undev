@@ -89,6 +89,13 @@ production: &base
         production:
           title: "Nix"
           key: ""
+    obs:
+      domain: ""
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Obs"
+          key: ""
 
   ## Gravatar
   gravatar:
@@ -211,6 +218,14 @@ development:
         production:
           title: "Nix"
           key: ""
+    obs:
+      domain: ""
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Obs"
+          key: ""
+
 
 test:
   <<: *base
@@ -270,4 +285,11 @@ staging:
       deploy_keys:
         production:
           title: "Nix"
+          key: ""
+    obs:
+      domain: ""
+      web_hook_path: ""
+      deploy_keys:
+        production:
+          title: "Obs"
           key: ""
