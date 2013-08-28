@@ -25,9 +25,11 @@ module Mentionable
   end
 
   def mentionable_text
-    if self.class == Issue
+    case self
+    when Issue
+    when MergeRequest
       description
-    elsif self.class == Note
+    when Note
       note
     else
       nil
