@@ -1,6 +1,6 @@
 namespace :undev do
   desc "Undev | migrate exist projects to Jenkins service"
-  task :migrate_to_jenkins do
+  task migrate_to_jenkins: :environment do
     ["admon-ror/admon-func-tests",
      "admon-ror/admon-music-func-tests",
      "admon-ror/admon-ror",

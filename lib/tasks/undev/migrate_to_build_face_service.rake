@@ -1,6 +1,6 @@
 namespace :undev do
   desc "Undev | migrate exist projects to build face service"
-  task :migrate_to_build_face do
+  task migrate_to_build_face: :environment do
    ["videosearch/videosearch-alg-backend", "infrastructure/pypiserver", "nptv-cloud/entry-point-resolver",
      "backend/pyhls-prefetcher", "nptv/nptv-xfonts", "storage/mogilefs-interesting-moments", "storage/state_of_minutes",
      "storage/mogilefs-resolver", "backend/front-tail", "infrastructure/mono", "infrastructure/puc",

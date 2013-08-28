@@ -60,7 +60,7 @@ class Service::BuildFace < Service::Base
       }
     }
 
-    if project.repository
+    if project.repository.nil?
       data[:repository][:branches] = project.repository.branches.map {|br| br.name}
       data[:repository][:tags] = project.repository.tags.map {|t| t.name}
     end
