@@ -60,6 +60,11 @@ class Service::BuildFace < Service::Base
       }
     }
 
+    if project.repository
+      data[:repository][:branches] = project.repository.branches.map {|br| br.name}
+      data[:repository][:tags] = project.repository.tags.map {|t| t.name}
+    end
+
     WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
   end
 
