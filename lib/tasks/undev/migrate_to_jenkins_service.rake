@@ -102,9 +102,17 @@ namespace :undev do
      "yakshankin/contentup_acceptance_testing"].each do |project_name|
        project = Project.find_with_namespace(project_name)
        if project
-         ci01key = DeployKey.where(key: Gitlab.config.services.jenkins.deploy_keys.production.key)
-         ci61key = DeployKey.where(key: Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
-         project.deploy_keys_projects.where(deploy_key_id: [ci01key, ci61key]).destroy_all
+         ci01key = Key.find_by_key(Gitlab.config.services.jenkins.service_keys.production.key)
+         if ci01key
+           project.deploy_keys_projects.where(deploy_key_id: ci01key).destroy_all
+           ci01key.destroy
+         end
+
+         ci61key = Key.find_by_key(Gitlab.config.services.jenkins.service_keys.ci_61.key)
+         if ci61key
+           project.deploy_keys_projects.where(deploy_key_id: ci61key).destroy_all
+           ci61key.destroy
+         end
 
          project.create_jenkins_service unless project.jenkins_service.present?
          project.jenkins_service.enable unless project.jenkins_service.enabled?

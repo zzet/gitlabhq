@@ -1,4 +1,4 @@
-class Service::BuildFace < Service::Base
+class Service::BuildFace < Service
   attr_accessible :project_id, :project_url, :title, :token, :type, :state_event
 
   delegate :execute, to: :service_hook, prefix: nil
@@ -65,7 +65,7 @@ class Service::BuildFace < Service::Base
       data[:repository][:tags] = project.repository.tags.map {|t| t.name}
     end
 
-    WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
+    #WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
   end
 
   def compose_service_hook

@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(:version => 20130828113938) do
     t.datetime "updated_at",    :null => false
   end
 
-  create_table "service_keys_service_relationships", :force => true do |t|
+  create_table "service_key_service_relationships", :force => true do |t|
     t.integer  "service_key_id",           :null => false
     t.integer  "service_id",               :null => false
     t.boolean  "push_access"

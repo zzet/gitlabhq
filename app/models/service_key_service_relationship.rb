@@ -1,5 +1,5 @@
 class ServiceKeyServiceRelationship < ActiveRecord::Base
-  attr_accessible :service_key_id, :service_id, :service_key
+  attr_accessible :service_key_id, :service_id, :service_key, :clone_access, :push_access, :push_to_protected_access
 
   belongs_to :service
   belongs_to :service_key

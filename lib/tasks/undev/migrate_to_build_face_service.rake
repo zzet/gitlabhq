@@ -23,9 +23,11 @@ namespace :undev do
      "nptv-cloud/ipvs-info", "ibc-weather-3d/weather-sfk-apps", "backend/minute_encoder", "backend/record-broker2",
      "backend/bsf_app", "rnd/networkremote"].each do |project_name|
        project = Project.find_with_namespace(project_name)
-       project.create_build_face_service unless project.build_face_service.present?
-       project.build_face_service.enable unless project.build_face_service.enabled?
-       ProjectHook.where(url: "http://build-face.undev.cc/hooks").destroy_all
+       if project.present?
+         project.create_build_face_service unless project.build_face_service.present?
+         project.build_face_service.enable unless project.build_face_service.enabled?
+         ProjectHook.where(url: "http://build-face.undev.cc/hooks").destroy_all
+       end
      end
   end
 end

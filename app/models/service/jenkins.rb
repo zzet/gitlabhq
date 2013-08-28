@@ -1,4 +1,4 @@
-class Service::Jenkins < Service::Base
+class Service::Jenkins < Service
   attr_accessible :project_id, :project_url, :title, :token, :type, :state_event
 
   delegate :execute, to: :service_hook, prefix: nil

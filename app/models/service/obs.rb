@@ -1,4 +1,4 @@
-class Service::Obs < Service::Base
+class Service::Obs < Service
   attr_accessible :project_id, :project_url, :title, :token, :type, :state_event
 
   delegate :execute, to: :service_hook, prefix: nil

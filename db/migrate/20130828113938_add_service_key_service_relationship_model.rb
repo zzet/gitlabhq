@@ -1,6 +1,6 @@
 class AddServiceKeyServiceRelationshipModel < ActiveRecord::Migration
   def change
-    create_table :service_keys_service_relationships do |t|
+    create_table :service_key_service_relationships do |t|
       t.integer :service_key_id, null: false
       t.integer :service_id, null: false
       t.boolean :push_access

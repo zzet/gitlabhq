@@ -169,7 +169,7 @@ class Project < ActiveRecord::Base
   end
 
   def repository
-    @repository ||= Repository.new(path_with_namespace, default_branch)
+    @repository ||= ::Repository.new(path_with_namespace, default_branch)
   end
 
   def saved?

@@ -1,4 +1,4 @@
-class Service::Nix < Service::Base
+class Service::Nix < Service
   attr_accessible :project_id, :project_url, :title, :token, :type, :state_event
 
   delegate :execute, to: :service_hook, prefix: nil
