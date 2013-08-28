@@ -12,6 +12,7 @@ class Service::Nix < Service::Base
       transition enabled: :disabled
     end
 
+    after_transition :enabled, do: :add_service_keys_to_project
     state :enabled
 
     state :disabled
@@ -41,20 +42,20 @@ class Service::Nix < Service::Base
 
   end
 
-  def add_deploy_keys_to_project
-    if deploy_keys.blank?
-      deploy_key_from_production
+  def add_service_keys_to_project
+    if service_keys.blank?
+      service_key_from_production
     end
   end
 
-  def deploy_key_from_production
-    deploy_key = DeployKey.find_by_key(Gitlab.config.services.nix.deploy_keys.production.key)
+  def service_key_from_production
+    service_key = serviceKey.find_by_key(Gitlab.config.services.nix.service_keys.production.key)
 
-    if deploy_key
-      deploy_key_service_relationships.create(deploy_key: deploy_key)
+    if service_key
+      service_key_service_relationships.create(service_key: service_key)
     else
-      deploy_keys.create(title: Gitlab.config.services.nix.deploy_keys.production.title,
-                         key: Gitlab.config.services.nix.deploy_keys.production.key)
+      service_keys.create(title: Gitlab.config.services.nix.service_keys.production.title,
+                         key: Gitlab.config.services.nix.service_keys.production.key)
     end
   end
 end
