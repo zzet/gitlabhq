@@ -12,7 +12,9 @@ class Service::Nix < Service::Base
       transition enabled: :disabled
     end
 
-    after_transition :enabled, do: :add_service_keys_to_project
+    after_transition on: :enable,   do: :add_service_keys
+    after_transition on: :disabled, do: :remove_service_keys
+
     state :enabled
 
     state :disabled
@@ -42,20 +44,12 @@ class Service::Nix < Service::Base
 
   end
 
-  def add_service_keys_to_project
-    if service_keys.blank?
-      service_key_from_production
-    end
+  def add_service_keys
+    options = { clone_access: true, push_access: true, push_to_protected_access: true }
+    add_service_key(Gitlab.config.services.nix.service_keys.production.title, Gitlab.config.services.nix.service_keys.production.key, options)
   end
 
-  def service_key_from_production
-    service_key = serviceKey.find_by_key(Gitlab.config.services.nix.service_keys.production.key)
-
-    if service_key
-      service_key_service_relationships.create(service_key: service_key)
-    else
-      service_keys.create(title: Gitlab.config.services.nix.service_keys.production.title,
-                         key: Gitlab.config.services.nix.service_keys.production.key)
-    end
+  def remove_service_keys
+    remove_service_key(Gitlab.config.services.nix.service_keys.production.key)
   end
 end

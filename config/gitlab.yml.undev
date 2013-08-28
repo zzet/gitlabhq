@@ -65,7 +65,7 @@ production: &base
       domain: "http://build-face.undev.cc"
       web_hook_path: "/hooks"
       system_hook_path: "/hooks/gitlab"
-      deploy_keys:
+      service_keys:
         production:
           title: "Build face production"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq3hiE+hNaWsAHGXEWthfwcOznlQJ7n3mvk+oXpSp0JQ1KD4FNf8CodG8XvVXeLYvrbbpW/DSDrdrKRefbhAzdBUVhHDXHwuSafm9eGM3/3VX64osv85MPJZDz/F8iAnCtw8a4uqmHGU5ejU4jadqWnl2ajxlaOKJlnJihJSste1jWdSvwBGLYxnJDHw2bvDobVtmPATxF1/5MFYrBIP9sbreIBhpvPNa1joHyMI5dyTcAMSPHAjZL5amXUbVYsVnhgsmVjlWPG5Kh+1EEDxi+gqsZQ4kqyfsowA5imwlGO1iZbYCbhmfSyIX2O0Vhx0M/iEoVTVVf/aHaHYjGUkGp build-face@undev.ru"
@@ -75,7 +75,7 @@ production: &base
     jenkins:
       domain: "http://ci01.undev.cc/"
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Jenkins ci01"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtz5bH9EQPHsPAkoPgi8IQGzDru0PGTHyL/srQWVV8jhTlGwdexWSJxtCf2gmxcGgQqals7j7xM0P2CFPi0Grv/8Xv3ZrAPT7BY9Z3aL2O/uwUw8COVRa2GczivZ8okg6rLCiG+4b2rderSJE+lllhnSk7FWLtvDtrS5RBcNeBcLQfZrtgva1Mu6+opzI0uwD4evZwg220DGHOI2LLbLE1e8uBws0JBChlTuCgpLIteYl1S1CJFY0F8+vLdOLMhPwWOVM9wiTqyaoNDX3uk2JGZVEpa25XiF+NVqIWD+7Ugbnj3yf9OfR/hQ/RE/b9vWnvP7mJ5xbycdJnN64dsNVD jenkins@ci01"
@@ -85,14 +85,14 @@ production: &base
     nix:
       domain: ""
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Nix"
           key: ""
     obs:
       domain: ""
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Obs"
           key: ""
@@ -194,7 +194,7 @@ development:
       domain: "http://build-face.undev.cc"
       web_hook_path: "/hooks"
       system_hook_path: "/hooks/gitlab"
-      deploy_keys:
+      service_keys:
         production:
           title: "Build face production"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq3hiE+hNaWsAHGXEWthfwcOznlQJ7n3mvk+oXpSp0JQ1KD4FNf8CodG8XvVXeLYvrbbpW/DSDrdrKRefbhAzdBUVhHDXHwuSafm9eGM3/3VX64osv85MPJZDz/F8iAnCtw8a4uqmHGU5ejU4jadqWnl2ajxlaOKJlnJihJSste1jWdSvwBGLYxnJDHw2bvDobVtmPATxF1/5MFYrBIP9sbreIBhpvPNa1joHyMI5dyTcAMSPHAjZL5amXUbVYsVnhgsmVjlWPG5Kh+1EEDxi+gqsZQ4kqyfsowA5imwlGO1iZbYCbhmfSyIX2O0Vhx0M/iEoVTVVf/aHaHYjGUkGp build-face@undev.ru"
@@ -204,7 +204,7 @@ development:
     jenkins:
       domain: "http://ci01.undev.cc/"
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Jenkins ci01"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtz5bH9EQPHsPAkoPgi8IQGzDru0PGTHyL/srQWVV8jhTlGwdexWSJxtCf2gmxcGgQqals7j7xM0P2CFPi0Grv/8Xv3ZrAPT7BY9Z3aL2O/uwUw8COVRa2GczivZ8okg6rLCiG+4b2rderSJE+lllhnSk7FWLtvDtrS5RBcNeBcLQfZrtgva1Mu6+opzI0uwD4evZwg220DGHOI2LLbLE1e8uBws0JBChlTuCgpLIteYl1S1CJFY0F8+vLdOLMhPwWOVM9wiTqyaoNDX3uk2JGZVEpa25XiF+NVqIWD+7Ugbnj3yf9OfR/hQ/RE/b9vWnvP7mJ5xbycdJnN64dsNVD jenkins@ci01"
@@ -214,14 +214,14 @@ development:
     nix:
       domain: ""
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Nix"
           key: ""
     obs:
       domain: ""
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Obs"
           key: ""
@@ -262,7 +262,7 @@ staging:
       domain: "http://build-face.undev.cc"
       web_hook_path: "/hooks"
       system_hook_path: "/hooks/gitlab"
-      deploy_keys:
+      service_keys:
         production:
           title: "Build face production"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq3hiE+hNaWsAHGXEWthfwcOznlQJ7n3mvk+oXpSp0JQ1KD4FNf8CodG8XvVXeLYvrbbpW/DSDrdrKRefbhAzdBUVhHDXHwuSafm9eGM3/3VX64osv85MPJZDz/F8iAnCtw8a4uqmHGU5ejU4jadqWnl2ajxlaOKJlnJihJSste1jWdSvwBGLYxnJDHw2bvDobVtmPATxF1/5MFYrBIP9sbreIBhpvPNa1joHyMI5dyTcAMSPHAjZL5amXUbVYsVnhgsmVjlWPG5Kh+1EEDxi+gqsZQ4kqyfsowA5imwlGO1iZbYCbhmfSyIX2O0Vhx0M/iEoVTVVf/aHaHYjGUkGp build-face@undev.ru"
@@ -272,7 +272,7 @@ staging:
     jenkins:
       domain: "http://ci01.undev.cc/"
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Jenkins ci01"
           key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtz5bH9EQPHsPAkoPgi8IQGzDru0PGTHyL/srQWVV8jhTlGwdexWSJxtCf2gmxcGgQqals7j7xM0P2CFPi0Grv/8Xv3ZrAPT7BY9Z3aL2O/uwUw8COVRa2GczivZ8okg6rLCiG+4b2rderSJE+lllhnSk7FWLtvDtrS5RBcNeBcLQfZrtgva1Mu6+opzI0uwD4evZwg220DGHOI2LLbLE1e8uBws0JBChlTuCgpLIteYl1S1CJFY0F8+vLdOLMhPwWOVM9wiTqyaoNDX3uk2JGZVEpa25XiF+NVqIWD+7Ugbnj3yf9OfR/hQ/RE/b9vWnvP7mJ5xbycdJnN64dsNVD jenkins@ci01"
@@ -282,14 +282,14 @@ staging:
     nix:
       domain: ""
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Nix"
           key: ""
     obs:
       domain: ""
       web_hook_path: ""
-      deploy_keys:
+      service_keys:
         production:
           title: "Obs"
           key: ""

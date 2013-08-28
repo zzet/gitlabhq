@@ -12,6 +12,9 @@ class Service::Obs < Service::Base
       transition enabled: :disabled
     end
 
+    after_transition on: :enable,   do: :add_service_keys
+    after_transition on: :disabled, do: :remove_service_keys
+
     state :enabled
 
     state :disabled
@@ -41,20 +44,12 @@ class Service::Obs < Service::Base
 
   end
 
-  def add_deploy_keys_to_project
-    if deploy_keys.blank?
-      deploy_key_from_production
-    end
+  def add_service_keys
+    options = { clone_access: true, push_access: false, push_to_protected_access: false }
+    add_service_key(Gitlab.config.services.obs.service_keys.production.title, Gitlab.config.services.obs.service_keys.production.key, options)
   end
 
-  def deploy_key_from_production
-    deploy_key = DeployKey.find_by_key(Gitlab.config.services.obs.deploy_keys.production.key)
-
-    if deploy_key
-      deploy_key_service_relationships.create(deploy_key: deploy_key)
-    else
-      deploy_keys.create(title: Gitlab.config.services.obs.deploy_keys.production.title,
-                         key: Gitlab.config.services.obs.deploy_keys.production.key)
-    end
+  def remove_service_keys
+    remove_service_key(Gitlab.config.services.obs.service_keys.production.key)
   end
 end

@@ -12,8 +12,8 @@ class Service::BuildFace < Service::Base
       transition enabled: :disabled
     end
 
-    after_transition on: :enable,   do: [:notify_build_face, :compose_service_hook, :add_deploy_keys_to_project]
-    after_transition on: :disabled, do: :remove_deploy_keys_from_project
+    after_transition on: :enable,   do: [:notify_build_face, :compose_service_hook, :add_service_keys]
+    after_transition on: :disabled, do: :remove_service_keys
 
     state :enabled
 
@@ -48,7 +48,17 @@ class Service::BuildFace < Service::Base
     action = "created" if action.is_a? StateMachine::Transition
 
     url = "#{Gitlab.config.services.build_face.domain}/#{Gitlab.config.services.build_face.system_hook_path}"
-    data =  { action: action, repository: { id: project.id, path: project.path_with_namespace, name: project.name_with_namespace, url: project.ssh_url_to_repo, description: project.description, homepage: project.http_url_to_repo } }
+    data = {
+      action: action,
+      repository: {
+        id: project.id,
+        path: project.path_with_namespace,
+        name: project.name_with_namespace,
+        url: project.ssh_url_to_repo,
+        description: project.description,
+        homepage: project.http_url_to_repo
+      }
+    }
 
     WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
   end
@@ -59,14 +69,15 @@ class Service::BuildFace < Service::Base
     hook.save
   end
 
-  def add_deploy_keys_to_project
-    add_deploy_key(Gitlab.config.services.build_face.deploy_keys.production.title, Gitlab.config.services.build_face.deploy_keys.production.key)
-    add_deploy_key(Gitlab.config.services.build_face.deploy_keys.staging.title, Gitlab.config.services.build_face.deploy_keys.staging.key)
+  def add_service_keys
+    options = { clone_access: true, push_access: false, push_to_protected_access: false }
+    add_service_key(Gitlab.config.services.build_face.service_keys.production.title, Gitlab.config.services.build_face.service_keys.production.key, options)
+    add_service_key(Gitlab.config.services.build_face.service_keys.staging.title, Gitlab.config.services.build_face.service_keys.staging.key, options)
   end
 
-  def remove_deploy_keys_from_project
-    remove_deploy_key(Gitlab.config.services.build_face.deploy_keys.production.key)
-    remove_deploy_key(Gitlab.config.services.build_face.deploy_keys.staging.key)
+  def remove_service_keys
+    remove_service_key(Gitlab.config.services.build_face.service_keys.production.key)
+    remove_service_key(Gitlab.config.services.build_face.service_keys.staging.key)
   end
 
   def commit_status_path sha

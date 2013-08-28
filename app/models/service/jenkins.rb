@@ -12,8 +12,8 @@ class Service::Jenkins < Service::Base
       transition enabled: :disabled
     end
 
-    after_transition on: :enable, do: :add_deploy_keys_to_project
-    after_transition on: :disabled, do: :remove_deploy_keys_from_project
+    after_transition on: :enable,   do: :add_service_keys
+    after_transition on: :disabled, do: :remove_service_keys
 
     state :enabled
 
@@ -44,13 +44,14 @@ class Service::Jenkins < Service::Base
 
   end
 
-  def add_deploy_keys_to_project
-    add_deploy_key(Gitlab.config.services.jenkins.deploy_keys.production.title, Gitlab.config.services.jenkins.deploy_keys.production.key)
-    add_deploy_key(Gitlab.config.services.jenkins.deploy_keys.ci_61.title, Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
+  def add_service_keys
+    options = { clone_access: true, push_access: false, push_to_protected_access: false }
+    add_service_key(Gitlab.config.services.jenkins.service_keys.production.title, Gitlab.config.services.jenkins.service_keys.production.key, options)
+    add_service_key(Gitlab.config.services.jenkins.service_keys.ci_61.title, Gitlab.config.services.jenkins.service_keys.ci_61.key, options)
   end
 
-  def remove_deploy_keys_from_project
-    remove_deploy_key(Gitlab.config.services.jenkins.deploy_keys.production.key)
-    remove_deploy_key(Gitlab.config.services.jenkins.deploy_keys.ci_61.key)
+  def remove_service_keys
+    remove_service_key(Gitlab.config.services.jenkins.service_keys.production.key)
+    remove_service_key(Gitlab.config.services.jenkins.service_keys.ci_61.key)
   end
 end
