@@ -10,7 +10,7 @@ class Admin::Teams::ProjectsController < Admin::Teams::ApplicationController
 
     ::Teams::Projects::CreateRelationContext.new(current_user, user_team, params).execute
 
-    redirect_to admin_team_path(user_team), notice: 'Team of users was successfully assgned to projects.'
+    redirect_to admin_team_path(user_team), notice: 'Team of users was successfully assigned to projects.'
   end
 
   def edit
