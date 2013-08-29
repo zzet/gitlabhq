@@ -1,0 +1,6 @@
+- if @tokens.empty?
+  %h3.nothing_here_message Nothing here.
+- else
+  %ul.bordered-list
+    - @tokens.each do |token|
+      = render partial: 'token', locals: { token: token }
