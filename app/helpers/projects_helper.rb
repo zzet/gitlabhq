@@ -78,6 +78,10 @@ module ProjectsHelper
       nav_tabs << feature if project.send :"#{feature}_enabled"
     end
 
+    if project.file_tokens.any?
+      nav_tabs << :file_tokens
+    end
+
     nav_tabs.flatten
   end
 end
