@@ -1722,6 +1722,7 @@ class EventNotificationMailer < ActionMailer::Base
     @notification   = notification
     @event          = @notification.event
     @user           = @event.author
+    @project        = @merge_request.project
     @merge_request  = @event.source
     @assigned_user  = @merge_request.assignee
 
