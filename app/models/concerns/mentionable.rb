@@ -27,7 +27,6 @@ module Mentionable
   def mentionable_text
     case self
     when Issue
-    when MergeRequest
       description
     when Note
       note
