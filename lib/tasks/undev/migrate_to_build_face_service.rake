@@ -24,6 +24,18 @@ namespace :undev do
      "backend/bsf_app", "rnd/networkremote"].each do |project_name|
        project = Project.find_with_namespace(project_name)
        if project.present?
+         bfp = DeployKey.find_by_key(Gitlab.config.services.build_face.service_keys.production.key)
+         if bfp
+           project.deploy_keys_projects.where(deploy_key_id: bfp).destroy_all
+           bfp.destroy
+         end
+
+         bfs = DeployKey.find_by_key(Gitlab.config.services.build_face.service_keys.staging.key)
+         if bfs
+           project.deploy_keys_projects.where(deploy_key_id: bfs).destroy_all
+           bfs.destroy
+         end
+
          project.create_build_face_service unless project.build_face_service.present?
          project.build_face_service.enable unless project.build_face_service.enabled?
          ProjectHook.where(url: "http://build-face.undev.cc/hooks").destroy_all

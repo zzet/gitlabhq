@@ -12,15 +12,15 @@ class ServiceKeyServiceRelationship < ActiveRecord::Base
   state_machine :code_access_state, initial: :none do
 
     event :denied do
-      transition [:none, :clone, :push, :protected_push] => :none
+      transition [:clone, :push, :protected_push] => :none
     end
 
     event :download_access do
-      transition [:none, :clone, :push, :protected_push] => :clone
+      transition [:none, :push, :protected_push] => :clone
     end
 
     event :safe_push_access do
-      transition [:none, :clone, :push, :protected_push] => :push
+      transition [:none, :clone, :protected_push] => :push
     end
 
     event :push_to_all_access do
