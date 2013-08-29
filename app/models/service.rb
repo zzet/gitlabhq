@@ -18,7 +18,7 @@
 class Service < ActiveRecord::Base
   include Watchable
 
-  attr_accessible :title, :token, :type, :active
+  attr_accessible :title, :token, :type, :active, :service_key_service_relationships_attributes
 
   belongs_to :project
   has_one :service_hook
@@ -30,6 +30,8 @@ class Service < ActiveRecord::Base
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
+
+  accepts_nested_attributes_for :service_key_service_relationships, reject_if: :all_blank, allow_destroy: true
 
   validates :project, presence: true
 
@@ -51,18 +53,13 @@ class Service < ActiveRecord::Base
 
   scope :with_project, ->(project){ where(project_id: project) }
 
-  def add_service_key title, key, options = {}
+  def add_service_key title, key, key_state
     service_key = ServiceKey.find_by_key(key)
+    service_key = ServiceKey.create(title: title, key: key) unless service_key
 
-    if service_key
-      if service_key_service_relationships.where(service_key_id: service_key).blank?
-        service_key_service_relationships.create(service_key: service_key)
-      end
-    else
-      service_key = service_keys.create(title: title, key: key)
+    if service_key_service_relationships.where(service_key_id: service_key).blank?
+      service_key_service_relationships.create(service_key: service_key, code_access_state: key_state)
     end
-
-    service_key_service_relationships.where(service_key_id: service_key).first.update_attributes(options) if options.any?
   end
 
   def remove_service_key key
@@ -72,11 +69,15 @@ class Service < ActiveRecord::Base
   end
 
   def allowed_clone?
-    true
+    code_access.clone?
   end
 
   def allowed_push?
-    true
+    code_access.push?
+  end
+
+  def allowed_protected_push?
+    code_access.protected_push?
   end
 
   def activated?

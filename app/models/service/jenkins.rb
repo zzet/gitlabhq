@@ -45,7 +45,7 @@ class Service::Jenkins < Service
   end
 
   def add_service_keys
-    options = { clone_access: true, push_access: false, push_to_protected_access: false }
+    options = :clone
     add_service_key(Gitlab.config.services.jenkins.service_keys.production.title, Gitlab.config.services.jenkins.service_keys.production.key, options)
     add_service_key(Gitlab.config.services.jenkins.service_keys.ci_61.title, Gitlab.config.services.jenkins.service_keys.ci_61.key, options)
   end

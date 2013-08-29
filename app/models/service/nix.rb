@@ -45,7 +45,7 @@ class Service::Nix < Service
   end
 
   def add_service_keys
-    options = { clone_access: true, push_access: true, push_to_protected_access: true }
+    options = :push
     add_service_key(Gitlab.config.services.nix.service_keys.production.title, Gitlab.config.services.nix.service_keys.production.key, options)
   end
 

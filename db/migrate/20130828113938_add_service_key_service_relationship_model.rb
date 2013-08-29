@@ -3,9 +3,7 @@ class AddServiceKeyServiceRelationshipModel < ActiveRecord::Migration
     create_table :service_key_service_relationships do |t|
       t.integer :service_key_id, null: false
       t.integer :service_id, null: false
-      t.boolean :push_access
-      t.boolean :clone_access
-      t.boolean :push_to_protected_access
+      t.string :code_access_state
 
       t.timestamps
     end

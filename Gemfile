@@ -97,6 +97,7 @@ gem "httparty"
 
 # Colored output to console
 gem "colored"
+gem "cocoon"
 
 # GitLab settings
 gem 'settingslogic'

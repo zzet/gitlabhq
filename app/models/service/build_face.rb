@@ -75,7 +75,7 @@ class Service::BuildFace < Service
   end
 
   def add_service_keys
-    options = { clone_access: true, push_access: false, push_to_protected_access: false }
+    options = :clone
     add_service_key(Gitlab.config.services.build_face.service_keys.production.title, Gitlab.config.services.build_face.service_keys.production.key, options)
     add_service_key(Gitlab.config.services.build_face.service_keys.staging.title, Gitlab.config.services.build_face.service_keys.staging.key, options)
   end

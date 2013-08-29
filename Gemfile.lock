@@ -91,6 +91,7 @@ GEM
     chosen-rails (0.9.8)
       railties (~> 3.0)
       thor (~> 0.14)
+    cocoon (1.2.0)
     code_analyzer (0.3.1)
       sexp_processor
     coderay (1.0.9)
@@ -562,6 +563,7 @@ DEPENDENCIES
   capybara
   carrierwave
   chosen-rails (= 0.9.8)
+  cocoon
   coffee-rails
   colored
   coveralls
