@@ -862,4 +862,26 @@ describe ActivityObserver do
       data[:data][:source].should be_kind_of ::SystemHook
     end
   end
+
+  describe "Ignore system notes" do
+    let(:author) { create(:user) }
+    let!(:issue) { create(:issue, project: project) }
+    let!(:other) { create(:issue) }
+
+    it "should not create events for status change notes" do
+      expect do
+        Note.observers.enable :activity_observer do
+          Note.create_status_change_note(issue, project, author, 'reopened', nil)
+        end
+      end.to_not change { Event.count }
+    end
+
+    it "should not create events for cross-reference notes" do
+      expect do
+        Note.observers.enable :activity_observer do
+          Note.create_cross_reference_note(issue, other, author, issue.project)
+        end
+      end.to_not change { Event.count }
+    end
+  end
 end

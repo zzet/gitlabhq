@@ -16,7 +16,7 @@ class ProjectTeamManagement < Spinach::FeatureSteps
   end
 
   Given 'I click link "New Team Member"' do
-    click_link "New Team Member"
+    click_link "New project member"
   end
 
   And 'I select "Mike" as "Reporter"' do
@@ -30,26 +30,26 @@ class ProjectTeamManagement < Spinach::FeatureSteps
   end
 
   Then 'I should see "Mike" in team list as "Reporter"' do
-    within '.reporters' do
+    within ".access-reporter" do
       page.should have_content('Mike')
     end
   end
 
   Given 'I should see "Sam" in team list as "Developer"' do
-    within '.developers' do
+    within ".access-developer" do
       page.should have_content('Sam')
     end
   end
 
   And 'I change "Sam" role to "Reporter"' do
     user = User.find_by_name("Sam")
-    within ".user_#{user.id}" do
+    within "#user_#{user.id}" do
       select "Reporter", from: "team_member_project_access"
     end
   end
 
   And 'I should see "Sam" in team list as "Reporter"' do
-    within '.reporters' do
+    within ".access-reporter" do
       page.should have_content('Sam')
     end
   end
@@ -79,7 +79,7 @@ class ProjectTeamManagement < Spinach::FeatureSteps
   end
 
   Given 'I own project "Website"' do
-    @project = create(:project, name: "Website")
+    @project = create(:project, name: "Website", namespace: @user.namespace)
     @project.team << [@user, :master]
   end
 
@@ -90,11 +90,12 @@ class ProjectTeamManagement < Spinach::FeatureSteps
   end
 
   And 'I click link "Import team from another project"' do
-    click_link "Import team from another project"
+    click_link "Import members from another project"
   end
 
   When 'I submit "Website" project for import team' do
-    select 'Website', from: 'source_project_id'
+    project = Project.find_by_name("Website")
+    select project.name_with_namespace, from: 'source_project_id'
     click_button 'Import'
   end
 

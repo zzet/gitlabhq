@@ -31,8 +31,8 @@ class SearchContext < BaseContext
     if params[:search_code].present?
       result[:blobs] = project.repository.search_files(query, params[:repository_ref]) unless project.empty_repo?
     else
-      result[:merge_requests] = MergeRequest.where(project_id: projects).search(query).limit(10)
-      result[:issues] = Issue.where(project_id: projects).search(query).limit(10)
+      result[:merge_requests] = MergeRequest.where(project_id: projects).search(query).order('updated_at DESC').limit(20)
+      result[:issues]         = Issue.where(project_id: projects).search(query).order('updated_at DESC').limit(20)
       result[:wiki_pages] = []
     end
 

@@ -38,7 +38,7 @@ class Admin::GroupsController < Admin::ApplicationController
     if @group.save
       redirect_to [:admin, @group], notice: 'Group was successfully created.'
     else
-      render action: "new"
+      render "new"
     end
   end
 
@@ -47,35 +47,19 @@ class Admin::GroupsController < Admin::ApplicationController
     owner_id = group_params.delete(:owner_id)
 
     if owner_id
-      @group.owner = User.find(owner_id)
+      @group.change_owner(User.find(owner_id))
     end
 
     if @group.update_attributes(group_params)
       redirect_to [:admin, @group], notice: 'Group was successfully updated.'
     else
-      render action: "edit"
+      render "edit"
     end
   end
 
-  def project_update
-    project_ids = params[:project_ids]
-
-    Project.where(id: project_ids).each do |project|
-      Projects::TransferContext.new(@current_user, project, @group).execute
-    end
-
-    redirect_to :back, notice: 'Group was successfully updated.'
-  end
-
-  def remove_project
-    @project = Project.find(params[:project_id])
-    Projects::TransferContext.new(@current_user, project, Namespace.global_id).execute
-
-    redirect_to :back, notice: 'Group was successfully updated.'
-  end
 
   def project_teams_update
-    @group.add_users_to_project_teams(params[:user_ids].split(','), params[:project_access])
+    @group.add_users(params[:user_ids].split(','), params[:group_access])
 
     redirect_to [:admin, @group], notice: 'Users were successfully added.'
   end

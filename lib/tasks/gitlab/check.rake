@@ -374,8 +374,8 @@ namespace :gitlab do
       check_repo_base_is_not_symlink
       check_repo_base_user_and_group
       check_repo_base_permissions
-      check_post_receive_hook_is_up_to_date
-      check_repos_post_receive_hooks_is_link
+      check_update_hook_is_up_to_date
+      check_repos_update_hooks_is_link
 
       finished_checking "GitLab Shell"
     end
@@ -385,10 +385,10 @@ namespace :gitlab do
     ########################
 
 
-    def check_post_receive_hook_is_up_to_date
-      print "post-receive hook up-to-date? ... "
+    def check_update_hook_is_up_to_date
+      print "update hook up-to-date? ... "
 
-      hook_file = "post-receive"
+      hook_file = "update"
       gitlab_shell_hooks_path = Gitlab.config.gitlab_shell.hooks_path
       gitlab_shell_hook_file  = File.join(gitlab_shell_hooks_path, hook_file)
       gitlab_shell_ssh_user = Gitlab.config.gitlab_shell.ssh_user
@@ -494,10 +494,10 @@ namespace :gitlab do
       end
     end
 
-    def check_repos_post_receive_hooks_is_link
-      print "post-receive hooks in repos are links: ... "
+    def check_repos_update_hooks_is_link
+      print "update hooks in repos are links: ... "
 
-      hook_file = "post-receive"
+      hook_file = "update"
       gitlab_shell_hooks_path = Gitlab.config.gitlab_shell.hooks_path
       gitlab_shell_hook_file  = File.join(gitlab_shell_hooks_path, hook_file)
       gitlab_shell_ssh_user = Gitlab.config.gitlab_shell.ssh_user
@@ -657,7 +657,7 @@ namespace :gitlab do
   end
 
   def check_gitlab_shell
-    required_version = Gitlab::VersionInfo.new(1, 4, 0)
+    required_version = Gitlab::VersionInfo.new(1, 7, 0)
     current_version = Gitlab::VersionInfo.parse(gitlab_shell_version)
 
     print "GitLab Shell version >= #{required_version} ? ... "

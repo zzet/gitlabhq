@@ -49,5 +49,4 @@ class Event < ActiveRecord::Base
   def full?
     source.present? && target.present?
   end
-
 end

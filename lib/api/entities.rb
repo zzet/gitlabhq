@@ -36,7 +36,7 @@ module API
       expose :owner, using: Entities::UserBasic
       expose :name, :name_with_namespace
       expose :path, :path_with_namespace
-      expose :issues_enabled, :merge_requests_enabled, :wall_enabled, :wiki_enabled, :snippets_enabled, :created_at, :last_activity_at
+      expose :issues_enabled, :merge_requests_enabled, :wall_enabled, :wiki_enabled, :snippets_enabled, :created_at, :last_activity_at, :public
       expose :namespace
       expose :forked_from_project, using: Entities::ForkedFromProject, :if => lambda{ | project, options | project.forked? }
     end
@@ -106,12 +106,9 @@ module API
       expose :id, :title, :key, :created_at
     end
 
-    class UserTeam < Grape::Entity
-      expose :id, :name, :path, :owner_id
-    end
-
     class MergeRequest < Grape::Entity
-      expose :id, :target_branch, :source_branch, :project_id, :title, :state
+      expose :id, :target_branch, :source_branch, :title, :state
+      expose :target_project_id, as: :project_id
       expose :author, :assignee, using: Entities::UserBasic
     end
 

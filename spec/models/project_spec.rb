@@ -20,11 +20,16 @@
 #  issues_tracker_id      :string(255)
 #  snippets_enabled       :boolean          default(TRUE), not null
 #  last_activity_at       :datetime
+#  imported               :boolean          default(FALSE), not null
+#  import_url             :string(255)
 #
 
 require 'spec_helper'
 
 describe Project do
+  before(:each) { enable_observers }
+  after(:each) { disable_observers }
+
   describe "Associations" do
     it { should belong_to(:group) }
     it { should belong_to(:namespace) }
@@ -64,9 +69,10 @@ describe Project do
     it { should ensure_length_of(:issues_tracker_id).is_within(0..255) }
 
     it "should not allow new projects beyond user limits" do
-      project.stub(:creator).and_return(double(can_create_project?: false, projects_limit: 1))
-      project.should_not be_valid
-      project.errors[:limit_reached].first.should match(/Your own projects limit is 1/)
+      project2 = build(:project)
+      project2.stub(:creator).and_return(double(can_create_project?: false, projects_limit: 0))
+      project2.should_not be_valid
+      project2.errors[:limit_reached].first.should match(/Your own projects limit is 0/)
     end
   end
 
@@ -99,7 +105,7 @@ describe Project do
     let(:last_event) { double(project_id: project.id, created_at: Time.now) }
 
     describe "last_activity" do
-      it "should alias last_activity to last_event"do
+      it "should alias last_activity to last_event" do
         project.stub(last_event: last_event)
         project.last_activity.should == last_event
       end
@@ -121,7 +127,7 @@ describe Project do
     let(:project) { create(:project_with_code) }
 
     before do
-      @merge_request = create(:merge_request, project: project)
+      @merge_request = create(:merge_request, source_project: project, target_project: project)
       @key = create(:key, user_id: project.owner.id)
     end
 
@@ -197,11 +203,11 @@ describe Project do
     let(:ext_project) { create(:redmine_project) }
 
     it "should be true or if used internal tracker and issue exists" do
-      project.issue_exists?(existed_issue.id).should be_true
+      project.issue_exists?(existed_issue.iid).should be_true
     end
 
     it "should be false or if used internal tracker and issue not exists" do
-      project.issue_exists?(not_existed_issue.id).should be_false
+      project.issue_exists?(not_existed_issue.iid).should be_false
     end
 
     it "should always be true if used other tracker" do
@@ -234,7 +240,7 @@ describe Project do
       project.can_have_issues_tracker_id?.should be_false
     end
 
-    it "should be always false if issues disbled" do
+    it "should be always false if issues disabled" do
       project.issues_enabled = false
       ext_project.issues_enabled = false
 

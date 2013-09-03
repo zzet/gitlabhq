@@ -25,14 +25,14 @@ module Projects
       # Ex.
       #  'GitLab HQ'.parameterize => "gitlab-hq"
       #
-      @project.path = @project.name.dup.parameterize
+      @project.path = @project.name.dup.parameterize unless @project.path.present?
 
 
       if namespace_id
         # Find matching namespace and check if it allowed
         # for current user if namespace_id passed.
         if allowed_namespace?(current_user, namespace_id)
-          @project.namespace_id = namespace_id unless namespace_id == Namespace.global_id
+          @project.namespace_id = namespace_id
         else
           deny_namespace
           return @project
@@ -44,21 +44,11 @@ module Projects
 
       @project.creator = current_user
 
-      # Import project from cloneable resource
-      if @project.valid? && @project.import_url.present?
-        shell = Gitlab::Shell.new
-        if shell.import_repository(@project.path_with_namespace, @project.import_url)
-          # We should create satellite for imported repo
-          @project.satellite.create unless @project.satellite.exists?
-          @project.imported = true
-          true
-        else
-          @project.errors.add(:import_url, 'cannot clone repo')
-        end
-      end
-
       if @project.save
+        @project.discover_default_branch
+
         group = Group.find_by_id(@project.namespace_id)
+
         if group
           group.user_teams.each do |team|
             access = team.max_project_access_in_group(group)
@@ -67,6 +57,7 @@ module Projects
         end
 
         master_permission = @project.users_projects.find_by_user_id(current_user)
+
         if master_permission.blank?
           @project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
         else
@@ -76,6 +67,7 @@ module Projects
         if current_user.notification_setting && current_user.notification_setting.subscribe_if_owner
           SubscriptionService.subscribe(current_user, :all, @project, :all)
         end
+
       end
 
       receive_delayed_notifications
@@ -94,12 +86,8 @@ module Projects
     end
 
     def allowed_namespace?(user, namespace_id)
-      if namespace_id == Namespace.global_id
-        return user.admin
-      else
-        namespace = Namespace.find_by_id(namespace_id)
-        current_user.can?(:manage_namespace, namespace)
-      end
+      namespace = Namespace.find_by_id(namespace_id)
+      current_user.can?(:manage_namespace, namespace)
     end
   end
 end

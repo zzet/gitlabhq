@@ -7,7 +7,23 @@ module Users
           user.user_teams.find_each do |team|
             Gitlab::UserTeamManager.remove_member_from_team(team, user)
           end
-          UsersProject.with_user(user).destroy_all
+
+          # Remove user from all groups
+          user.users_groups.find_each do |membership|
+            # skip owned resources
+            next if membership.group.owners.include?(user)
+
+            return false unless membership.destroy
+          end
+
+          # Remove user from all projects and
+          user.users_projects.find_each do |membership|
+            # skip owned resources
+            next if membership.project.owner == user
+
+            return false unless membership.destroy
+          end
+
         end
       end
 

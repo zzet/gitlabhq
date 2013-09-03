@@ -9,7 +9,6 @@ class Admin::ProjectsController < Admin::ApplicationController
     @projects = @projects.where(public: true) if params[:public_only].present?
     @projects = @projects.with_push if params[:with_push].present?
     @projects = @projects.abandoned if params[:abandoned].present?
-    @projects = @projects.where(namespace_id: nil) if params[:namespace_id] == Namespace.global_id
     @projects = @projects.search(params[:name]) if params[:name].present?
     @projects = @projects.includes(:namespace).order("namespaces.path, projects.name ASC").page(params[:page]).per(20)
     check_git_protocol
@@ -17,9 +16,10 @@ class Admin::ProjectsController < Admin::ApplicationController
 
   def show
     @repository = @project.repository
+    @group = @project.group
+
     @users = User.active
     @users = @users.not_in_project(@project) if @project.users.present?
-    #@users = @users.all
     check_git_protocol
   end
 

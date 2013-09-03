@@ -9,9 +9,11 @@ module Projects
 
         if @merge_request.save
           @merge_request.reload_code
+          @merge_request.create_cross_references!(@project, @current_user)
 
           receive_delayed_notifications
         end
+
         @merge_request
       end
     end
