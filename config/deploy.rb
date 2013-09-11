@@ -69,6 +69,7 @@ namespace :deploy do
   desc "Update to 6.1"
   task :update_app_to_6_1, roles: :app do
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:backup:create"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} db:migrate"
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_groups"
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_global_projects"
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_keys"
