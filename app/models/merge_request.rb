@@ -28,7 +28,7 @@ class MergeRequest < ActiveRecord::Base
   include InternalId
   include Watchable
 
-  attr_accessible :title, :assignee_id,
+  attr_accessible :title, :description, :assignee_id,
                   :source_project_id, :source_branch,
                   :target_project_id, :target_branch,
                   :milestone_id, :author_id_of_changes, :state_event

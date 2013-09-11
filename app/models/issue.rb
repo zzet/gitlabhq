@@ -33,7 +33,6 @@ class Issue < ActiveRecord::Base
   attr_accessible :title, :assignee_id, :position, :description,
                   :milestone_id, :label_list, :author_id_of_changes,
                   :state_event
-  attr_mentionable :title, :description
 
   actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented]
 

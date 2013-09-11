@@ -142,6 +142,7 @@ ActiveRecord::Schema.define(:version => 20130904151300) do
     t.string   "merge_status"
     t.integer  "target_project_id", :null => false
     t.integer  "iid"
+    t.text     "description"
   end
 
   add_index "merge_requests", ["assignee_id"], :name => "index_merge_requests_on_assignee_id"

@@ -43,6 +43,8 @@ module Issuable
              prefix: true
 
     attr_accessor :author_id_of_changes
+
+    attr_mentionable :title, :description
   end
 
   module ClassMethods

@@ -168,6 +168,7 @@ class User < ActiveRecord::Base
   scope :not_in_team, ->(team){ where('users.id NOT IN (:ids)', ids: team.member_ids) }
   scope :not_in_project, ->(project) { project.users.present? ? where("id not in (:ids)", ids: project.users.map(&:id) ) : scoped }
   scope :without_projects, -> { where('id NOT IN (SELECT DISTINCT(user_id) FROM users_projects)') }
+  scope :ldap, -> { where(provider:  'ldap') }
 
   scope :potential_team_members, ->(team) { team.members.any? ? active.not_in_team(team) : active  }
 
@@ -197,24 +198,16 @@ class User < ActiveRecord::Base
       end
     end
 
-    def create_from_omniauth(auth, ldap = false)
-      gitlab_auth.create_from_omniauth(auth, ldap)
-    end
-
-    def find_or_new_for_omniauth(auth)
-      gitlab_auth.find_or_new_for_omniauth(auth)
-    end
-
-    def find_for_ldap_auth(auth, signed_in_resource = nil)
-      gitlab_auth.find_for_ldap_auth(auth, signed_in_resource)
-    end
-
-    def gitlab_auth
-      Gitlab::Auth.new
-    end
-
     def search query
       where("name LIKE :query OR email LIKE :query OR username LIKE :query", query: "%#{query}%")
+    end
+
+    def by_username_or_id(name_or_id)
+      if (name_or_id.is_a?(Integer))
+        User.find_by_id(name_or_id)
+      else
+        User.find_by_username(name_or_id)
+      end
     end
   end
 

@@ -62,6 +62,7 @@ production: &base
       wiki: true
       wall: false
       snippets: false
+      public: false
 
   ## External issues trackers
   issues_tracker:
