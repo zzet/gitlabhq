@@ -12,6 +12,7 @@ class Ability
       when "PersonalSnippet" then personal_snippet_abilities(user, subject)
       when "MergeRequest" then merge_request_abilities(user, subject)
       when "Group" then group_abilities(user, subject)
+      when "Team" then team_abilities(user, subject)
       when "Namespace" then namespace_abilities(user, subject)
       else []
       end.concat(global_abilities(user))
@@ -28,8 +29,8 @@ class Ability
 
       team = project.team
 
-      user_teams = project.user_teams
-      is_team_admin = user_teams.inject(false) { |a, b| a = a || b.admin?(user)}
+      teams = project.teams
+      is_team_admin = teams.inject(false) { |a, b| a = a || b.admin?(user)}
 
       # Rules based on role in project
       if team.masters.include?(user) || is_team_admin
@@ -145,6 +146,20 @@ class Ability
         rules << [
           :manage_group,
           :manage_namespace
+        ]
+      end
+
+      rules.flatten
+    end
+
+    def team_abilities user, team
+      rules = []
+
+      # Only group owner and administrators can manage group
+      if team.owners.include?(user) || user.admin? || team.admins.include?(user)
+        rules << [
+          :manage_team,
+          :remove_team
         ]
       end
 

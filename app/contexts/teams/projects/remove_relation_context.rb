@@ -2,7 +2,7 @@ module Teams
   module Projects
     class RemoveRelationContext < Teams::Projects::BaseContext
       def execute
-        Gitlab::UserTeamManager.resign(team, project)
+        relation = team.team_project_relationships.where(project_id: project).destroy_all
 
         receive_delayed_notifications
       end

@@ -10,6 +10,8 @@ class Admin::UsersController < Admin::ApplicationController
 
   def show
     @projects = user.authorized_projects
+    @groups = user.groups
+    @teams = user.teams
   end
 
   def new

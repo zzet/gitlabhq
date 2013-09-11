@@ -1,0 +1,18 @@
+%h3.page-title
+  Team members
+%p.light
+  Members of team have access to all team projects.
+%hr
+- can_manage_team =  current_user.can? :manage_team, @team
+.ui-box.span5.no_margin
+  .title
+    %strong #{@team.name}
+    team members
+    %small
+      (#{@members.count})
+  %ul.well-list
+    - @members.each do |member|
+      = render 'member', team: @team, member: member, show_controls: can_manage_team
+- if can_manage_team
+  .span5.pull-right
+    = render "new_member"

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130821090531) do
+ActiveRecord::Schema.define(:version => 20130904151300) do
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -127,20 +127,20 @@ ActiveRecord::Schema.define(:version => 20130821090531) do
   add_index "keys", ["user_id"], :name => "index_keys_on_user_id"
 
   create_table "merge_requests", :force => true do |t|
-    t.string   "target_branch",                           :null => false
-    t.string   "source_branch",                           :null => false
-    t.integer  "source_project_id",                       :null => false
+    t.string   "target_branch",     :null => false
+    t.string   "source_branch",     :null => false
+    t.integer  "source_project_id", :null => false
     t.integer  "author_id"
     t.integer  "assignee_id"
     t.string   "title"
-    t.datetime "created_at",                              :null => false
-    t.datetime "updated_at",                              :null => false
-    t.text     "st_commits",        :limit => 2147483647
-    t.text     "st_diffs",          :limit => 2147483647
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+    t.text     "st_commits"
+    t.text     "st_diffs"
     t.integer  "milestone_id"
     t.string   "state"
     t.string   "merge_status"
-    t.integer  "target_project_id",                       :null => false
+    t.integer  "target_project_id", :null => false
     t.integer  "iid"
   end
 
@@ -193,8 +193,8 @@ ActiveRecord::Schema.define(:version => 20130821090531) do
     t.string   "line_code"
     t.string   "commit_id"
     t.integer  "noteable_id"
-    t.text     "st_diff"
     t.boolean  "system",        :default => false, :null => false
+    t.text     "st_diff"
   end
 
   add_index "notes", ["author_id"], :name => "index_notes_on_author_id"
@@ -274,6 +274,14 @@ ActiveRecord::Schema.define(:version => 20130821090531) do
     t.datetime "updated_at",    :null => false
   end
 
+  create_table "service_key_service_relationships", :force => true do |t|
+    t.integer  "service_key_id",    :null => false
+    t.integer  "service_id",        :null => false
+    t.string   "code_access_state"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
+
   create_table "services", :force => true do |t|
     t.string   "type"
     t.string   "title"
@@ -285,20 +293,21 @@ ActiveRecord::Schema.define(:version => 20130821090531) do
     t.string   "project_url"
     t.string   "subdomain"
     t.string   "room"
+    t.string   "state"
   end
 
   add_index "services", ["project_id"], :name => "index_services_on_project_id"
 
   create_table "snippets", :force => true do |t|
     t.string   "title"
-    t.text     "content",    :limit => 2147483647
-    t.integer  "author_id",                                          :null => false
+    t.text     "content"
+    t.integer  "author_id",                    :null => false
     t.integer  "project_id"
-    t.datetime "created_at",                                         :null => false
-    t.datetime "updated_at",                                         :null => false
+    t.datetime "created_at",                   :null => false
+    t.datetime "updated_at",                   :null => false
     t.string   "file_name"
     t.datetime "expires_at"
-    t.boolean  "private",                          :default => true, :null => false
+    t.boolean  "private",    :default => true, :null => false
     t.string   "type"
   end
 
@@ -322,6 +331,38 @@ ActiveRecord::Schema.define(:version => 20130821090531) do
 
   create_table "tags", :force => true do |t|
     t.string "name"
+  end
+
+  create_table "team_group_relationships", :force => true do |t|
+    t.integer  "team_id"
+    t.integer  "group_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "team_project_relationships", :force => true do |t|
+    t.integer  "project_id"
+    t.integer  "team_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "team_user_relationships", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "team_id"
+    t.integer  "team_access"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  create_table "teams", :force => true do |t|
+    t.string   "name"
+    t.string   "path"
+    t.text     "description"
+    t.integer  "creator_id"
+    t.boolean  "public"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "user_team_group_relationships", :force => true do |t|

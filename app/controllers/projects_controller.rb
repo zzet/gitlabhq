@@ -63,6 +63,16 @@ class ProjectsController < Projects::ApplicationController
     @events = event_filter.apply_filter(@events)
     @events = @events.limit(limit).offset(params[:offset] || 0)
 
+    @owners     = @project.team.owners
+    @masters    = @project.team.masters     - @owners
+    @developers = @project.team.developers  - (@owners + @masters)
+    @reporters  = @project.team.reporters   - (@owners + @masters + @developers)
+    @guests     = @project.team.guests      - (@owners + @masters + @developers + @reporters)
+
+    @members_count = @owners.count + @masters.count + @developers.count + @reporters.count + @guests.count
+
+    @teams = (@project.teams + @project.group_teams).uniq
+
     # Ensure project default branch is set if it possible
     # Normally it defined on push or during creation
     @project.discover_default_branch

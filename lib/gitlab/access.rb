@@ -16,6 +16,11 @@ module Gitlab
         options.values
       end
 
+      def values_with_owner
+        options_with_owner.values
+      end
+
+
       def options
         {
           "Guest"     => GUEST,

@@ -200,7 +200,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "New user '#{@new_user.name}' was created")
   end
 
-  def created_user_team_user_team_email(notification)
+  def created_team_team_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -233,13 +233,13 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Group '#{@group.name}' was updated")
   end
 
-  def updated_group_user_team_group_relationship_email(notification)
+  def updated_group_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utgr         = @event.source
     @group        = @event.target
-    @team         = @utgr.user_team
+    @team         = @utgr.team
     @changes      = JSON.load(@event.data).to_hash["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'group',
@@ -428,7 +428,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user         = @event.author
     @banned_user  = @event.source
     data          = JSON.load(@event.data)
-    @teams        = data["teams"].map { |t| UserTeam.find_by_id(t["id"]) }.reject { |t| t.nil? }
+    @teams        = data["teams"].map { |t| Team.find_by_id(t["id"]) }.reject { |t| t.nil? }
     @projects     = data["projects"].map { |pr| Project.find_by_id(pr["id"]) }.reject { |pr| pr.nil? }
 
     headers 'X-Gitlab-Entity' => 'user',
@@ -470,7 +470,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@updated_user.name}' was updated")
   end
 
-  def updated_user_team_user_team_email(notification)
+  def updated_team_team_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -485,7 +485,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was updated")
   end
 
-  def updated_user_team_user_team_project_relationship_email(notification)
+  def updated_team_team_project_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -502,13 +502,13 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Default project access rules for team '#{@team.name}' was updated")
   end
 
-  def updated_user_team_user_team_group_relationship_email(notification)
+  def updated_team_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utgr         = @event.source
     @group        = @event.target
-    @team         = @utgr.user_team
+    @team         = @utgr.team
     @changes      = JSON.load(@event.data).to_hash["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'team',
@@ -520,13 +520,13 @@ class EventNotificationMailer < ActionMailer::Base
   end
 
 
-  def updated_project_user_team_project_relationship_email(notification)
+  def updated_project_team_project_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utpr         = @event.source
     @project      = @event.target
-    @team         = @utpr.user_team
+    @team         = @utpr.team
     @changes      = JSON.load(@event.data).to_hash["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'project',
@@ -537,7 +537,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Default project access rules for team '#{@team.name}' was updated")
   end
 
-  def updated_user_team_user_team_user_relationship_email(notification)
+  def updated_team_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -554,13 +554,13 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Membership settings for user '#{@member.name}' in team '#{@team.name}' was updated")
   end
 
-  def updated_user_user_team_user_relationship_email(notification)
+  def updated_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @source       = @event.source
     @member       = @event.target
-    @team         = @source.user_team
+    @team         = @source.team
     @changes      = JSON.load(@event.data).to_hash["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'team',
@@ -755,17 +755,17 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Group '#{@group["name"]}' was deleted")
   end
 
-  def deleted_user_team_user_relationship_user_team_user_relationship_email(notification)
+  def deleted_team_user_relationship_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     data          = JSON.load(@event.data).to_hash
     @user         = User.find_by_id(data["user_id"])
-    @team         = UserTeam.find_by_id(data["user_team_id"])
+    @team         = Team.find_by_id(data["team_id"])
 
     subscription_target = @notification.subscription.target
     source = case subscription_target
-             when UserTeam
+             when Team
                "team"
              when User
                "user"
@@ -787,17 +787,17 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
-  def deleted_user_team_group_relationship_user_team_group_relationship_email(notification)
+  def deleted_team_group_relationship_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     data          = JSON.load(@event.data).to_hash
     @group        = Group.find_by_id(data["group_id"])
-    @team         = UserTeam.find_by_id(data["user_team_id"])
+    @team         = Team.find_by_id(data["team_id"])
 
     subscription_target = @notification.subscription.target
     source = case subscription_target
-             when UserTeam
+             when Team
                "team"
              when User
                "user"
@@ -819,17 +819,17 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
-  def deleted_user_team_project_relationship_user_team_project_relationship_email(notification)
+  def deleted_team_project_relationship_team_project_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     data          = JSON.load(@event.data).to_hash
     @project      = Project.find_by_id(data["project_id"])
-    @team         = UserTeam.find_by_id(data["user_team_id"])
+    @team         = Team.find_by_id(data["team_id"])
 
     subscription_target = @notification.subscription.target
     source = case subscription_target
-             when UserTeam
+             when Team
                "team"
              when User
                "user"
@@ -902,7 +902,7 @@ class EventNotificationMailer < ActionMailer::Base
 
   end
 
-  def deleted_user_team_user_team_email(notification)
+  def deleted_team_team_email(notification)
     @notification = notification
     @event        = @notification.event
     data          = JSON.load(@event.data).to_hash
@@ -1074,13 +1074,13 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was added to '#{@project.path_with_namespace}' project")
   end
 
-  def joined_user_user_team_user_relationship_email(notification)
+  def joined_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utur         = @source = @event.source
     @tm           = @event.target
-    @team         = @utur.user_team
+    @team         = @utur.team
     @projects     = @team.projects
 
     headers 'X-Gitlab-Entity' => 'user',
@@ -1091,7 +1091,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@tm.username}' was added to '#{@team.name}' team")
   end
 
-  def joined_user_team_user_team_user_relationship_email(notification)
+  def joined_team_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -1131,7 +1131,7 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
-  def left_user_team_user_team_user_relationship_email(notification)
+  def left_team_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @up           = JSON.load(@event.data)
@@ -1168,7 +1168,7 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
-  def left_user_team_user_team_user_relationship_email(notification)
+  def left_team_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -1186,13 +1186,13 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
-  def left_user_user_team_user_relationship_email(notification)
+  def left_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utur         = JSON.load(@event.data)
     @member       = @event.target
-    @team         = UserTeam.find(@utur["user_team_id"])
+    @team         = Team.find(@utur["team_id"])
 
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'left',
@@ -1257,7 +1257,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@old_owner.path}/#{@project.path}] Project was moved from '#{@old_owner.path}' to '#{@new_owner.path}' namespace [transfered]")
   end
 
-  def transfer_user_team_user_team_email(notification)
+  def transfer_team_team_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -1465,13 +1465,13 @@ class EventNotificationMailer < ActionMailer::Base
   # Assigned action
   #
 
-  def assigned_project_user_team_project_relationship_email(notification)
+  def assigned_project_team_project_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utpr         = @event.source
     @project      = @event.target
-    @team         = @utpr.user_team
+    @team         = @utpr.team
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'assigned',
@@ -1481,7 +1481,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Team '#{@team.name}' was assigned to project")
   end
 
-  def assigned_user_team_user_team_project_relationship_email(notification)
+  def assigned_team_team_project_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -1497,17 +1497,17 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was assigned on '#{@project.path_with_namespace}' project")
   end
 
-  def created_user_team_project_relationship_user_team_project_relationship_email(notification)
+  def created_team_project_relationship_team_project_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utpr         = @source = @event.source
     @project      = @utpr.project
-    @team         = @utpr.user_team
+    @team         = @utpr.team
 
     subscription_target = @notification.subscription.target
     source = case subscription_target
-             when UserTeam
+             when Team
                "team"
              when User
                "user"
@@ -1527,19 +1527,19 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was assigned to '#{@project.path_with_namespace}' project")
   end
 
-  def updated_user_team_user_relationship_user_team_user_relationship_email(notification)
+  def updated_team_user_relationship_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utur         = @event.source
     @updated_user = @utur.user
-    @team         = @utur.user_team
+    @team         = @utur.team
     @data         = JSON.load(@event.data).to_hash
     @changes      = @data["previous_changes"]
 
     subscription_target = @notification.subscription.target
     source = case subscription_target
-             when UserTeam
+             when Team
                "team"
              when User
                "user"
@@ -1559,17 +1559,17 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team membership in '#{@team.name}' team for '#{@updated_user.name}' user was updated")
   end
 
-  def updated_user_team_group_relationship_user_team_group_relationship_email(notification)
+  def updated_team_group_relationship_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utgr         = @event.source
     @group        = @utgr.group
-    @team         = @utgr.user_team
+    @team         = @utgr.team
 
     subscription_target = @notification.subscription.target
     source = case subscription_target
-             when UserTeam
+             when Team
                "team"
              when User
                "user"
@@ -1589,18 +1589,18 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Assignation of '#{@team.name}' team on '#{@group.name}' group was updated")
   end
 
-  def created_user_team_user_relationship_user_team_user_relationship_email(notification)
+  def created_team_user_relationship_team_user_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utur         = @event.source
     @added_user   = @utur.user
-    @team         = @utur.user_team
+    @team         = @utur.team
     @projects     = @team.projects.with_user(@notification.subscriber)
 
     subscription_target = @notification.subscription.target
     source = case subscription_target
-             when UserTeam
+             when Team
                "team"
              when User
                "user"
@@ -1620,17 +1620,17 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@added_user.name}' was added to '#{@team.name}' team")
   end
 
-  def created_user_team_group_relationship_user_team_group_relationship_email(notification)
+  def created_team_group_relationship_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utgr         = @event.source
     @group        = @utgr.group
-    @team         = @utgr.user_team
+    @team         = @utgr.team
 
     subscription_target = @notification.subscription.target
     source = case subscription_target
-             when UserTeam
+             when Team
                "team"
              when User
                "user"
@@ -1650,13 +1650,13 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was assigned to '#{@group.name}' group")
   end
 
-  def assigned_group_user_team_group_relationship_email(notification)
+  def assigned_group_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @utgr         = @event.source
     @group        = @event.target
-    @team         = @utgr.user_team
+    @team         = @utgr.team
 
     headers 'X-Gitlab-Entity' => 'group',
             'X-Gitlab-Action' => 'created',
@@ -1666,7 +1666,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was assigned to '#{@group.name}' group")
   end
 
-  def joined_user_team_user_team_group_relationship_email(notification)
+  def joined_team_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -1682,7 +1682,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was assigned to '#{@group.name}' group")
   end
 
-  def assigned_user_team_user_team_group_relationship_email(notification)
+  def assigned_team_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -1753,12 +1753,12 @@ class EventNotificationMailer < ActionMailer::Base
   # Reassigned action
   #
 
-  def reassigned_project_user_team_project_relationship_email(notification)
+  def reassigned_project_team_project_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @source       = JSON.load(@event.data).to_hash
-    @team         = UserTeam.find(@source["user_team_id"])
+    @team         = Team.find(@source["team_id"])
     @project      = @event.target
 
     headers 'X-Gitlab-Entity' => 'project',
@@ -1769,7 +1769,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Team '#{@team.name}' was resigned from project")
   end
 
-  def resigned_user_team_user_team_project_relationship_email(notification)
+  def resigned_team_team_project_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -1787,7 +1787,7 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
-  def left_user_team_user_team_group_relationship_email(notification)
+  def left_team_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -1803,12 +1803,12 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was resigned from '#{@group.name}' group")
   end
 
-  def resigned_group_user_team_group_relationship_email(notification)
+  def resigned_group_team_group_relationship_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
     @source       = JSON.load(@event.data).to_hash
-    @team         = UserTeam.find(@source["user_team_id"])
+    @team         = Team.find(@source["team_id"])
     @group        = @event.target
 
     headers 'X-Gitlab-Entity' => 'group',

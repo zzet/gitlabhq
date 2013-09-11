@@ -14,10 +14,9 @@
 class UsersProject < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
-  include Notifiable
   include Gitlab::Access
 
-  attr_accessible :user, :user_id, :project_access
+  attr_accessible :user, :user_id, :project_access, :source_id, :source_type, :source
 
   belongs_to :user
   belongs_to :project
@@ -40,6 +39,7 @@ class UsersProject < ActiveRecord::Base
   scope :reporters, -> { where(project_access: REPORTER) }
   scope :developers, -> { where(project_access: DEVELOPER) }
   scope :masters,  -> { where(project_access: MASTER) }
+  scope :owners,  -> { where(project_access: OWNER) }
 
   scope :in_project, ->(project) { where(project_id: project.id) }
   scope :in_projects, ->(projects) { where(project_id: projects) }
@@ -67,7 +67,7 @@ class UsersProject < ActiveRecord::Base
     #     :master
     #   )
     #
-    def add_users_into_projects(project_ids, user_ids, access)
+    def add_users_into_projects(project_ids, user_ids, access, source = self)
       project_access = if roles_hash.has_key?(access)
                          roles_hash[access]
                        elsif roles_hash.values.include?(access.to_i)
@@ -79,7 +79,7 @@ class UsersProject < ActiveRecord::Base
       UsersProject.transaction do
         project_ids.each do |project_id|
           user_ids.each do |user_id|
-            users_project = UsersProject.new(project_access: project_access, user_id: user_id)
+            users_project = UsersProject.new(project_access: project_access, user_id: user_id, source: source)
             users_project.project_id = project_id
             users_project.save
           end

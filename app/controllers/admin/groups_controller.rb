@@ -10,7 +10,7 @@ class Admin::GroupsController < Admin::ApplicationController
   def show
     @group_projects = @group.projects
     @members = @group.users
-    @teams = @group.user_teams
+    @teams = @group.teams
 
     @projects = Project.scoped
     @projects = @projects.not_in_group(@group) if @group.projects.present?
@@ -18,7 +18,7 @@ class Admin::GroupsController < Admin::ApplicationController
     @projects.reject!(&:empty_repo?)
 
     @users = User.active
-    @available_teams = group.user_teams.any? ? UserTeam.where("id not in (?)", group.user_teams) : UserTeam.scoped
+    @available_teams = group.teams.any? ? Team.where("id not in (?)", group.teams) : Team.scoped
 
     session[:redirect_to] = admin_group_path(@group)
   end

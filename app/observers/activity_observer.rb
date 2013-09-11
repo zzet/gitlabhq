@@ -10,10 +10,10 @@ class ActivityObserver < ActiveRecord::Observer
           :service,         # +
           :snippet,         # +
           :user,            # +
-          :user_team,       # +
-          :user_team_project_relationship,
-          :user_team_group_relationship,
-          :user_team_user_relationship,
+          :team,       # +
+          :team_project_relationship,
+          :team_group_relationship,
+          :team_user_relationship,
           :users_project,   # +
           :project_hook,    # +
           :system_hook

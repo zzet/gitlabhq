@@ -7,12 +7,20 @@
     = link_to '#groups', 'data-toggle' => 'tab', id: 'sidebar-groups-tab' do
       Groups
       %span.badge= @groups.count
+  %li
+    = link_to '#teams', 'data-toggle' => 'tab', id: 'sidebar-teams-tab' do
+      Teams
+      %span.badge= @teams.count
+
 
 .tab-content
   .tab-pane.active#projects
-    = render "projects", projects: @projects
+    = render "projects", projects: @projects, authorized_projects: @authorized_projects
   .tab-pane#groups
     = render "groups", groups: @groups
+  .tab-pane#teams
+    = render "teams", teams: @teams
+
 
 .prepend-top-20
   %span.rss-icon

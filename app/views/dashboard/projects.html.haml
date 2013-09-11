@@ -26,7 +26,6 @@
           %span.pull-right
             = current_user.owned_projects.count
 
-
     - if @groups.present?
       %fieldset
         %legend Groups
@@ -39,7 +38,17 @@
                 %small.pull-right
                   = group.projects.count
 
-
+    - if @teams.present?
+      %fieldset
+        %legend Teams
+        %ul.bordered-list
+          - @teams.each do |team|
+            %li{ class: (team.name == params[:team]) ? 'active' : 'light' }
+              = link_to projects_dashboard_path(team: team.name) do
+                %i.icon-folder-close-alt
+                = team.name
+                %small.pull-right
+                  = team.projects.count
 
     - if @labels.present?
       %fieldset

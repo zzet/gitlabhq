@@ -3,10 +3,14 @@
     = link_to edit_project_path(@project), class: "stat-tab tab " do
       %i.icon-edit
       Edit Project
-  = nav_link(controller: [:team_members, :teams]) do
+  = nav_link(controller: [:team_members, :projects]) do
     = link_to project_team_index_path(@project), class: "team-tab tab" do
       %i.icon-group
       Members
+  = nav_link(controller: [:teams, :projects]) do
+    = link_to project_teams_path(@project), class: "team-tab tab" do
+      %i.icon-group
+      Teams
   = nav_link(controller: :deploy_keys) do
     = link_to project_deploy_keys_path(@project) do
       %span

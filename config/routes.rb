@@ -83,6 +83,8 @@ Gitlab::Application.routes.draw do
       end
     end
 
+    resources :teams
+
     resources :hooks, only: [:index, :create, :destroy] do
       get :test
     end
@@ -153,8 +155,20 @@ Gitlab::Application.routes.draw do
   resource :dashboard, controller: "dashboard", only: [:show] do
     member do
       get :projects
+      get :teams
       get :issues
       get :merge_requests
+    end
+  end
+
+  #
+  # Teams Area
+  #
+  resources :teams do
+    scope module: :teams do
+      resources :members,   only: [:index, :create, :update, :destroy]
+      resources :projects,  only: [:index, :create, :destroy]
+      resources :groups,    only: [:index, :create, :destroy]
     end
   end
 
@@ -167,6 +181,7 @@ Gitlab::Application.routes.draw do
       get :merge_requests
       get :members
     end
+
     scope module: :groups do
       resources :teams
     end
@@ -201,11 +216,11 @@ Gitlab::Application.routes.draw do
       resources :graphs, only: [:show], constraints: {id: /(?:[^.]|\.(?!json$))+/, format: /json/}
       match "/compare/:from...:to" => "compare#show", as: "compare", via: [:get, :post], constraints: {from: /.+/, to: /.+/}
 
-        resources :snippets do
-          member do
-            get "raw"
-          end
+      resources :snippets do
+        member do
+          get "raw"
         end
+      end
 
       resources :wikis, only: [:show, :edit, :destroy, :create] do
         collection do
@@ -293,6 +308,8 @@ Gitlab::Application.routes.draw do
       end
 
       resources :team, controller: 'team_members', only: [:index]
+      resources :teams, only: [:index, :create, :destroy]
+
       resources :milestones, except: [:destroy]
 
       resources :labels, only: [:index] do

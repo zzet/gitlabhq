@@ -1,0 +1,15 @@
+.ui-box
+  .title.clearfix
+    = search_field_tag :filter_member, nil, placeholder: 'Filter by name', class: 'dash-filter'
+    - if can? current_user, :manage_group, @group
+      %span.pull-right
+        = link_to members_group_path(@group), class: "btn btn-new" do
+          %i.icon-plus
+            Add member
+  %ul.well-list.dash-list
+    - members.each do |member|
+      %li.member-row
+        = render "member", member: member, member_role: @group.human_access_for(member)
+    - if members.blank?
+      %li
+        %h3.nothing_here_message You have no members yet.

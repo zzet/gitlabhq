@@ -87,7 +87,7 @@ class User < ActiveRecord::Base
   has_many :projects,                 through: :users_projects
   has_many :personal_projects,        through: :namespace, source: :projects
   has_many :own_projects,             foreign_key: :creator_id, class_name: Project
-  has_many :owned_projects,           through: :namespaces, source: :projects
+  has_many :accessed_projects,        through: :namespaces, source: :projects
   has_many :groups_projects,          through: :groups, source: :projects
   has_many :master_projects,          through: :users_projects, source: :project,
                                       conditions: { users_projects: { project_access: UsersProject::MASTER } }
@@ -100,15 +100,17 @@ class User < ActiveRecord::Base
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: MergeRequest
 
   # Teams
-  has_many :own_teams,                            dependent: :destroy, foreign_key: :owner_id, class_name: UserTeam
-  has_many :user_team_user_relationships,         dependent: :destroy
-  has_many :user_teams,                           through: :user_team_user_relationships
-  has_many :user_team_project_relationships,      through: :user_teams
-  has_many :team_projects,                        through: :user_team_project_relationships
-  has_many :user_team_group_relationships,        through: :user_teams
-  has_many :master_user_team_group_relationships, through: :user_teams, conditions: { user_team_user_relationships: { group_admin: true } }, source: :user_team_group_relationships
-  has_many :team_groups,                          through: :user_team_group_relationships, source: :group
-  has_many :master_team_groups,                   through: :master_user_team_group_relationships, source: :group
+  has_many :team_user_relationships,         dependent: :destroy
+  has_many :teams,                           through: :team_user_relationships
+  has_many :personal_teams,                  through: :team_user_relationships, foreign_key: :creator_id, source: :team
+  has_many :own_teams,                       through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
+  has_many :maser_teams,                     through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
+  has_many :team_project_relationships,      through: :teams
+  has_many :team_group_relationships,        through: :teams
+  has_many :team_projects,                   through: :team_project_relationships
+  has_many :team_groups,                     through: :team_group_relationships,        source: :group
+  has_many :master_team_group_relationships, through: :teams, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team_group_relationships
+  has_many :master_team_groups,              through: :master_team_group_relationships, source: :group
 
   # Events
   has_many :events,                   as: :source
@@ -260,8 +262,9 @@ class User < ActiveRecord::Base
     own_teams
   end
 
-  def owned_teams
-    own_teams
+  def owned_projects
+    @project_ids ||= (Project.where(namespace_id: owned_groups).pluck(:id) + master_projects.pluck(:id) + accessed_projects.pluck(:id)).uniq
+    Project.where(id: @project_ids)
   end
 
   # Groups user has access to
@@ -270,16 +273,12 @@ class User < ActiveRecord::Base
     unless self.admin?
       agroups = personal_groups
     end
-    @authorized_groups ||= agroups
+    agroups
   end
 
   def personal_groups
     @group_ids ||= (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
     Group.where(id: @group_ids).order('namespaces.name ASC')
-  end
-
-  # Groups user has access to
-  def authorized_groups
   end
 
   def authorized_namespaces
@@ -301,16 +300,16 @@ class User < ActiveRecord::Base
   end
 
   def authorized_teams
-    ateams = UserTeam.scoped
+    ateams = Team.scoped
     unless self.admin?
-      ateams = personal_teams
+      ateams = known_projects
     end
     ateams
   end
 
-  def personal_teams
-    @team_ids ||= (user_teams.pluck(:id) + own_teams.pluck(:id)).uniq
-    UserTeam.where(id: @team_ids)
+  def known_teams
+    @known_teams_ids ||= (personal_teams.pluck(:id) + teams.pluck(:id) + Team.public.pluck(:id)).uniq
+    Team.where(id: @known_teams_ids)
   end
 
   # Team membership in authorized projects

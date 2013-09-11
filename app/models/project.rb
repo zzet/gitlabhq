@@ -29,6 +29,7 @@ require "grit"
 class Project < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
+  include Gitlab::Access
 
   extend Enumerize
 
@@ -70,10 +71,22 @@ class Project < ActiveRecord::Base
   has_many :protected_branches, dependent: :destroy
 
   has_many :file_tokens,        dependent: :destroy
-  has_many :user_team_project_relationships, dependent: :destroy
 
-  has_many :users_projects, dependent: :destroy
-  has_many :users, through: :users_projects
+  has_many :team_project_relationships, dependent: :destroy
+  has_many :teams,                      through: :team_project_relationships
+
+  has_many :team_group_relationships,   through: :group
+  has_many :group_teams,                through: :team_group_relationships, source: :team
+
+  has_many :users, through: :users_projects, conditions: { users: { state: :active } }
+
+  has_many :users_projects,           dependent: :destroy
+  has_many :users_groups,             through: :group
+  has_many :team_user_relationships,  through: :teams
+
+  has_many :core_members,             through: :users_projects,          source: :user, conditions: { users: { state: :active } }
+  has_many :groups_members,           through: :users_groups,            source: :user, conditions: { users: { state: :active } }
+  has_many :teams_members,            through: :team_user_relationships, source: :user, conditions: { users: { state: :active } }
 
   has_many :deploy_keys_projects, dependent: :destroy
   has_many :deploy_keys, through: :deploy_keys_projects
@@ -423,12 +436,6 @@ class Project < ActiveRecord::Base
     [Gitlab.config.gitlab.git_url, "/", path_with_namespace, ".git"].join('')
   end
 
-
-  def project_access_human(member)
-    project_user_relation = self.users_projects.find_by_user_id(member.id)
-    self.class.access_options.key(project_user_relation.project_access)
-  end
-
   # Check if current branch name is marked as protected in the system
   def protected_branch? branch_name
     protected_branches_names.include?(branch_name)
@@ -479,7 +486,7 @@ class Project < ActiveRecord::Base
   # Thus it will automatically generate a new fragment
   # when the event is updated because the key changes.
   def reset_events_cache
-    Event.where(project_id: self.id).
+    OldEvent.where(project_id: self.id).
       order('id DESC').limit(100).
       update_all(updated_at: Time.now)
   end

@@ -1,12 +1,12 @@
 = render 'clone_panel'
 
 .row
-  .span9
+  .span8
     = render "events/event_last_push", event: @last_push
     = render 'shared/event_filter'
     .content_list
     .loading.hide
-  .span3
+  .span4
     .light-well
       %h3.page-title
         = @project.name
@@ -45,3 +45,6 @@
         %hr
         = link_to @project.gitlab_ci_service.builds_path do
           = image_tag @project.gitlab_ci_service.status_img_path, alt: "build status"
+
+    %hr
+    = render "sidebar"

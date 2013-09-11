@@ -92,7 +92,7 @@ class MergeRequest < ActiveRecord::Base
   validate :validate_branches
 
   scope :of_group, ->(group) { where("source_project_id in (:group_project_ids) OR target_project_id in (:group_project_ids)", group_project_ids: group.project_ids) }
-  scope :of_user_team, ->(team) { where("(source_project_id in (:team_project_ids) OR target_project_id in (:team_project_ids) AND assignee_id in (:team_member_ids))", team_project_ids: team.project_ids, team_member_ids: team.member_ids) }
+  scope :of_team, ->(team) { where("(source_project_id in (:team_project_ids) OR target_project_id in (:team_project_ids) AND assignee_id in (:team_member_ids))", team_project_ids: team.project_ids, team_member_ids: team.member_ids) }
   scope :opened, -> { with_state(:opened) }
   scope :closed, -> { with_state(:closed) }
   scope :merged, -> { with_state(:merged) }

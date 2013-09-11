@@ -29,7 +29,7 @@ class Gitlab::Event::Notification::Creator::User < Gitlab::Event::Notification::
 
     teams = data["teams"]
     teams.each do |team|
-      team = UserTeam.find_by_id(team["id"])
+      team = Team.find_by_id(team["id"])
       if team.present?
         subscriptions = ::Event::Subscription.by_target(team).by_source_type(event.source_type)
         subscriptions.each do |subscription|

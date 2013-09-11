@@ -122,8 +122,8 @@ class Gitlab::Event::Notification::Creator::Default
       when Group
         ug = user.groups.find(entity)
         has_access = has_access || ug.present?
-      when UserTeam
-        ut = user.user_teams.find(entity)
+      when Team
+        ut = user.teams.find(entity)
         has_access = has_access || ut.present?
       else
         has_access = true

@@ -18,23 +18,6 @@ module Projects
           old_namespace = project.namespace
 
           if transfer_to(namespace)
-            # Remove all teams assignations
-            case old_namespace
-            when Group
-              old_namespace.user_teams
-            when User
-              project.user_teams
-            end.each { |team| Gitlab::UserTeamManager.resign(team, project) }
-
-            # Assign group teams to projects in group
-            case namespace
-            when Group
-              namespace.user_teams.each do |team|
-                access = team.max_project_access_in_group(namespace)
-                Gitlab::UserTeamManager.assign(team, project, access)
-              end
-            end
-
             receive_delayed_notifications
           end
         end

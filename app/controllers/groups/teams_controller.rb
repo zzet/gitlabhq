@@ -3,11 +3,11 @@ class Groups::TeamsController < Groups::ApplicationController
   before_filter :authorize_admin_group!, only: [:new, :edit, :create, :update, :destroy]
 
   def index
-    @teams = group.user_teams
+    @teams = group.teams
   end
 
   def new
-    @available_teams = current_user.admin? ? (group.user_teams.any? ? UserTeam.where("id not in (?)", group.user_teams) : UserTeam.scoped) : current_user.authorized_teams
+    @available_teams = current_user.admin? ? (group.teams.any? ? Team.where("id not in (?)", group.teams) : Team.scoped) : current_user.authorized_teams
     session[:redirect_to] = request.referer
     if @available_teams.blank?
       flash[:notice] = "No available teams for adding to group"
@@ -43,6 +43,6 @@ class Groups::TeamsController < Groups::ApplicationController
   protected
 
   def team
-    @team ||= (params[:id].present? ? UserTeam.find_by_path(params[:id]) : UserTeam.find(params[:team_id]))
+    @team ||= (params[:id].present? ? Team.find_by_path(params[:id]) : Team.find(params[:team_id]))
   end
 end

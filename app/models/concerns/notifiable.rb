@@ -6,10 +6,9 @@ module Notifiable
   extend ActiveSupport::Concern
 
   included do
-    validates :notification_level, inclusion: { in: Notification.project_notification_levels }, presence: true
+    validates :notification_level, presence: true
   end
 
   def notification
-    @notification ||= Notification.new(self)
   end
 end

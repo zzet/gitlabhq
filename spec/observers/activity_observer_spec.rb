@@ -568,13 +568,13 @@ describe ActivityObserver do
 
 
   #
-  # Observe UserTeam changes
+  # Observe Team changes
   #
 
-  describe "UserTeam events" do
+  describe "Team events" do
     before do
       ActiveRecord::Base.observers.disable :all
-      UserTeam.observers.enable :activity_observer
+      Team.observers.enable :activity_observer
 
       @user = create :user
 
@@ -584,47 +584,47 @@ describe ActivityObserver do
     it "Should generate :created event" do
 
       data = notification_data_for(/gitlab/) do
-        @user_team = create(:user_team, owner: @user)
+        @team = create(:team, owner: @user)
       end
 
       data[:name].should match(/created/)
-      data[:data][:source].should be_kind_of ::UserTeam
+      data[:data][:source].should be_kind_of ::Team
     end
 
     it "Should generate :updated event" do
-      @user_team = create(:user_team, owner: @user)
+      @team = create(:team, owner: @user)
 
       data = notification_data_for(/gitlab/) do
-        @user_team.name = "#{@user_team.name}_updated"
-        @user_team.save
+        @team.name = "#{@team.name}_updated"
+        @team.save
       end
 
       data[:name].should match(/updated/)
-      data[:data][:source].should be_kind_of ::UserTeam
+      data[:data][:source].should be_kind_of ::Team
     end
 
     it "Should generate :deleted event" do
-      @user_team = create(:user_team, owner: @user)
+      @team = create(:team, owner: @user)
 
       data = notification_data_for(/gitlab/) do
-        @user_team.destroy
+        @team.destroy
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:source].should be_kind_of ::UserTeam
+      data[:data][:source].should be_kind_of ::Team
     end
 
   end
 
 
   #
-  # Observe UserTeamProjectRelationship changes
+  # Observe TeamProjectRelationship changes
   #
 
-  describe "UserTeamProjectRelationship events" do
+  describe "TeamProjectRelationship events" do
     before do
       ActiveRecord::Base.observers.disable :all
-      UserTeamProjectRelationship.observers.enable :activity_observer
+      TeamProjectRelationship.observers.enable :activity_observer
 
       @user = create :user
 
@@ -634,47 +634,47 @@ describe ActivityObserver do
     it "Should generate :created event" do
 
       data = notification_data_for(/gitlab/) do
-        @user_team_project_relationship = create(:user_team_project_relationship, project: @project)
+        @team_project_relationship = create(:team_project_relationship, project: @project)
       end
 
       data[:name].should match(/created/)
-      data[:data][:source].should be_kind_of ::UserTeamProjectRelationship
+      data[:data][:source].should be_kind_of ::TeamProjectRelationship
     end
 
     it "Should generate :updated event" do
-      @user_team_project_relationship = create(:user_team_project_relationship, project: @project)
+      @team_project_relationship = create(:team_project_relationship, project: @project)
 
       data = notification_data_for(/gitlab/) do
-        @user_team_project_relationship.greatest_access = (UsersProject.access_roles.values - [@user_team_project_relationship.greatest_access]).first
-        @user_team_project_relationship.save
+        @team_project_relationship.greatest_access = (UsersProject.access_roles.values - [@team_project_relationship.greatest_access]).first
+        @team_project_relationship.save
       end
 
       data[:name].should match(/updated/)
-      data[:data][:source].should be_kind_of ::UserTeamProjectRelationship
+      data[:data][:source].should be_kind_of ::TeamProjectRelationship
     end
 
     it "Should generate :deleted event" do
-      @user_team_project_relationship = create(:user_team_project_relationship, project: @project)
+      @team_project_relationship = create(:team_project_relationship, project: @project)
 
       data = notification_data_for(/gitlab/) do
-        @user_team_project_relationship.destroy
+        @team_project_relationship.destroy
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:source].should be_kind_of ::UserTeamProjectRelationship
+      data[:data][:source].should be_kind_of ::TeamProjectRelationship
     end
 
   end
 
 
   #
-  # Observe UserTeamUserRelationship changes
+  # Observe TeamUserRelationship changes
   #
 
-  describe "UserTeamUserRelationship events" do
+  describe "TeamUserRelationship events" do
     before do
       ActiveRecord::Base.observers.disable :all
-      UserTeamUserRelationship.observers.enable :activity_observer
+      TeamUserRelationship.observers.enable :activity_observer
 
       @user = create :user
 
@@ -684,34 +684,34 @@ describe ActivityObserver do
     it "Should generate :created event" do
 
       data = notification_data_for(/gitlab/) do
-        @user_team_user_relationship = create(:user_team_user_relationship, user: @user)
+        @team_user_relationship = create(:team_user_relationship, user: @user)
       end
 
       data[:name].should match(/created/)
-      data[:data][:source].should be_kind_of ::UserTeamUserRelationship
+      data[:data][:source].should be_kind_of ::TeamUserRelationship
     end
 
     it "Should generate :updated event" do
-      @user_team_user_relationship = create(:user_team_user_relationship, user: @user)
+      @team_user_relationship = create(:team_user_relationship, user: @user)
 
       data = notification_data_for(/gitlab/) do
-        @user_team_user_relationship.permission = (UsersProject.access_roles.values - [@user_team_user_relationship.permission]).first
-        @user_team_user_relationship.save
+        @team_user_relationship.permission = (UsersProject.access_roles.values - [@team_user_relationship.permission]).first
+        @team_user_relationship.save
       end
 
       data[:name].should match(/updated/)
-      data[:data][:source].should be_kind_of ::UserTeamUserRelationship
+      data[:data][:source].should be_kind_of ::TeamUserRelationship
     end
 
     it "Should generate :deleted event" do
-      @user_team_user_relationship = create(:user_team_user_relationship, user: @user)
+      @team_user_relationship = create(:team_user_relationship, user: @user)
 
       data = notification_data_for(/gitlab/) do
-        @user_team_user_relationship.destroy
+        @team_user_relationship.destroy
       end
 
       data[:name].should match(/deleted/)
-      data[:data][:source].should be_kind_of ::UserTeamUserRelationship
+      data[:data][:source].should be_kind_of ::TeamUserRelationship
     end
 
   end

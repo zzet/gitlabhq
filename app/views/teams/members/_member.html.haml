@@ -1,0 +1,25 @@
+- user = member.user
+- return unless user
+%li{class: "#{dom_class(member)} js-toggle-container", id: dom_id(member)}
+  = image_tag gravatar_icon(user.email, 16), class: "avatar s16"
+  %strong= user.name
+  %span.cgray= user.username
+  - if user == current_user
+    %span.label.label-success It's you
+
+  %span.pull-right
+    %strong= member.human_access
+
+    - if show_controls && user != team.creator && user != current_user
+      = link_to '#', class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
+        %i.icon-edit
+      = link_to team_member_path(team, member), confirm: remove_user_from_team_message(team, user), method: :delete, remote: true, class: "btn-tiny btn btn-remove", title: 'Remove user from team' do
+        %i.icon-minus.icon-white
+    - if user == team.creator
+      %strong Owner
+
+  .edit-member.hide.js-toggle-content
+    = form_for member, url: team_member_path(team, member), remote: true do |f|
+      .alert.prepend-top-20
+        = f.select :team_access, options_for_select(Team.access_roles, member.team_access)
+        = f.submit 'Save', class: 'btn btn-save'

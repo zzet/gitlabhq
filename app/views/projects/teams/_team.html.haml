@@ -1,0 +1,9 @@
+%li
+  - if team.public
+    = public_icon
+  - else
+    = private_icon
+  = link_to team.name, team
+  .pull-right
+    = link_to 'Members', team_members_path(team), id: "edit_#{dom_id(team)}", class: "btn btn-small"
+    = link_to 'Remove', project_team_path(@project, team), confirm: remove_project_from_team_message(team, @project), method: :delete, class: "btn btn-small btn-remove"

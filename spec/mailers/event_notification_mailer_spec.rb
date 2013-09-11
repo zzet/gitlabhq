@@ -20,7 +20,7 @@ describe EventNotificationMailer do
 
   let(:project) { pr = create :project, creator: @another_user, path: 'gitlabhq', namespace_id: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; pr }
   let(:group)   { g = create :group, owner: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; g }
-  let(:team)    { t = create :user_team, owner: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; t }
+  let(:team)    { t = create :team, owner: @another_user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; t }
   let(:user)    { u = create :user; ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset; u }
 
   describe "Project mails" do
@@ -120,19 +120,19 @@ describe EventNotificationMailer do
     end
 
     it "should send email about create merge request in project" do
-      merge_request = create :merge_request, project: project
+      merge_request = create :merge_request, source_project: project, target_project: project
 
       ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about create assigned merge request in project" do
-      merge_request = create :merge_request, project: project, assignee: @user
+      merge_request = create :merge_request, source_project: project, target_project: project, assignee: @user
 
       ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about add note in project merge request" do
-      merge_request = create :merge_request, project: project
+      merge_request = create :merge_request, source_project: project, target_project: project
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
@@ -142,7 +142,7 @@ describe EventNotificationMailer do
     end
 
     it "should send email about update merge request in project" do
-      merge_request = create :merge_request, project: project
+      merge_request = create :merge_request, source_project: project, target_project: project
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
@@ -153,7 +153,7 @@ describe EventNotificationMailer do
     end
 
     it "should send email about merge merge request in project" do
-      merge_request = create :merge_request, project: project
+      merge_request = create :merge_request, source_project: project, target_project: project
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
@@ -163,7 +163,7 @@ describe EventNotificationMailer do
     end
 
     it "should send email about merge merge request in project" do
-      merge_request = create :merge_request, project: project
+      merge_request = create :merge_request, source_project: project, target_project: project
       merge_request.close
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
@@ -216,22 +216,6 @@ describe EventNotificationMailer do
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
       ::Projects::TransferContext.new(@another_user, project_in_group, new_group).execute
-
-      ActionMailer::Base.deliveries.count.should == 1
-    end
-
-    it "should send email about project transfer from user to global namespace" do
-      ::Projects::TransferContext.new(@another_user, project, Namespace.global_id).execute
-
-      ActionMailer::Base.deliveries.count.should == 1
-    end
-
-    it "should send email about project transfer from group to global namespace" do
-      project_in_group = create :project, creator: @another_user, namespace_id: group.id
-
-      ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
-
-      ::Projects::TransferContext.new(@another_user, project_in_group, Namespace.global_id).execute
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -364,13 +348,13 @@ describe EventNotificationMailer do
     end
   end
 
-  describe "UserTeams emails" do
+  describe "Teams emails" do
     before do
-      SubscriptionService.subscribe(@user, :all, :user_team, :all)
+      SubscriptionService.subscribe(@user, :all, :team, :all)
     end
 
     it "should send email about create team" do
-      new_team = create :user_team, owner: @another_user
+      new_team = create :team, owner: @another_user
       ActionMailer::Base.deliveries.count.should == 1
     end
 
@@ -397,8 +381,8 @@ describe EventNotificationMailer do
       user1 = create :user
       user2 = create :user
 
-      Gitlab::UserTeamManager.add_member_into_team(team, user1, UsersProject::MASTER, true)
-      Gitlab::UserTeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
+      Gitlab::TeamManager.add_member_into_team(team, user1, UsersProject::MASTER, true)
+      Gitlab::TeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 
@@ -429,7 +413,7 @@ describe EventNotificationMailer do
 
       params = { user_ids: user3.id.to_s, permission: UsersProject::MASTER, group_admin: false }
       ::Teams::Users::CreateRelationContext.new(@another_user, team, params).execute
-      Gitlab::UserTeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
+      Gitlab::TeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
 
       ActionMailer::Base.deliveries.count.should == 1
     end
@@ -478,8 +462,8 @@ describe EventNotificationMailer do
       user1 = create :user
       user2 = create :user
 
-      Gitlab::UserTeamManager.add_member_into_team(team, user1, UsersProject::MASTER, true)
-      Gitlab::UserTeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
+      Gitlab::TeamManager.add_member_into_team(team, user1, UsersProject::MASTER, true)
+      Gitlab::TeamManager.add_member_into_team(team, user2, UsersProject::DEVELOPER, false)
 
       ActionMailer::Base.deliveries.clear; EventHierarchyWorker.reset
 

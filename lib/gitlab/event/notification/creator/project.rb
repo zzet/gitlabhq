@@ -120,7 +120,7 @@ class Gitlab::Event::Notification::Creator::Project < Gitlab::Event::Notificatio
   def create_teams_notifications(group, event)
     notifications = []
 
-    teams = group.user_teams
+    teams = group.teams
     teams.each do |team|
       subscriptions = ::Event::Subscription.by_target(team).by_source_type(event.source_type)
       subscriptions.each do |subscription|

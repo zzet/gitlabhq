@@ -1,0 +1,22 @@
+.ui-box
+  .title.clearfix
+    = search_field_tag :filter_team, nil, placeholder: 'Filter by name', class: 'dash-filter'
+    - if can? current_user, :manage_group, @group
+      %span.pull-right
+        = link_to new_group_team_path(@group), class: "btn btn-new" do
+          %i.icon-plus
+          Assign team
+  %ul.well-list.dash-list
+    - teams.each do |team|
+      %li.group-row
+        = link_to team_path(id: team.path), class: dom_class(team) do
+          %span.group-name.filter-title
+            = truncate(team.name, length: 35)
+          %span.arrow
+            %i.icon-angle-right
+          %span.owner-info
+            %span Creator:
+            %span.owner= team.creator_name
+    - if teams.blank?
+      %li
+        %h3.nothing_here_message You have no teams yet.

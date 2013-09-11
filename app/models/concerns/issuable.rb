@@ -13,6 +13,8 @@ module Issuable
     belongs_to :assignee, class_name: User
     belongs_to :milestone
 
+    has_many :notes, as: :noteable
+
     has_many :events,         as: :source
     has_many :subscriptions,  as: :target, class_name: Event::Subscription
     has_many :notifications,  through: :subscriptions

@@ -1,4 +1,4 @@
-class MergeRequestObserver < ActivityObserver
+class MergeRequestObserver < OldActivityObserver
   observe :merge_request
 
   def after_create(merge_request)

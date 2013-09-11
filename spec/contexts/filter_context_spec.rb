@@ -24,15 +24,15 @@ describe FilterContext do
 
     it 'should by default filter properly' do
       merge_requests = user.cared_merge_requests
-      params ={}
-      merge_requests = FilterContext.new(merge_requests, params).execute
+      params = {}
+      merge_requests = FilterContext.new(user, merge_requests, params).execute
       merge_requests.size.should == 3
     end
 
     it 'should apply blocks passed in on creation to the filters' do
       merge_requests = user.cared_merge_requests
       params = {:project_id => project1.id}
-      merge_requests = FilterContext.new(merge_requests, params).execute
+      merge_requests = FilterContext.new(user, merge_requests, params).execute
       merge_requests.size.should == 1
     end
   end
@@ -46,13 +46,13 @@ describe FilterContext do
     it 'should by default filter projects properly' do
       issues = user.assigned_issues
       params = {}
-      issues = FilterContext.new(issues, params).execute
+      issues = FilterContext.new(user, issues, params).execute
       issues.size.should == 2
     end
     it 'should apply blocks passed in on creation to the filters' do
       issues = user.assigned_issues
       params = {:project_id => project1.id}
-      issues = FilterContext.new(issues, params).execute
+      issues = FilterContext.new(user, issues, params).execute
       issues.size.should == 1
     end
   end

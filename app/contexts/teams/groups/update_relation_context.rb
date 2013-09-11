@@ -3,9 +3,8 @@ module Teams
     class UpdateRelationContext < Teams::Groups::BaseContext
       def execute
         permission = params[:greatest_project_access]
-        rebuild_flag = params[:rebuild_permissions]
 
-        Gitlab::UserTeamManager.update_team_user_access_in_group(team, group, permission, rebuild_flag)
+        team.team_group_relationship.find_by_group_id(group).updated_attributes(greates_access: permission)
 
         receive_delayed_notifications
       end

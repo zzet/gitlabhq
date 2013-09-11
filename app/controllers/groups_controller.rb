@@ -41,6 +41,10 @@ class GroupsController < ApplicationController
     @events = @events.limit(20).offset(params[:offset] || 0)
     @last_push = current_user.recent_push
 
+    @teams = @group.teams
+    @projects = @group.projects
+    @members = @group.users.includes(:users_groups).order("users_groups.group_access DESC")
+
     respond_to do |format|
       format.html
       format.js

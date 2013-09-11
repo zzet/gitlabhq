@@ -13,11 +13,12 @@ class ProjectTeam
   #
   def << args
     users = args.first
+    source = args.third.present? ? args.third : @project
 
     if users.respond_to?(:each)
-      add_users(users, args.second)
+      add_users(users, args.second, source)
     else
-      add_user(users, args.second)
+      add_user(users, args.second, source)
     end
   end
 
@@ -43,19 +44,20 @@ class ProjectTeam
     tm
   end
 
-  def add_user(user, access)
-    add_users_ids([user.id], access)
+  def add_user(user, access, source)
+    add_users_ids([user.id], access, source)
   end
 
-  def add_users(users, access)
-    add_users_ids(users.map(&:id), access)
+  def add_users(users, access, source)
+    add_users_ids(users.map(&:id), access, source)
   end
 
-  def add_users_ids(user_ids, access)
+  def add_users_ids(user_ids, access, source)
     UsersProject.add_users_into_projects(
       [project.id],
       user_ids,
-      access
+      access,
+      source
     )
   end
 
@@ -82,6 +84,10 @@ class ProjectTeam
 
   def masters
     @masters ||= fetch_members(:masters)
+  end
+
+  def owners
+    @owners ||= fetch_members(:owners)
   end
 
   def import(source_project)
@@ -117,18 +123,54 @@ class ProjectTeam
   private
 
   def fetch_members(level = nil)
-    project_members = project.users_projects
-    group_members = group ? group.users_groups : []
-
-    if level
-      project_members = project_members.send(level)
-      group_members = group_members.send(level) if group
-    end
-
-    (project_members + group_members).map(&:user).uniq
+    User.where(id: (project_member_ids(level) + group_member_ids(level) + teams_member_ids(level)).uniq)
   end
 
   def group
     project.group
+  end
+
+  def teams
+    (project_teams + group_teams).uniq
+  end
+
+  def project_teams
+    project.teams.any? ? project.teams : []
+  end
+
+  def group_teams
+    group ? project.group.teams : []
+  end
+
+  def project_member_ids(level = nil)
+    project_members = project.users_projects
+    project_members = project_members.send(level) if level
+    project_members.pluck(:user_id)
+  end
+
+  def group_member_ids(level = nil)
+    return [] unless group.present?
+    group_members = group.users_groups
+    group_members = group_members.send(level) if level
+    group_members.pluck(:user_id)
+  end
+
+  def teams_member_ids(level = nil)
+    group_teams_members   = group_teams.any? ? group.team_user_relationships : []
+    project_teams_members = project_teams.any? ? project.team_user_relationships : []
+
+    if level
+      project_teams_members = project_teams_members.send(level) if project_teams_members.any?
+      group_teams_members   = group_teams_members.send(level)   if group_teams_members.any?
+    end
+
+    project_teams_member_ids = project_teams_members.is_a?(Array) ? [] : project_teams_members.pluck(:user_id)
+    group_teams_member_ids   = group_teams_members.is_a?(Array)   ? [] : group_teams_members.pluck(:user_id)
+
+    (project_teams_member_ids + group_teams_member_ids).uniq
+  end
+
+  def project_access(member)
+    
   end
 end

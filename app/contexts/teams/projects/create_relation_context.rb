@@ -11,7 +11,7 @@ module Teams
         end
 
         project_ids.each do |project|
-          Gitlab::UserTeamManager.assign(team, project, access)
+          team.team_project_relationships.create(project_id: project, greatest_access: access)
         end
 
         receive_delayed_notifications

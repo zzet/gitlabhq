@@ -68,7 +68,7 @@ class Event::Subscription < ActiveRecord::Base
 
   class << self
     def global_entity_to_subscription
-      [:project, :group, :user_team, :user]
+      [:project, :group, :team, :user]
     end
   end
 

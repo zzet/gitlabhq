@@ -1,6 +1,6 @@
 .ui-box
-  .title
-    Projects (#{projects.count})
+  .title.clearfix
+    = search_field_tag :filter_project, nil, placeholder: 'Filter by name', class: 'dash-filter'
     - if can? current_user, :manage_group, @group
       %span.pull-right
         = link_to new_project_path(namespace_id: @group.id), class: "btn btn-new" do
@@ -16,9 +16,9 @@
             = truncate(project.name, length: 25)
           %span.arrow
             %i.icon-angle-right
-          %span.last_activity
+          %div.last_activity
             %strong Last activity:
             %span.date= project_last_activity(project)
-          %span.last_activity
+          %div.last_activity
             %strong Last push:
             %span.date= project_last_push(project)

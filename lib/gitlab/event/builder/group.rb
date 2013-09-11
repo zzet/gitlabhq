@@ -6,7 +6,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
 
     def can_build?(action, data)
       known_action = known_action? action, ::Group.available_actions
-      known_sources = [::Group, ::Project, ::UserTeamGroupRelationship]
+      known_sources = [::Group, ::Project, ::TeamGroupRelationship]
       known_source = known_sources.include? data.class
       known_source && known_action
     end
@@ -56,7 +56,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
           end
         end
 
-      when ::UserTeamGroupRelationship
+      when ::TeamGroupRelationship
         target = source.group
 
         case meta[:action]
