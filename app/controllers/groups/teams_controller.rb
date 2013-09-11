@@ -4,42 +4,22 @@ class Groups::TeamsController < Groups::ApplicationController
 
   def index
     @teams = group.teams
-  end
-
-  def new
-    @available_teams = current_user.admin? ? (group.teams.any? ? Team.where("id not in (?)", group.teams) : Team.scoped) : current_user.authorized_teams
-    session[:redirect_to] = request.referer
-    if @available_teams.blank?
-      flash[:notice] = "No available teams for adding to group"
-      redirect_to :back
-    end
+    @team_group_relation = group.team_group_relationships.build
+    @avaliable_teams = current_user.authorized_teams.where("id not in (?)", @teams.pluck(:id))
+    render :index, layout: 'group_settings'
   end
 
   def create
-    ::Teams::Groups::CreateRelationContext.new(current_user, team, group, params).execute
+    ::Group::Teams::CreateRelationContext.new(@current_user, group, params).execute
 
-    flash[:notice] = "Team successful added to group"
-    redirect_back_or_default(action: :index)
-  end
-
-  def update
-    ::Teams::Groups::UpdateRelationContext.new(current_user, team, group, params).execute
-
-    redirect_to :back
+    redirect_to group_teams_path(@group)
   end
 
   def destroy
-    ::Teams::Groups::RemoveRelationContext.new(current_user, team, group).execute
+    ::Group::Teams::RemoveRelationContext.new(@current_user, group, team).execute
 
-    flash[:notice] = "Team successful removed from group"
-    redirect_to :back
+    redirect_to group_teams_path(@group)
   end
-
-  def edit
-    group
-    team
-  end
-
   protected
 
   def team

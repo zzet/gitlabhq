@@ -1,4 +1,4 @@
-= form_for @users_group, url: group_users_groups_path(@group) do |f|
+= form_for @member_group_relation, url: group_members_path(@group) do |f|
   %fieldset
     %legend
       New member(s) for
@@ -13,8 +13,7 @@
     %p 2. Set access level for them
     .control-group
       = f.label :group_access, "Group Access"
-      .controls= select_tag :group_access, options_for_select(UsersGroup.group_access_roles, @users_group.group_access), class: "project-access-select chosen"
+      .controls= select_tag :group_access, options_for_select(UsersGroup.group_access_roles, @member_group_relation.group_access), class: "project-access-select chosen"
 
     .form-actions
       = f.submit 'Add users into group', class: "btn btn-create"
-

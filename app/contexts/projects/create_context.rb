@@ -8,16 +8,15 @@ module Projects
       default_features = Gitlab.config.gitlab.default_projects_features
 
       default_opts = {
-        issues_enabled: default_features.issues,
-        wiki_enabled: default_features.wiki,
-        wall_enabled: default_features.wall,
-        snippets_enabled: default_features.snippets,
+        issues_enabled:         default_features.issues,
+        wiki_enabled:           default_features.wiki,
+        wall_enabled:           default_features.wall,
+        snippets_enabled:       default_features.snippets,
         merge_requests_enabled: default_features.merge_requests,
-        public: default_features.public
+        public:                 default_features.public
       }
 
       @project = Project.new(default_opts.merge(params))
-      @project.public = true
       @project.issues_tracker = "redmine"
       @project.git_protocol_enabled = false
 

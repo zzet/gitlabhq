@@ -79,6 +79,7 @@ class GroupsController < ApplicationController
   end
 
   def edit
+    render :edit, layout: 'group_settings'
   end
 
   def update
@@ -93,7 +94,7 @@ class GroupsController < ApplicationController
     if @group.update_attributes(group_params)
       redirect_to @group, notice: 'Group was successfully updated.'
     else
-      render action: "edit"
+      render action: :edit, layout: 'group_settings'
     end
   end
 

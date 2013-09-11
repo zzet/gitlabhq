@@ -1,94 +1,41 @@
-.row
-  .span2
-    %ul.nav.nav-pills.nav-stacked.nav-stacked-menu
-      %li.active
-        = link_to '#tab-edit', 'data-toggle' => 'tab' do
-          %i.icon-edit
-          Edit Group
-      %li
-        = link_to '#tab-projects', 'data-toggle' => 'tab' do
-          %i.icon-folder-close
-          Projects
-      %li
-        = link_to 'Teams', '#tab-teams', 'data-toggle' => 'tab'
-      %li
-        = link_to 'Transfer', '#tab-transfer', 'data-toggle' => 'tab'
-      %li
-        = link_to 'Remove', '#tab-remove', 'data-toggle' => 'tab'
+.project-edit-container
+  .project-edit-errors
+  .project-edit-content
+    %div
+      %h3.page-title
+        Group settings:
+      %p.light Some settings, such as "Transfer Group", are hidden inside the danger area below
+      %hr
+      .form-holder
+        = form_for @group do |f|
+          - if @group.errors.any?
+            .alert.alert-error
+              %span= @group.errors.full_messages.first
+          .control-group
+            = f.label :name do
+              Group name is
+            .controls
+              = f.text_field :name, placeholder: "Ex. OpenSource", class: "input-xxlarge left"
 
-  .span10
-    .tab-content
-      .tab-pane.active#tab-edit
-        .ui-box
-          .title
-            %strong= @group.name
-            group settings:
-          %div.form-holder
-            = form_for @group do |f|
-              - if @group.errors.any?
-                .alert.alert-error
-                  %span= @group.errors.full_messages.first
-              .control-group
-                = f.label :name do
-                  Group name is
-                .controls
-                  = f.text_field :name, placeholder: "Ex. OpenSource", class: "input-xxlarge left"
+          .control-group.group-description-holder
+            = f.label :description, "Details"
+            .controls
+              = f.text_area :description, maxlength: 250, class: "input-xxlarge js-gfm-input", rows: 4
 
-              .control-group.group-description-holder
-                = f.label :description, "Details"
-                .controls
-                  = f.text_area :description, maxlength: 250, class: "input-xxlarge js-gfm-input", rows: 4
+          .form-actions
+            = f.submit 'Save group', class: "btn btn-save"
 
-              .form-actions
-                = f.submit 'Save group', class: "btn btn-save"
+    %center.light.prepend-top-20.padded
+      %h3
+        %i.icon-warning-sign
+        Dangerous settings
+      %p Group settings below may result in data loss!
+      = link_to '#', class: 'btn js-toggle-visibility-link' do
+        Show it to me
+        %i.icon-chevron-down
 
-      .tab-pane#tab-projects
-        .ui-box
-          .title
-            %strong= @group.name
-            projects:
-            - if can? current_user, :manage_group, @group
-              %span.pull-right
-                = link_to new_project_path(namespace_id: @group.id), class: "btn btn-tiny" do
-                  %i.icon-plus
-                  New Project
-          %ul.well-list
-            - @group.projects.each do |project|
-              %li
-                - if project.public
-                  = public_icon
-                - else
-                  = private_icon
-                = link_to project.name_with_namespace, project
-                .pull-right
-                  = link_to 'Members', project_team_index_path(project), id: "edit_#{dom_id(project)}", class: "btn btn-small"
-                  = link_to 'Edit', edit_project_path(project), id: "edit_#{dom_id(project)}", class: "btn btn-small"
-                  = link_to 'Remove', project, confirm: remove_project_message(project), method: :delete, class: "btn btn-small btn-remove"
-            - if @group.projects.blank?
-              %p.nothing_here_message This group has no projects yet
-
-      .tab-pane#tab-teams
-        .ui-box
-          %h5.title
-            Teams
-            %small
-              (#{@group.teams.count})
-            %span.pull-right
-              = link_to new_group_team_path(@group), class: "btn btn-tiny info" do
-                %i.icon-plus
-                Assign Team
-            -# if @avaliable_teams.any?
-          %ul.well-list
-            - @group.teams.each do |team|
-              %li
-                = link_to team.name, team_path(team)
-                .pull-right
-                  = link_to 'Edit', edit_group_team_path(@group, team), id: "edit_#{dom_id(team)}", class: "btn btn-small"
-                  = link_to 'Resign', group_team_path(@group, team), confirm: "RESIGN #{team.name} from #{@group.name} and all group projects? Are you sure?", method: :delete, class: "btn btn-small btn-remove"
-            - if @group.projects.blank?
-              %p.nothing_here_message This group has no teams yet
-
-      .tab-pane#tab-transfer
+    .js-toggle-visibility-container.hide
+      - if can?(current_user, :manage_namespace, @group)
         .ui-box.ui-box-danger
           .title Transfer group
           .ui-box-body
@@ -99,7 +46,6 @@
               %hr
               = f.submit 'Transfer group', class: "btn btn-small btn-remove"
 
-      .tab-pane#tab-remove
         .ui-box.ui-box-danger
           .title Remove group
           .ui-box-body
@@ -109,3 +55,12 @@
               %strong Removed group can not be restored!
 
             = link_to 'Remove Group', @group, confirm: 'Removed group can not be restored! Are you sure?', method: :delete, class: "btn btn-remove"
+
+      - else
+        %p.nothing_here_message Only the group owner can transfer or remove group
+
+.save-project-loader.hide
+  %center
+    = image_tag "ajax_loader.gif"
+    %h3 Saving group.
+    %p Please wait a moment, this page will automatically refresh when ready.

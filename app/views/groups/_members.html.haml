@@ -3,7 +3,7 @@
     = search_field_tag :filter_member, nil, placeholder: 'Filter by name', class: 'dash-filter'
     - if can? current_user, :manage_group, @group
       %span.pull-right
-        = link_to members_group_path(@group), class: "btn btn-new" do
+        = link_to group_members_path(@group), class: "btn btn-new" do
           %i.icon-plus
             Add member
   %ul.well-list.dash-list

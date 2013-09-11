@@ -167,6 +167,7 @@ class User < ActiveRecord::Base
   scope :in_team, ->(team){ where(id: team.member_ids) }
   scope :not_in_team, ->(team){ where('users.id NOT IN (:ids)', ids: team.member_ids) }
   scope :not_in_project, ->(project) { project.users.present? ? where("id not in (:ids)", ids: project.users.map(&:id) ) : scoped }
+  scope :not_in_group, ->(group) { group.users.present? ? where("id not in (:ids)", ids: group.users.pluck(:id)) : scoped }
   scope :without_projects, -> { where('id NOT IN (SELECT DISTINCT(user_id) FROM users_projects)') }
   scope :ldap, -> { where(provider:  'ldap') }
 

@@ -179,11 +179,13 @@ Gitlab::Application.routes.draw do
     member do
       get :issues
       get :merge_requests
-      get :members
+      #get :members
     end
 
     scope module: :groups do
-      resources :teams
+      resources :teams, only: [:index, :create, :destroy]
+      resources :members, only: [:index, :create, :update, :destroy]
+      resources :projects, only: [:index]
     end
 
     resources :users_groups, only: [:create, :update, :destroy]
