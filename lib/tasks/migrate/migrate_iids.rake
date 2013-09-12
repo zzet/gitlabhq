@@ -1,5 +1,6 @@
 desc "GITLAB | Build internal ids for issues and merge requests"
 task migrate_iids: :environment do
+  ActiveRecord::Base.observers.disable :activity_observer
   puts 'Issues'.yellow
   Issue.where(iid: nil).find_each(batch_size: 100) do |issue|
     begin

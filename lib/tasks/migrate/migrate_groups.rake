@@ -2,6 +2,7 @@ namespace :gitlab do
   desc "GITLAB | Migrate Groups to match v6.0"
   task migrate_groups: :environment do
     puts "This will add group owners to group membership"
+    ActiveRecord::Base.observers.disable :activity_observer
     #ask_to_continue
 
     Group.find_each(batch_size: 20) do |group|
@@ -17,6 +18,7 @@ namespace :gitlab do
 
   desc "GITLAB | Migrate Global Projects to Namespaces"
   task migrate_global_projects: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     found = Project.where(namespace_id: nil).count
     if found > 0
       puts "Global namespace is deprecated. We found #{found} projects stored in global namespace".yellow
@@ -41,6 +43,7 @@ namespace :gitlab do
 
   desc "GITLAB | Migrate inline notes"
   task migrate_inline_notes: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     Note.where('line_code IS NOT NULL').find_each(batch_size: 100) do |note|
       begin
         note.set_diff
@@ -57,6 +60,7 @@ namespace :gitlab do
 
   desc "GITLAB | Migrate SSH Keys"
   task migrate_keys: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     puts "This will add fingerprint to ssh keys in db"
     puts "If you have duplicate keys https://github.com/gitlabhq/gitlabhq/issues/4453 all but the first will be deleted".yellow
     #ask_to_continue
@@ -77,12 +81,14 @@ namespace :gitlab do
 
   desc "GITLAB | Migrate Milestones"
   task migrate_milestones: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     Milestone.where(state: nil).update_all(state: 'active')
   end
 
   # This taks will reload commits/diff for all merge requests
   desc "GITLAB | Migrate Merge Requests"
   task migrate_merge_requests: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     puts "Since 5.1 old merge request serialization logic was replaced with a better one."
     puts "It makes old merge request diff invalid for GitLab 5.1+"
     puts "* * *"
@@ -100,6 +106,7 @@ namespace :gitlab do
 
   desc "GITLAB | Migrate Note LineCode"
   task migrate_note_linecode: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     Note.inline.each do |note|
       index = note.diff_file_index
       if index =~ /^\d{1,10}$/ # is number. not hash.

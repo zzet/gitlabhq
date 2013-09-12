@@ -1,6 +1,7 @@
 desc "Undev | Migrate teams data from one table to another"
 namespace :undev do
   task migrate_teams_data: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     puts "Move teams".yellow
     Team.transaction do
       UserTeam.find_each do |ut|
@@ -71,6 +72,7 @@ namespace :undev do
 
   desc "Undev | Rebuild users lists in new teams and groups"
   task rebuild_users_lists: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     Team.transaction do
       Team.find_each do |t|
         puts "Try move #{t.name} members".yellow
@@ -100,6 +102,7 @@ namespace :undev do
 
   desc "Undev | Clean projects members lists"
   task clean_projects_members_lists: :environment do
+    ActiveRecord::Base.observers.disable :activity_observer
     Project.find_each do |pr|
       puts "#{pr.name_with_namespace} work".green
       pr.users_projects.find_each do |up|
