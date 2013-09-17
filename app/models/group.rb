@@ -30,7 +30,7 @@ class Group < Namespace
 
   actions_to_watch [:created, :deleted, :updated, :transfer]
 
-  scope :without_team, ->(team) { team.groups.present? ? where("projects.id NOT IN (:ids)", ids: team.groups.map(&:id)) : scoped }
+  scope :without_team, ->(team) { team.groups.present? ? where("namespaces.id NOT IN (:ids)", ids: team.groups.pluck(:id)) : scoped }
 
   after_create :add_owner
 

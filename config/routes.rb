@@ -167,7 +167,7 @@ Gitlab::Application.routes.draw do
   resources :teams do
     scope module: :teams do
       resources :members,   only: [:index, :create, :update, :destroy]
-      resources :projects,  only: [:index, :create, :destroy]
+      resources :projects,  only: [:index, :create, :destroy], constraints: { id: /[a-zA-Z.0-9_\-]+\/[a-zA-Z.0-9_\-]+/ }
       resources :groups,    only: [:index, :create, :destroy]
     end
   end

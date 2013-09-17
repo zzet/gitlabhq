@@ -9,19 +9,19 @@ class Teams::GroupsController < Teams::ApplicationController
   end
 
   def create
-    ::Teams::Users::CreateRelationContext.new(@current_user, team, params).execute
+    ::Teams::Groups::CreateRelationContext.new(@current_user, team, params).execute
 
-    redirect_to team_members_path(team), notice: 'Members were successfully added into Team of users.'
+    redirect_to team_groups_path(team), notice: 'Groups were successfully added into Team of users.'
   end
 
   def destroy
-    ::Teams::Users::RemoveRelationContext.new(@current_user, team, team_member).execute
-    redirect_to team_path(team), notice: "Member #{team_member.name} was successfully removed from Team of users."
+    ::Teams::Groups::RemoveRelationContext.new(@current_user, team, group).execute
+    redirect_to team_groups_path(team), notice: "Group #{group.name} was successfully removed from Team of users."
   end
 
   protected
 
-  def team_member
-    @member ||= team.members.find_by_username(params[:id])
+  def group
+    @group ||= team.groups.find_by_path(params[:id])
   end
 end

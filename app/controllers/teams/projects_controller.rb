@@ -11,13 +11,13 @@ class Teams::ProjectsController < Teams::ApplicationController
 
     ::Teams::Projects::CreateRelationContext.new(current_user, team, params).execute
 
-    redirect_to edit_team_path(team), notice: 'Team of users was successfully assigned to projects.'
+    redirect_to team_projects_path(team), notice: 'Team of users was successfully assigned to projects.'
   end
 
   def destroy
-    ::Teams::Projects::RemoveRelationContext.new(current_user, team, team_project, params).execute
+    ::Teams::Projects::RemoveRelationContext.new(current_user, team, team_project).execute
 
-    redirect_to team_path(team), notice: 'Team of users was successfully reassigned from project.'
+    redirect_to team_projects_path(team), notice: 'Team of users was successfully removed from project.'
   end
 
   private

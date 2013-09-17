@@ -10,13 +10,13 @@ class Groups::TeamsController < Groups::ApplicationController
   end
 
   def create
-    ::Group::Teams::CreateRelationContext.new(@current_user, group, params).execute
+    ::Groups::Teams::CreateRelationContext.new(@current_user, group, params).execute
 
     redirect_to group_teams_path(@group)
   end
 
   def destroy
-    ::Group::Teams::RemoveRelationContext.new(@current_user, group, team).execute
+    ::Groups::Teams::RemoveRelationContext.new(@current_user, group, team).execute
 
     redirect_to group_teams_path(@group)
   end

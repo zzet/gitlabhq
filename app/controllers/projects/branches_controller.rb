@@ -19,7 +19,7 @@ class Projects::BranchesController < Projects::ApplicationController
     @repository.add_branch(params[:branch_name], params[:ref])
 
     if new_branch = @repository.find_branch(params[:branch_name])
-      Event.create_ref_event(@project, current_user, new_branch, 'add')
+      OldEvent.create_ref_event(@project, current_user, new_branch, 'add')
     end
 
     redirect_to project_branches_path(@project)
@@ -29,7 +29,7 @@ class Projects::BranchesController < Projects::ApplicationController
     branch = @repository.find_branch(params[:id])
 
     if branch && @repository.rm_branch(branch.name)
-      Event.create_ref_event(@project, current_user, branch, 'rm')
+      OldEvent.create_ref_event(@project, current_user, branch, 'rm')
     end
 
     respond_to do |format|

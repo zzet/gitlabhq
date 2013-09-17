@@ -104,7 +104,7 @@ class User < ActiveRecord::Base
   has_many :teams,                           through: :team_user_relationships
   has_many :personal_teams,                  through: :team_user_relationships, foreign_key: :creator_id, source: :team
   has_many :own_teams,                       through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
-  has_many :maser_teams,                     through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
+  has_many :master_teams,                    through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
   has_many :team_project_relationships,      through: :teams
   has_many :team_group_relationships,        through: :teams
   has_many :team_projects,                   through: :team_project_relationships
@@ -303,13 +303,13 @@ class User < ActiveRecord::Base
   def authorized_teams
     ateams = Team.scoped
     unless self.admin?
-      ateams = known_projects
+      ateams = known_teams
     end
     ateams
   end
 
   def known_teams
-    @known_teams_ids ||= (personal_teams.pluck(:id) + teams.pluck(:id) + Team.public.pluck(:id)).uniq
+    @known_teams_ids ||= (personal_teams.pluck(:id) + own_teams.pluck(:id) + master_teams.pluck(:id) + teams.pluck(:id) + Team.where(public: true).pluck(:id)).uniq
     Team.where(id: @known_teams_ids)
   end
 

@@ -2,7 +2,7 @@ module Teams
   module Projects
     class RemoveRelationContext < Teams::Projects::BaseContext
       def execute
-        relation = team.team_project_relationships.where(project_id: project).destroy_all
+        team.team_project_relationships.where(project_id: project).destroy_all
 
         receive_delayed_notifications
       end
