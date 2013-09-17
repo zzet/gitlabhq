@@ -210,6 +210,22 @@ class User < ActiveRecord::Base
         User.find_by_username(name_or_id)
       end
     end
+
+    def build_user(attrs = {}, options= {})
+      if options[:as] == :admin
+        User.new(defaults.merge(attrs.symbolize_keys), options)
+      else
+        User.new(attrs, options).with_defaults
+      end
+    end
+
+    def defaults
+      {
+        projects_limit: Gitlab.config.gitlab.default_projects_limit,
+        can_create_group: Gitlab.config.gitlab.default_can_create_group,
+        theme_id: Gitlab::Theme::MARS
+      }
+    end
   end
 
   #
@@ -220,15 +236,6 @@ class User < ActiveRecord::Base
     username
   end
 
-  def with_defaults
-    tap do |u|
-      u.projects_limit = Gitlab.config.gitlab.default_projects_limit
-      u.can_create_group = Gitlab.config.gitlab.default_can_create_group
-      u.theme_id = Gitlab::Theme::MARS
-    end
-  end
-
-  # TODO. Check this
   def notification
     @notification ||= Notification.new(self)
   end
@@ -378,7 +385,7 @@ class User < ActiveRecord::Base
   end
 
   def several_namespaces?
-    authorized_namespaces.many?
+    namespaces.many? || owned_groups.any?
   end
 
   def namespace_id
@@ -430,5 +437,13 @@ class User < ActiveRecord::Base
     @solo_owned_groups ||= owned_groups.select do |group|
       group.owners == [self]
     end
+  end
+
+  def with_defaults
+    User.defaults.each do |k, v|
+      self.send("#{k}=", v)
+    end
+
+    self
   end
 end
