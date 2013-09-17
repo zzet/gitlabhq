@@ -39,7 +39,6 @@ class Team < ActiveRecord::Base
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
-  validates :name,    presence: true, uniqueness: true
   validates :creator, presence: true
   validates :name,    presence: true, uniqueness: true,
                       length: { within: 0..255 },

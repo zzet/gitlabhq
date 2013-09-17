@@ -2,8 +2,7 @@ module Teams
   module Projects
     class CreateRelationContext < Teams::BaseContext
       def execute
-        project_ids = params[:project_ids]
-        access = params[:greatest_project_access]
+        project_ids = params[:project_ids].respond_to?(:each) ? params[:project_ids] : params[:project_ids].split(',')
 
         unless current_user.admin?
           allowed_project_ids = (current_user.own_projects.pluck(:id) + current_user.owned_projects.pluck(:id)).uniq
@@ -11,7 +10,7 @@ module Teams
         end
 
         project_ids.each do |project|
-          team.team_project_relationships.create(project_id: project, greatest_access: access)
+          team.team_project_relationships.create(project_id: project)
         end
 
         receive_delayed_notifications

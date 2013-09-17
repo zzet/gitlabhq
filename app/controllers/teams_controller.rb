@@ -44,29 +44,12 @@ class TeamsController < ApplicationController
   end
 
   def create
-    new_team = ::Teams::CreateContext.new(current_user, params).execute
-    if new_team.persisted?
+    @team = ::Teams::CreateContext.new(current_user, params[:team]).execute
+    if @team.persisted?
       redirect_to team_path(@team)
     else
       render action: :new
     end
-  end
-
-  # Get authored or assigned open merge requests
-  def merge_requests
-    projects
-    @merge_requests = MergeRequest.of_team(team)
-    @merge_requests = FilterContext.new(@current_user, @merge_requests, params).execute
-    @merge_requests = @merge_requests.recent.page(params[:page]).per(20)
-  end
-
-  # Get only assigned issues
-  def issues
-    projects
-    @issues = Issue.of_team(team)
-    @issues = FilterContext.new(@current_user, @issues, params).execute
-    @issues = @issues.recent.page(params[:page]).per(20)
-    @issues = @issues.includes(:author, :project)
   end
 
   protected

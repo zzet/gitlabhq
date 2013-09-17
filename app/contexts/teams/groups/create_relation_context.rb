@@ -1,10 +1,17 @@
 module Teams
   module Groups
-    class CreateRelationContext < Teams::Groups::BaseContext
+    class CreateRelationContext < Teams::BaseContext
       def execute
-        permission = params[:greatest_project_access]
+        group_ids = params[:group_ids].respond_to?(:each) ? params[:group_ids] : params[:group_ids].split(',')
 
-        team.team_group_relationship.create(group_id: group, greatest_access: permission)
+        unless current_user.admin?
+          allowed_group_ids = (current_user.own_groups.pluck(:id) + current_user.owned_groups.pluck(:id)).uniq
+          group_ids.select! { |id| allowed_group_ids.include?(id.to_i) }
+        end
+
+        group_ids.each do |group|
+          team.team_group_relationships.create(group_id: group)
+        end
 
         receive_delayed_notifications
       end

@@ -75,7 +75,7 @@ class User < ActiveRecord::Base
   has_many :keys, dependent: :destroy
 
   # Groups
-  has_many :own_groups, class_name: "Group", foreign_key: :owner_id
+  has_many :own_groups,   class_name: Group, foreign_key: :owner_id
   has_many :owned_groups, through: :users_groups, source: :group, conditions: { users_groups: { group_access: UsersGroup::OWNER } }
 
   has_many :users_groups, dependent: :destroy

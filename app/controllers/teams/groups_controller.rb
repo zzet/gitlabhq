@@ -3,7 +3,7 @@ class Teams::GroupsController < Teams::ApplicationController
 
   def index
     groups
-    @avaliable_groups   = current_user.owned_groups.without_team(team)
+    @avaliable_groups = current_user.admin? ? current_user.owned_groups.without_team(team) : Group.without_team(team)
     @group_relation   = team.team_group_relationships.build
     render :index, layout: 'team_settings'
   end

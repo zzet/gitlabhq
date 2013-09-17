@@ -93,26 +93,26 @@
             %span.pull-right.light
               = member.human_access
 
--# Our table
-%ul#group-relations.nav.nav-tabs
-  %li= link_to("Projects (#{@group_projects.count})", "#projects-list", "data-toggle" => "tab")
-  %li= link_to("Members (#{@members.count})", "#members-list", "data-toggle" => "tab")
-  %li= link_to("Teams (#{@teams.count})", "#teams-list", "data-toggle" => "tab")
-.tab-content
-  = render "projects_list"
-  = render "members_list"
-  = render "teams_list"
+-#-# Our table
+-#%ul#group-relations.nav.nav-tabs
+  -#%li= link_to("Projects (#{@group_projects.count})", "#projects-list", "data-toggle" => "tab")
+  -#%li= link_to("Members (#{@members.count})", "#members-list", "data-toggle" => "tab")
+  -#%li= link_to("Teams (#{@teams.count})", "#teams-list", "data-toggle" => "tab")
+-#.tab-content
+  -#= render "projects_list"
+  -#= render "members_list"
+  -#= render "teams_list"
 
-:javascript
-  $(function(){
-    var modal = $('.change-owner-holder');
-    $('.change-owner-link').bind("click", function(){
-      $(this).hide();
-      modal.show();
-    });
-    $('.change-owner-cancel-link').bind("click", function(){
-      modal.hide();
-      $('.change-owner-link').show();
-    })
-    $('#group-relations a:first').tab('show')
-  })
+-#:javascript
+  -#$(function(){
+    -#var modal = $('.change-owner-holder');
+    -#$('.change-owner-link').bind("click", function(){
+      -#$(this).hide();
+      -#modal.show();
+    -#});
+    -#$('.change-owner-cancel-link').bind("click", function(){
+      -#modal.hide();
+      -#$('.change-owner-link').show();
+    -#})
+    -#$('#group-relations a:first').tab('show')
+  -#})
