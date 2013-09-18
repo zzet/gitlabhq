@@ -4,7 +4,7 @@
       .title Projects
       .data.padded
         = link_to admin_projects_path do
-          %h1= Project.count
+          %h1= @projects_count
         %hr
         = link_to 'New Project', new_project_path, class: "btn btn-small"
   .span3
@@ -12,7 +12,7 @@
       .title Users
       .data.padded
         = link_to admin_users_path do
-          %h1= User.count
+          %h1= @users_count
         %hr
         = link_to 'New User', new_admin_user_path, class: "btn btn-small"
   .span3
@@ -20,7 +20,7 @@
       .title Groups
       .data.padded
         = link_to admin_groups_path do
-          %h1= Group.count
+          %h1= @groups_count
         %hr
         = link_to 'New Group', new_admin_group_path, class: "btn btn-small"
   .span3
@@ -28,7 +28,7 @@
       %h5.title Teams
       .data.padded
         = link_to admin_teams_path do
-          %h1= UserTeam.count
+          %h1= @teams_count
         %hr
         = link_to 'New Team', new_admin_team_path, class: "btn btn-small"
 
@@ -61,32 +61,32 @@
     %p
       Forks
       %span.light.pull-right
-        = ForkedProjectLink.count
+        = @forked_projects_count
     %p
       Issues
       %span.light.pull-right
-        = Issue.count
+        = @issues_count
     %p
       Merge Requests
       %span.light.pull-right
-        = MergeRequest.count
+        = @merge_requests_count
     %p
       Notes
       %span.light.pull-right
-        = Note.count
+        = @note_count
     %p
       Snippets
       %span.light.pull-right
-        = Snippet.count
+        = @snippets_count
     %p
       SSH Keys
       %span.light.pull-right
-        = Key.count
+        = @keys_count
     %p
       Milestones
       %span.light.pull-right
-        = Milestone.count
+        = @milestones_count
     %p
       File tokens (public links)
       %span.light.pull-right
-        = FileToken.count
+        = @file_tokens_count

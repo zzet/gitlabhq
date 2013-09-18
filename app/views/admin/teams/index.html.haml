@@ -1,61 +1,80 @@
 .row
-  .span4
-    .admin-filter
-      = form_tag admin_projects_path, method: :get, class: 'form-inline' do
-        .control-group
-          = label_tag :name, 'Name:', class: 'control-label'
-          .controls
-            = text_field_tag :name, params[:name], class: "span2"
+  .span3
+    %ul.nav.nav-pills.nav-stacked
+      = nav_tab :scope, nil do
+        = link_to admin_teams_path do
+          All
+          %span.pull-right
+            = @teams_count
+      %hr
 
-        .control-group
-          = label_tag :owner_id, 'Owner:', class: 'control-label'
-          .controls
-            = users_select_tag :owner_id, selected: params[:owner_id], class: 'input-large'
-        .control-group
-          = label_tag :public_only, 'Public Only', class: 'control-label'
-          .controls
-            = check_box_tag :public_only, 1, params[:public_only]
-        .control-group
-          = label_tag :with_push, 'Not empty', class: 'control-label'
-          .controls
-            = check_box_tag :with_push, 1, params[:with_push]
-            &nbsp;
-            %span.light Projects with push events
-        .control-group
-          = label_tag :abandoned, 'Abandoned', class: 'control-label'
-          .controls
-            = check_box_tag :abandoned, 1, params[:abandoned]
-            &nbsp;
-            %span.light No activity over 6 month
+      = nav_tab :scope, nil do
+        Search by name
+        = form_tag admin_teams_path, method: :get, class: 'form-inline' do
+          = text_field_tag :name, params[:name], class: "span3"
 
+      = nav_tab :scope, 'joined' do
+        With user
+        = form_tag(admin_teams_path, method: :get) do
+          = select_tag :member, options_from_collection_for_select(@users, :username, :name),
+                                class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
 
+      = nav_tab :scope, 'owned' do
+        Owned by
+        = form_tag(admin_teams_path, method: :get) do
+          = select_tag :owner, options_from_collection_for_select(@users, :username, :name, params[:owner]),
+                               class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
 
-        .form-actions
-          = submit_tag "Search", class: "btn submit btn-primary"
-          = link_to "Reset", admin_projects_path, class: "btn"
-  .span8
+      = nav_tab :scope, 'group' do
+        Assigned on group
+        = form_tag(admin_teams_path, method: :get) do
+          = select_tag :group, options_from_collection_for_select(@groups, :path, :name, params[:group]),
+                               class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
+
+      = nav_tab :scope, 'project' do
+        Assigned on project
+        = form_tag(admin_teams_path, method: :get) do
+          = select_tag :project, options_from_collection_for_select(@projects, :path_with_namespace, :name_with_namespace, params[:project]),
+                                 class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
+
+  .span9
     .ui-box
       .title
-        Projects (#{@projects.total_count})
+        Teams (#{@teams.count})
         .pull-right
-          = link_to 'New Project', new_project_path, class: "btn btn-new"
+          = link_to 'New Team', new_team_path, class: "btn btn-new"
       %ul.well-list
-        - @projects.each do |project|
+        - @teams.each do |team|
           %li
-            - if project.public
-              = public_icon
-            - else
-              = private_icon
-            - if @git_protocol_enabled
-              %span.cblue
-                = git_protocol_icon(project.git_protocol_enabled)
-            = link_to project.name_with_namespace, [:admin, project]
-            .pull-right
-              = link_to project_path(project), id: "view_#{dom_id(project)}", class: "btn btn-small" do
-                %i.icon-list-alt
-                Public page
-              = link_to 'Edit', edit_project_path(project), id: "edit_#{dom_id(project)}", class: "btn btn-small"
-              = link_to 'Destroy', [project], confirm: remove_project_message(project), method: :delete, class: "btn btn-small btn-remove"
-        - if @projects.blank?
-          %p.nothing_here_message 0 projects matches
-    = paginate @projects, theme: "gitlab"
+            .team-info
+              .pull-right
+                = link_to team_members_path(team), id: "team_members_#{dom_id(team)}", class: "btn btn-small", title: "Team members" do
+                  %i.icon-group
+                %nbsp
+
+                = link_to team_groups_path(team), id: "team_groups_#{dom_id(team)}", class: "btn btn-small", title: "Team groups" do
+                  %i.icon-folder-open
+                %nbsp
+
+                = link_to team_projects_path(team), id: "team_groups_#{dom_id(team)}", class: "btn btn-small", title: "Team projects" do
+                  %i.icon-inbox
+                %nbsp
+
+                = link_to edit_team_path(team), id: "edit_#{dom_id(team)}", class: "btn btn-small", title: "Edit team" do
+                  %i.icon-edit
+                %nbsp
+                = link_to [team], confirm: remove_team_message(team), method: :delete, class: "btn btn-small btn-remove" do
+                  %i.icon-trash
+            = link_to team_path(team), class: dom_class(team) do
+              %span
+                - if team.public
+                  = public_icon
+                - else
+                  = private_icon
+              %strong= team.name
+              %p= truncate team.description, length: 100
+        - if @teams.blank?
+          %li
+            %h3.nothing_here_message There are no teams here.
+    .bottom
+      = paginate @teams, theme: "gitlab"

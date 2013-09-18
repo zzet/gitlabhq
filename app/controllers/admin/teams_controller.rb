@@ -1,6 +1,41 @@
 class Admin::TeamsController < Admin::ApplicationController
   def index
     @teams = Team.order('name ASC')
+    @teams_count = @teams.count
+
+    if params[:member].present?
+      user = User.find_by_username(params[:member])
+      team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
+      @teams = @teams.where(id: team_ids)
+    end
+
+    if params[:owner].present?
+      user = User.find_by_username(params[:owner])
+      team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
+      @teams = @teams.where(id: team_ids)
+    end
+
+    if params[:group].present?
+      group = Group.find_by_path(params[:group])
+      team_ids = TeamGroupRelationship.where(group_id: group).pluck(:team_id)
+      @teams = @teams.where(id: team_ids)
+    end
+
+    if params[:project].present?
+      project = Project.find_with_namespace(params[:project])
+      team_ids = TeamProjectRelationship.where(project_id: project).pluck(:team_id)
+      @teams = @teams.where(id: team_ids)
+    end
+
+    user_ids = TeamUserRelationship.where(team_id: @teams).pluck(:user_id)
+    @users = User.where(id: user_ids).active.order('name ASC')
+
+    group_ids = TeamGroupRelationship.where(team_id: @teams).pluck(:group_id)
+    @groups = Group.where(id: group_ids).order("name ASC")
+
+    project_ids = TeamProjectRelationship.where(team_id: @teams).pluck(:project_id)
+    @projects = Project.where(id: project_ids).includes(:namespace).order("namespaces.name, projects.name ASC")
+
     @teams = @teams.search(params[:name]) if params[:name].present?
     @teams = @teams.page(params[:page]).per(20)
   end

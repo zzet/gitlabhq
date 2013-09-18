@@ -48,6 +48,7 @@ Gitlab::Application.routes.draw do
       get "raw"
     end
   end
+
   get "/s/:username" => "snippets#user_index", as: :user_snippets, constraints: { username: /.*/ }
 
   #
@@ -218,10 +219,9 @@ Gitlab::Application.routes.draw do
       resources :graphs, only: [:show], constraints: {id: /(?:[^.]|\.(?!json$))+/, format: /json/}
       match "/compare/:from...:to" => "compare#show", as: "compare", via: [:get, :post], constraints: {from: /.+/, to: /.+/}
 
-        resources :snippets, constraints: {id: /\d+/} do
-          member do
-            get "raw"
-          end
+      resources :snippets, constraints: {id: /\d+/} do
+        member do
+          get "raw"
         end
       end
 
@@ -265,14 +265,14 @@ Gitlab::Application.routes.draw do
 
       resources :branches, only: [:index, :new, :create, :destroy], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ } do
         collection do
-          get :recent
+        get :recent
         end
       end
 
       resources :tags, only: [:index, :new, :create, :destroy], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ }
-      resources :protected_branches, only: [:index, :create, :destroy], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ }
+        resources :protected_branches, only: [:index, :create, :destroy], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ }
 
-      resources :refs, only: [] do
+        resources :refs, only: [] do
         collection do
           get "switch"
         end
@@ -280,14 +280,14 @@ Gitlab::Application.routes.draw do
         member do
           # tree viewer logs
           get "logs_tree", constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ }
-          get "logs_tree/:path" => "refs#logs_tree",
+            get "logs_tree/:path" => "refs#logs_tree",
             as: :logs_file,
             constraints: {
-              id:   /[a-zA-Z.0-9\/_\-#%+]+/,
-              path: /.*/
-            }
+            id:   /[a-zA-Z.0-9\/_\-#%+]+/,
+            path: /.*/
+          }
         end
-      end
+        end
 
       resources :merge_requests, constraints: {id: /\d+/}, except: [:destroy] do
         member do
@@ -331,10 +331,10 @@ Gitlab::Application.routes.draw do
       resources :team_members, except: [:index, :edit], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ } do
         collection do
 
-          # Used for import team
-          # from another project
-          get :import
-          post :apply_import
+        # Used for import team
+        # from another project
+        get :import
+        post :apply_import
         end
       end
 
