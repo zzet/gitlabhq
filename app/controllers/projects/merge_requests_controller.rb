@@ -62,10 +62,10 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def create
-    @merge_request = Projects::MergeRequests::CreateContext.new(current_user, @project, params).execute
+    @merge_request = Projects::MergeRequests::CreateContext.new(current_user, @project, params[:merge_request]).execute
     @target_branches ||= []
     if @merge_request.persisted?
-      redirect_to [@project, @merge_request], notice: 'Merge request was successfully created.'
+      redirect_to [@merge_request.target_project, @merge_request], notice: 'Merge request was successfully created.'
     else
       @source_project = @merge_request.source_project
       @target_project = @merge_request.target_project

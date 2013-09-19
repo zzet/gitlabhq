@@ -4,12 +4,11 @@ module Projects
   module MergeRequests
     class CreateContext < Projects::BaseContext
       def execute
-        @merge_request = @project.merge_requests.new(params[:merge_request])
+        @merge_request = MergeRequest.new
         @merge_request.author = @current_user
 
         if @merge_request.save
           @merge_request.reload_code
-          @merge_request.create_cross_references!(@project, @current_user)
 
           receive_delayed_notifications
         end
