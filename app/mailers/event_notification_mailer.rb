@@ -1938,8 +1938,8 @@ class EventNotificationMailer < ActionMailer::Base
     result = Rails.cache.fetch(key)
 
     if result.nil?
-      result = Gitlab::Git::Compare.new(@project.repository, @push_data["before"], @push_data["after"])
-      Rails.cache.write(key, result, expires_in: 1.hour)
+      result = Gitlab::Git::Compare.new(@project.raw_repository, @push_data["before"], @push_data["after"])
+      Rails.cache.write(key, result, expires_in: 20.minutes)
     end
 
     if result
@@ -1949,7 +1949,7 @@ class EventNotificationMailer < ActionMailer::Base
 
       if @before_commit.nil?
         @before_commit = @project.repository.commit(@push_data["before"])
-        Rails.cache.write(before_key, @before_commit, expires_in: 1.hour)
+        Rails.cache.write(before_key, @before_commit, expires_in: 20.minutes)
       end
 
       after_key = "#{key}-#{@push_data["after"]}"
@@ -1957,7 +1957,7 @@ class EventNotificationMailer < ActionMailer::Base
 
       if @after_commit.nil?
         @after_commit = @project.repository.commit(@push_data["after"])
-        Rails.cache.write(after_key, @after_commit, expires_in: 1.hour)
+        Rails.cache.write(after_key, @after_commit, expires_in: 20.minutes)
       end
 
       @branch = @push_data["ref"]
@@ -1969,7 +1969,7 @@ class EventNotificationMailer < ActionMailer::Base
       @refs_are_same = result.same
 
       @suppress_diff = result.diffs.size > Commit::DIFF_SAFE_SIZE
-      @suppress_diff ||= result.diffs.inject(0) { |sum, diff| diff.diff.lines.count } > Commit::DIFF_SAFE_LINES_COUNT
+      @suppress_diff ||= result.diffs.inject(0) { |sum, diff| diff.diff.lines.count } > Commit::DIFF_SAFE_LINES
 
       @line_notes    = []
 

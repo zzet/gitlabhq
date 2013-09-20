@@ -2,7 +2,7 @@ class Teams::ApplicationController < ApplicationController
 
   layout 'team'
 
-  #before_filter :authorize_manage_team!
+  before_filter :authorize_manage_team!
 
   protected
 

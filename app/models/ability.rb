@@ -159,10 +159,27 @@ class Ability
     def team_abilities user, team
       rules = []
 
+      if user.active?
+        rules << [
+          :create_team
+        ]
+      end
+
+      if team.public? || team.members.include?(user)
+        rules << [
+          :read_team
+        ]
+      end
+
+      if team.masters.include?(user) || user.admin?
+        rules << [
+          :manage_team
+        ]
+      end
+
       # Only group owner and administrators can manage group
       if team.owners.include?(user) || user.admin? || team.admins.include?(user)
         rules << [
-          :manage_team,
           :remove_team
         ]
       end

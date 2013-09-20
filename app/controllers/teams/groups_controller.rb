@@ -1,6 +1,4 @@
 class Teams::GroupsController < Teams::ApplicationController
-  #skip_before_filter :authorize_manage_team!, only: [:index]
-
   def index
     groups
     @avaliable_groups = current_user.admin? ? current_user.owned_groups.without_team(team) : Group.without_team(team)

@@ -1,6 +1,4 @@
 class Teams::MembersController < Teams::ApplicationController
-  #skip_before_filter :authorize_manage_team!, only: [:index]
-
   def index
     @members = team.team_user_relationships
     @user_relation = team.team_user_relationships.build

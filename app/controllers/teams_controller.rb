@@ -1,8 +1,9 @@
 class TeamsController < ApplicationController
   # Authorize
-  #before_filter :authorize_create_team!, only: [:new, :create]
-  #before_filter :authorize_manage_team!, only: [:edit, :update]
-  #before_filter :authorize_admin_team!, only: [:destroy]
+
+  before_filter :authorize_create_team!, only: [:new, :create]
+  before_filter :authorize_manage_team!, only: [:edit, :update]
+  before_filter :authorize_remove_team!, only: [:destroy]
 
   before_filter :team, except: [:index, :new, :create]
 
@@ -74,6 +75,31 @@ class TeamsController < ApplicationController
     @team ||= teams.find_by_path(params[:id])
     raise ActiveRecord::RecordNotFound if @team.nil?
     @team
+  end
+
+  # Dont allow unauthorized access to team
+  def authorize_read_team!
+    unless teams.present? or can?(current_user, :read_team, team)
+      return render_404
+    end
+  end
+
+  def authorize_create_team!
+    unless can?(current_user, :create_team, nil)
+      return render_404
+    end
+  end
+
+  def authorize_manage_team!
+    unless can?(current_user, :manage_team, team)
+      return render_404
+    end
+  end
+
+  def authorize_remove_team!
+    unless can?(current_user, :remove_team, team)
+      return render_404
+    end
   end
 
   def set_title
