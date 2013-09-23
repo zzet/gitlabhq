@@ -8,6 +8,7 @@
     .loading.hide
   .span4
     .light-well
+      = render "shared/watch_button", current_entity: @project
       %h3.page-title
         = @project.name
       - if @project.description.present?
