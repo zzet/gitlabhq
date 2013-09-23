@@ -311,9 +311,7 @@ Gitlab::Application.routes.draw do
       end
 
       resources :team, controller: 'team_members', only: [:index]
-
-      resources :teams, only: [:index, :create, :destroy]
-
+      resources :teams, only: [:index, :create, :destroy], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ }
       resources :milestones, except: [:destroy], constraints: {id: /\d+/}
 
       resources :labels, only: [:index] do

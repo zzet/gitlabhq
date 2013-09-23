@@ -109,19 +109,6 @@
                   = link_to group_users_group_path(group, user_group), confirm: remove_user_from_group_message(group, @user), method: :delete, remote: true, class: "btn-tiny btn btn-remove", title: 'Remove user from group' do
                     %i.icon-remove.icon-white
 
-    - if @groups.any?
-      .ui-box
-        %h5.title Groups:
-        %ul.well-list
-          - @groups.each do |group|
-            %li
-              %strong= link_to group.name, admin_group_path(group)
-              %span.pull-right.light
-                - if group.owner == @admin_user
-                  %i.icon-wrench
-
-
-
     - if @teams.any?
       .ui-box
         %h5.title Teams:
@@ -130,7 +117,7 @@
             %li
               %strong= link_to team.name, admin_team_path(team)
               %span.pull-right.light
-                - if team.owner == @admin_user
+                - if team.creator == @admin_user
                   %i.icon-wrench
 
     .ui-box

@@ -8,7 +8,9 @@ class Projects::TeamMembersController < Projects::ApplicationController
   def index
     @group = @project.group
     @users_projects = @project.users_projects.order('project_access DESC')
-    @teams = Team.where(id: (@project.teams.pluck(:id) + @project.group.teams.pluck(:id)).uniq)
+    teams_ids = @project.teams.pluck(:id)
+    teams_ids += @group.teams.pluck(:id) if @group.present?
+    @teams = Team.where(id: teams_ids)
   end
 
   def new

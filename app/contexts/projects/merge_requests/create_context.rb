@@ -4,7 +4,7 @@ module Projects
   module MergeRequests
     class CreateContext < Projects::BaseContext
       def execute
-        @merge_request = MergeRequest.new
+        @merge_request = MergeRequest.new(params)
         @merge_request.author = @current_user
 
         if @merge_request.save
