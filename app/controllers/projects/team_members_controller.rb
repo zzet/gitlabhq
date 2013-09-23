@@ -8,6 +8,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
   def index
     @group = @project.group
     @users_projects = @project.users_projects.order('project_access DESC')
+    @teams = Team.where(id: (@project.teams.pluck(:id) + @project.group.teams.pluck(:id)).uniq)
   end
 
   def new
@@ -28,6 +29,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
     unless Projects::Users::UpdateRelationContext.new(@current_user, @project, member, params).execute
       flash[:alert] = "User should have at least one role"
     end
+
     redirect_to project_team_index_path(@project)
   end
 
