@@ -242,15 +242,17 @@ module ApplicationHelper
     %w(greatest_access permission project_access).include?(key)
   end
 
-  #def search_placeholder
-    #if @project && @project.persisted?
-      #"Search in this project"
-    #elsif @group && @group.persisted?
-      #"Search in this group"
-    #else
-      #"Search"
-    #end
-  #end
+  def search_placeholder
+    if @project && @project.persisted?
+      "Search in this project"
+    elsif @group && @group.persisted?
+      "Search in this group"
+    elsif @team && @team.persisted?
+      "Search in this team"
+    else
+      "Search"
+    end
+  end
 
   def first_line(str)
     lines = str.split("\n")
