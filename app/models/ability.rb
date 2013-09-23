@@ -21,6 +21,7 @@ class Ability
     def global_abilities(user)
       rules = []
       rules << :create_group if user.can_create_group
+      rules << :create_team  if user.active?
       rules
     end
 
@@ -29,11 +30,8 @@ class Ability
 
       team = project.team
 
-      teams = project.teams
-      is_team_admin = teams.inject(false) { |a, b| a = a || b.admin?(user)}
-
       # Rules based on role in project
-      if team.masters.include?(user) || is_team_admin
+      if team.masters.include?(user)
         rules << project_master_rules
 
       elsif team.developers.include?(user)
@@ -178,7 +176,7 @@ class Ability
       end
 
       # Only group owner and administrators can manage group
-      if team.owners.include?(user) || user.admin? || team.admins.include?(user)
+      if team.owners.include?(user) || user.admin?
         rules << [
           :remove_team
         ]

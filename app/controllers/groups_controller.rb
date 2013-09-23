@@ -24,7 +24,7 @@ class GroupsController < ApplicationController
   end
 
   def create
-    @group = Groups::CreateContext.new(current_user, params).execute
+    @group = Groups::CreateContext.new(current_user, params[:group]).execute
     if @group.persisted?
       redirect_to @group, notice: 'Group was successfully created.'
     else

@@ -21,4 +21,11 @@ class Teams::ApplicationController < ApplicationController
   def team
     @team ||= Team.find_by_path(params[:team_id])
   end
+
+  def authorize_manage_team!
+    unless can?(current_user, :manage_team, team)
+      return render_404
+    end
+  end
+
 end

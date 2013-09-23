@@ -75,10 +75,6 @@ class Team < ActiveRecord::Base
     path
   end
 
-  def admin?(member)
-    member.admin? || admins.where(id: member).any?
-  end
-
   def add_users(user_ids, access)
     user_ids.compact.each do |user_id|
       team_user_relationships.create(user_id: user_id, team_access: access)
