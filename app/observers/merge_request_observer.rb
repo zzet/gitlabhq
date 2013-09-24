@@ -11,7 +11,7 @@ class MergeRequestObserver < OldActivityObserver
     create_event(merge_request, OldEvent::CLOSED)
     Note.create_status_change_note(merge_request, merge_request.target_project, current_user, merge_request.state, nil)
 
-    notification.close_mr(merge_request, current_user)
+    #notification.close_mr(merge_request, current_user)
   end
 
   def after_merge(merge_request, transition)
