@@ -17,7 +17,7 @@
         %i.icon-minus.icon-white
 
   .edit-member.hide.js-toggle-content
-    = form_for group_member_path(@group, member), remote: true do |f|
+    = form_for :group_member, group_member_path(@group, member), remote: true do |f|
       .alert.prepend-top-20
         = f.select :group_access, options_for_select(UsersGroup.group_access_roles, member.group_access)
         = f.submit 'Save', class: 'btn btn-save'

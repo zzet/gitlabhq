@@ -3,7 +3,7 @@ module Groups
     class BaseContext < Groups::BaseContext
       attr_accessor :group, :current_user, :member, :params
 
-      def initialize(user, project, member, params = {})
+      def initialize(user, group, member, params = {})
         @group, @current_user, @member, @params = group, user, member, params.dup
       end
 

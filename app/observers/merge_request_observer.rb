@@ -36,7 +36,7 @@ class MergeRequestObserver < OldActivityObserver
   def after_update(merge_request)
     #notification.reassigned_merge_request(merge_request, current_user) if merge_request.is_being_reassigned?
 
-    #merge_request.notice_added_references(merge_request.project, current_user)
+    merge_request.notice_added_references(merge_request.project, current_user)
   end
 
   def create_event(record, status)

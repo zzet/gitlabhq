@@ -1938,7 +1938,7 @@ class EventNotificationMailer < ActionMailer::Base
     result = Rails.cache.fetch(key)
 
     if result.nil?
-      result = Gitlab::Git::Compare.new(@project.raw_repository, @push_data["before"], @push_data["after"])
+      result = Gitlab::Git::Compare.new(@project.repository.raw_repository, @push_data["before"], @push_data["after"])
       Rails.cache.write(key, result, expires_in: 20.minutes)
     end
 

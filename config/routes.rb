@@ -345,7 +345,7 @@ Gitlab::Application.routes.draw do
         end
       end
 
-      resources :tokens,  only: [:index, :show, :create, :destroy]
+      resources :tokens,  only: [:index, :show, :create, :destroy], constraints: {id: /\d+/}
     end
   end
 

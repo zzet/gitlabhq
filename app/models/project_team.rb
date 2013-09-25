@@ -13,12 +13,11 @@ class ProjectTeam
   #
   def << args
     users = args.first
-    source = args.third.present? ? args.third : @project
 
     if users.respond_to?(:each)
-      add_users(users, args.second, source)
+      add_users(users, args.second)
     else
-      add_user(users, args.second, source)
+      add_user(users, args.second)
     end
   end
 
@@ -44,20 +43,19 @@ class ProjectTeam
     tm
   end
 
-  def add_user(user, access, source)
-    add_users_ids([user.id], access, source)
+  def add_user(user, access)
+    add_users_ids([user.id], access)
   end
 
-  def add_users(users, access, source)
-    add_users_ids(users.map(&:id), access, source)
+  def add_users(users, access)
+    add_users_ids(users.map(&:id), access)
   end
 
-  def add_users_ids(user_ids, access, source)
+  def add_users_ids(user_ids, access)
     UsersProject.add_users_into_projects(
       [project.id],
       user_ids,
-      access,
-      source
+      access
     )
   end
 
