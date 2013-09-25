@@ -16,7 +16,8 @@ class Groups::MembersController < Groups::ApplicationController
   end
 
   def update
-    ::Groups::Users::UpdateRelationContext.new(@current_user, group, member, params).execute
+    ::Groups::Users::UpdateRelationContext.new(@current_user, group, member, params[:group_member]).execute
+    redirect_to group_members_path(group), notice: "Member was successfully updated."
   end
 
   def destroy

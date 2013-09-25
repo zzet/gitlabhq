@@ -1,6 +1,6 @@
 - user = member.user
 - return unless user
-%li{class: "#{dom_class(member)} js-toggle-container", id: dom_id(member)}
+%li{class: "#{dom_class(user)} js-toggle-container", id: dom_id(user)}
   = image_tag gravatar_icon(user.email, 16), class: "avatar s16"
   %strong= user.name
   %span.cgray= user.username
@@ -17,7 +17,7 @@
         %i.icon-minus.icon-white
 
   .edit-member.hide.js-toggle-content
-    = form_for :group_member, group_member_path(@group, member), remote: true do |f|
+    = form_for :group_member, url: group_member_path(@group, member) do |f|
       .alert.prepend-top-20
         = f.select :group_access, options_for_select(UsersGroup.group_access_roles, member.group_access)
         = f.submit 'Save', class: 'btn btn-save'
