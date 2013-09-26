@@ -67,7 +67,7 @@ class UsersProject < ActiveRecord::Base
     #     :master
     #   )
     #
-    def add_users_into_projects(project_ids, user_ids, access, source = self)
+    def add_users_into_projects(project_ids, user_ids, access)
       project_access = if roles_hash.has_key?(access)
                          roles_hash[access]
                        elsif roles_hash.values.include?(access.to_i)
@@ -79,7 +79,7 @@ class UsersProject < ActiveRecord::Base
       UsersProject.transaction do
         project_ids.each do |project_id|
           user_ids.each do |user_id|
-            users_project = UsersProject.new(project_access: project_access, user_id: user_id, source: source)
+            users_project = UsersProject.new(project_access: project_access, user_id: user_id)
             users_project.project_id = project_id
             users_project.save
           end
