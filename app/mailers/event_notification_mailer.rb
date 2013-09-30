@@ -1485,9 +1485,9 @@ class EventNotificationMailer < ActionMailer::Base
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
-    @utpr         = @event.source
+    @tpr          = @event.source
     @team         = @event.target
-    @project      = @utpr.project
+    @project      = @tpr.project
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'assigned',
@@ -1968,7 +1968,7 @@ class EventNotificationMailer < ActionMailer::Base
       @diffs         = result.diffs
       @refs_are_same = result.same
 
-      @suppress_diff = result.diffs.size > Commit::DIFF_SAFE_SIZE
+      @suppress_diff = result.diffs.size > Commit::DIFF_SAFE_FILES
       @suppress_diff ||= result.diffs.inject(0) { |sum, diff| diff.diff.lines.count } > Commit::DIFF_SAFE_LINES
 
       @line_notes    = []
@@ -1981,7 +1981,7 @@ class EventNotificationMailer < ActionMailer::Base
       subject = if @commits.many?
         "[#{@project.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.short_id} [undev gitlab commits]"
       else
-        "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.title}' to parent commit #{@before_commit.short_id} [undev gitlab commits]"
+        "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.message.truncate(100, omission: "...")}' to parent commit #{@before_commit.short_id} [undev gitlab commits]"
       end
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: subject)

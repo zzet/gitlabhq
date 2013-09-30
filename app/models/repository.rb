@@ -30,7 +30,7 @@ class Repository
       ref: ref,
       path: path,
       limit: limit,
-      offset: offset,
+      offset: offset
     )
     commits = Commit.decorate(commits) if commits.present?
     commits

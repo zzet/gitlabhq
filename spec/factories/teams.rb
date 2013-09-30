@@ -4,7 +4,7 @@ FactoryGirl.define do
   factory :team do
     name
     description
-    path
+    sequence(:path) { |n| "team-path-#{n}"}
     public true
   end
 end

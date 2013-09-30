@@ -13,12 +13,10 @@
   %tr
     %th Project name
     %th Project description
-    %th Default permission role
   - @group.projects.each do |project|
     %tr
       %td= link_to "#{project.name_with_namespace} (#{project.path_with_namespace})", project_url(project.path_with_namespace)
       %td= project.description
-      %td= @team.human_max_project_access(project)
 %br
 %br
 %p
@@ -34,6 +32,6 @@
         - @group.projects.each do |project|
           = project.path_with_namespace
           (
-          = project.project_access_human(member)
+          = @team.team_user_relationships.where(user_id: member).first.human_access
           )
           %br
