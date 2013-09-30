@@ -15,4 +15,4 @@
   - @team.members.each do |member|
     %tr
       %td= link_to member.name, user_url(member.username)
-      %td= @project.project_access_human(member)
+      %td= @team.team_user_relationships.where(user_id: member).first.human_access
