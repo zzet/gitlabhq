@@ -4,7 +4,7 @@ class Gitlab::Event::Notification::Creator::Note < Gitlab::Event::Notification::
 
     notifications << create_notification_for_commit_author(event) if can_create_for_commit_author?(event)
 
-    notifications << create_notification_for_mentioned_users(event, notifications.flatten)
+    #notifications << create_notification_for_mentioned_users(event, notifications.flatten)
   end
 
   def can_create_for_commit_author?(event)
