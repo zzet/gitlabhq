@@ -638,12 +638,14 @@ class EventNotificationMailer < ActionMailer::Base
         Rails.cache.write(key, @commit, expires_in: 1.hour)
       end
 
-      headers 'X-Gitlab-Entity' => 'project/commit',
-              'X-Gitlab-Action' => 'commented',
-              'X-Gitlab-Source' => 'note',
-              'In-Reply-To'     => "project-#{@project.path_with_namespace}-commit-#{@commit_sha}"
+      if @project && @commit
+        headers 'X-Gitlab-Entity' => 'project/commit',
+          'X-Gitlab-Action' => 'commented',
+          'X-Gitlab-Source' => 'note',
+          'In-Reply-To'     => "project-#{@project.path_with_namespace}-commit-#{@commit_sha}"
 
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Commit '#{@commit.title}' (sha #{@commit.short_id}) was commented")
+        mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Commit '#{@commit.title}' (sha #{@commit.short_id}) was commented")
+      end
     end
   end
 
