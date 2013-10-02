@@ -50,9 +50,9 @@ module Projects
         master_permission = @project.users_projects.find_by_user_id(current_user)
 
         if master_permission.blank?
-          @project.users_projects.create(project_access: UsersProject::OWNER, user: current_user)
+          @project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
         else
-          master_permission.update_attribute(:project_access, UsersProject::OWNER) if master_permission.project_access != UsersProject::OWNER
+          master_permission.update_attribute(:project_access, UsersProject::MASTER) if master_permission.project_access != UsersProject::MASTER
         end
 
         if current_user.notification_setting && current_user.notification_setting.subscribe_if_owner
