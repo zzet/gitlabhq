@@ -4,7 +4,7 @@
 #
 #  id         :integer          not null, primary key
 #  title      :string(255)
-#  content    :text(2147483647)
+#  content    :text
 #  author_id  :integer          not null
 #  project_id :integer
 #  created_at :datetime         not null

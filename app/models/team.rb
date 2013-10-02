@@ -5,10 +5,11 @@
 #  id          :integer          not null, primary key
 #  name        :string(255)
 #  path        :string(255)
-#  owner_id    :integer
+#  description :text
+#  creator_id  :integer
+#  public      :boolean
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  description :string(255)      default(""), not null
 #
 
 class Team < ActiveRecord::Base

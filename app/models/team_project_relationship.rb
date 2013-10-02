@@ -2,12 +2,11 @@
 #
 # Table name: team_project_relationships
 #
-#  id              :integer          not null, primary key
-#  project_id      :integer
+#  id         :integer          not null, primary key
+#  project_id :integer
 #  team_id    :integer
-#  greatest_access :integer
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 
 class TeamProjectRelationship < ActiveRecord::Base

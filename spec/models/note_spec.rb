@@ -13,6 +13,7 @@
 #  line_code     :string(255)
 #  commit_id     :string(255)
 #  noteable_id   :integer
+#  system        :boolean          default(FALSE), not null
 #  st_diff       :text
 #
 

@@ -11,8 +11,8 @@
 #  title             :string(255)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  st_commits        :text(2147483647)
-#  st_diffs          :text(2147483647)
+#  st_commits        :text
+#  st_diffs          :text
 #  milestone_id      :integer
 #  state             :string(255)
 #  merge_status      :string(255)

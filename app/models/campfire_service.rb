@@ -13,6 +13,7 @@
 #  project_url :string(255)
 #  subdomain   :string(255)
 #  room        :string(255)
+#  state       :string(255)
 #
 
 class CampfireService < Service

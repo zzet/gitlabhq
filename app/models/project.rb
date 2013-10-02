@@ -19,8 +19,10 @@
 #  issues_tracker         :string(255)      default("gitlab"), not null
 #  issues_tracker_id      :string(255)
 #  snippets_enabled       :boolean          default(TRUE), not null
+#  git_protocol_enabled   :boolean
 #  last_activity_at       :datetime
 #  imported               :boolean          default(FALSE), not null
+#  last_pushed_at         :datetime
 #  import_url             :string(255)
 #
 
