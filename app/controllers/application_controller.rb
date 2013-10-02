@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   before_filter :dev_tools if Rails.env == 'development'
   before_filter :default_headers
   before_filter :add_gon_variables
+  before_filter :load_banner
 
   protect_from_forgery
 
@@ -159,5 +160,9 @@ class ApplicationController < ActionController::Base
   def event_filter
     filters = cookies['event_filter'].split(',') if cookies['event_filter'].present?
     @event_filter ||= EventFilter.new(filters)
+  end
+
+  def load_banner
+    @banner = Banner.published.last
   end
 end

@@ -1,7 +1,7 @@
 include ActionDispatch::TestProcess
 
 FactoryGirl.define do
-  sequence :sentence, aliases: [:title, :content] do
+  sequence :sentence, aliases: [:title, :content, :description] do
     Faker::Lorem.sentence
   end
 

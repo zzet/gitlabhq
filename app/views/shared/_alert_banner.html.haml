@@ -1,0 +1,9 @@
+- if banner.present?
+  .alert-container
+    .alert{class: banner.category}
+      .pull-right
+        = link_to "#", :"data-dismiss" => "alert" do
+          &times;
+
+      %strong= banner.title
+      = banner.description

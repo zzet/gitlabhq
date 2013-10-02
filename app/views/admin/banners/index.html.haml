@@ -1,0 +1,24 @@
+%h3.page_title
+  Banners
+  = link_to 'New Banner', new_admin_banner_path, class: "btn btn-small pull-right"
+%br
+
+.row
+  .span3
+    .admin-filter
+
+  .span9
+    .ui-box
+      %h5.title
+        Banners (#{@banners.count})
+      %ul.well-list.alert-list
+        - @banners.each do |banner|
+          %li.clearfix
+            .span6
+              .alert{class: banner.category}
+                %strong= banner.title
+            .span3
+              .pull-right
+                .label= banner.state
+                = link_to 'Edit', edit_admin_banner_path(banner), id: "edit_#{dom_id(banner)}", class: "btn btn-small"
+                = link_to 'Destroy', [:admin, banner], confirm: "Banner '#{banner.title}' WILL BE REMOVED! Are you sure?", method: :delete, class: "btn btn-small btn-remove"

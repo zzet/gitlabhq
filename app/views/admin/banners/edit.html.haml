@@ -1,0 +1,38 @@
+= form_for @banner, url: admin_banner_path(@banner), method: :put do |f|
+  - if @banner.errors.any?
+    .alert.alert-error
+      %span= @banner.errors.full_messages.first
+  .clearfix
+    = f.label :title do
+      Banner title is
+    .input
+      = f.text_field :title, placeholder: "Ex. Ruby Developers", class: "xxlarge left"
+
+  .clearfix.banner-description-holder
+    = f.label :description, "Details"
+    .input
+      = f.text_area :description, maxlength: 250, class: "xxlarge js-gfm-input", rows: 4
+
+  .clearfix
+    = f.label :category do
+      Category is
+    .input
+      = f.select :category, Banner.available_categories, include_blank: @banner.category, class: "xxlarge left"
+
+  .clearfix
+    = f.label :state_event do
+      State is
+    .input
+      = f.select(:state_event, @banner.state_transitions.map {|s| [s.human_event, s.event]}, include_blank: @banner.human_state_name)
+
+
+
+  .clearfix
+    .input
+      %ul
+        %li Some notes
+        %li Some notes
+        %li Some notes
+
+  .form-actions
+    = f.submit 'Update', class: "btn btn-create"

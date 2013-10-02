@@ -1,0 +1,17 @@
+.alert-container {
+  width: 1170px;
+  margin: auto;
+  margin-top: 5px;
+}
+
+.well-list.alert-list {
+  .span6, .span3 {
+    margin-left: 0px;
+  }
+
+  .span6 {
+    .alert {
+      margin-bottom: 0px;
+    }
+  }
+}

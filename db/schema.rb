@@ -11,7 +11,21 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130926081215) do
+ActiveRecord::Schema.define(:version => 20131002112429) do
+
+  create_table "banners", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.string   "category"
+    t.string   "state"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer  "author_id"
+    t.integer  "entity_id"
+    t.string   "entity_type"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
