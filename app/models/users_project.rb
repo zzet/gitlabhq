@@ -30,7 +30,7 @@ class UsersProject < ActiveRecord::Base
 
   validates :user, presence: true
   validates :user_id, uniqueness: { scope: [:project_id], message: "already exists in project" }
-  validates :project_access, inclusion: { in: Gitlab::Access.values }, presence: true
+  validates :project_access, inclusion: { in: Gitlab::Access.values_with_owner }, presence: true
   validates :project, presence: true
 
   delegate :name, :username, :email, to: :user, prefix: true
