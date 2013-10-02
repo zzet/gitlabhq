@@ -21,7 +21,7 @@
 
         -# Only if current_user dev - can be rendered some items in dropdown
         -# It's not Gitlab bisness rule - it's Undev requiments
-        - if @project.team.developers.include?(current_user)
+        - if can? current_user, :push_code, @project
           .dropdown.pull-right
             %a.dropdown-toggle.btn{href: '#', "data-toggle" => "dropdown"}
               %i.icon-plus-sign-alt
