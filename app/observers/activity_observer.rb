@@ -15,6 +15,7 @@ class ActivityObserver < ActiveRecord::Observer
           :team_group_relationship,
           :team_user_relationship,
           :users_project,   # +
+          :users_group,   # +
           :project_hook,    # +
           :system_hook
 
@@ -51,8 +52,8 @@ class ActivityObserver < ActiveRecord::Observer
     Gitlab::Event::Action.trigger :updated, model unless updated_by_system?(model)
   end
 
-  def before_destroy(model)
-    Gitlab::Event::Action.trigger :deleted, model
+  def after_destroy(model)
+    #Gitlab::Event::Action.trigger :deleted, model
   end
 
   def updated_by_system?(model)

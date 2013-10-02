@@ -1,12 +1,12 @@
-class Gitlab::Event::Builder::UsersProject < Gitlab::Event::Builder::Base
+class Gitlab::Event::Builder::UsersGroup < Gitlab::Event::Builder::Base
   class << self
     def prioritet
       1
     end
 
     def can_build?(action, data)
-      known_action = known_action? action, ::UsersProject.available_actions
-      known_source = data.is_a? ::UsersProject
+      known_action = known_action? action, ::UsersGroup.available_actions
+      known_source = data.is_a? ::UsersGroup
       known_source && known_action
     end
 

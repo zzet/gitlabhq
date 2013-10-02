@@ -284,12 +284,6 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def send_move_instructions
-    team.members.each do |user|
-      Notify.delay.project_was_moved_email(self.id, user.id)
-    end
-  end
-
   def owner
     if namespace
       namespace_owner
@@ -462,7 +456,6 @@ class Project < ActiveRecord::Base
         gitlab_shell.mv_repository("#{old_path_with_namespace}.wiki", "#{new_path_with_namespace}.wiki")
         gitlab_shell.rm_satellites(old_path_with_namespace)
         ensure_satellite_exists
-        send_move_instructions
         reset_events_cache
       rescue
         # Returning false does not rollback after_* transaction but gives

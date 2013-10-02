@@ -12,7 +12,7 @@
 #
 
 class UsersGroup < ActiveRecord::Base
-  include Notifiable
+  include Watchable
   include Gitlab::Access
 
   def self.group_access_roles
@@ -39,6 +39,8 @@ class UsersGroup < ActiveRecord::Base
   validates :user_id, uniqueness: { scope: [:group_id], message: "already exists in group" }
 
   delegate :name, :username, :email, to: :user, prefix: true
+
+  actions_to_watch [:created, :updated, :deleted]
 
   def access_field
     group_access

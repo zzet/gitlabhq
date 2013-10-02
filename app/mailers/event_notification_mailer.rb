@@ -285,21 +285,6 @@ class EventNotificationMailer < ActionMailer::Base
   end
 
   # User watch MR
-  def updated_merge_request_merge_request_email(notification)
-    @notification  = notification
-    @event         = @notification.event
-    @user          = @event.author
-    @merge_request = @event.source
-    @project       = @merge_request.project
-    @changes       = JSON.load(@event.data).to_hash["previous_changes"]
-
-    headers 'X-Gitlab-Entity' => 'merge_request',
-            'X-Gitlab-Action' => 'updated',
-            'X-Gitlab-Source' => 'merge_request',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
-
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge Request ##{@merge_request.id} '#{@source.title}' was updated")
-  end
 
   def updated_merge_request_note_email(notification)
     @notification  = notification
@@ -615,6 +600,28 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
+  def updated_group_users_group_email(notification)
+    @notification         = notification
+    @event                = @notification.event
+    @user                 = @event.author
+    @upr                  = @event.source
+    data                  = JSON.load(@event.data)
+    @group                = Group.find(data["group_id"])
+    @member               = User.find(data["user_id"])
+    @changes              = data["previous_changes"]
+    unless @changes.blank?
+      @previous_permission  = UsersGroup.access_roles.key(@changes["group_access"].first)
+      @current_permission   = UsersGroup.access_roles.key(@changes["group_access"].last)
+
+      headers 'X-Gitlab-Entity' => 'group',
+              'X-Gitlab-Action' => 'updated',
+              'X-Gitlab-Source' => 'group-user-relationship',
+              'In-Reply-To'     => "group-#{@group.path_with_namespace}-user-#{@member.username}"
+
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@group.path_with_namespace}] Permissions for user '#{ @member.name }' was updated")
+    end
+  end
+
   #
   # Commented action
   #
@@ -763,7 +770,9 @@ class EventNotificationMailer < ActionMailer::Base
     @user         = User.find_by_id(data["user_id"])
     @team         = Team.find_by_id(data["team_id"])
 
-    subscription_target = @notification.subscription.target
+    subscription = @notification.subscription
+    subscription_target = Team.new
+    subscription_target = subscription.target if subscription.present?
     source = case subscription_target
              when Team
                "team"
@@ -1026,6 +1035,37 @@ class EventNotificationMailer < ActionMailer::Base
     end
   end
 
+  def created_users_group_users_group_email(notification)
+    case notification.subscription.target
+    when Group
+      EventNotificationMailer.joined_group_users_group_email(notification).deliver!
+    when User
+      EventNotificationMailer.joined_user_users_group_email(notification).deliver!
+    end
+  end
+
+  def deleted_users_group_users_group_email(notification)
+    subscription = notification.subscription
+    if subscription
+      case subscription.target_type
+      when "Group"
+        EventNotificationMailer.left_group_users_group_email(notification).deliver!
+      when "User"
+        EventNotificationMailer.left_user_users_group_email(notification).deliver!
+      end
+    end
+  end
+
+  def updated_users_group_users_group_email(notification)
+    case notification.subscription.target
+    when Group
+      EventNotificationMailer.updated_group_users_group_email(notification).deliver!
+    when User
+      EventNotificationMailer.updated_user_users_group_email(notification).deliver!
+    end
+  end
+
+
   def imported_project_project_email(notification)
     @notification = notification
     @event        = @notification.event
@@ -1072,6 +1112,40 @@ class EventNotificationMailer < ActionMailer::Base
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was added to '#{@project.path_with_namespace}' project")
+  end
+
+  def joined_group_users_group_email(notification)
+    @notification = notification
+    @event        = @notification.event
+    @user         = @event.author
+    @ug           = @event.source
+    @group        = @event.target
+    @member       = @ug.user
+    @group        = @ug.group if @group.is_a?(UsersGroup)
+
+    headers 'X-Gitlab-Entity' => 'group',
+            'X-Gitlab-Action' => 'joined',
+            'X-Gitlab-Source' => 'group-user-relationship',
+            'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@group.path}] User '#{@member.name}' was added")
+  end
+
+  def joined_user_users_group_email(notification)
+    @notification = notification
+    @event        = @notification.event
+    @user         = @event.author
+    @ug           = @event.source
+    @group        = @ug.group
+    @member       = @event.target
+    @member       = @up.user if @member.is_a?(UsersGroup)
+
+    headers 'X-Gitlab-Entity' => 'user',
+            'X-Gitlab-Action' => 'joined',
+            'X-Gitlab-Source' => 'group-user-relationship',
+            'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was added to '#{@group.path}' group")
   end
 
   def joined_team_user_relationship_email(notification)
@@ -1128,6 +1202,25 @@ class EventNotificationMailer < ActionMailer::Base
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] User '#{@member.name}' was removed from project team")
+    end
+  end
+
+  def left_group_users_group_email(notification)
+    @notification = notification
+    @event        = @notification.event
+    @user         = @event.author
+    @ug           = JSON.load(@event.data)
+    @group        = @event.target
+    @member       = User.find(@ug["user_id"])
+    @group        = Group.find(@ug["group_id"]) if @group.nil? || @group.is_a?(UsersGroup)
+
+    if @member && @group
+    headers 'X-Gitlab-Entity' => 'group',
+            'X-Gitlab-Action' => 'left',
+            'X-Gitlab-Source' => 'group-user-relationship',
+            'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@group.path}] User '#{@member.name}' was removed from group team")
     end
   end
 
@@ -1358,21 +1451,6 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} '#{@merge_request.title}' was closed")
   end
 
-  def closed_project_merge_request_email(notification)
-    @notification  = notification
-    @event         = @notification.event
-    @user          = @event.author
-    @merge_request = @event.source
-    @project       = @event.target
-
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'closed',
-            'X-Gitlab-Source' => 'merge_request',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
-
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} '#{@merge_request.title}' was closed")
-  end
-
   def opened_project_issue_email(notification)
     @notification = notification
     @event = @notification.event
@@ -1411,40 +1489,10 @@ class EventNotificationMailer < ActionMailer::Base
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} #{@merge_request.title} was reopened")
   end
-  def reopened_project_merge_request_email(notification)
-    @notification   = notification
-    @event          = @notification.event
-    @user           = @event.author
-    @merge_request  = @event.source
-    @project        = @event.target
-
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'reopened',
-            'X-Gitlab-Source' => 'merge_request',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
-
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} #{@merge_request.title} was reopened")
-  end
 
   #
   # Merged action
   #
-
-  def merged_merge_request_merge_request_email(notification)
-    @notification   = notification
-    @event          = @notification.event
-    @user           = @event.author
-    @merge_request  = @event.source
-    @project        = @merge_request.project
-
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'merged',
-            'X-Gitlab-Source' => 'merge_request',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
-
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} #{@merge_request.title} was merged")
-  end
-
 
   def merged_project_merge_request_email(notification)
     @notification   = notification
@@ -1722,8 +1770,8 @@ class EventNotificationMailer < ActionMailer::Base
     @notification   = notification
     @event          = @notification.event
     @user           = @event.author
-    @project        = @merge_request.project
     @merge_request  = @event.source
+    @project        = @merge_request.project
     @assigned_user  = @merge_request.assignee
 
     headers 'X-Gitlab-Entity' => 'user',
@@ -1732,21 +1780,6 @@ class EventNotificationMailer < ActionMailer::Base
             'In-Reply-To'     => "user-#{@assigned_user.username}-merge_request-#{@merge_request.id}"
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Merge request ##{@merge_request.id} '#{@merge_request.title}' was assigned")
-  end
-
-  def assigned_user_merge_request_email(notification)
-    @notification   = notification
-    @event          = @notification.event
-    @user           = @event.author
-    @merge_request  = @event.source
-    @assigned_user  = @event.target
-
-    headers 'X-Gitlab-Entity' => 'user',
-            'X-Gitlab-Action' => 'assigned',
-            'X-Gitlab-Source' => 'merge_request',
-            'In-Reply-To'     => "user-#{@assigned_user.username}-merge_request-#{@merge_request.id}"
-
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "#{@assigned_user.name} was assigned to #{@merge_request.title} merge request")
   end
 
   #
@@ -1829,7 +1862,7 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Issue #{@source.name} was reassigned to #{@target.name} user by #{@user.name} [reassigned]")
   end
 
-  def reassigned_user_merge_request_email(notification)
+  def reassigned_merge_request_merge_request_email(notification)
     @notification   = notification
     @event          = @notification.event
     @user           = @event.author
