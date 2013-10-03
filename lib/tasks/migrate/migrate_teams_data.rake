@@ -9,7 +9,7 @@ namespace :undev do
                      description: ut.description,
                      path:        ut.path,
                      creator_id:  ut.owner_id,
-                     public:      false)
+                     public:      true)
         t.created_at = ut.created_at
         t.updated_at = ut.updated_at
 
