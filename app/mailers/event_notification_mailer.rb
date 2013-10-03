@@ -767,7 +767,7 @@ class EventNotificationMailer < ActionMailer::Base
     @event        = @notification.event
     @user         = @event.author
     data          = JSON.load(@event.data).to_hash
-    @user         = User.find_by_id(data["user_id"])
+    @member       = User.find_by_id(data["user_id"])
     @team         = Team.find_by_id(data["team_id"])
 
     subscription = @notification.subscription
@@ -792,7 +792,7 @@ class EventNotificationMailer < ActionMailer::Base
             'In-Reply-To'     => "#{subscription_target.class.name.underscore}-#{subscription_target.id}-team-user-relationship-#{data["id"]}"
 
     if @user && @team
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@user.name}' was removed from '#{@team.name}' team")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was removed from '#{@team.name}' team")
     end
   end
 

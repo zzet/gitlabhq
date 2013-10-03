@@ -239,7 +239,7 @@ module ApplicationHelper
   end
 
   def permission_key?(key)
-    %w(greatest_access permission project_access).include?(key)
+    %w(group_access team_access project_access).include?(key)
   end
 
   def search_placeholder
