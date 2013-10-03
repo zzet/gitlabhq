@@ -126,7 +126,7 @@ module CommitsHelper
     if user.nil?
       mail_to(source_email, text.html_safe, options)
     else
-      link_to(text.html_safe, user_path(user), options)
+      link_to(text.html_safe, options[:type] == :path ? user_path(user) : user_url(user), options)
     end
   end
 end
