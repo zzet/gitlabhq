@@ -19,7 +19,15 @@ class TeamsController < ApplicationController
     projects
     groups
     members
-    @events = OldEvent.in_projects(team.project_ids).limit(20).offset(params[:offset] || 0)
+    @events = OldEvent.in_projects(team.projects.pluck(:id) + team.groups_projects.pluck(:id))
+    @events = event_filter.apply_filter(@events)
+    @events = @events.limit(20).offset(params[:offset] || 0)
+
+    respond_to do |format|
+      format.html
+      format.js
+      format.atom { render layout: false }
+    end
   end
 
   def edit

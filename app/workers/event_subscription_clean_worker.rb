@@ -26,7 +26,6 @@ class EventSubscriptionCleanWorker
       if Event::Subscription::Notification.where(subscription_id: subscription, notification_state: [:new, :delayed]).any?
         Sidekiq::Client.enqueue_to(:mail_notifications, EventSubscriptionCleanWorker, subscription_id)
       else
-        Rails.logger.info "Delete subscription by action: " << name
         subscription.destroy
       end
     end

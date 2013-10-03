@@ -6,6 +6,7 @@
     &nbsp;
     %span.cgray Events and projects are filtered in scope of team projects
     %hr
+    = render 'shared/event_filter'
     - if @events.any?
       .content_list
     - else
