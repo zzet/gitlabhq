@@ -2,7 +2,7 @@
   .ui-box
     .title
       %strong #{team.name}
-      group members (#{team.team_user_relationships.count})
+      team members (#{team.team_user_relationships.count})
       - if can? current_user, :manage_team, team
         .pull-right
           = link_to team_members_path(team), class: 'btn btn-small' do
