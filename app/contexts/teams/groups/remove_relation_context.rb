@@ -2,7 +2,7 @@ module Teams
   module Groups
     class RemoveRelationContext < Teams::Groups::BaseContext
       def execute
-        Gitlab::UserTeamManager.resign_from_group(team, group)
+        team.team_group_relationships.where(group_id: group).destroy_all
 
         receive_delayed_notifications
       end

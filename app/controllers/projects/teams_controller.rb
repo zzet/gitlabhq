@@ -2,27 +2,30 @@ class Projects::TeamsController < Projects::ApplicationController
 
   before_filter :authorize_admin_team_member!
 
-  def available
-    @teams = current_user.is_admin? ? UserTeam.scoped : current_user.user_teams
-    @teams = @teams.without_project(project)
-    unless @teams.any?
-      redirect_to project_team_index_path(project), notice: "No available teams for assigment."
-    end
+  def index
+    @teams = project.teams
+    @team_project_relation = project.team_project_relationships.build
+    not_avaliable_teams = (@teams.pluck(:id) + project.group_teams.pluck(:id)).uniq
+    @avaliable_teams = current_user.authorized_teams
+    @avaliable_teams = @avaliable_teams.where("teams.id not in (?)", not_avaliable_teams) if not_avaliable_teams.any?
+    render :index, layout: 'project_settings'
   end
 
-  def assign
-    Projects::Teams::CreateRelationContext.new(@current_user, project, params).execute
-    redirect_to project_team_index_path(project)
+  def create
+    ::Projects::Teams::CreateRelationContext.new(@current_user, project, params).execute
+
+    redirect_to project_teams_path(@project)
   end
 
-  def resign
-    Projects::Teams::RemoveRelationContext.new(@current_user, project, params).execute
-    redirect_to project_team_index_path(project)
+  def destroy
+    ::Projects::Teams::RemoveRelationContext.new(@current_user, project, team).execute
+
+    redirect_to project_teams_path(@project)
   end
 
   protected
 
-  def user_team
-    @team ||= UserTeam.find_by_path(params[:id])
+  def team
+    @team ||= project.teams.find_by_path(params[:id])
   end
 end

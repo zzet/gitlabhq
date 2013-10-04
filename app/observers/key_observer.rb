@@ -1,6 +1,6 @@
 class KeyObserver < BaseObserver
-  def after_save(key)
-    GitlabShellWorker.perform_async(
+  def after_create(key)
+    ::GitlabShellWorker.perform_async(
       :add_key,
       key.shell_id,
       key.key
@@ -8,7 +8,7 @@ class KeyObserver < BaseObserver
   end
 
   def after_destroy(key)
-    GitlabShellWorker.perform_async(
+    ::GitlabShellWorker.perform_async(
       :remove_key,
       key.shell_id,
       key.key,

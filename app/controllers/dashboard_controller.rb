@@ -1,13 +1,13 @@
 class DashboardController < ApplicationController
   respond_to :html
 
-  before_filter :load_projects
+  before_filter :load_projects, except: [:projects]
   before_filter :event_filter, only: :show
 
   def show
     @groups = current_user.personal_groups.sort_by(&:human_name)
     @has_authorized_projects = @projects.count > 0
-    @teams = current_user.user_teams
+    @teams = current_user.teams
     @projects_count = @projects.count
     @projects = @projects.limit(20)
 
@@ -27,19 +27,50 @@ class DashboardController < ApplicationController
   def projects
     @projects = case params[:scope]
                 when 'personal' then
-                  @projects.personal(current_user)
+                  current_user.namespace.projects
                 when 'joined' then
-                  @projects.joined(current_user)
+                  current_user.authorized_projects.joined(current_user)
+                when 'owned' then
+                  current_user.owned_projects
                 else
-                  @projects
+                  current_user.authorized_projects
                 end.sorted_by_push_date
 
-    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
-    @projects = @projects.search(params[:search]) if params[:search].present?
-    @projects = @projects.page(params[:page]).per(30)
+    @projects = @projects.where(namespace_id: Group.find_by_name(params[:group])) if params[:group].present?
+    @projects = @projects.where(id: Team.find_by_name(params[:team]).projects) if params[:team].present?
+    @projects = @projects.includes(:namespace).sorted_by_activity
 
-    @labels = Project.where(id: @projects.map(&:id)).tags_on(:labels)
+    @labels = current_user.authorized_projects.tags_on(:labels)
+    @groups = current_user.groups
+    @teams = current_user.teams
+
+    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
+    @projects = @projects.page(params[:page]).per(30)
   end
+
+  def teams
+    @teams = case params[:scope]
+                when 'personal' then
+                  current_user.personal_teams
+                when 'joined' then
+                  current_user.teams
+                when 'owned' then
+                  current_user.own_teams
+                else
+                  current_user.authorized_teams
+                end
+
+    @teams = @teams.with_group(Group.find_by_name(params[:group])) if params[:group].present?
+    @teams = @teams.with_project(Project.find_with_namespace(params[:project])) if params[:project].present?
+
+    @groups = current_user.authorized_groups
+    @projects = current_user.authorized_projects
+
+    #@labels = current_user.authorized_teams.tags_on(:labels)
+    #@teams = @teams.tagged_with(params[:label]) if params[:label].present?
+    @teams = @teams.page(params[:page]).per(30)
+  end
+
 
   # Get authored or assigned open merge requests
   def merge_requests
@@ -64,11 +95,7 @@ class DashboardController < ApplicationController
   protected
 
   def load_projects
-    @projects = current_user.authorized_projects.sorted_by_push_date
-  end
-
-  def event_filter
-    filters = cookies['event_filter'].split(',') if cookies['event_filter'].present?
-    @event_filter ||= EventFilter.new(filters)
+    @projects = current_user.projects.sorted_by_push_date
+    @authorized_projects = @projects.count < 20 ? current_user.authorized_projects.where("projects.id not in (?)", @projects.pluck(:id)).sorted_by_push_date.limit(10) : []
   end
 end

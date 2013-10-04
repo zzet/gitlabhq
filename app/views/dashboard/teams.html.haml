@@ -1,0 +1,101 @@
+%h3.page-title My teams
+%p.light
+  All teams you have access to are listed here.
+%hr
+.row
+  .span3
+    %ul.nav.nav-pills.nav-stacked
+      = nav_tab :scope, nil do
+        = link_to teams_dashboard_path do
+          All
+          %span.pull-right
+            = current_user.authorized_teams.count
+      = nav_tab :scope, 'personal' do
+        = link_to teams_dashboard_path(scope: 'personal') do
+          Personal
+          %span.pull-right
+            = current_user.personal_teams.count
+      = nav_tab :scope, 'joined' do
+        = link_to teams_dashboard_path(scope: 'joined') do
+          Joined
+          %span.pull-right
+            = current_user.teams.count
+      = nav_tab :scope, 'owned' do
+        = link_to teams_dashboard_path(scope: 'owned') do
+          Owned
+          %span.pull-right
+            = current_user.own_teams.count
+
+    - if @groups.present?
+      %fieldset
+        %legend Groups
+        %ul.bordered-list
+          - @groups.each do |group|
+            - next unless group.teams.any?
+            %li{ class: (group.name == params[:group]) ? 'active' : 'light' }
+              = link_to teams_dashboard_path(group: group.name) do
+                %i.icon-folder-close-alt
+                = group.name
+                %small.pull-right
+                  = group.teams.count
+
+    - if @projects.present?
+      %fieldset
+        %legend Projects
+        %ul.bordered-list
+          - @projects.each do |project|
+            - next unless project.teams.any?
+            %li{ class: (project.path_with_namespace == params[:project]) ? 'active' : 'light' }
+              = link_to projects_dashboard_path(project: project.path_with_namespace) do
+                %i.icon-folder-close-alt
+                = project.name_with_namespace
+                %small.pull-right
+                  = project.teams.count
+
+    -#- if @labels.present?
+      -#%fieldset
+        -#%legend Labels
+        -#%ul.bordered-list
+          -#- @labels.each do |label|
+            -#%li{ class: (label.name == params[:label]) ? 'active' : 'light' }
+              -#= link_to teams_dashboard_path(scope: params[:scope], label: label.name) do
+                -#%i.icon-tag
+                -#= label.name
+
+  .span9
+    %ul.bordered-list.my-teams.top-list
+      - @teams.each do |team|
+        %li
+          %h4.team-title
+            %span.access-icon
+              -#- if team.public
+                -#= public_icon
+              -#- else
+                -#= private_icon
+            = link_to team_path(team), class: dom_class(team) do
+              %strong= team.name
+
+          .team-info
+            .pull-right
+              -#- team.labels.each do |label|
+                -#%span.label.label-info
+                  -#%i.icon-tag
+                  -#= label.name
+            - if team.description.present?
+              %p= truncate team.description, length: 100
+            -#.last-activity
+              -#%span.light Last activity:
+              -#%span.date= team_last_activity(team)
+
+            -#.pull-right.light
+              -#%small.light
+                -#Last activity #{team_last_activity(team)}
+              -#%br
+              -#%small.light
+                -#Last push #{team_last_push(team)}
+
+        - if @teams.blank?
+          %li
+            %h3.nothing_here_message There are no teams here.
+    .bottom
+      = paginate @teams, theme: "gitlab"

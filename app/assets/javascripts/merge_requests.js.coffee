@@ -11,7 +11,7 @@ class MergeRequest
 
   constructor: (@opts) ->
     this.$el = $('.merge-request')
-    @diffs_loaded = false
+    @diffs_loaded = if @opts.action == 'diffs' then true else false
     @commits_loaded = false
 
     this.activateTab(@opts.action)
@@ -22,12 +22,7 @@ class MergeRequest
     this.$('.show-all-commits').on 'click', =>
       this.showAllCommits()
     
-    modal = $('#modal_merge_info').modal modal: true, show:false
-
-    $('.how_to_merge_link').bind "click", ->
-      modal.show()
-    $('.modal-header .close').bind "click", ->
-      modal.hide()
+    modal = $('#modal_merge_info').modal(show: false)
 
   # Local jQuery finder
   $: (selector) ->

@@ -1,25 +1,33 @@
 .ui-box
-  %h5.title
-    Projects
-    %small
-      (#{projects.count})
-    - if can? current_user, :manage_user_team, @team
+  .title.clearfix
+    = search_field_tag :filter_projects, nil, placeholder: 'Filter by name', class: 'dash-filter'
+    - if current_user.can_create_project?
       %span.pull-right
-        = link_to edit_team_path(@team), class: "btn btn-tiny info" do
+        = link_to team_projects_path(@team), class: "btn btn-new" do
           %i.icon-plus
-          Assign Project
-  %ul.well-list
-    - if projects.blank?
-      %p.nothing_here_message This team has no projects yet
+          New project
+
+  %ul.well-list.dash-list
     - projects.each do |project|
-      %li
+      %li.project-row
         = link_to project_path(project), class: dom_class(project) do
-          %strong.well-title= truncate(project.name_with_namespace, length: 40)
+          %span.namespace-name
+            - if project.namespace
+              = project.namespace.human_name
+              \/
+          %span.project-name.filter-title
+            = truncate(project.name, length: 25)
           %span.arrow
-            &rarr;
-          %span.last_activity
+            %i.icon-angle-right
+          %div.last_activity
             %strong Last activity:
-            %span= project_last_activity(project)
-          %span.last_activity
+            %span.date= project_last_activity(project)
+          %div.last_activity
             %strong Last push:
-            %span= project_last_push(project)
+            %span.date= project_last_push(project)
+    - if projects.blank?
+      %li
+        %h3.nothing_here_message There are no projects here.
+    - if @projects.count > 20
+      %li.bottom
+        %strong= link_to "show all projects", projects_dashboard_path

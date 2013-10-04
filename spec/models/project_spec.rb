@@ -19,12 +19,19 @@
 #  issues_tracker         :string(255)      default("gitlab"), not null
 #  issues_tracker_id      :string(255)
 #  snippets_enabled       :boolean          default(TRUE), not null
+#  git_protocol_enabled   :boolean
 #  last_activity_at       :datetime
+#  imported               :boolean          default(FALSE), not null
+#  last_pushed_at         :datetime
+#  import_url             :string(255)
 #
 
 require 'spec_helper'
 
 describe Project do
+  before(:each) { enable_observers }
+  after(:each) { disable_observers }
+
   describe "Associations" do
     it { should belong_to(:group) }
     it { should belong_to(:namespace) }
@@ -53,20 +60,21 @@ describe Project do
     let!(:project) { create(:project) }
 
     it { should validate_presence_of(:name) }
-    it { should validate_uniqueness_of(:name) }
+    it { should validate_uniqueness_of(:name).scoped_to(:namespace_id) }
     it { should ensure_length_of(:name).is_within(0..255) }
 
     it { should validate_presence_of(:path) }
-    it { should validate_uniqueness_of(:path) }
+    it { should validate_uniqueness_of(:path).scoped_to(:namespace_id) }
     it { should ensure_length_of(:path).is_within(0..255) }
     it { should ensure_length_of(:description).is_within(0..2000) }
     it { should validate_presence_of(:creator) }
     it { should ensure_length_of(:issues_tracker_id).is_within(0..255) }
 
     it "should not allow new projects beyond user limits" do
-      project.stub(:creator).and_return(double(can_create_project?: false, projects_limit: 1))
-      project.should_not be_valid
-      project.errors[:limit_reached].first.should match(/Your own projects limit is 1/)
+      project2 = build(:project)
+      project2.stub(:creator).and_return(double(can_create_project?: false, projects_limit: 0))
+      project2.should_not be_valid
+      project2.errors[:limit_reached].first.should match(/Your own projects limit is 0/)
     end
   end
 
@@ -99,7 +107,7 @@ describe Project do
     let(:last_event) { double(project_id: project.id, created_at: Time.now) }
 
     describe "last_activity" do
-      it "should alias last_activity to last_event"do
+      it "should alias last_activity to last_event" do
         project.stub(last_event: last_event)
         project.last_activity.should == last_event
       end
@@ -121,7 +129,7 @@ describe Project do
     let(:project) { create(:project_with_code) }
 
     before do
-      @merge_request = create(:merge_request, project: project)
+      @merge_request = create(:merge_request, source_project: project, target_project: project)
       @key = create(:key, user_id: project.owner.id)
     end
 
@@ -152,15 +160,6 @@ describe Project do
       it { Project.find_with_namespace('gitlab/gitlab-ci').should == @project }
       it { Project.find_with_namespace('gitlab-ci').should be_nil }
     end
-
-    context 'w/o namespace' do
-      before do
-        @project = create(:project, name: 'gitlab-ci')
-      end
-
-      it { Project.find_with_namespace('gitlab-ci').should == @project }
-      it { Project.find_with_namespace('gitlab/gitlab-ci').should be_nil }
-    end
   end
 
   describe :to_param do
@@ -171,14 +170,6 @@ describe Project do
       end
 
       it { @project.to_param.should == "gitlab/gitlab-ci" }
-    end
-
-    context 'w/o namespace' do
-      before do
-        @project = create(:project, name: 'gitlab-ci')
-      end
-
-      it { @project.to_param.should == "gitlab-ci" }
     end
   end
 
@@ -197,11 +188,11 @@ describe Project do
     let(:ext_project) { create(:redmine_project) }
 
     it "should be true or if used internal tracker and issue exists" do
-      project.issue_exists?(existed_issue.id).should be_true
+      project.issue_exists?(existed_issue.iid).should be_true
     end
 
     it "should be false or if used internal tracker and issue not exists" do
-      project.issue_exists?(not_existed_issue.id).should be_false
+      project.issue_exists?(not_existed_issue.iid).should be_false
     end
 
     it "should always be true if used other tracker" do
@@ -234,7 +225,7 @@ describe Project do
       project.can_have_issues_tracker_id?.should be_false
     end
 
-    it "should be always false if issues disbled" do
+    it "should be always false if issues disabled" do
       project.issues_enabled = false
       ext_project.issues_enabled = false
 

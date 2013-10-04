@@ -5,7 +5,7 @@ class Admin::Teams::ApplicationController < Admin::ApplicationController
 
   private
 
-  def user_team
-    @team = UserTeam.find_by_path(params[:team_id])
+  def team
+    @team = Team.find_by_path(params[:team_id])
   end
 end

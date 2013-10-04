@@ -14,13 +14,9 @@
 class UsersProject < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
+  include Gitlab::Access
 
-  GUEST     = 10
-  REPORTER  = 20
-  DEVELOPER = 30
-  MASTER    = 40
-
-  attr_accessible :user, :user_id, :project_access
+  attr_accessible :user, :user_id, :project_access, :source_id, :source_type, :source
 
   belongs_to :user
   belongs_to :project
@@ -34,9 +30,8 @@ class UsersProject < ActiveRecord::Base
 
   validates :user, presence: true
   validates :user_id, uniqueness: { scope: [:project_id], message: "already exists in project" }
-  validates :project_access, inclusion: { in: [GUEST, REPORTER, DEVELOPER, MASTER] }, presence: true
+  validates :project_access, inclusion: { in: Gitlab::Access.values_with_owner }, presence: true
   validates :project, presence: true
-
 
   delegate :name, :username, :email, to: :user, prefix: true
 
@@ -44,6 +39,7 @@ class UsersProject < ActiveRecord::Base
   scope :reporters, -> { where(project_access: REPORTER) }
   scope :developers, -> { where(project_access: DEVELOPER) }
   scope :masters,  -> { where(project_access: MASTER) }
+  scope :owners,  -> { where(project_access: OWNER) }
 
   scope :in_project, ->(project) { where(project_id: project.id) }
   scope :in_projects, ->(projects) { where(project_id: projects) }
@@ -85,7 +81,6 @@ class UsersProject < ActiveRecord::Base
           user_ids.each do |user_id|
             users_project = UsersProject.new(project_access: project_access, user_id: user_id)
             users_project.project_id = project_id
-            users_project.skip_git = true
             users_project.save
           end
         end
@@ -100,7 +95,6 @@ class UsersProject < ActiveRecord::Base
       UsersProject.transaction do
         users_projects = UsersProject.where(project_id: project_ids)
         users_projects.each do |users_project|
-          users_project.skip_git = true
           users_project.destroy
         end
       end
@@ -115,37 +109,19 @@ class UsersProject < ActiveRecord::Base
     end
 
     def roles_hash
-      {
-        guest: GUEST,
-        reporter: REPORTER,
-        developer: DEVELOPER,
-        master: MASTER
-      }
+      Gitlab::Access.sym_options
     end
 
     def access_roles
-      {
-        "Guest"     => GUEST,
-        "Reporter"  => REPORTER,
-        "Developer" => DEVELOPER,
-        "Master"    => MASTER
-      }
+      Gitlab::Access.options
     end
   end
 
-  def project_access_human
-    Project.access_options.key(self.project_access)
+  def access_field
+    project_access
   end
 
-  def repo_access_human
-    self.class.access_roles.invert[self.project_access]
-  end
-
-  def skip_git?
-    !!@skip_git
-  end
-
-  def notification
-    @notification ||= Notification.new(self)
+  def owner?
+    project.owner == user
   end
 end

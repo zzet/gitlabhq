@@ -41,7 +41,7 @@
                 .right.light
                   - if project.owner == current_user
                     %i.icon-wrench
-                  - tm = project.team.get_tm(current_user.id)
+                  - tm = project.team.find_tm(current_user.id)
                   - if tm
-                    = tm.project_access_human
+                    -#= project.project_access_human(tm)
 

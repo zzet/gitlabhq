@@ -34,6 +34,8 @@
 #  state                  :string(255)
 #  color_scheme_id        :integer          default(1), not null
 #  notification_level     :integer          default(1), not null
+#  password_expires_at    :datetime
+#  created_by_id          :integer
 #
 
 require 'spec_helper'
@@ -106,15 +108,11 @@ describe User do
       ActiveRecord::Base.observers.enable(:user_observer)
       @user = create :user
       @project = create :project, namespace: @user.namespace
-      @project_2 = create :project # Grant MASTER access to the user
-      @project_3 = create :project # Grant DEVELOPER access to the user
+      @project_2 = create :project, group: create(:group) # Grant MASTER access to the user
+      @project_3 = create :project, group: create(:group) # Grant DEVELOPER access to the user
 
-      UsersProject.add_users_into_projects(
-        [@project_2.id], [@user.id], UsersProject::MASTER
-      )
-      UsersProject.add_users_into_projects(
-        [@project_3.id], [@user.id], UsersProject::DEVELOPER
-      )
+      @project_2.team << [@user, :master]
+      @project_3.team << [@user, :developer]
     end
 
     it { @user.authorized_projects.should include(@project) }
@@ -126,13 +124,6 @@ describe User do
     it { @user.personal_projects.should include(@project) }
     it { @user.personal_projects.should_not include(@project_2) }
     it { @user.personal_projects.should_not include(@project_3) }
-
-    # master_projects doesn't check creator/namespace.
-    # In real case the users_projects relation will certainly be assigned
-    # when the project is created.
-    it { @user.master_projects.should_not include(@project) }
-    it { @user.master_projects.should include(@project_2) }
-    it { @user.master_projects.should_not include(@project_3) }
   end
 
   describe 'groups' do
@@ -148,21 +139,17 @@ describe User do
     it { @user.owned_groups.should == [@group] }
   end
 
-  describe 'teams' do
+  describe 'group multiple owners' do
     before do
       ActiveRecord::Base.observers.enable(:user_observer)
-      @admin = create :user, admin: true
-      @user1 = create :user
+      @user = create :user
       @user2 = create :user
-      @team = create :user_team, owner: @user1
+      @group = create :group, owner: @user
+
+      @group.add_users([@user2.id], UsersGroup::OWNER)
     end
 
-    it { @admin.authorized_teams.should == [@team] }
-    it { @user1.authorized_teams.should == [@team] }
-    it { @user2.authorized_teams.should be_empty }
-    it { @admin.should be_can(:manage_user_team, @team) }
-    it { @user1.should be_can(:manage_user_team, @team) }
-    it { @user2.should_not be_can(:manage_user_team, @team) }
+    it { @user2.several_namespaces?.should be_true }
   end
 
   describe 'namespaced' do
@@ -209,31 +196,79 @@ describe User do
     it { User.not_in_project(@project).should include(@user, @project.owner) }
   end
 
-  describe 'normal user' do
-    let(:user) { create(:user, name: 'John Smith') }
+  describe 'user creation' do
+    describe 'normal user' do
+      let(:user) { create(:user, name: 'John Smith') }
 
-    it { user.is_admin?.should be_false }
-    it { user.require_ssh_key?.should be_true }
-    it { user.can_create_group?.should be_true }
-    it { user.can_create_project?.should be_true }
-    it { user.first_name.should == 'John' }
-  end
+      it { user.is_admin?.should be_false }
+      it { user.require_ssh_key?.should be_true }
+      it { user.can_create_group?.should be_true }
+      it { user.can_create_project?.should be_true }
+      it { user.first_name.should == 'John' }
+    end
 
-  describe 'without defaults' do
-    let(:user) { User.new }
-    it "should not apply defaults to user" do
-      user.projects_limit.should == 10
-      user.can_create_group.should == true
-      user.can_create_team.should == true
+    describe 'without defaults' do
+      let(:user) { User.new }
+
+      it "should not apply defaults to user" do
+        user.projects_limit.should == 10
+        user.can_create_group.should be_true
+        user.theme_id.should == Gitlab::Theme::BASIC
+      end
+    end
+    context 'as admin' do
+      describe 'with defaults' do
+        let(:user) { User.build_user({}, as: :admin) }
+
+        it "should apply defaults to user" do
+          user.projects_limit.should == 42
+          user.can_create_group.should be_false
+          user.theme_id.should == Gitlab::Theme::MARS
+        end
+      end
+
+      describe 'with default overrides' do
+        let(:user) { User.build_user({projects_limit: 123, can_create_group: true, can_create_team: true, theme_id: Gitlab::Theme::BASIC}, as: :admin) }
+
+        it "should apply defaults to user" do
+          user.projects_limit.should == 123
+          user.can_create_group.should be_true
+          user.theme_id.should == Gitlab::Theme::BASIC
+        end
+      end
+    end
+
+    context 'as user' do
+      describe 'with defaults' do
+        let(:user) { User.build_user }
+
+        it "should apply defaults to user" do
+          user.projects_limit.should == 42
+          user.can_create_group.should be_false
+          user.theme_id.should == Gitlab::Theme::MARS
+        end
+      end
+
+      describe 'with default overrides' do
+        let(:user) { User.build_user(projects_limit: 123, can_create_group: true, theme_id: Gitlab::Theme::BASIC) }
+
+        it "should apply defaults to user" do
+          user.projects_limit.should == 42
+          user.can_create_group.should be_false
+          user.theme_id.should == Gitlab::Theme::MARS
+        end
+      end
     end
   end
 
-  describe 'with defaults' do
-    let(:user) { User.new.with_defaults }
-    it "should apply defaults to user" do
-      user.projects_limit.should == 42
-      user.can_create_group.should == false
-      user.can_create_team.should == false
+  describe 'by_username_or_id' do
+    let(:user1) { create(:user, username: 'foo') }
+
+    it "should get the correct user" do
+      User.by_username_or_id(user1.id).should == user1
+      User.by_username_or_id('foo').should == user1
+      User.by_username_or_id(-1).should be_nil
+      User.by_username_or_id('bar').should be_nil
     end
   end
 end

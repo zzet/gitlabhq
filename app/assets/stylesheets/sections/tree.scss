@@ -15,6 +15,12 @@
   .tree-table {
     @include border-radius(0);
     .tree-item {
+      td {
+        padding: 8px 10px;
+        strong {
+          font-weight: normal;
+        }
+      }
       &:hover {
         td {
           background: $hover;
@@ -22,6 +28,14 @@
           border-bottom: 1px solid #ADF;
         }
         cursor: pointer;
+      }
+
+      &.selected {
+        td {
+          background: $hover;
+          border-top: 1px solid #ADF;
+          border-bottom: 1px solid #ADF;
+        }
       }
     }
   }
@@ -96,6 +110,8 @@
 }
 
 .tree-btn-group {
+  top: 2px;
+
   .btn {
     margin-right: 0px;
     padding: 2px 10px;

@@ -1,0 +1,14 @@
+.ui-box
+  .title.clearfix
+  %ul.well-list.dash-list
+    - owners.each do |member|
+      %li.member-row
+        = render "member", member: member, member_role: "Owner"
+
+    - masters.each do |member|
+      %li.member-row
+        = render "member", member: member, member_role: "Master"
+
+    - if owners.blank? && masters.blank?
+      %li
+        %h3.nothing_here_message You have no members yet.

@@ -2,13 +2,24 @@ class Gitlab::Event::Notification::Creator::Default
   def create(event)
     notifications = []
 
-    subscriptions = ::Event::Subscription.by_target(event.target).by_source_type(event.source_type)
+    subscriptions = ::Event::Subscription.scoped
+
+    subscriptions = if event.target.present?
+                      subscriptions.by_target(event.target)
+                    else
+                      subscriptions.by_event_target(event)
+                    end
+
+    subscriptions = subscriptions.by_source_type(event.source_type)
 
     subscriptions.each do |subscription|
       # Not send notification about changes to changes author
       # TODO. Rewrite in future with check by Entity type
       if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: event, subscriber: subscription.user)
+        opts = { event: event, subscriber: subscription.user }
+        opts[:notification_state] = :delayed if event.action == "deleted"
+
+        notifications << subscription.notifications.create(opts)
       end
     end
 
@@ -122,8 +133,8 @@ class Gitlab::Event::Notification::Creator::Default
       when Group
         ug = user.groups.find(entity)
         has_access = has_access || ug.present?
-      when UserTeam
-        ut = user.user_teams.find(entity)
+      when Team
+        ut = user.teams.find(entity)
         has_access = has_access || ut.present?
       else
         has_access = true

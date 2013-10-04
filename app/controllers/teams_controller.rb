@@ -1,85 +1,113 @@
 class TeamsController < ApplicationController
   # Authorize
-  before_filter :authorize_create_team!, only: [:new, :create]
-  before_filter :authorize_manage_user_team!, only: [:edit, :update]
-  before_filter :authorize_admin_user_team!, only: [:destroy]
 
-  before_filter :user_team, except: [:new, :create]
+  before_filter :authorize_create_team!, only: [:new, :create]
+  before_filter :authorize_manage_team!, only: [:edit, :update]
+  before_filter :authorize_remove_team!, only: [:destroy]
+
+  before_filter :team, except: [:index, :new, :create]
 
   layout :determine_layout
 
   before_filter :set_title, only: [:new, :create]
 
+  def index
+    redirect_to teams_dashboard_path
+  end
+
   def show
     projects
-    @events = OldEvent.in_projects(user_team.project_ids).limit(20).offset(params[:offset] || 0)
+    groups
+    members
+    @events = OldEvent.in_projects(team.projects.pluck(:id) + team.groups_projects.pluck(:id))
+    @events = event_filter.apply_filter(@events)
+    @events = @events.limit(20).offset(params[:offset] || 0)
+
+    respond_to do |format|
+      format.html
+      format.js
+      format.atom { render layout: false }
+    end
   end
 
   def edit
-    projects
-    @avaliable_projects = current_user.owned_projects.without_team(user_team)
+    render 'edit', layout: "team_settings"
   end
 
   def update
-    if user_team.update_attributes(params[:user_team])
-      redirect_to team_path(user_team)
+    if team.update_attributes(params[:team])
+      redirect_to team_path(team)
     else
       render action: :edit
     end
   end
 
   def destroy
-    ::Teams::RemoveContext.new(current_user, user_team).execute
+    ::Teams::RemoveContext.new(current_user, team).execute
 
     redirect_to dashboard_path
   end
 
   def new
-    @team = UserTeam.new
+    @team = Team.new
   end
 
   def create
-    @team = UserTeam.new(params[:user_team])
-    @team.owner = current_user unless params[:owner]
-    @team.path = @team.name.dup.parameterize if @team.name
-
-    if @team.save
-      # Add current user as Master to the team
-      @team.add_members([current_user.id], UsersProject::MASTER, true)
-
+    @team = ::Teams::CreateContext.new(current_user, params[:team]).execute
+    if @team.persisted?
       redirect_to team_path(@team)
     else
       render action: :new
     end
   end
 
-  # Get authored or assigned open merge requests
-  def merge_requests
-    projects
-    @merge_requests = MergeRequest.of_user_team(user_team)
-    @merge_requests = FilterContext.new(@current_user, @merge_requests, params).execute
-    @merge_requests = @merge_requests.recent.page(params[:page]).per(20)
-  end
-
-  # Get only assigned issues
-  def issues
-    projects
-    @issues = Issue.of_user_team(user_team)
-    @issues = FilterContext.new(@current_user, @issues, params).execute
-    @issues = @issues.recent.page(params[:page]).per(20)
-    @issues = @issues.includes(:author, :project)
-  end
-
   protected
 
   def projects
-    @projects ||= user_team.projects.sorted_by_push_date
+    @projects ||= team.projects.sorted_by_push_date
   end
 
-  def user_team
-    @team ||= current_user.authorized_teams.find_by_path(params[:id])
+  def groups
+    @groups ||= team.groups
+  end
+
+  def members
+    @members ||= team.members
+  end
+
+  def teams
+    @teams ||= current_user.authorized_teams
+  end
+
+  def team
+    @team ||= teams.find_by_path(params[:id])
     raise ActiveRecord::RecordNotFound if @team.nil?
     @team
+  end
+
+  # Dont allow unauthorized access to team
+  def authorize_read_team!
+    unless teams.present? or can?(current_user, :read_team, team)
+      return render_404
+    end
+  end
+
+  def authorize_create_team!
+    unless can?(current_user, :create_team, nil)
+      return render_404
+    end
+  end
+
+  def authorize_manage_team!
+    unless can?(current_user, :manage_team, team)
+      return render_404
+    end
+  end
+
+  def authorize_remove_team!
+    unless can?(current_user, :remove_team, team)
+      return render_404
+    end
   end
 
   def set_title
@@ -87,10 +115,10 @@ class TeamsController < ApplicationController
   end
 
   def determine_layout
-    if [:new, :create].include?(action_name.to_sym)
+    if [:index, :new, :create].include?(action_name.to_sym)
       'navless'
     else
-      'user_team'
+      'team'
     end
   end
 end

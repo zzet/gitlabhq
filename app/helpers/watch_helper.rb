@@ -22,7 +22,7 @@ module WatchHelper
     case entity
     when Project
       link_to entity.path_with_namespace, project_path(entity)
-    when UserTeam
+    when Team
       link_to entity.name, team_path(entity)
     when Group
       link_to entity.name, group_path(entity)

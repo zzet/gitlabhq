@@ -1,6 +1,10 @@
 module Watchable
   extend ActiveSupport::Concern
 
+  included do
+    before_destroy :trigger_destroy_notification
+  end
+
   module ClassMethods
     def actions_to_watch(actions)
       return if actions.empty?
@@ -44,6 +48,11 @@ module Watchable
     def add_to_adjacent_sources(source)
       @adjacent_sources << source if !watched_adjacent_sources.include?(source)
     end
+
+  end
+
+  def trigger_destroy_notification
+    Gitlab::Event::Action.trigger :deleted, self
   end
 
   def watched_by?(user)

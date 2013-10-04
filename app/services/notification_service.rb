@@ -8,7 +8,6 @@ class NotificationService
     def process_notification(notification)
       Gitlab::Event::Notifications.process_notification(notification)
     end
-
   end
 
   def mailer
