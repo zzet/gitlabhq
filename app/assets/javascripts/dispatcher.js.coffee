@@ -16,24 +16,35 @@ class Dispatcher
     path = page.split(':')
 
     switch page
-      when 'issues:index'
+      when 'projects:issues:index'
         Issues.init()
+      when 'projects:issues:new', 'projects:merge_requests:new'
+        GitLab.GfmAutoComplete.setup()
       when 'dashboard:show'
         new Dashboard()
-      when 'commit:show'
+        new Activities()
+      when 'projects:commit:show'
         new Commit()
-      when 'groups:show', 'teams:show', 'projects:show'
-        Pager.init(20, true)
+      when 'groups:show', 'projects:show', 'teams:show'
+        new Activities()
       when 'projects:new', 'projects:edit'
         new Project()
-      when 'walls:show'
+      when 'projects:walls:show'
         new Wall(project_id)
-      when 'teams:members:index'
+      when 'projects:teams:members:index'
         new TeamMembers()
+      when 'groups:members'
+        new GroupMembers()
+      when 'projects:tree:show'
+        new TreeView()
+      when 'projects:blob:show'
+        new BlobView()
 
     switch path.first()
       when 'admin' then new Admin()
-      when 'wikis' then new Wikis()
+      when 'projects'
+        new Wikis() if path[1] == 'wikis'
+
 
   initSearch: ->
     autocomplete_json = $('.search-autocomplete-json').data('autocomplete-opts')

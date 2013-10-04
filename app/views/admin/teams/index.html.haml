@@ -1,48 +1,80 @@
-%h3.page_title
-  Teams (#{@teams.total_count})
-  %small
-    allow you to organize groups of people that have a common focus. Use teams to simplify the process of assigning roles to groups of people.
+.row
+  .span3
+    %ul.nav.nav-pills.nav-stacked
+      = nav_tab :scope, nil do
+        = link_to admin_teams_path do
+          All
+          %span.pull-right
+            = @teams_count
+      %hr
 
-  = link_to 'New Team', new_admin_team_path, class: "btn btn-small pull-right"
-%br
+      = nav_tab :scope, nil do
+        Search by name
+        = form_tag admin_teams_path, method: :get, class: 'form-inline' do
+          = text_field_tag :name, params[:name], class: "span3"
 
-= form_tag admin_teams_path, method: :get, class: 'form-inline' do
-  = text_field_tag :name, params[:name], class: "span6"
-  = submit_tag "Search", class: "btn submit btn-primary"
+      = nav_tab :scope, 'joined' do
+        With user
+        = form_tag(admin_teams_path, method: :get) do
+          = select_tag :member, options_from_collection_for_select(@users, :username, :name),
+                                class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
 
-%hr
+      = nav_tab :scope, 'owned' do
+        Owned by
+        = form_tag(admin_teams_path, method: :get) do
+          = select_tag :owner, options_from_collection_for_select(@users, :username, :name, params[:owner]),
+                               class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
 
-%ul.bordered-list
-  - @teams.each do |team|
-    %li
-      .clearfix
-        .pull-right.prepend-top-10
-          = link_to 'Edit', edit_admin_team_path(team), id: "edit_#{dom_id(team)}", class: "btn btn-small"
-          = link_to 'Destroy', admin_team_path(team), confirm: "REMOVE #{team.name}? Are you sure?", method: :delete, class: "btn btn-small btn-remove"
+      = nav_tab :scope, 'group' do
+        Assigned on group
+        = form_tag(admin_teams_path, method: :get) do
+          = select_tag :group, options_from_collection_for_select(@groups, :path, :name, params[:group]),
+                               class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
 
-        %h4
-          = link_to admin_team_path(team) do
-            %i.icon-group
-            = team.name
+      = nav_tab :scope, 'project' do
+        Assigned on project
+        = form_tag(admin_teams_path, method: :get) do
+          = select_tag :project, options_from_collection_for_select(@projects, :path_with_namespace, :name_with_namespace, params[:project]),
+                                 class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
 
-      .clearfix.light.append-bottom-10
-        %span
-          %b Owner:
-          - if team.owner
-            = link_to team.owner.name, admin_user_path(team.owner)
-          - else
-            (deleted)
-        \|
-        %span
-          %b Users:
-          %span.badge= team.members.count
-        \|
-        %span
-          %b Projects:
-          %span.badge= team.projects.count
+  .span9
+    .ui-box
+      .title
+        Teams (#{@teams.count})
+        .pull-right
+          = link_to 'New Team', new_team_path, class: "btn btn-new"
+      %ul.well-list
+        - @teams.each do |team|
+          %li
+            .team-info
+              .pull-right
+                = link_to team_members_path(team), id: "team_members_#{dom_id(team)}", class: "btn btn-small", title: "Team members" do
+                  %i.icon-group
+                %nbsp
 
-      .clearfix
-        %p
-          = truncate team.description, length: 150
+                = link_to team_groups_path(team), id: "team_groups_#{dom_id(team)}", class: "btn btn-small", title: "Team groups" do
+                  %i.icon-folder-open
+                %nbsp
 
-= paginate @teams, theme: "gitlab"
+                = link_to team_projects_path(team), id: "team_groups_#{dom_id(team)}", class: "btn btn-small", title: "Team projects" do
+                  %i.icon-inbox
+                %nbsp
+
+                = link_to edit_team_path(team), id: "edit_#{dom_id(team)}", class: "btn btn-small", title: "Edit team" do
+                  %i.icon-edit
+                %nbsp
+                = link_to [team], confirm: remove_team_message(team), method: :delete, class: "btn btn-small btn-remove" do
+                  %i.icon-trash
+            = link_to team_path(team), class: dom_class(team) do
+              %span
+                - if team.public
+                  = public_icon
+                - else
+                  = private_icon
+              %strong= team.name
+              %p= truncate team.description, length: 100
+        - if @teams.blank?
+          %li
+            %h3.nothing_here_message There are no teams here.
+    .bottom
+      = paginate @teams, theme: "gitlab"

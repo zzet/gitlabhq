@@ -22,7 +22,8 @@ module Projects
           result[:notes_count] = project.notes.for_commit_id(commit.id).count
 
           begin
-            result[:suppress_diff] = true if commit.diffs.size > Commit::DIFF_SAFE_SIZE && !params[:force_show_diff]
+            result[:suppress_diff] = true if commit.diff_suppress? && !params[:force_show_diff]
+            result[:force_suppress_diff] = commit.diff_force_suppress?
           rescue Grit::Git::GitTimeout
             result[:suppress_diff] = true
             result[:status] = :huge_commit

@@ -3,7 +3,10 @@ module LoginHelpers
   #
   # role - User role (e.g., :admin, :user)
   def login_as(role)
-    @user = create(role)
+    ActiveRecord::Base.observers.enable(:user_observer) do
+      @user = create(role)
+    end
+
     login_with(@user)
   end
 
@@ -15,6 +18,7 @@ module LoginHelpers
     fill_in "user_login", with: user.email
     fill_in "user_password", with: "123456"
     click_button "Sign in"
+    Thread.current[:current_user] = user
   end
 
   def logout

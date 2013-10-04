@@ -6,5 +6,5 @@
         = link_to team_path(team), class: dom_class(team) do
           %strong.well-title= team.name
           %span.pull-right.light
-            - if team.owner == user
+            - if team.creator == user
               %i.icon-wrench

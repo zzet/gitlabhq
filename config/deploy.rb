@@ -65,6 +65,24 @@ namespace :deploy do
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "sudo sv restart /etc/service/gitlab-*"
   end
+
+  desc "Update to 6.1"
+  task :update_app_to_6_1, roles: :app do
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:backup:create"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} db:migrate"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_groups"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_global_projects"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_keys"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_inline_notes"
+    #run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:satellites:create"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} migrate_iids"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} cache:clear"
+    #run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} assets:clean"
+    #run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} assets:precompile"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} undev:migrate_teams_data"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} undev:rebuild_users_lists"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} undev:clean_projects_members_lists"
+  end
 end
 
 before 'deploy:finalize_update',

@@ -10,9 +10,11 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  state       :string(255)
+#  iid         :integer
 #
 
 class Milestone < ActiveRecord::Base
+  include InternalId
   include Watchable
 
   attr_accessible :title, :description, :due_date, :state_event, :author_id_of_changes

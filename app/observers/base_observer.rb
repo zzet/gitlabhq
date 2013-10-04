@@ -6,4 +6,8 @@ class BaseObserver < ActiveRecord::Observer
   def current_user
     RequestStore.store[:current_user]
   end
+
+  def current_commit
+    RequestStore.current[:current_commit]
+  end
 end

@@ -1,0 +1,2 @@
+class UsersGroupObserver < BaseObserver
+end

@@ -75,23 +75,6 @@ describe Admin::ProjectsController, "routing" do
   end
 end
 
-# edit_admin_project_member GET      /admin/projects/:project_id/members/:id/edit(.:format)    admin/projects/members#edit {id: /[^\/]+/, project_id: /[^\/]+/}
-#      admin_project_member PUT      /admin/projects/:project_id/members/:id(.:format)         admin/projects/members#update {id: /[^\/]+/, project_id: /[^\/]+/}
-#                           DELETE   /admin/projects/:project_id/members/:id(.:format)         admin/projects/members#destroy {id: /[^\/]+/, project_id: /[^\/]+/}
-describe Admin::Projects::MembersController, "routing" do
-  it "to #edit" do
-    get("/admin/projects/test/members/1/edit").should route_to('admin/projects/members#edit', project_id: 'test', id: '1')
-  end
-
-  it "to #update" do
-    put("/admin/projects/test/members/1").should route_to('admin/projects/members#update', project_id: 'test', id: '1')
-  end
-
-  it "to #destroy" do
-    delete("/admin/projects/test/members/1").should route_to('admin/projects/members#destroy', project_id: 'test', id: '1')
-  end
-end
-
 # admin_hook_test GET    /admin/hooks/:hook_id/test(.:format) admin/hooks#test
 #     admin_hooks GET    /admin/hooks(.:format)               admin/hooks#index
 #                 POST   /admin/hooks(.:format)               admin/hooks#create

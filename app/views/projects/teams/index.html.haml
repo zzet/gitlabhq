@@ -1,0 +1,18 @@
+%h3.page-title
+  Project teams
+%p.light
+  members access to project.
+%hr
+- admin_team_member =  current_user.can? :admin_team_member, @project
+.ui-box.span5.no_margin
+  .title
+    %strong #{@project.name_with_namespace}
+    project teams
+    %small
+      (#{@teams.count})
+  %ul.well-list
+    - @teams.each do |team|
+      = render 'team', team: team, show_controls: admin_team_member
+- if admin_team_member
+  .span5.pull-right
+    = render "new_team"

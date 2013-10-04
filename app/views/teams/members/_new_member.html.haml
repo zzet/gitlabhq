@@ -1,0 +1,19 @@
+= form_for @user_relation, url: team_members_path(@team) do |f|
+  %fieldset
+    %legend
+      New member(s) for
+      %strong #{@team.name}
+      team
+
+    %p 1. Choose users you want in the team
+    .control-group
+      = f.label :user_ids, "People"
+      .controls= users_select_tag(:user_ids, multiple: true, class: 'input-large')
+
+    %p 2. Set access level for them
+    .control-group
+      = f.label :team_access, "Team Access"
+      .controls= select_tag :team_access, options_for_select(Team.access_roles, @user_relation.team_access), class: "project-access-select chosen"
+
+    .form-actions
+      = f.submit 'Add users into team', class: "btn btn-create"

@@ -2,13 +2,7 @@ module Teams
   module Users
     class UpdateRelationContext < Teams::Users::BaseContext
       def execute
-
-        options = {
-          default_projects_access: params[:permission],
-          group_admin: params[:group_admin] || 0
-        }
-
-        result = @team.update_membership(@user, options)
+        result = @team.team_user_relationships.find_by_user_id(@user).update_attributes(team_access: params[:team_access])
 
         receive_delayed_notifications
 

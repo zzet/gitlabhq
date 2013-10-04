@@ -1,8 +1,8 @@
 - color = commit_counter.odd? ? '#efefef' : '#f7f7f7'
 %tr{style: "margin: 1px; background: #{color}"}
   %td
-    = link_to commit.short_id(8), project_commit_url(@project, commit)
-  %td{title: commit.title}
+    = link_to commit.short_id(8), project_commit_url(@project.path_with_namespace, commit.id)
+  %td{title: commit.message.truncate(100)}
     = simple_format(commit.message)
   %td
     = commit.committed_date.strftime("%Y-%d-%m %H:%M:%S")

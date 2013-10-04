@@ -15,8 +15,8 @@
 #     - ProtectedBranch                  -  + + -      -  + + -    -  + + -      |
 #     - Service                          -  + + -      -  + + -    -  + + -      |
 #   - Team                                                                       |
-#     - UserTeamProjectRelationship      -  + + -      -  + + -    -  + + -      |
-#     - UserTeamUserRelationship         -  + + -      -  + + -    -  + + -      |
+#     - TeamProjectRelationship      -  + + -      -  + + -    -  + + -      |
+#     - TeamUserRelationship         -  + + -      -  + + -    -  + + -      |
 #     - UsersProject                     -  + + -      -  + + -    -  + + -      |
 #
 # TODO: Add PushEvents
@@ -26,13 +26,13 @@
 #     - Key                              + +           + +         + +           |
 #     - User                             + -           + -         + -           |
 #   - Membership                                                                 |
-#     - UserTeamUserRelationship         + +           + +         + +           |
+#     - TeamUserRelationship         + +           + +         + +           |
 #     - UsersProject                     + +           + +         + +           |
 #
-# UserTeam                               TM O A        TM O A      TM O A        | TM = TeamMember  O = TeamOwner  A = Admin
-#   - UserTeam                           -  + +        -  + +      -  + +        |
-#   - UserTeamProjectRelationship        +  + +        -  + +      +  + +        |
-#   - UserTeamUserRelationship           -  + +        -  + +      -  + +        |
+# Team                               TM O A        TM O A      TM O A        | TM = TeamMember  O = TeamOwner  A = Admin
+#   - Team                           -  + +        -  + +      -  + +        |
+#   - TeamProjectRelationship        +  + +        -  + +      +  + +        |
+#   - TeamUserRelationship           -  + +        -  + +      -  + +        |
 #
 # Issue                                  O U A         O U A       O U A         | O = IssueOwner  U = AnyUser (if PublicProject) A = Admin
 #   - Issue                              - - +         + + +       + + +         |

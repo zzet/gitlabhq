@@ -1,6 +1,18 @@
-%h3.page_title
-  Teams
-  %small
-    assigned to all projects in Group
-
-= render "groups/teams/team_list"
+%h3.page-title
+  Group teams
+%p.light
+  members access to group.
+%hr
+- admin_team_member =  current_user.can? :manage_group, @group
+.ui-box.span5.no_margin
+  .title
+    %strong #{@group.name}
+    group teams
+    %small
+      (#{@teams.count})
+  %ul.well-list
+    - @teams.each do |team|
+      = render 'team', team: team, show_controls: admin_team_member
+- if admin_team_member
+  .span5.pull-right
+    = render "new_team"

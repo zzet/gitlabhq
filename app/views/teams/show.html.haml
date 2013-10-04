@@ -1,10 +1,12 @@
 .dashboard
   .activities.span8
+    = render "events/event_last_push", event: @last_push
     = link_to dashboard_path, class: 'btn btn-tiny' do
       &larr; To dashboard
     &nbsp;
-    %span.cgray Events and projects are filtered in scope of team
+    %span.cgray Events and projects are filtered in scope of team projects
     %hr
+    = render 'shared/event_filter'
     - if @events.any?
       .content_list
     - else
@@ -12,20 +14,20 @@
     .loading.hide
   .side.span4
     .light-well
-      - if can? current_user, :manage_user_team, @team
-        .dropdown.pull-right
-          %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
-            %i.icon-plus-sign-alt
-            %b.caret
-          %ul.dropdown-menu
-            %li.divider
-              = link_to new_team_member_path(@team), title: "New Team Member" do
-                %i.icon-plus
-                New Team Member
-            %li
-              = link_to edit_team_path(@team), title: "Assign project" do
-                %i.icon-plus
-                Assign Project
+      -#- if can? current_user, :manage_team, @team
+        -#.dropdown.pull-right
+          -#%a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+            -#%i.icon-plus-sign-alt
+            -#%b.caret
+          -#%ul.dropdown-menu
+            -#%li
+              -#= link_to new_team_member_path(@team), title: "Add new team member" do
+                -#%i.icon-plus
+                -#New team member
+            -#%li
+              -#= link_to edit_team_path(@team), title: "Assign project" do
+                -#%i.icon-plus
+                -#Assign on project
 
       = render "shared/watch_button", current_entity: @team
 
@@ -37,16 +39,21 @@
       %hr
       %p
       %p Members count: #{@team.members.count }
-      %p Projects count: #{@team.projects.count}
+      - if @team.projects.any?
+        %p Assigned on #{@team.projects.count} projects
+      - else
+        %p Team not assigned to any projects
+      - if @team.groups.any?
+        %p Assigned on #{@team.groups.count} groups (access to #{@team.groups_projects.count} projects)
+      - else
+        %p Team not assigned to any groups
       %p Created on: #{@team.created_at.stamp('Aug 22, 2013')}
-      %p Owner: #{link_to @team.owner_name, @team.owner}
-
-    = render "projects", projects: @projects
-    .prepend-top-20
-      = link_to team_path(@team, { format: :atom, private_token: current_user.private_token }), title: "Feed" do
-        %strong
-          %i.icon-rss
-          News Feed
-
+      %p Creator: #{link_to @team.creator_name, @team.creator}
+      - if @team.owners.any?
+        %p
+          Owners:
+          - @team.owners.each do |owner|
+            %span #{link_to owner.name, user_path(owner.username)}
     %hr
-    = render 'shared/promo'
+
+    = render "sidebar"

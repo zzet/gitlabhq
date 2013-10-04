@@ -16,7 +16,7 @@
 
 class OldEvent < ActiveRecord::Base
   attr_accessible :project, :action, :data, :author_id, :project_id,
-                  :target_id, :target_type
+    :target_id, :target_type
 
   default_scope where("author_id IS NOT NULL")
 
@@ -54,6 +54,27 @@ class OldEvent < ActiveRecord::Base
         COMMENTED
       end
     end
+
+    def create_ref_event(project, user, ref, action = 'add', prefix = 'refs/heads')
+      if action.to_s == 'add'
+        before = '00000000'
+        after = ref.commit.id
+      else
+        before = ref.commit.id
+        after = '00000000'
+      end
+
+      OldEvent.create(
+        project: project,
+        action: PUSHED,
+        data: {
+        ref: "#{prefix}/#{ref.name}",
+        before: before,
+          after: after
+      },
+        author_id: user.id
+      )
+    end
   end
 
   def proper?
@@ -68,7 +89,7 @@ class OldEvent < ActiveRecord::Base
 
   def project_name
     if project
-      project.name
+      project.name_with_namespace
     else
       "(deleted project)"
     end
@@ -132,19 +153,11 @@ class OldEvent < ActiveRecord::Base
     target if target_type == "MergeRequest"
   end
 
-  def note_project_snippet?
-    target.noteable_type == "Snippet"
-  end
-
-  def note_target
-    target.noteable
-  end
-
   def action_name
     if closed?
       "closed"
     elsif merged?
-      "merged"
+      "accepted"
     elsif joined?
       'joined'
     elsif left?
@@ -210,7 +223,7 @@ class OldEvent < ActiveRecord::Base
 
   # Max 20 commits from push DESC
   def commits
-    @commits ||= data[:commits].reverse #@commits ||= repository.present? ? data[:commits].map { |commit| repository.commit(commit[:id]) }.reverse : []
+    @commits ||= data[:commits].reverse
   end
 
   def commits_count
@@ -243,12 +256,20 @@ class OldEvent < ActiveRecord::Base
     target.commit_id
   end
 
+  def target_iid
+    target.respond_to?(:iid) ? target.iid : target_id
+  end
+
   def note_short_commit_id
     note_commit_id[0..8]
   end
 
   def note_commit?
     target.noteable_type == "Commit"
+  end
+
+  def note_project_snippet?
+    target.noteable_type == "Snippet"
   end
 
   def note_target
@@ -263,6 +284,14 @@ class OldEvent < ActiveRecord::Base
     end
   end
 
+  def note_target_iid
+    if note_target.respond_to?(:iid)
+      note_target.iid
+    else
+      note_target_id
+    end.to_s
+  end
+
   def wall_note?
     target.noteable_type.blank?
   end
@@ -273,5 +302,15 @@ class OldEvent < ActiveRecord::Base
     else
       "Wall"
     end.downcase
+  end
+
+  def body?
+    if push?
+      push_with_commits?
+    elsif note?
+      true
+    else
+      target.respond_to? :title
+    end
   end
 end

@@ -6,7 +6,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
 
     def can_build?(action, data)
       known_action = known_action? action, ::User.available_actions
-      known_sources = [::User, ::UserTeamUserRelationship, ::UsersProject, ::Key]
+      known_sources = [::User, ::TeamUserRelationship, ::UsersProject, ::Key]
       known_source = known_sources.include? data.class
       known_source && known_action
     end
@@ -27,7 +27,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           actions << :created
         when :blocked
           actions << :blocked
-          temp_data["teams"] = source.user_teams.map { |t| t.attributes }
+          temp_data["teams"] = source.teams.map { |t| t.attributes }
           temp_data["projects"] = source.projects.map { |pr| pr.attributes }
         when :activate
           actions << :activate
@@ -63,7 +63,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
         when :deleted
           actions << :left
         end
-      when ::UserTeamUserRelationship
+      when ::TeamUserRelationship
         target = source.user
 
         case meta[:action]
