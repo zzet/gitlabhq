@@ -4,9 +4,8 @@ module Teams
       def execute
         unless params[:user_ids].blank?
           user_ids = params[:user_ids].respond_to?(:each) ? params[:user_ids] : params[:user_ids].split(',')
-          access = params[:permission]
-          is_admin = params[:group_admin]
-          @team.add_members(user_ids, access, is_admin)
+          access = params[:team_access]
+          @team.add_users(user_ids, access)
         end
 
         receive_delayed_notifications

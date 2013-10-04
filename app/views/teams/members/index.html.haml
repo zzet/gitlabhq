@@ -1,37 +1,18 @@
-%h3.page_title
-  Team Members
-  (#{@members.count})
-  %small
-    Read more about project permissions
-    %strong= link_to "here", help_permissions_path, class: "vlink"
-
-  - if can? current_user, :manage_user_team, @team
-    %span.pull-right
-      = link_to new_team_member_path(@team), class: "btn btn-primary small grouped", title: "New Team Member" do
-        New Team Member
+%h3.page-title
+  Team members
+%p.light
+  Members of team have access to all team projects.
 %hr
-
-
-.row
-  .span3
-    %ul.nav.nav-pills.nav-stacked
-      %li{class: ("active" if !params[:type])}
-        = link_to team_members_path(@team, type: nil) do
-          All
-      %li{class: ("active" if params[:type] == 'masters')}
-        = link_to team_members_path(@team, type: 'masters') do
-          Masters
-      %li{class: ("active" if params[:type] == 'developers')}
-        = link_to team_members_path(@team, type: 'developers') do
-          Developers
-      %li{class: ("active" if params[:type] == 'reporters')}
-        = link_to team_members_path(@team, type: 'reporters') do
-          Reporters
-      %li{class: ("active" if params[:type] == 'guests')}
-        = link_to team_members_path(@team, type: 'guests') do
-          Guests
-
-  .span9
-    .clearfix
-    %div.team-table
-      = render "teams/members/team", team: @team
+- can_manage_team =  current_user.can? :manage_team, @team
+.ui-box.span5.no_margin
+  .title
+    %strong #{@team.name}
+    team members
+    %small
+      (#{@members.count})
+  %ul.well-list
+    - @members.each do |member|
+      = render 'member', team: @team, member: member, show_controls: can_manage_team
+- if can_manage_team
+  .span5.pull-right
+    = render "new_member"

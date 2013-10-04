@@ -1,23 +1,22 @@
-.ui-box.teams-box
-  %h5.title
-    Teams
-    %span.light
-      (#{teams.count})
-    %span.pull-right
-      = link_to new_team_path, class: "btn btn-small" do
-        %i.icon-plus
-        New Team
-  %ul.well-list
+.ui-box
+  .title.clearfix
+    = search_field_tag :filter_team, nil, placeholder: 'Filter by name', class: 'dash-filter'
+    - if current_user.can_create_team?
+      %span.pull-right
+        = link_to new_team_path, class: "btn btn-new" do
+          %i.icon-plus
+          New team
+  %ul.well-list.dash-list
     - teams.each do |team|
-      %li
+      %li.group-row
         = link_to team_path(id: team.path), class: dom_class(team) do
-          %strong.well-title= truncate(team.name, length: 35)
-        %span.pull-right.light
-          - if team.owner == current_user
-            %i.icon-wrench
-          - tm = current_user.user_team_user_relationships.find_by_user_team_id(team.id)
-          - if tm
-            = tm.access_human
+          %span.group-name.filter-title
+            = truncate(team.name, length: 35)
+          %span.arrow
+            %i.icon-angle-right
+          %span.owner-info
+            %span Owner:
+            %span.owner= team.creator_name
     - if teams.blank?
       %li
         %h3.nothing_here_message You have no teams yet.

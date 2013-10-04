@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BlobController do
+describe Projects::BlobController do
   let(:project) { create(:project_with_code) }
   let(:user)    { create(:user) }
 
@@ -17,7 +17,7 @@ describe BlobController do
   describe "GET show" do
     render_views
 
-    before { get :show, project_id: project.code, id: id }
+    before { get :show, project_id: project.to_param, id: id }
 
     context "valid branch, valid file" do
       let(:id) { 'master/README.md' }

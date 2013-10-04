@@ -16,28 +16,8 @@ module Projects
 
         if allowed_transfer && (namespace != project.namespace)
           old_namespace = project.namespace
-          target = Namespace.global?(namespace) ? nil : namespace
 
-          if transfer_to(target)
-            # Remove all teams assignations
-            case old_namespace
-            when Group
-              old_namespace.user_teams
-            when User, NilClass, String
-              project.user_teams
-            else
-              []
-            end.each { |team| Gitlab::UserTeamManager.resign(team, project) }
-
-            # Assign group teams to projects in group
-            case namespace
-            when Group
-              namespace.user_teams.each do |team|
-                access = team.max_project_access_in_group(namespace)
-                Gitlab::UserTeamManager.assign(team, project, access)
-              end
-            end
-
+          if transfer_to(namespace)
             receive_delayed_notifications
           end
         end
@@ -63,6 +43,12 @@ module Projects
 
           # Move wiki repo also if present
           gitlab_shell.mv_repository("#{old_path}.wiki", "#{new_path}.wiki")
+
+          # create satellite repo
+          project.ensure_satellite_exists
+
+          # clear project cached events
+          project.reset_events_cache
 
           return true
         else

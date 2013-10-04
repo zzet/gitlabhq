@@ -1,0 +1,17 @@
+%ul.nav.nav-pills.nav-stacked.nav-stacked-menu
+  = nav_link(path: 'teams#edit') do
+    = link_to edit_team_path(@team), class: "stat-tab tab " do
+      %i.icon-edit
+      Edit team
+  = nav_link(controller: [:members, :teams]) do
+    = link_to team_members_path(@team), class: "team-tab tab" do
+      %i.icon-group
+      Members
+  = nav_link(controller: [:projects, :teams]) do
+    = link_to team_projects_path(@team), class: "team-tab tab" do
+      %i.icon-folder-open
+      Projects
+  = nav_link(controller: [:groups, :teams]) do
+    = link_to team_groups_path(@team), class: "team-tab tab" do
+      %i.icon-inbox
+      Groups

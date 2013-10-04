@@ -1,0 +1,12 @@
+- @teams.each do |team|
+  .ui-box
+    .title
+      %strong #{team.name}
+      team members (#{team.team_user_relationships.count})
+      - if can? current_user, :manage_team, team
+        .pull-right
+          = link_to team_members_path(team), class: 'btn btn-small' do
+            %i.icon-edit
+    %ul.well-list
+      - team.team_user_relationships.order('team_access DESC').each do |member|
+        = render 'teams/members/member', team: team, member: member, show_controls: false

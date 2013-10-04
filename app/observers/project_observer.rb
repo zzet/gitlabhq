@@ -1,17 +1,24 @@
 class ProjectObserver < BaseObserver
   def after_create(project)
-    return true if project.forked? || project.imported?
+    project.update_column(:last_activity_at, project.created_at)
 
-    GitlabShellWorker.perform_async(
-      :add_repository,
-      project.path_with_namespace
-    )
+    return true if project.forked?
 
-    log_info("#{project.owner.name} created a new project \"#{project.name_with_namespace}\"")
+    if project.import?
+      RepositoryImportWorker.perform_in(5.seconds, project.id)
+    else
+      GitlabShellWorker.perform_async(
+        :add_repository,
+        project.path_with_namespace
+      )
+
+      log_info("#{project.owner.name} created a new project \"#{project.name_with_namespace}\"")
+    end
   end
 
   def after_update(project)
     project.rename_repo if project.path_changed?
+
     if project.git_protocol_enabled_changed?
       if project.git_protocol_enabled
         log_info("#{project.owner.name} granted public access via git protocol for project \"#{project.name_with_namespace}\"")
@@ -27,6 +34,12 @@ class ProjectObserver < BaseObserver
         )
       end
     end
+
+    GitlabShellWorker.perform_async(
+      :update_repository_head,
+      project.path_with_namespace,
+      project.default_branch
+    ) if project.default_branch_changed?
   end
 
   def before_destroy(project)

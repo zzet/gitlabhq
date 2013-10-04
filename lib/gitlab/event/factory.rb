@@ -5,7 +5,10 @@ module Gitlab
       def build(action, data)
         events = []
 
-        Gitlab::Event::Builder::Base.descendants.each do |descendant|
+        descendants = Gitlab::Event::Builder::Base.descendants
+        descendants.reverse! if action.include? "deleted"
+
+        descendants.each do |descendant|
           events << descendant.build(action, data[:source], data[:user], data[:data]) if descendant.can_build?(action, data[:data])
         end
 

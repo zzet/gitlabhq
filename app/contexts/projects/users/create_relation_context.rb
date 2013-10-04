@@ -2,7 +2,8 @@ module Projects
   module Users
     class CreateRelationContext < Projects::BaseContext
       def execute
-        users = User.where(id: params[:user_ids].split(','))
+        user_ids = params[:user_ids].respond_to?(:each) ? params[:user_ids] : params[:user_ids].split(',')
+        users = User.where(id: user_ids)
         @project.team << [users, params[:project_access]]
 
         receive_delayed_notifications

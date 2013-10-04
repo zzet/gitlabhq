@@ -9,25 +9,26 @@ module Issuable
   include Mentionable
 
   included do
-    belongs_to :project
     belongs_to :author,   class_name: User
     belongs_to :assignee, class_name: User
     belongs_to :milestone
 
-    has_many :notes,          as: :noteable,  dependent: :destroy
+    has_many :notes, as: :noteable
+
     has_many :events,         as: :source
     has_many :subscriptions,  as: :target, class_name: Event::Subscription
     has_many :notifications,  through: :subscriptions
     has_many :subscribers,    through: :subscriptions
 
-    scope :opened, -> { with_state(:opened) }
-    scope :closed, -> { with_state(:closed) }
-    scope :of_group, ->(group) { where(project_id: group.project_ids) }
-    scope :of_user_team, ->(team) { where(project_id: team.project_ids, assignee_id: team.member_ids) }
+    validates :author, presence: true
+    validates :title, presence: true, length: { within: 0..255 }
+
+    scope :authored, ->(user) { where(author_id: user) }
     scope :assigned_to, ->(u) { where(assignee_id: u.id)}
     scope :recent, -> { order("created_at DESC") }
     scope :assigned, -> { where("assignee_id IS NOT NULL") }
     scope :unassigned, -> { where("assignee_id IS NULL") }
+    scope :of_projects, ->(ids) { where(project_id: ids) }
 
     delegate :name,
              :email,
@@ -41,6 +42,8 @@ module Issuable
              prefix: true
 
     attr_accessor :author_id_of_changes
+
+    attr_mentionable :title, :description
   end
 
   module ClassMethods

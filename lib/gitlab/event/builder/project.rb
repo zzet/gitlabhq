@@ -9,7 +9,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
       known_sources = [::Project,
                        ::Issue, ::Milestone, ::Note, ::MergeRequest, ::Snippet,
                        ::ProjectHook, ::ProtectedBranch, ::Service,
-                       ::UserTeamProjectRelationship, ::UsersProject]
+                       ::TeamProjectRelationship, ::UsersProject]
       known_source = known_sources.include? data.class
       known_source && known_action
     end
@@ -146,7 +146,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::UserTeamProjectRelationship
+      when ::TeamProjectRelationship
         target = source.project
 
         case meta[:action]

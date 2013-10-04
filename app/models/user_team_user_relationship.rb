@@ -13,6 +13,7 @@
 
 class UserTeamUserRelationship < ActiveRecord::Base
   include Watchable
+  include Gitlab::Access
 
   attr_accessible :group_admin, :permission, :user_id, :user_team_id
 

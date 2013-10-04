@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: user_team_group_relationships
+#
+#  id              :integer          not null, primary key
+#  user_team_id    :integer
+#  group_id        :integer
+#  greatest_access :integer
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
+
 class UserTeamGroupRelationship < ActiveRecord::Base
   include Watchable
 

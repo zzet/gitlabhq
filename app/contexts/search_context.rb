@@ -8,15 +8,21 @@ class SearchContext < BaseContext
   def execute
     project_id = params[:project_id]
     group_id = params[:group_id]
+    team_id = params[:team_id]
 
     projects = current_user.known_projects
 
-    if group_id.present?
-      @group = Group.find(group_id)
-      projects = @group.projects.where(id: projects)
-    elsif project_id.present?
-      @project = Project.find(project_id)
-      projects = projects.where(id: @project)
+    if projects.any?
+      if group_id.present?
+        @group = Group.find(group_id)
+        projects = @group.projects.where(id: projects)
+      elsif team_id.present?
+        @team = Team.find(team_id)
+        projects = (@team.projects.where(id: projects) + @team.groups_projects.where(id: projects)).uniq
+      elsif project_id.present?
+        @project = Project.find(project_id)
+        projects = projects.where(id: @project)
+      end
     end
 
     query = params[:search]
@@ -31,8 +37,8 @@ class SearchContext < BaseContext
     if params[:search_code].present?
       result[:blobs] = project.repository.search_files(query, params[:repository_ref]) unless project.empty_repo?
     else
-      result[:merge_requests] = MergeRequest.where(project_id: projects).search(query).limit(10)
-      result[:issues] = Issue.where(project_id: projects).search(query).limit(10)
+      result[:merge_requests] = MergeRequest.in_projects(projects).search(query).order('updated_at DESC').limit(20)
+      result[:issues]         = Issue.where(project_id: projects).search(query).order('updated_at DESC').limit(20)
       result[:wiki_pages] = []
     end
 

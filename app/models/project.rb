@@ -19,7 +19,11 @@
 #  issues_tracker         :string(255)      default("gitlab"), not null
 #  issues_tracker_id      :string(255)
 #  snippets_enabled       :boolean          default(TRUE), not null
+#  git_protocol_enabled   :boolean
 #  last_activity_at       :datetime
+#  imported               :boolean          default(FALSE), not null
+#  last_pushed_at         :datetime
+#  import_url             :string(255)
 #
 
 require "grit"
@@ -27,6 +31,7 @@ require "grit"
 class Project < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
+  include Gitlab::Access
 
   extend Enumerize
 
@@ -37,8 +42,6 @@ class Project < ActiveRecord::Base
   attr_accessible :namespace_id, :creator_id, as: :admin
 
   acts_as_taggable_on :labels, :issues_default_labels
-
-  attr_accessor :import_url
 
   # Relations
   belongs_to :creator,      foreign_key: "creator_id", class_name: "User"
@@ -61,37 +64,48 @@ class Project < ActiveRecord::Base
   has_many :subscribers,    through: :subscriptions
 
   has_many :services,           dependent: :destroy
-  has_many :merge_requests,     dependent: :destroy
+  has_many :merge_requests,     dependent: :destroy, foreign_key: "target_project_id"
   has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
   has_many :milestones,         dependent: :destroy
-  has_many :users_projects,     dependent: :destroy
   has_many :notes,              dependent: :destroy
   has_many :snippets,           dependent: :destroy, class_name: "ProjectSnippet"
   has_many :hooks,              dependent: :destroy, class_name: "ProjectHook"
   has_many :protected_branches, dependent: :destroy
-  has_many :file_tokens,        dependent: :destroy
-  has_many :user_team_project_relationships, dependent: :destroy
 
-  has_many :users,          through: :users_projects
-  has_many :user_teams,     through: :user_team_project_relationships
-  has_many :user_team_user_relationships, through: :user_teams
-  has_many :user_teams_members, through: :user_team_user_relationships
+  has_many :file_tokens,        dependent: :destroy
+
+  has_many :team_project_relationships, dependent: :destroy
+  has_many :teams,                      through: :team_project_relationships
+
+  has_many :team_group_relationships,   through: :group
+  has_many :group_teams,                through: :team_group_relationships, source: :team
+
+  has_many :users, through: :users_projects, conditions: { users: { state: :active } }
+
+  has_many :users_projects,           dependent: :destroy
+  has_many :users_groups,             through: :group
+  has_many :team_user_relationships,  through: :teams
+
+  has_many :core_members,             through: :users_projects,          source: :user, conditions: { users: { state: :active } }
+  has_many :groups_members,           through: :users_groups,            source: :user, conditions: { users: { state: :active } }
+  has_many :teams_members,            through: :team_user_relationships, source: :user, conditions: { users: { state: :active } }
 
   has_many :deploy_keys_projects, dependent: :destroy
   has_many :deploy_keys, through: :deploy_keys_projects
 
   delegate :name, to: :owner, allow_nil: true, prefix: true
+  delegate :members, to: :team, prefix: true
 
   # Validations
   validates :creator, presence: true
   validates :description, length: { within: 0..2000 }
   validates :name, presence: true, length: { within: 0..255 },
             format: { with: Gitlab::Regex.project_name_regex,
-                      message: "only letters, digits, spaces & '_' '-' '.' allowed. Letter should be first" }
+                      message: "only letters, digits, spaces & '_' '-' '.' allowed. Letter or digit should be first" }
   validates :path, presence: true, length: { within: 0..255 },
             exclusion: { in: Gitlab::Blacklist.path },
             format: { with: Gitlab::Regex.path_regex,
-                      message: "only letters, digits & '_' '-' '.' allowed. Letter should be first" }
+                      message: "only letters, digits & '_' '-' '.' allowed. Letter or digit should be first" }
   validates :issues_enabled, :wall_enabled, :merge_requests_enabled,
             :wiki_enabled, inclusion: { in: [true, false] }
   validates :issues_tracker_id, length: { within: 0..255 }
@@ -103,7 +117,7 @@ class Project < ActiveRecord::Base
     format: { with: URI::regexp(%w(git http https)), message: "should be a valid url" },
     if: :import?
 
-  validate :check_limit
+  validate :check_limit, on: :create
 
   # Scopes
   scope :without_user, ->(user)  { where("projects.id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
@@ -154,10 +168,6 @@ class Project < ActiveRecord::Base
         where(path: id, namespace_id: nil).last
       end
     end
-
-    def access_options
-      UsersProject.access_roles
-    end
   end
 
   def team
@@ -174,6 +184,10 @@ class Project < ActiveRecord::Base
 
   def import?
     import_url.present?
+  end
+
+  def imported?
+    imported
   end
 
   def check_limit
@@ -226,7 +240,7 @@ class Project < ActiveRecord::Base
 
   def issue_exists?(issue_id)
     if used_default_issues_tracker?
-      self.issues.where(id: issue_id).first.present?
+      self.issues.where(iid: issue_id).first.present?
     else
       true
     end
@@ -269,12 +283,6 @@ class Project < ActiveRecord::Base
       issues
     when 'merge_request' then
       merge_requests
-    end
-  end
-
-  def send_move_instructions
-    self.users_projects.each do |member|
-      Notify.delay.project_was_moved_email(member.id)
     end
   end
 
@@ -333,7 +341,7 @@ class Project < ActiveRecord::Base
   def discover_default_branch
     # Discover the default branch, but only if it hasn't already been set to
     # something else
-    if repository && default_branch.nil?
+    if repository.exists? && default_branch.nil?
       update_attributes(default_branch: self.repository.discover_default_branch)
     end
   end
@@ -424,12 +432,6 @@ class Project < ActiveRecord::Base
     [Gitlab.config.gitlab.git_url, "/", path_with_namespace, ".git"].join('')
   end
 
-
-  def project_access_human(member)
-    project_user_relation = self.users_projects.find_by_user_id(member.id)
-    self.class.access_options.key(project_user_relation.project_access)
-  end
-
   # Check if current branch name is marked as protected in the system
   def protected_branch? branch_name
     protected_branches_names.include?(branch_name)
@@ -439,8 +441,8 @@ class Project < ActiveRecord::Base
     !(forked_project_link.nil? || forked_project_link.forked_from_project.nil?)
   end
 
-  def imported?
-    imported
+  def personal?
+    !group
   end
 
   def rename_repo
@@ -453,10 +455,12 @@ class Project < ActiveRecord::Base
       # However we cannot allow rollback since we moved repository
       # So we basically we mute exceptions in next actions
       begin
+        gitlab_shell.mv_repository("#{old_path_with_namespace}.wiki", "#{new_path_with_namespace}.wiki")
         gitlab_shell.rm_satellites(old_path_with_namespace)
-        send_move_instructions
+        ensure_satellite_exists
+        reset_events_cache
       rescue
-        # Returning false does not rolback after_* transaction but gives
+        # Returning false does not rollback after_* transaction but gives
         # us information about failing some of tasks
         false
       end
@@ -465,5 +469,20 @@ class Project < ActiveRecord::Base
       # db changes in order to prevent out of sync between db and fs
       raise Exception.new('repository cannot be renamed')
     end
+  end
+
+  # Reset events cache related to this project
+  #
+  # Since we do cache @event we need to reset cache in special cases:
+  # * when project was moved
+  # * when project was renamed
+  # Events cache stored like  events/23-20130109142513.
+  # The cache key includes updated_at timestamp.
+  # Thus it will automatically generate a new fragment
+  # when the event is updated because the key changes.
+  def reset_events_cache
+    OldEvent.where(project_id: self.id).
+      order('id DESC').limit(100).
+      update_all(updated_at: Time.now)
   end
 end

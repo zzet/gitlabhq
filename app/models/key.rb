@@ -2,19 +2,20 @@
 #
 # Table name: keys
 #
-#  id         :integer          not null, primary key
-#  user_id    :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  key        :text
-#  title      :string(255)
-#  identifier :string(255)
-#  project_id :integer
+#  id          :integer          not null, primary key
+#  user_id     :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  key         :text
+#  title       :string(255)
+#  type        :string(255)
+#  fingerprint :string(255)
 #
 
 require 'digest/md5'
 
 class Key < ActiveRecord::Base
+  include Gitlab::Popen
   include Watchable
 
   belongs_to :user
@@ -25,11 +26,11 @@ class Key < ActiveRecord::Base
 
   attr_accessible :key, :title
 
-  before_validation :strip_white_space
+  before_validation :strip_white_space, :generate_fingerpint
 
   validates :title, presence: true, length: { within: 0..255 }
   validates :key, presence: true, length: { within: 0..5000 }, format: { with: /\A(ssh|ecdsa)-.*\Z/ }, uniqueness: true
-  validate :fingerprintable_key
+  validates :fingerprint, uniqueness: true, presence: { message: 'cannot be generated' }
 
   delegate :name, :email, to: :user, prefix: true
 
@@ -39,21 +40,6 @@ class Key < ActiveRecord::Base
     self.key = key.strip unless key.blank?
   end
 
-  def fingerprintable_key
-    return true unless key # Don't test if there is no key.
-
-    file = Tempfile.new('key_file')
-    begin
-      file.puts key
-      file.rewind
-      fingerprint_output = `ssh-keygen -lf #{file.path} 2>&1` # Catch stderr.
-    ensure
-      file.close
-      file.unlink # deletes the temp file
-    end
-    errors.add(:key, "can't be fingerprinted") if $?.exitstatus != 0
-  end
-
   # projects that has this key
   def projects
     user.authorized_projects
@@ -61,5 +47,26 @@ class Key < ActiveRecord::Base
 
   def shell_id
     "key-#{id}"
+  end
+
+  private
+
+  def generate_fingerpint
+    self.fingerprint = nil
+    return unless key.present?
+
+    cmd_status = 0
+    cmd_output = ''
+    Tempfile.open('gitlab_key_file') do |file|
+      file.puts key
+      file.rewind
+      cmd_output, cmd_status = popen("ssh-keygen -lf #{file.path}", '/tmp')
+    end
+
+    if cmd_status.zero?
+      cmd_output.gsub /([\d\h]{2}:)+[\d\h]{2}/ do |match|
+        self.fingerprint = match
+      end
+    end
   end
 end

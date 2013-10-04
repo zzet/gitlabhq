@@ -21,7 +21,7 @@ class Gitlab::Event::Notification::Creator::Note < Gitlab::Event::Notification::
 
   def no_notification?(event, user)
     return false if user.blank?
-    ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user).any?
+    ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user).blank?
   end
 
   def create_notification_for_mentioned_users(event, notifications)

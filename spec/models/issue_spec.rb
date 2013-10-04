@@ -14,6 +14,7 @@
 #  description  :text
 #  milestone_id :integer
 #  state        :string(255)
+#  iid          :integer
 #
 
 require 'spec_helper'
@@ -45,7 +46,7 @@ describe Issue do
   end
 
   describe '#is_being_reassigned?' do
-    it 'returnes issues assigned to user' do
+    it 'returns issues assigned to user' do
       user = create :user
 
       2.times do
@@ -54,5 +55,11 @@ describe Issue do
 
       Issue.open_for(user).count.should eq 2
     end
+  end
+
+  it_behaves_like 'an editable mentionable' do
+    let(:subject) { create :issue, project: mproject }
+    let(:backref_text) { "issue ##{subject.iid}" }
+    let(:set_mentionable_text) { ->(txt){ subject.description = txt } }
   end
 end

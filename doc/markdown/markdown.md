@@ -1,4 +1,3 @@
-
 ----------------------------------------------
 
 Table of Contents  
@@ -28,8 +27,9 @@ Table of Contents
 [Inline HTML](#toc_25)
 [Horizontal Rule](#toc_26)
 [Line Breaks](#toc_27)
+[Tables](#toc_28)
 
-[References](#toc_28)
+[References](#toc_29)
 ---------------------
 
 ----------------------------------------------
@@ -159,7 +159,7 @@ Emoji
 
 	If you are :new: to this, don't be :fearful:. You can easily join the emoji :circus_tent:. All you need to do is to :book: up on the supported codes.
 
-	Consult the [Emoji Cheat Sheet]( "http://www.emoji-cheat-sheet.com/") for a list of all supported emoji codes. :thumbsup: 
+	Consult the [Emoji Cheat Sheet](http://www.emoji-cheat-sheet.com/) for a list of all supported emoji codes. :thumbsup: 
 
 Sometimes you want to be :cool: and add some :sparkles: to your :speech_balloon:. Well we have a :gift: for you:
 
@@ -169,7 +169,7 @@ You can use it to point out a :bug: or warn about :monkey:patches. And if someon
 
 If you are :new: to this, don't be :fearful:. You can easily join the emoji :circus_tent:. All you need to do is to :book: up on the supported codes.
 
-Consult the [Emoji Cheat Sheet]( "http://www.emoji-cheat-sheet.com/") for a list of all supported emoji codes. :thumbsup: 
+Consult the [Emoji Cheat Sheet](http://www.emoji-cheat-sheet.com/) for a list of all supported emoji codes. :thumbsup: 
 
 <a name="special"/>
 Special GitLab References
@@ -440,6 +440,27 @@ This line is separated from the one above by two newlines, so it will be a *sepa
 
 This line is also begins a separate paragraph, but...  
 This line is only separated by a single newline, so it's a separate line in the *same paragraph*.
+
+
+<a name="tables"/>
+## Tables
+
+Tables aren't part of the core Markdown spec, but they are part of GFM and Markdown Here supports them.
+
+```
+| header 1 | header 2 |
+| -------- | -------- |
+| cell 1   | cell 2   |
+| cell 3   | cell 4   |
+```
+
+Code above produces next output:
+
+| header 1 | header 2 |
+| -------- | -------- |
+| cell 1   | cell 2   |
+| cell 3   | cell 4   |
+
 
 ------------
 
