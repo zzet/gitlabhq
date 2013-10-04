@@ -25,7 +25,7 @@ class Dispatcher
         new Activities()
       when 'projects:commit:show'
         new Commit()
-      when 'groups:show', 'projects:show'
+      when 'groups:show', 'projects:show', 'teams:show'
         new Activities()
       when 'projects:new', 'projects:edit'
         new Project()
