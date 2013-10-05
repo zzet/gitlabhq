@@ -74,7 +74,7 @@ namespace :deploy do
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_global_projects"
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_keys"
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:migrate_inline_notes"
-    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:satellites:create"
+    #run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} gitlab:satellites:create"
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} migrate_iids"
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} cache:clear"
     run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} assets:clean"
