@@ -11,3 +11,6 @@ set :bundle_without, %w[staging development test] + (%w[mysql postgres] - [db_ad
 role :web, "10.40.252.13"
 role :app, "10.40.252.13"
 role :db,  "10.40.252.13", primary: true
+
+after "deploy:update_code", "deploy:migrate"
+after "deploy:update", "deploy:cleanup", "deploy:update_app_to_6_1"
