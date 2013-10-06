@@ -5,7 +5,8 @@ class Groups::TeamsController < Groups::ApplicationController
   def index
     @teams = group.teams
     @team_group_relation = group.team_group_relationships.build
-    @avaliable_teams = current_user.authorized_teams.where("id not in (?)", @teams.pluck(:id))
+    @avaliable_teams = current_user.authorized_teams
+    @avaliable_teams = @avaliable_teams.where("id not in (?)", @teams.pluck(:id)) if @teams.any?
     render :index, layout: 'group_settings'
   end
 
