@@ -1,7 +1,7 @@
 class Teams::ProjectsController < Teams::ApplicationController
   def index
     projects
-    @avaliable_projects = current_user.owned_projects.without_team(team)
+    @avaliable_projects = current_user.admin? ? Project.without_team(team) : current_user.owned_projects.without_team(team)
     @project_relation = team.team_project_relationships.build
     render :index, layout: 'team_settings'
   end
