@@ -21,7 +21,11 @@
 class Service < ActiveRecord::Base
   include Watchable
 
-  attr_accessible :title, :token, :type, :active, :service_key_service_relationships_attributes
+  attr_accessible :title, :description, :token, :type,
+                  :public_state_event, :active_state_event, :state_event,
+                  :service_key_service_relationships_attributes
+
+  acts_as_tree parent_column_name: :service_pattern_id, dependent: :nullify
 
   belongs_to :project
   has_one :service_hook
@@ -36,8 +40,6 @@ class Service < ActiveRecord::Base
 
   accepts_nested_attributes_for :service_key_service_relationships, reject_if: :all_blank, allow_destroy: true
 
-  validates :project, presence: true
-
   state_machine :state, initial: :disabled do
     event :enable do
       transition [:disabled] => :enabled
@@ -48,13 +50,63 @@ class Service < ActiveRecord::Base
     end
 
     state :enabled
-
     state :disabled
+  end
+
+  state_machine :public_state, initial: :unpublished do
+    event :publish do
+      transition unpublished: :published
+    end
+
+    event :unpublish do
+      transition published: :unpublished
+    end
+
+    state :published
+    state :unpublished
+  end
+
+  state_machine :active_state, initial: :inactive do
+    event :activate do
+      transition [:inactive] => :active
+    end
+
+    event :deactivate do
+      transition active: :inactive
+    end
+
+    after_transition on: :deactivate, do: :deactivate_childrens
+
+    state :active
+    state :inactive
   end
 
   actions_to_watch [:created, :updated, :deleted]
 
   scope :with_project, ->(project){ where(project_id: project) }
+
+  class << self
+    def descendants
+      # In production class cache :)
+      Dir[File.dirname(__FILE__) << "/service/*.rb"].each {|f| load f} if super.blank?
+
+      super
+    end
+
+    def can_build?(param)
+      service_name == param
+    end
+
+    def build_by_type(param)
+      services = descendants.map { |s| s if s.can_build?(param) }
+
+      if services.one?
+        services.first.new
+      else
+        raise ActiveRecord::RecordNotFound
+      end
+    end
+  end
 
   def add_service_key title, key, key_state
     service_key = ServiceKey.find_by_key(key)
@@ -65,10 +117,22 @@ class Service < ActiveRecord::Base
     end
   end
 
+  def import_service_keys service
+    service.service_keys.each do |sk|
+      service_key_service_relationships.create(service_key_id: sk.id, key_state: options)
+    end
+  end
+
   def remove_service_key key
     key = ServiceKey.find_by_key(key) unless key.is_a? ServiceKey
 
     service_key_service_relationships.where(service_key_id: key).destroy_all if key
+  end
+
+  def deactivate_childrens
+    children.each do |child|
+      child.disable
+    end
   end
 
   def allowed_clone?
@@ -110,5 +174,9 @@ class Service < ActiveRecord::Base
 
   def can_test?
     !project.empty_repo?
+  end
+
+  def pattern
+    parent
   end
 end

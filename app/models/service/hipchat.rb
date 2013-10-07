@@ -16,13 +16,18 @@
 #  state       :string(255)
 #
 
-class CampfireService < Service
-  attr_accessible :subdomain, :room
+class Service::Hipchat < Service
+
+  attr_accessible :room
 
   validates :token, presence: true, if: :activated?
 
+  def self.service_name
+    'hipchat'
+  end
+
   def title
-    'Campfire'
+    'Hipchat'
   end
 
   def description
@@ -30,50 +35,47 @@ class CampfireService < Service
   end
 
   def to_param
-    'campfire'
+    self.class.service_name
   end
 
   def fields
     [
       { type: 'text', name: 'token',     placeholder: '' },
-      { type: 'text', name: 'subdomain', placeholder: '' },
       { type: 'text', name: 'room',      placeholder: '' }
     ]
   end
 
   def execute(push_data)
-    room = gate.find_room_by_name(self.room)
-    return true unless room
-
-    message = build_message(push_data)
-
-    room.speak(message)
+    gate[room].send('Gitlab', create_message(push_data))
   end
 
   private
 
   def gate
-    @gate ||= Tinder::Campfire.new(subdomain, token: token)
+    @gate ||= HipChat::Client.new(token)
   end
 
-  def build_message(push)
+  def create_message(push)
     ref = push[:ref].gsub("refs/heads/", "")
     before = push[:before]
     after = push[:after]
 
     message = ""
-    message << "[#{project.name_with_namespace}] "
     message << "#{push[:user_name]} "
-
     if before =~ /000000/
-      message << "pushed new branch #{ref} \n"
+      message << "pushed new branch <a href=\"#{project.web_url}/commits/#{ref}\">#{ref}</a> to <a href=\"#{project.web_url}\">#{project.name_with_namespace.gsub!(/\s/,'')}</a>\n"
     elsif after =~ /000000/
-      message << "removed branch #{ref} \n"
+      message << "removed branch #{ref} from <a href=\"#{project.web_url}\">#{project.name_with_namespace.gsub!(/\s/,'')}</a> \n"
     else
-      message << "pushed #{push[:total_commits_count]} commits to #{ref}. "
-      message << "#{project.web_url}/compare/#{before}...#{after}"
+      message << "#pushed to branch <a href=\"#{project.web_url}/commits/#{ref}\">#{ref}</a> "
+      message << "of <a href=\"#{project.web_url}\">#{project.name_with_namespace.gsub!(/\s/,'')}</a> "
+      message << "(<a href=\"#{project.web_url}/compare/#{before}...#{after}\">Compare changes</a>)"
+      for commit in push[:commits] do
+        message << "<br /> - #{commit[:message]} (<a href=\"#{commit[:url]}\">#{commit[:id][0..5]}</a>)"
+      end
     end
 
     message
   end
+
 end

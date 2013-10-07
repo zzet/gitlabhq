@@ -49,12 +49,9 @@ class Project < ActiveRecord::Base
   belongs_to :namespace
 
   has_one :last_event, class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
-  has_one :gitlab_ci_service, dependent: :destroy
-  has_one :campfire_service, dependent: :destroy
-  has_one :hipchat_service, dependent: :destroy
-  has_one :build_face_service, dependent: :destroy, class_name: Service::BuildFace
-  has_one :jenkins_service, dependent: :destroy, class_name: Service::Jenkins
-  has_one :nix_service, dependent: :destroy, class_name: Service::Nix
+
+  has_many :services,           as: :service
+
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 

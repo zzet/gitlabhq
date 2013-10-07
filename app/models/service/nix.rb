@@ -1,4 +1,5 @@
 class Service::Nix < Service
+
   attr_accessible :project_id, :project_url, :title, :token, :type, :state_event
 
   delegate :execute, to: :service_hook, prefix: nil
@@ -22,6 +23,10 @@ class Service::Nix < Service
 
   alias :activated? :enabled?
 
+  def self.service_name
+    'nix'
+  end
+
   def title
     'Nix'
   end
@@ -31,7 +36,7 @@ class Service::Nix < Service
   end
 
   def to_param
-    'nix'
+    self.class.service_name
   end
 
   def fields

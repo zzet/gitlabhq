@@ -16,7 +16,8 @@
 #  state       :string(255)
 #
 
-class GitlabCiService < Service
+class Service::GitlabCi < Service
+
   attr_accessible :project_url
 
   validates :project_url, presence: true, if: :activated?
@@ -25,6 +26,10 @@ class GitlabCiService < Service
   delegate :execute, to: :service_hook, prefix: nil
 
   after_save :compose_service_hook, if: :activated?
+
+  def self.service_name
+    'gitlab_ci'
+  end
 
   def compose_service_hook
     hook = service_hook || build_service_hook
@@ -67,7 +72,7 @@ class GitlabCiService < Service
   end
 
   def to_param
-    'gitlab_ci'
+    self.class.service_name
   end
 
   def fields

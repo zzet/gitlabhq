@@ -11,7 +11,21 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130909132950) do
+ActiveRecord::Schema.define(:version => 20131007122617) do
+
+  create_table "banners", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.string   "category"
+    t.string   "state"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer  "author_id"
+    t.integer  "entity_id"
+    t.string   "entity_type"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -21,6 +35,15 @@ ActiveRecord::Schema.define(:version => 20130909132950) do
   end
 
   add_index "deploy_keys_projects", ["project_id"], :name => "index_deploy_keys_projects_on_project_id"
+
+  create_table "event_hierarchies", :id => false, :force => true do |t|
+    t.integer "ancestor_id",   :null => false
+    t.integer "descendant_id", :null => false
+    t.integer "generations",   :null => false
+  end
+
+  add_index "event_hierarchies", ["ancestor_id", "descendant_id", "generations"], :name => "event_anc_desc_udx", :unique => true
+  add_index "event_hierarchies", ["descendant_id"], :name => "event_desc_idx"
 
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
@@ -275,6 +298,25 @@ ActiveRecord::Schema.define(:version => 20130909132950) do
     t.datetime "updated_at",    :null => false
   end
 
+  create_table "service_configuration_build_faces", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.string   "domain"
+    t.string   "system_hook_path"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  create_table "service_hierarchies", :id => false, :force => true do |t|
+    t.integer "ancestor_id",   :null => false
+    t.integer "descendant_id", :null => false
+    t.integer "generations",   :null => false
+  end
+
+  add_index "service_hierarchies", ["ancestor_id", "descendant_id", "generations"], :name => "service_anc_desc_udx", :unique => true
+  add_index "service_hierarchies", ["descendant_id"], :name => "service_desc_idx"
+
   create_table "service_key_service_relationships", :force => true do |t|
     t.integer  "service_key_id",    :null => false
     t.integer  "service_id",        :null => false
@@ -287,14 +329,18 @@ ActiveRecord::Schema.define(:version => 20130909132950) do
     t.string   "type"
     t.string   "title"
     t.string   "token"
-    t.integer  "project_id",                     :null => false
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
-    t.boolean  "active",      :default => false, :null => false
+    t.integer  "project_id"
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+    t.boolean  "active",             :default => false, :null => false
     t.string   "project_url"
     t.string   "subdomain"
     t.string   "room"
     t.string   "state"
+    t.integer  "service_pattern_id"
+    t.string   "public_state"
+    t.string   "active_state"
+    t.text     "description"
   end
 
   add_index "services", ["project_id"], :name => "index_services_on_project_id"

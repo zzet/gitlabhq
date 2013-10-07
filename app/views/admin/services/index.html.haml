@@ -1,0 +1,54 @@
+%h3.page-title Services
+%p.light Services allow you to integrate GitLab with other applications
+%hr
+
+.span6
+  %h4 Configured Services
+  %ul.bordered-list
+    - @services.each do |service|
+      %li
+        .pull-right
+          = link_to admin_service_keys_path(service.id), class: "btn" do
+            %i.icon-wrench
+
+          .btn
+            - if service.published?
+              %i.icon-eye-close.cred
+            - else
+              %i.icon-eye-open.cgreen
+
+          = link_to edit_admin_service_path(service.id), class: "btn" do
+            %i.icon-edit
+
+        %h4
+          - if service.active?
+            %span.cgreen
+              %i.icon-circle
+          - else
+            %span.cgray
+              %i.icon-circle-blank
+
+          - if service.published?
+            %span.cgreen
+              %i.icon-globe
+          - else
+            %span.cgray
+              %i.icon-lock
+
+          = link_to admin_service_path(service.id) do
+            = service.title
+        %p= service.description
+        %p
+          Used in
+          = service.children.count
+          projects
+
+.span5
+  %h4 Avaliable Services
+  %ul.bordered-list
+    - @service_modules.each do |service|
+      %li
+        %h4
+          = link_to new_admin_service_path(key: service.to_param) do
+            = service.title
+        %p= service.description

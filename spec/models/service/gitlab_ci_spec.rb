@@ -18,7 +18,7 @@
 
 require 'spec_helper'
 
-describe GitlabCiService do
+describe Service::GitlabCi do
   describe "Associations" do
     it { should belong_to :project }
     it { should have_one :service_hook }
@@ -30,7 +30,7 @@ describe GitlabCiService do
 
   describe 'commits methods' do
     before do
-      @service = GitlabCiService.new
+      @service = Service::GitlabCi.new
       @service.stub(
         service_hook: true,
         project_url: 'http://ci.gitlab.org/projects/2',

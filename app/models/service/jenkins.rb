@@ -1,4 +1,5 @@
 class Service::Jenkins < Service
+
   attr_accessible :project_id, :project_url, :title, :token, :type, :state_event
 
   delegate :execute, to: :service_hook, prefix: nil
@@ -22,6 +23,10 @@ class Service::Jenkins < Service
 
   alias :activated? :enabled?
 
+  def self.service_name
+    'jenkins'
+  end
+
   def title
     'Jenkins CI'
   end
@@ -31,7 +36,7 @@ class Service::Jenkins < Service
   end
 
   def to_param
-    'jenkins'
+    self.class.service_name
   end
 
   def fields

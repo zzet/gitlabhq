@@ -51,6 +51,9 @@ gem "stamp"
 # Enumeration fields
 gem 'enumerize'
 
+# Tree data structure
+gem 'closure_tree'
+
 # Pagination
 gem "kaminari", "~> 0.14.1"
 
