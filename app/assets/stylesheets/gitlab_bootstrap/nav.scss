@@ -10,6 +10,7 @@
   > li > a {
     @include border-radius(0);
   }
+
   &.nav-stacked {
     > li > a {
       border-left: 4px solid #EEE;
@@ -21,6 +22,20 @@
       background: #F1F1F1;
       color: $style_color;
       font-weight: bold;
+      text-shadow: 0 1px 1px #fff;
+    }
+
+    &.nav-stacked-menu {
+      background: #FAFAFA;
+      li > a {
+        padding: 16px;
+      }
+    }
+  }
+
+  &.nav-pills-small {
+    > li > a {
+      padding: 8px 12px;
     }
   }
 }
@@ -37,7 +52,7 @@
 .nav.nav-tabs {
   li {
     > a {
-      padding: 8px 20px;
+      padding: 8px 15px;
       margin-right: 7px;
       line-height: 20px;
       border-color: #EEE;
@@ -63,4 +78,15 @@
   }
 
   &.nav-small-tabs > li > a { padding: 6px 9px; }
+}
+
+
+
+/**
+ * fix to keep tooltips position in top navigation bar
+ *
+ */
+.navbar .nav > li {
+  position: relative;
+  white-space: nowrap;
 }

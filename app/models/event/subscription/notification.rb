@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: event_subscription_notifications
+#
+#  id                 :integer          not null, primary key
+#  event_id           :integer
+#  subscription_id    :integer
+#  notification_state :string(255)
+#  notified_at        :datetime
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  subscriber_id      :integer
+#
+
 class Event::Subscription::Notification < ActiveRecord::Base
   attr_accessible :event_id, :event, :notification_state, :notified_at, :subscription_id, :subscriber, :subscriber_id
 

@@ -24,11 +24,8 @@ class GroupsController < ApplicationController
   end
 
   def create
-    @group = Group.new(params[:group])
-    @group.path = @group.name.dup.parameterize if @group.name
-    @group.owner = current_user
-
-    if @group.save
+    @group = Groups::CreateContext.new(current_user, params[:group]).execute
+    if @group.persisted?
       redirect_to @group, notice: 'Group was successfully created.'
     else
       render action: "new"
@@ -36,8 +33,14 @@ class GroupsController < ApplicationController
   end
 
   def show
-    @events = OldEvent.in_projects(project_ids).limit(20).offset(params[:offset] || 0)
+    @events = OldEvent.in_projects(project_ids)
+    @events = event_filter.apply_filter(@events)
+    @events = @events.limit(20).offset(params[:offset] || 0)
     @last_push = current_user.recent_push
+
+    @teams = @group.teams
+    @projects = @group.projects
+    @members = @group.users.includes(:users_groups).order("users_groups.group_access DESC")
 
     respond_to do |format|
       format.html
@@ -66,29 +69,19 @@ class GroupsController < ApplicationController
     end
   end
 
-  def people
+  def members
     @project = group.projects.find(params[:project_id]) if params[:project_id]
-    @users = @project ? @project.users : group.users
-    @users.sort_by!(&:name)
-
-    if @project
-      @team_member = @project.users_projects.new
-    else
-      @team_member = UsersProject.new
-    end
-  end
-
-  def team_members
-    @group.add_users_to_project_teams(params[:user_ids].split(','), params[:project_access])
-    redirect_to people_group_path(@group), notice: 'Users were successfully added.'
+    @members = group.users_groups.order('group_access DESC')
+    @users_group = UsersGroup.new
   end
 
   def edit
+    render :edit, layout: 'group_settings'
   end
 
   def update
     group_params = params[:group].dup
-    owner_id =group_params.delete(:owner_id)
+    owner_id = group_params.delete(:owner_id)
 
     if owner_id
       @group.owner = User.find(owner_id)
@@ -98,7 +91,7 @@ class GroupsController < ApplicationController
     if @group.update_attributes(group_params)
       redirect_to @group, notice: 'Group was successfully updated.'
     else
-      render action: "edit"
+      render action: :edit, layout: 'group_settings'
     end
   end
 
@@ -124,7 +117,7 @@ class GroupsController < ApplicationController
 
   # Dont allow unauthorized access to group
   def authorize_read_group!
-    unless projects.present? or can?(current_user, :manage_group, group)
+    unless projects.present? or can?(current_user, :read_group, @group)
       return render_404
     end
   end

@@ -15,7 +15,7 @@ gem "mysql2", group: :mysql
 gem "pg", group: :postgres
 
 # Auth
-gem "devise"
+gem "devise", '~> 2.2'
 gem 'omniauth', "~> 1.1.3"
 gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
@@ -23,7 +23,7 @@ gem 'omniauth-github'
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
-gem 'gitlab_git', '~> 1.3.0'
+gem "gitlab_git", '2.3.1'
 
 # Ruby/Rack Git Smart-HTTP Server Handler
 gem 'gitlab-grack', '~> 1.0.1', require: 'grack'
@@ -35,7 +35,7 @@ gem 'gitlab_omniauth-ldap', '1.0.3', require: "omniauth-ldap"
 gem "gitlab-pygments.rb", '~> 0.3.2', require: 'pygments.rb'
 
 # Git Wiki
-gem "gitlab-gollum-lib", "~> 1.0.0", require: 'gollum-lib'
+gem "gitlab-gollum-lib", "~> 1.0.1", require: 'gollum-lib'
 
 # Language detection
 gem "github-linguist", require: "linguist"
@@ -59,8 +59,9 @@ gem "haml-rails"
 
 # Files attachments
 gem "carrierwave"
+
 # for aws storage
-# gem "fog", "~> 1.3.1"
+gem "fog", "~> 1.3.1", group: :aws
 
 # Authorization
 gem "six"
@@ -75,8 +76,9 @@ gem "github-markup", "~> 0.7.4", require: 'github/markup'
 # Asciidoc to HTML
 gem  "asciidoctor"
 
-# Servers
-gem "puma", '~> 2.0.1'
+# Application server
+#gem "unicorn", '~> 4.6.3', group: :unicorn
+gem "puma", '~> 2.3.1', group: :puma
 
 #
 gem 'request_store'
@@ -120,6 +122,9 @@ gem "d3_rails", "~> 3.1.4"
 # underscore-rails
 gem "underscore-rails", "~> 1.4.4"
 
+# Sanitize user input
+gem "sanitize"
+
 group :assets do
   gem "sass-rails"
   gem "coffee-rails"
@@ -128,15 +133,15 @@ group :assets do
   gem 'turbolinks'
   gem 'jquery-turbolinks'
 
-  gem 'chosen-rails',     "0.9.8"
+  gem 'chosen-rails',     "1.0.0"
   gem 'select2-rails'
   gem 'jquery-atwho-rails', "0.3.0"
   gem "jquery-rails",     "2.1.3"
   gem "jquery-ui-rails",  "2.0.2"
   gem "modernizr",        "2.6.2"
-  gem "raphael-rails",    git: "https://github.com/gitlabhq/raphael-rails.git"
+  gem "raphael-rails", "~> 2.1.2"
   gem 'bootstrap-sass'
-  gem "font-awesome-rails", "~> 3.1.1"
+  gem "font-awesome-rails"
   gem "gemoji", "~> 1.2.1", require: 'emoji/railtie'
   gem "gon"
   gem "js-routes"
@@ -164,12 +169,12 @@ group :development do
   gem 'capistrano'
   gem 'rvm-capistrano'
   gem 'capistrano-ext'
-  gem 'airbrake'
   gem 'capistrano-maintenance'
 end
 
 gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
+gem 'newrelic_rpm'
 
 group :development, :staging, :test do
   # Visual email testing
@@ -184,12 +189,13 @@ group :development, :test do
   gem "rspec-rails"
   gem "capybara"
   gem "pry"
+  gem 'pry-rails'
   gem "awesome_print"
   gem "database_cleaner"
   gem "launchy"
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
-  gem 'minitest'
+  gem 'minitest', '~> 4.7.0'
 
   # Generate Fake data
   gem "ffaker"
@@ -203,7 +209,7 @@ group :development, :test do
   gem 'growl',      require: darwin_only('growl')
 
   # PhantomJS driver for Capybara
-  gem 'poltergeist', '~> 1.3.0'
+  gem 'poltergeist', '~> 1.4.1'
 
   gem 'spork', '~> 1.0rc'
   gem 'jasmine'
@@ -218,5 +224,5 @@ group :test do
 end
 
 group :production do
-  gem "gitlab_meta", '5.0'
+  gem "gitlab_meta", '6.0'
 end

@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: events
+#
+#  id              :integer          not null, primary key
+#  author_id       :integer
+#  action          :string(255)
+#  source_id       :integer
+#  source_type     :string(255)
+#  target_id       :integer
+#  target_type     :string(255)
+#  data            :text
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  parent_event_id :integer
+#
+
 class Event < ActiveRecord::Base
   include Actionable
 
@@ -49,5 +66,4 @@ class Event < ActiveRecord::Base
   def full?
     source.present? && target.present?
   end
-
 end

@@ -55,7 +55,7 @@ namespace :gitlab do
   # Runs the given command and matches the output against the given pattern
   #
   # Returns nil if nothing matched
-  # Retunrs the MatchData if the pattern matched
+  # Returns the MatchData if the pattern matched
   #
   # see also #run
   # see also String#match
@@ -80,7 +80,11 @@ namespace :gitlab do
   end
 
   def gid_for(group_name)
-    Etc.getgrnam(group_name).gid
+    begin
+      Etc.getgrnam(group_name).gid
+    rescue ArgumentError # no group
+      "group #{group_name} doesn't exist"
+    end
   end
 
   def warn_user_is_not_gitlab

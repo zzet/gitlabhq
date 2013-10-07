@@ -25,13 +25,20 @@ module API
       expose :id, :url, :created_at
     end
 
+    class ForkedFromProject < Grape::Entity
+      expose :id
+      expose :name, :name_with_namespace
+      expose :path, :path_with_namespace
+    end
+
     class Project < Grape::Entity
       expose :id, :description, :default_branch, :public, :ssh_url_to_repo, :http_url_to_repo, :web_url
       expose :owner, using: Entities::UserBasic
       expose :name, :name_with_namespace
       expose :path, :path_with_namespace
-      expose :issues_enabled, :merge_requests_enabled, :wall_enabled, :wiki_enabled, :created_at, :last_activity_at
+      expose :issues_enabled, :merge_requests_enabled, :wall_enabled, :wiki_enabled, :snippets_enabled, :created_at, :last_activity_at, :public
       expose :namespace
+      expose :forked_from_project, using: Entities::ForkedFromProject, :if => lambda{ | project, options | project.forked? }
     end
 
     class ProjectMember < UserBasic
@@ -42,13 +49,13 @@ module API
 
     class TeamMember < UserBasic
       expose :permission, as: :access_level do |user, options|
-        options[:user_team].user_team_user_relationships.find_by_user_id(user.id).permission
+        options[:team].team_user_relationships.find_by_user_id(user.id).permission
       end
     end
 
     class TeamProject < Project
       expose :greatest_access, as: :greatest_access_level do |project, options|
-        options[:user_team].user_team_project_relationships.find_by_project_id(project.id).greatest_access
+        options[:team].team_project_relationships.find_by_project_id(project.id).greatest_access
       end
     end
 
@@ -58,6 +65,12 @@ module API
 
     class GroupDetail < Group
       expose :projects, using: Entities::Project
+    end
+
+    class GroupMember < UserBasic
+      expose :group_access, as: :access_level do |user, options|
+        options[:group].users_groups.find_by_user_id(user.id).group_access
+      end
     end
 
     class RepoObject < Grape::Entity
@@ -99,12 +112,9 @@ module API
       expose :id, :title, :key, :created_at
     end
 
-    class UserTeam < Grape::Entity
-      expose :id, :name, :path, :owner_id
-    end
-
     class MergeRequest < Grape::Entity
-      expose :id, :target_branch, :source_branch, :project_id, :title, :state
+      expose :id, :target_branch, :source_branch, :title, :state
+      expose :target_project_id, as: :project_id
       expose :author, :assignee, using: Entities::UserBasic
     end
 

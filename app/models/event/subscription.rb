@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: event_subscriptions
+#
+#  id                    :integer          not null, primary key
+#  user_id               :integer
+#  action                :string(255)
+#  target_id             :integer
+#  target_type           :string(255)
+#  source_id             :integer
+#  source_type           :string(255)
+#  source_category       :string(255)
+#  notification_interval :integer
+#  last_notified_at      :datetime
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  target_category       :string(255)
+#
+
 class Event::Subscription < ActiveRecord::Base
   include Actionable
 
@@ -47,6 +66,7 @@ class Event::Subscription < ActiveRecord::Base
   scope :by_source, ->(source) { where(source_id: source.id, source_type: source.class.name) }
   scope :uniq_by_target, -> { select("DISTINCT ON (event_subscriptions.target_type, event_subscriptions.target_id, event_subscriptions.user_id) event_subscriptions.*") }
   scope :by_target, ->(target) { where(target_id: target.id, target_type: target.class.name).uniq_by_target }
+  scope :by_event_target, ->(event) { where(target_id: event.target_id, target_type: event.target_type).uniq_by_target }
   scope :by_target_category, ->(target) { where(target_category: target).uniq_by_target }
 
   scope :by_source_type, ->(source_type) do
@@ -68,7 +88,7 @@ class Event::Subscription < ActiveRecord::Base
 
   class << self
     def global_entity_to_subscription
-      [:project, :group, :user_team, :user]
+      [:project, :group, :team, :user]
     end
   end
 

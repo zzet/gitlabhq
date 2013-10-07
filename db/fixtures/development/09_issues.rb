@@ -11,7 +11,7 @@ Gitlab::Seeder.quiet do
     next unless user
 
     user_id = user.id
-    IssueObserver.current_user = user
+    Thread.current[:current_user] = user
 
     Issue.seed(:id, [{
       id: i,
@@ -23,5 +23,10 @@ Gitlab::Seeder.quiet do
       title: Faker::Lorem.sentence(6)
     }])
     print('.')
+  end
+
+  Issue.all.map do |issue|
+    issue.set_iid
+    issue.save
   end
 end

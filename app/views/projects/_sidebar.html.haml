@@ -1,0 +1,23 @@
+%ul.nav.nav-tabs.dash-sidebar-tabs
+  %li.active
+    = link_to '#owners', 'data-toggle' => 'tab', id: 'sidebar-projects-tab' do
+      Owners
+      %span.badge= (@owners.count + @masters.count)
+  %li
+    = link_to '#members', 'data-toggle' => 'tab', id: 'sidebar-members-tab' do
+      Members
+      %span.badge= @members_count
+  %li
+    = link_to '#teams', 'data-toggle' => 'tab', id: 'sidebar-groups-tab' do
+      Teams
+      %span.badge= @teams.count
+
+.tab-content
+  .tab-pane.active#owners
+    = render "owners", owners: @owners, masters: @masters
+  .tab-pane#members
+    = render "members", owners: @owners, masters: @masters, developers: @developers, reporters: @reporters, guests: @guests
+  .tab-pane#teams
+    = render "teams", teams: @teams
+%hr
+= render 'shared/promo'

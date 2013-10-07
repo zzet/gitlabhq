@@ -33,6 +33,6 @@ class Gitlab::Event::Notification::Creator::MergeRequest < Gitlab::Event::Notifi
 
   def no_notification?(event, user)
     return false if user.blank?
-    ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user).any?
+    ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user).blank?
   end
 end

@@ -2,24 +2,24 @@
   = nav_link(path: 'teams#show', html_options: {class: 'home'}) do
     = link_to team_path(@team), title: "Home" do
       %i.icon-home
+  -#= nav_link(path: 'teams#issues') do
+    -#= link_to issues_team_path(@team) do
+      -#Issues
+      -#%span.count= current_user.assigned_issues.opened.of_team(@team).count
+  -#= nav_link(path: 'teams#merge_requests') do
+    -#= link_to merge_requests_team_path(@team) do
+      -#Merge Requests
+      -#%span.count= current_user.cared_merge_requests.opened.of_team(@team).count
 
-  = nav_link(path: 'teams#issues') do
-    = link_to issues_team_path(@team) do
-      Issues
-      %span.count= Issue.opened.of_user_team(@team).count
+  -#= nav_link(path: 'teams#people') do
+    -#= link_to "People", people_team_path(@team)
+  -#= nav_link(path: 'teams#teams') do
+    -#= link_to "Teams", team_teams_path(@team)
 
-  = nav_link(path: 'teams#merge_requests') do
-    = link_to merge_requests_team_path(@team) do
-      Merge Requests
-      %span.count= MergeRequest.opened.of_user_team(@team).count
+  -#= nav_link(path: 'teams#members') do
+    -#= link_to "Members", members_team_path(@team)
 
-  = nav_link(controller: [:members]) do
-    = link_to team_members_path(@team), class: "team-tab tab" do
-      Members
-      %span.count= @team.members.count
-
-  - if can? current_user, :manage_user_team, @team
+  - if can?(current_user, :manage_team, @team)
     = nav_link(path: 'teams#edit') do
-      = link_to edit_team_path(@team), class: "stat-tab tab " do
+      = link_to edit_team_path(@team), class: "tab " do
         Settings
-

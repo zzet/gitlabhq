@@ -1,24 +1,59 @@
 class Admin::TeamsController < Admin::ApplicationController
   def index
-    @teams = UserTeam.order('name ASC')
+    @teams = Team.order('name ASC')
+    @teams_count = @teams.count
+
+    if params[:member].present?
+      user = User.find_by_username(params[:member])
+      team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
+      @teams = @teams.where(id: team_ids)
+    end
+
+    if params[:owner].present?
+      user = User.find_by_username(params[:owner])
+      team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
+      @teams = @teams.where(id: team_ids)
+    end
+
+    if params[:group].present?
+      group = Group.find_by_path(params[:group])
+      team_ids = TeamGroupRelationship.where(group_id: group).pluck(:team_id)
+      @teams = @teams.where(id: team_ids)
+    end
+
+    if params[:project].present?
+      project = Project.find_with_namespace(params[:project])
+      team_ids = TeamProjectRelationship.where(project_id: project).pluck(:team_id)
+      @teams = @teams.where(id: team_ids)
+    end
+
+    user_ids = TeamUserRelationship.where(team_id: @teams).pluck(:user_id)
+    @users = User.where(id: user_ids).active.order('name ASC')
+
+    group_ids = TeamGroupRelationship.where(team_id: @teams).pluck(:group_id)
+    @groups = Group.where(id: group_ids).order("name ASC")
+
+    project_ids = TeamProjectRelationship.where(team_id: @teams).pluck(:project_id)
+    @projects = Project.where(id: project_ids).includes(:namespace).order("namespaces.name, projects.name ASC")
+
     @teams = @teams.search(params[:name]) if params[:name].present?
     @teams = @teams.page(params[:page]).per(20)
   end
 
   def show
-    user_team
+    team
   end
 
   def new
-    @team = UserTeam.new
+    @team = Team.new
   end
 
   def edit
-    user_team
+    team
   end
 
   def create
-    @team = UserTeam.new(params[:user_team])
+    @team = Team.new(params[:team])
     @team.path = @team.name.dup.parameterize if @team.name
     @team.owner = current_user
 
@@ -30,30 +65,30 @@ class Admin::TeamsController < Admin::ApplicationController
   end
 
   def update
-    user_team_params = params[:user_team].dup
-    owner_id = user_team_params.delete(:owner_id)
+    team_params = params[:team].dup
+    owner_id = team_params.delete(:owner_id)
 
     if owner_id
-      user_team.owner = User.find(owner_id)
+      team.owner = User.find(owner_id)
     end
 
-    if user_team.update_attributes(user_team_params)
-      redirect_to admin_team_path(user_team), notice: 'Team of users was successfully updated.'
+    if team.update_attributes(team_params)
+      redirect_to admin_team_path(team), notice: 'Team of users was successfully updated.'
     else
       render action: "edit"
     end
   end
 
   def destroy
-    ::Teams::RemoveContext.new(current_user, user_team).execute
+    ::Teams::RemoveContext.new(current_user, team).execute
 
     redirect_to admin_teams_path, notice: 'Team of users was successfully deleted.'
   end
 
   protected
 
-  def user_team
-    @team ||= UserTeam.find_by_path(params[:id])
+  def team
+    @team ||= Team.find_by_path(params[:id])
   end
 
 end

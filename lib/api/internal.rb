@@ -1,6 +1,10 @@
 module API
   # Internal access API
   class Internal < Grape::API
+
+    DOWNLOAD_COMMANDS = %w{ git-upload-pack git-upload-archive }
+    PUSH_COMMANDS = %w{ git-receive-pack }
+
     namespace 'internal' do
       #
       # Check if ssh key has access to project code

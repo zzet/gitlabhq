@@ -2,6 +2,8 @@
 
 ![logo](https://raw.github.com/gitlabhq/gitlabhq/master/public/gitlab_logo.png)
 
+![animated-screenshots](https://gist.github.com/fnkr/2f9badd56bfe0ed04ee7/raw/4f48806fbae97f556c2f78d8c2d299c04500cb0d/compiled.gif)
+
 ### GitLab allows you to
  * keep your code secure on your own server
  * manage repositories, users and access permissions
@@ -12,7 +14,7 @@
 
 * powered by Ruby on Rails
 * completely free and open source (MIT license)
-* used by more than 10.000 organizations to keep their code secure
+* used by more than 25.000 organizations to keep their code secure
 
 ### Code status
 
@@ -22,7 +24,7 @@
 
 * [![Code Climate](https://codeclimate.com/github/gitlabhq/gitlabhq.png)](https://codeclimate.com/github/gitlabhq/gitlabhq)
 
-* [![Dependency Status](https://gemnasium.com/gitlabhq/gitlabhq.png)](https://gemnasium.com/gitlabhq/gitlabhq) this button can be yellow (small updates are available) but must not be red (a security fix or an important update is available)
+* [![Dependency Status](https://gemnasium.com/gitlabhq/gitlabhq.png)](https://gemnasium.com/gitlabhq/gitlabhq) this button can be yellow (small updates are available) but must not be red (a security fix or an important update is available), gems are updated in major releases of GitLab.
 
 * [![Coverage Status](https://coveralls.io/repos/gitlabhq/gitlabhq/badge.png?branch=master)](https://coveralls.io/r/gitlabhq/gitlabhq)
 
@@ -59,11 +61,11 @@ If you want to contribute, please first read our [Contributing Guidelines](https
 * [Vagrant virtual machine for development](https://github.com/gitlabhq/gitlab-vagrant-vm)
 
 
-#### Unsupported production installation
+#### Unofficial production installations
 
-* [GitLab recipes](https://github.com/gitlabhq/gitlab-recipes) for setup on different platforms
+* [GitLab recipes](https://github.com/gitlabhq/gitlab-recipes) repository with unofficial guides for using GitLab with different software (operating systems, webservers, etc.) than the official version.
 
-* [Unofficial installation guides](https://github.com/gitlabhq/gitlab-public-wiki/wiki/Unofficial-Installation-Guides)
+* [Installation guides](https://github.com/gitlabhq/gitlab-public-wiki/wiki/Unofficial-Installation-Guides) public wiki with unofficial guides to install GitLab on different operating systems.
 
 * [BitNami one-click installers](http://bitnami.com/stack/gitlab)
 
@@ -72,13 +74,13 @@ If you want to contribute, please first read our [Contributing Guidelines](https
 
 ### New versions and upgrading
 
-Each month on the 22nd a new version is released together with an upgrade guide.
+Since 2011 GitLab is released on the 22nd of every month. Every new release includes an upgrade guide.
 
 * [Upgrade guides](doc/update)
 
 * [Changelog](CHANGELOG)
 
-* Features that will be in the next release are listed on [the feedback and suggestions forum with the status "started"](http://feedback.gitlab.com/forums/176466-general/status/796456).
+* Features that will be in the next releases are listed on [the feedback and suggestions forum](http://feedback.gitlab.com/forums/176466-general) with the status [started](http://feedback.gitlab.com/forums/176466-general/status/796456) and [completed](http://feedback.gitlab.com/forums/176466-general/status/796457).
 
 
 ### Run in production mode
@@ -143,7 +145,9 @@ or start each component separately
 
 * [Troubleshooting guide](https://github.com/gitlabhq/gitlab-public-wiki/wiki/Trouble-Shooting-Guide) contains solutions to common problems.
 
-* [Support forum](https://groups.google.com/forum/#!forum/gitlabhq) and [Stack Overflow](http://stackoverflow.com/questions/tagged/gitlab) are the best places to ask questions. For example you can use it if you have questions about: permission denied errors, invisible repos, can't clone/pull/push or with web hooks that don't fire. Please search for similar issues before posting your own, there's a good chance somebody else had the same issue you have now and has resolved it. There are a lot of helpful GitLab users there who may be able to help you quickly. If your particular issue turns out to be a bug, it will find its way from there to a fix.
+* [Mailing list](https://groups.google.com/forum/#!forum/gitlabhq) and [Stack Overflow](http://stackoverflow.com/questions/tagged/gitlab) are the best places to ask questions. For example you can use it if you have questions about: permission denied errors, invisible repos, can't clone/pull/push or with web hooks that don't fire. Please search for similar issues before posting your own, there's a good chance somebody else had the same issue you have now and has resolved it. There are a lot of helpful GitLab users there who may be able to help you quickly. If your particular issue turns out to be a bug, it will find its way from there to a fix.
+
+* [Unofficial #gitlab IRC on Freenode](http://www.freenode.net/) is another way to get in touch with other GitLab users who may be able to help you.
 
 * [Feedback and suggestions forum](http://feedback.gitlab.com) is the place to propose and discuss new features for GitLab.
 

@@ -17,7 +17,7 @@ module ProjectsHelper
   end
 
   def link_to_member(project, author, opts = {})
-    default_opts = { avatar: true }
+    default_opts = { avatar: true, name: true, size: 16 }
     opts = default_opts.merge(opts)
 
     return "(deleted)" unless author
@@ -25,14 +25,18 @@ module ProjectsHelper
     author_html =  ""
 
     # Build avatar image tag
-    author_html << image_tag(gravatar_icon(author.try(:email)), width: 16, class: "avatar avatar-inline s16") if opts[:avatar]
+    author_html << image_tag(gravatar_icon(author.try(:email), opts[:size]), width: opts[:size], class: "avatar avatar-inline #{"s#{opts[:size]}" if opts[:size]}", alt:'') if opts[:avatar]
 
     # Build name span tag
-    author_html << content_tag(:span, sanitize(author.name), class: 'author')
+    author_html << content_tag(:span, sanitize(author.name), class: 'author') if opts[:name]
 
     author_html = author_html.html_safe
 
-    link_to(author_html, user_path(author), class: "author_link").html_safe
+    if opts[:name]
+      link_to(author_html, user_path(author), class: "author_link").html_safe
+    else
+      link_to(author_html, user_path(author), class: "author_link has_tooltip", data: { :'original-title' => sanitize(author.name) } ).html_safe
+    end
   end
 
   def project_title project
@@ -57,12 +61,31 @@ module ProjectsHelper
     project_nav_tabs.include? name
   end
 
+  def project_filter_path(options={})
+    exist_opts = {
+      state: params[:state],
+      scope: params[:scope],
+      label_name: params[:label_name],
+      milestone_id: params[:milestone_id],
+    }
+
+    options = exist_opts.merge(options)
+
+    path = request.path
+    path << "?#{options.to_param}"
+    path
+  end
+
+  def project_active_milestones
+    @project.milestones.active.order("id desc").all
+  end
+
   private
 
   def get_project_nav_tabs(project, current_user)
     nav_tabs = [:home]
 
-    if project.repo_exists? && can?(current_user, :download_code, project)
+    if !project.empty_repo? && can?(current_user, :download_code, project)
       nav_tabs << [:files, :commits, :network, :graphs]
     end
 
@@ -76,6 +99,10 @@ module ProjectsHelper
 
     [:issues, :wiki, :wall, :snippets].each do |feature|
       nav_tabs << feature if project.send :"#{feature}_enabled"
+    end
+
+    if project.file_tokens.any?
+      nav_tabs << :file_tokens
     end
 
     nav_tabs.flatten

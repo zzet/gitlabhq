@@ -61,7 +61,7 @@ class EventFilters < Spinach::FeatureSteps
   end
 
   And 'this project has merge request event' do
-    merge_request = create :merge_request, author: @user, project: @project
+    merge_request = create :merge_request, author: @user, source_project: @project, target_project: @project
     OldEvent.create(
       project: @project,
       action: OldEvent::MERGED,

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Notifications::SubscriptionsController do
   let(:project)   { create(:project) }
   let(:group)     { create(:group) }
-  let(:user_team) { create(:user_team) }
+  let(:team) { create(:team) }
   let(:user)      { create(:user) }
 
   before do
@@ -26,9 +26,9 @@ describe Notifications::SubscriptionsController do
     end
 
     it "should register subscription on team" do
-      post :create, :entity => { id: user_team.id,  type: :user_team}, format: :html
+      post :create, :entity => { id: team.id,  type: :team}, format: :html
 
-      user_team.watched_by?(user).should be_true 
+      team.watched_by?(user).should be_true 
     end
 
     it "should unregister subscription on project" do
@@ -48,11 +48,11 @@ describe Notifications::SubscriptionsController do
     end
 
     it "should unregister subscription on team" do
-      SubscriptionService.subscribe(user, :all, user_team, :all)
+      SubscriptionService.subscribe(user, :all, team, :all)
 
-      delete :destroy, :entity => { id: user_team.id,  type: :user_team}, format: :html
+      delete :destroy, :entity => { id: team.id,  type: :team}, format: :html
 
-      user_team.watched_by?(user).should be_false 
+      team.watched_by?(user).should be_false 
     end
   end
 end

@@ -1,1 +1,1 @@
-= raw "Key #{ link_to @key.title, key_url(@key)} was added to #{ link_to @updated_user.name, user_url(@updated_user.username)}."
+= raw "Key #{ link_to @key.title, profile_key_url(@updated_user, @key)} was added to #{ link_to @updated_user.name, user_url(@updated_user.username)}."

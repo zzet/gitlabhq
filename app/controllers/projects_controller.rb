@@ -1,4 +1,4 @@
-class ProjectsController < ProjectResourceController
+class ProjectsController < Projects::ApplicationController
   skip_before_filter :project, only: [:new, :create]
   skip_before_filter :repository, only: [:new, :create]
 
@@ -16,6 +16,7 @@ class ProjectsController < ProjectResourceController
 
   def edit
     check_git_protocol
+    render 'edit', layout: "project_settings"
   end
 
   def create
@@ -27,7 +28,7 @@ class ProjectsController < ProjectResourceController
         if @project.saved?
           redirect_to @project
         else
-          render action: "new"
+          render "new"
         end
       end
       format.js
@@ -43,7 +44,7 @@ class ProjectsController < ProjectResourceController
         format.html { redirect_to edit_project_path(@project), notice: 'Project was successfully updated.' }
         format.js
       else
-        format.html { render action: "edit" }
+        format.html { render "edit", layout: "project_settings" }
         format.js
       end
     end
@@ -57,7 +58,24 @@ class ProjectsController < ProjectResourceController
   def show
     check_git_protocol
     limit = (params[:limit] || 20).to_i
-    @events = @project.old_events.recent.limit(limit).offset(params[:offset] || 0)
+
+    @events = @project.old_events.recent
+    @events = event_filter.apply_filter(@events)
+    @events = @events.limit(limit).offset(params[:offset] || 0)
+
+    @owners     = @project.team.owners
+    @masters    = @project.team.masters     - @owners
+    @developers = @project.team.developers  - (@owners + @masters)
+    @reporters  = @project.team.reporters   - (@owners + @masters + @developers)
+    @guests     = @project.team.guests      - (@owners + @masters + @developers + @reporters)
+
+    @members_count = @owners.count + @masters.count + @developers.count + @reporters.count + @guests.count
+
+    @teams = (@project.teams + @project.group_teams).uniq
+
+    # Ensure project default branch is set if it possible
+    # Normally it defined on push or during creation
+    @project.discover_default_branch
 
     respond_to do |format|
       format.html do
@@ -91,7 +109,7 @@ class ProjectsController < ProjectResourceController
           redirect_to(@forked_project, notice: 'Project was successfully forked.')
         else
           @title = 'Fork project'
-          render action: "fork"
+          render "fork"
         end
       end
       format.js
@@ -101,8 +119,8 @@ class ProjectsController < ProjectResourceController
   def autocomplete_sources
     @suggestions = {
       emojis: Emoji.names,
-      issues: @project.issues.select([:id, :title, :description]),
-      members: @project.users.select([:username, :name]).order(:username)
+      issues: @project.issues.select([:iid, :title, :description]),
+      members: @project.team.members.sort_by(&:username).map { |user| { username: user.username, name: user.name } }
     }
 
     respond_to do |format|

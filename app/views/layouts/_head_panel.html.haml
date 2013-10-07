@@ -30,15 +30,14 @@
               %i.icon-cogs
         - if current_user.can_create_project?
           %li
-            = link_to new_project_path, title: "Create New Project", class: 'has_bottom_tooltip', 'data-original-title' => 'New project'  do
+            = link_to new_project_path, title: "New project", class: 'has_bottom_tooltip', 'data-original-title' => 'New project'  do
               %i.icon-plus
         %li
-          = link_to profile_path, title: "My Profile", class: 'has_bottom_tooltip', 'data-original-title' => 'Your profile'  do
+          = link_to profile_path, title: "My profile", class: 'has_bottom_tooltip', 'data-original-title' => 'My profile'  do
             %i.icon-user
         %li
           = link_to destroy_user_session_path, class: "logout", method: :delete, title: "Logout", class: 'has_bottom_tooltip', 'data-original-title' => 'Logout'  do
             %i.icon-signout
         %li
-          = link_to current_user, class: "profile-pic" do
-            = image_tag gravatar_icon(current_user.email, 26)
-
+          = link_to current_user, class: "profile-pic", id: 'profile-pic' do
+            = image_tag gravatar_icon(current_user.email, 26), alt: ''
