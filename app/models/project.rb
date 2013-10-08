@@ -255,7 +255,7 @@ class Project < ActiveRecord::Base
   end
 
   def gitlab_ci?
-    gitlab_ci_service && gitlab_ci_service.active
+    services.where(service_type: Service::GitlabCi).any? && services.where(service_type: Service::GitlabCi).first.enabled?
   end
 
   # For compatibility with old code
