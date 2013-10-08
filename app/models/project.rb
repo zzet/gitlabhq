@@ -50,8 +50,6 @@ class Project < ActiveRecord::Base
 
   has_one :last_event, class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
 
-  has_many :services,           as: :service
-
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
@@ -63,8 +61,10 @@ class Project < ActiveRecord::Base
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
-  has_many :services,           dependent: :destroy
+  has_many :services
+
   has_many :merge_requests,     dependent: :destroy, foreign_key: "target_project_id"
+  has_many :fork_merge_requests,dependent: :destroy, foreign_key: "source_project_id"
   has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
   has_many :milestones,         dependent: :destroy
   has_many :notes,              dependent: :destroy
@@ -254,20 +254,6 @@ class Project < ActiveRecord::Base
     self.issues_enabled && !self.used_default_issues_tracker?
   end
 
-  def build_missing_services
-    available_services_names.each do |service_name|
-      service = services.find { |service| service.to_param == service_name }
-
-      # If service is available but missing in db
-      # we should create an instance. Ex `create_gitlab_ci_service`
-      service = self.send :"create_#{service_name}_service" if service.nil?
-    end
-  end
-
-  def available_services_names
-    %w(build_face jenkins nix)
-  end
-
   def gitlab_ci?
     gitlab_ci_service && gitlab_ci_service.active
   end
@@ -351,8 +337,10 @@ class Project < ActiveRecord::Base
     branch_name = ref.gsub("refs/heads/", "")
     c_ids = self.repository.commits_between(oldrev, newrev).map(&:id)
 
-    # Update code for merge requests
+    # Update code for merge requests in project
     mrs = self.merge_requests.opened.by_branch(branch_name).all
+    # Update code for merge requests in project
+    mrs += self.fork_merge_requests.opened.by_branch(branch_name).all
     mrs.each { |merge_request| merge_request.reload_code; merge_request.mark_as_unchecked }
 
     # Close merge requests

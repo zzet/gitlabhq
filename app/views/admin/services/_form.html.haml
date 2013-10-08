@@ -28,8 +28,20 @@
   = render "service_key_service_relationships", f: sksr
 
 - if @service.respond_to?(:configuration)
-  = f.fields_for :configuration do |config|
-    = render "services/#{@service.service_name}/configuration", f: config
+  - configuration = @service.configuration
+  = f.fields_for :configuration, configuration do |config|
+    - @service.fields.each do |field|
+      - name = field[:name]
+      - type = field[:type]
+      - placeholder = field[:placeholder]
+
+      .control-group
+        = config.label name, class: "control-label"
+        .controls
+          - if type == 'text'
+            = config.text_field name, class: "input-xlarge", placeholder: placeholder
+          - elsif type == 'checkbox'
+            = config.check_box name
 
 .form-actions
   = f.submit 'Save', class: 'btn btn-save'

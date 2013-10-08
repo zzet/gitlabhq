@@ -5,8 +5,6 @@ class Service::Jenkins < Service
   default_description 'Continuous integration server from Jenkins'
   service_name        'jenkins'
 
-  alias :activated? :enabled?
-
   def fields
     []
   end

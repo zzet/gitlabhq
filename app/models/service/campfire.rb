@@ -25,7 +25,7 @@ class Service::Campfire < Service
   default_description 'Simple web-based real-time group chat'
   service_name        'campfire'
 
-  validates :token, presence: true, if: :activated?
+  validates :token, presence: true, if: :enabled?
 
   def fields
     [

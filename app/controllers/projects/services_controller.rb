@@ -1,23 +1,37 @@
 class Projects::ServicesController < Projects::ApplicationController
   # Authorize
   before_filter :authorize_admin_project!
-  before_filter :service, only: [:edit, :update, :test]
 
   respond_to :html
 
   layout "project_settings"
 
   def index
-    @project.build_missing_services
-    @services = @project.services.reload
+    @project_services = @project.services
+
+    used_patters = @project_services.map {|ps| ps.pattern.id }
+    @services = Service.public_list
+
+    if used_patters.any?
+      @services = @services.where("id not in (:patterns)", patterns: used_patters)
+    end
+
+    @services = @services + @project_services
   end
 
   def edit
+    service
   end
 
   def update
-    if @service.update_attributes(params[:service])
-      redirect_to edit_project_service_path(@project, @service.to_param)
+    @service = if service.pattern.present?
+                 Projects::Services::UpdateContext.new(current_user, @project, service, params[:service]).execute
+               else
+                 Projects::Services::ImportContext.new(current_user, @project, service, params[:service]).execute
+               end
+
+    if @service.valid?
+      redirect_to edit_project_service_path(@project.path_with_namespace, @service.id)
     else
       render 'edit'
     end
@@ -26,7 +40,7 @@ class Projects::ServicesController < Projects::ApplicationController
   def test
     data = GitPushService.new.sample_data(project, current_user)
 
-    @service.execute(data)
+    service.execute(data)
 
     redirect_to :back
   end
@@ -34,6 +48,6 @@ class Projects::ServicesController < Projects::ApplicationController
   private
 
   def service
-    @service ||= @project.services.find { |service| service.to_param == params[:id] }
+    @service ||= Service.find(params[:id])
   end
 end

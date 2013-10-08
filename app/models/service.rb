@@ -28,6 +28,7 @@ class Service < ActiveRecord::Base
   acts_as_tree parent_column_name: :service_pattern_id, dependent: :nullify
 
   belongs_to :project
+
   has_one :service_hook
 
   has_many :service_key_service_relationships, dependent: :destroy
@@ -86,6 +87,8 @@ class Service < ActiveRecord::Base
   actions_to_watch [:created, :updated, :deleted]
 
   scope :with_project, ->(project){ where(project_id: project) }
+  scope :avaliable, -> { where(active_state: :active) }
+  scope :public_list, -> { avaliable.where(public_state: :published) }
 
   class << self
     def descendants

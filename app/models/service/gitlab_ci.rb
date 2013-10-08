@@ -25,10 +25,17 @@ class Service::GitlabCi < Service
   default_description 'Continuous integration server from GitLab'
   service_name        'gitlab_ci'
 
-  validates :project_url, presence: true, if: :activated?
-  validates :token, presence: true, if: :activated?
+  validates :project_url, presence: true, if: :enabled?
+  validates :token, presence: true, if: :enabled?
 
-  after_save :compose_service_hook, if: :activated?
+  after_save :compose_service_hook, if: :enabled?
+
+  def fields
+    [
+      { type: 'text', name: 'token', placeholder: 'GitLab CI project specific token' },
+      { type: 'text', name: 'project_url', placeholder: 'http://ci.gitlabhq.com/projects/3'}
+    ]
+  end
 
   def compose_service_hook
     hook = service_hook || build_service_hook
@@ -60,12 +67,5 @@ class Service::GitlabCi < Service
 
   def status_img_path
     project_url + "/status.png?ref=" + project.default_branch
-  end
-
-  def fields
-    [
-      { type: 'text', name: 'token', placeholder: 'GitLab CI project specific token' },
-      { type: 'text', name: 'project_url', placeholder: 'http://ci.gitlabhq.com/projects/3'}
-    ]
   end
 end

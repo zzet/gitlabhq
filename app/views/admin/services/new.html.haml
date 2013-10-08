@@ -18,7 +18,5 @@
 %hr
 
 = form_for(@service, as: :service, url: admin_services_path, method: :post) do |f|
-
   = f.hidden_field(:service_type, value: @service.to_param)
-
-  = render "service_form", f: f
+  = render "form", f: f

@@ -26,7 +26,8 @@ class Service::BuildFace < Service
 
   def fields
     [
-
+      { type: 'text', name: 'domain',           placeholder: 'http://build-face.undev.cc' },
+      { type: 'text', name: 'system_hook_path', placeholder: '/gitlab' },
     ]
   end
 

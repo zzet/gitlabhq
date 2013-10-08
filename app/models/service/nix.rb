@@ -5,8 +5,6 @@ class Service::Nix < Service
   default_description 'Nix'
   service_name        'nix'
 
-  alias :activated? :enabled?
-
   def fields
     []
   end
