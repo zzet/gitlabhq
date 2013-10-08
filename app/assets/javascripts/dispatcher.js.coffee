@@ -26,6 +26,7 @@ class Dispatcher
       when 'projects:commit:show'
         new Commit()
       when 'groups:show', 'projects:show', 'teams:show'
+        new Dashboard()
         new Activities()
       when 'projects:new', 'projects:edit'
         new Project()

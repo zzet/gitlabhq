@@ -8,7 +8,7 @@
             Add member
   %ul.well-list.dash-list
     - members.each do |member|
-      %li.member-row
+      %li.member-row.filter-title
         = render "member", member: member, member_role: @group.human_access_for(member)
     - if members.blank?
       %li
