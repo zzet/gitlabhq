@@ -80,25 +80,6 @@ Settings.gitlab.default_projects_features['wall']           = false if Settings.
 Settings.gitlab.default_projects_features['snippets']       = false if Settings.gitlab.default_projects_features['snippets'].nil?
 Settings.gitlab.default_projects_features['public']         = false if Settings.gitlab.default_projects_features['public'].nil?
 
-# Services
-Settings['services'] ||= Settingslogic.new({})
-
-Settings.services['build_face']                   ||= {}
-Settings.services.build_face['domain']            ||= 'http://build-face.undev.cc'
-Settings.services.build_face['web_hooks_path']    ||= '/hooks'
-Settings.services.build_face['system_hooks_path'] ||= '/hooks/gitlab'
-
-Settings.services['jenkins']                      ||= {}
-Settings.services.jenkins['domain']               ||= 'http://ci01.undev.cc'
-Settings.services.jenkins['web_hooks_path']       ||= '/hooks'
-Settings.services.jenkins['system_hooks_path']    ||= '/hooks/gitlab'
-
-Settings.services['nix']                          ||= {}
-Settings.services.nix['domain']                   ||= ''
-
-Settings.services['obs']                          ||= {}
-Settings.services.obs['domain']                   ||= ''
-
 #
 # Gravatar
 #
