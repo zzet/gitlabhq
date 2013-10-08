@@ -17,19 +17,18 @@
 #
 
 class Service::GitlabCi < Service
+  include Servisable
 
   attr_accessible :project_url
+
+  default_title       'Gitlab CI'
+  default_description 'Continuous integration server from GitLab'
+  service_name        'gitlab_ci'
 
   validates :project_url, presence: true, if: :activated?
   validates :token, presence: true, if: :activated?
 
-  delegate :execute, to: :service_hook, prefix: nil
-
   after_save :compose_service_hook, if: :activated?
-
-  def self.service_name
-    'gitlab_ci'
-  end
 
   def compose_service_hook
     hook = service_hook || build_service_hook
@@ -61,18 +60,6 @@ class Service::GitlabCi < Service
 
   def status_img_path
     project_url + "/status.png?ref=" + project.default_branch
-  end
-
-  def title
-    'GitLab CI'
-  end
-
-  def description
-    'Continuous integration server from GitLab'
-  end
-
-  def to_param
-    self.class.service_name
   end
 
   def fields

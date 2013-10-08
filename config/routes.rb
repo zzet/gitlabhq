@@ -88,7 +88,12 @@ Gitlab::Application.routes.draw do
 
     resources :services do
       scope module: :services do
-        resources :keys
+        resources :keys do
+          member do
+            put :enable
+            put :disable
+          end
+        end
       end
     end
 

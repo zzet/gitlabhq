@@ -27,9 +27,9 @@
 = f.fields_for :service_key_service_relationships do |sksr|
   = render "service_key_service_relationships", f: sksr
 
-= f.fields_for :configuration do |config|
-  = render "services/build_face/configuration", f: config
-
+- if @service.respond_to?(:configuration)
+  = f.fields_for :configuration do |config|
+    = render "services/#{@service.service_name}/configuration", f: config
 
 .form-actions
   = f.submit 'Save', class: 'btn btn-save'

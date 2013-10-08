@@ -17,26 +17,15 @@
 #
 
 class Service::Hipchat < Service
+  include Servisable
 
   attr_accessible :room
 
+  default_title       'Hipchat'
+  default_description 'Simple web-based real-time group chat'
+  service_name        'hipchat'
+
   validates :token, presence: true, if: :activated?
-
-  def self.service_name
-    'hipchat'
-  end
-
-  def title
-    'Hipchat'
-  end
-
-  def description
-    'Simple web-based real-time group chat'
-  end
-
-  def to_param
-    self.class.service_name
-  end
 
   def fields
     [

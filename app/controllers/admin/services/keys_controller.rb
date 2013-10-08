@@ -10,15 +10,13 @@ class Admin::Services::KeysController < Admin::Services::ApplicationController
 
   def new
     @key = @service.service_keys.new
-
-    respond_with(@key)
   end
 
   def create
     @key = ServiceKey.new(params[:service_key])
 
     if @key.valid? && @service.service_keys << @key
-      redirect_to service_service_keys_path(@service)
+      redirect_to admin_service_keys_path(@service.id)
     else
       render "new"
     end
@@ -29,7 +27,7 @@ class Admin::Services::KeysController < Admin::Services::ApplicationController
     @key.destroy
 
     respond_to do |format|
-      format.html { redirect_to service_service_keys_url }
+      format.html { redirect_to admin_service_keys_url }
       format.js { render nothing: true }
     end
   end
@@ -37,13 +35,13 @@ class Admin::Services::KeysController < Admin::Services::ApplicationController
   def enable
     service.service_keys << available_keys.find(params[:id])
 
-    redirect_to service_service_keys_path(@service)
+    redirect_to admin_service_keys_path(@service)
   end
 
   def disable
-    @service.service_keys_services.where(service_key_id: params[:id]).last.destroy
+    @service.service_keys_service_relationships.where(service_key_id: params[:id]).destroy_all
 
-    redirect_to service_service_keys_path(@service)
+    redirect_to admin_service_keys_path(@service)
   end
 
   protected

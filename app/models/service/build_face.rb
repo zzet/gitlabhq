@@ -1,10 +1,11 @@
 class Service::BuildFace < Service
-
-  attr_accessible :project_id, :project_url, :token, :type, :public_state_event, :active_state_event, :state_event
-
-  delegate :execute, to: :service_hook, prefix: nil
+  include Servisable
 
   has_one :configuration, as: :service, class_name: Service::Configuration::BuildFace
+
+  default_title       "Build Face"
+  default_description "Build Face service"
+  service_name        "build_face"
 
   state_machine :state, initial: :disabled do
     event :enable do
@@ -15,31 +16,13 @@ class Service::BuildFace < Service
       transition enabled: :disabled
     end
 
-    after_transition on: :enable,   do: [:notify_build_face, :compose_service_hook, :add_service_keys]
-    after_transition on: :disabled, do: :remove_service_keys
+    after_transition on: :enable,   do: [:notify_build_face, :compose_service_hook]
 
     state :enabled
-
     state :disabled
   end
 
   alias :activated? :enabled?
-
-  def self.service_name
-    'build_face'
-  end
-
-  def to_param
-    self.class.service_name
-  end
-
-  def title
-    read_attribute(:title) || 'Build face'
-  end
-
-  def description
-    read_attribute(:description) || 'Build face service'
-  end
 
   def fields
     [
@@ -79,22 +62,6 @@ class Service::BuildFace < Service
     hook = service_hook || build_service_hook
     hook.url = "#{Gitlab.config.services.build_face.domain}/#{Gitlab.config.services.build_face.web_hook_path}"
     hook.save
-  end
-
-  def add_service_keys
-    options = :clone
-    if pattern.present?
-      import_service_keys pattern
-    else
-      add_service_key(Gitlab.config.services.build_face.service_keys.production.title, Gitlab.config.services.build_face.service_keys.production.key, options)
-      add_service_key(Gitlab.config.services.build_face.service_keys.staging.title, Gitlab.config.services.build_face.service_keys.staging.key, options)
-    end
-  end
-
-  def remove_service_keys
-    service_key_service_relationships.destroy_all
-    #remove_service_key(Gitlab.config.services.build_face.service_keys.production.key)
-    #remove_service_key(Gitlab.config.services.build_face.service_keys.staging.key)
   end
 
   def commit_status_path sha

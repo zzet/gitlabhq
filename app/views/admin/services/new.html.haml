@@ -1,1 +1,24 @@
-= render "#{@service.to_param}"
+%h3.page-title
+  - if @service.active?
+    %span.cgreen
+      %i.icon-circle
+  - else
+    %span.cgray
+      %i.icon-circle-blank
+  Preconfigure
+  = @service.title
+  service
+
+%p= @service.description
+
+.back-link
+  = link_to admin_services_path do
+    &larr; to services
+
+%hr
+
+= form_for(@service, as: :service, url: admin_services_path, method: :post) do |f|
+
+  = f.hidden_field(:service_type, value: @service.to_param)
+
+  = render "service_form", f: f

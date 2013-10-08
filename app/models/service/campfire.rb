@@ -17,26 +17,15 @@
 #
 
 class Service::Campfire < Service
+  include Servisable
 
   attr_accessible :subdomain, :room
 
+  default_title       'Campfire'
+  default_description 'Simple web-based real-time group chat'
+  service_name        'campfire'
+
   validates :token, presence: true, if: :activated?
-
-  def self.service_name
-    'campfire'
-  end
-
-  def title
-    'Campfire'
-  end
-
-  def description
-    'Simple web-based real-time group chat'
-  end
-
-  def to_param
-    self.class.service_name
-  end
 
   def fields
     [

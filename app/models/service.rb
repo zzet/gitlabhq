@@ -38,6 +38,8 @@ class Service < ActiveRecord::Base
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
+  delegate :execute, to: :service_hook, prefix: nil
+
   accepts_nested_attributes_for :service_key_service_relationships, reject_if: :all_blank, allow_destroy: true
 
   state_machine :state, initial: :disabled do
@@ -98,7 +100,7 @@ class Service < ActiveRecord::Base
     end
 
     def build_by_type(param)
-      services = descendants.map { |s| s if s.can_build?(param) }
+      services = descendants.map { |s| s if s.can_build?(param) }.compact
 
       if services.one?
         services.first.new
@@ -106,27 +108,6 @@ class Service < ActiveRecord::Base
         raise ActiveRecord::RecordNotFound
       end
     end
-  end
-
-  def add_service_key title, key, key_state
-    service_key = ServiceKey.find_by_key(key)
-    service_key = ServiceKey.create(title: title, key: key) unless service_key
-
-    if service_key_service_relationships.where(service_key_id: service_key).blank?
-      service_key_service_relationships.create(service_key: service_key, code_access_state: key_state)
-    end
-  end
-
-  def import_service_keys service
-    service.service_keys.each do |sk|
-      service_key_service_relationships.create(service_key_id: sk.id, key_state: options)
-    end
-  end
-
-  def remove_service_key key
-    key = ServiceKey.find_by_key(key) unless key.is_a? ServiceKey
-
-    service_key_service_relationships.where(service_key_id: key).destroy_all if key
   end
 
   def deactivate_childrens
