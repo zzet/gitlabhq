@@ -31,8 +31,8 @@ class Service::BuildFace < Service
     ]
   end
 
-  def execute
-
+  def execute(data)
+    service_hook.async_execute(data)
   end
 
   def notify_build_face(action)

@@ -39,8 +39,6 @@ class Service < ActiveRecord::Base
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
-  delegate :execute, to: :service_hook, prefix: nil
-
   accepts_nested_attributes_for :service_key_service_relationships, reject_if: :all_blank, allow_destroy: true
 
   state_machine :state, initial: :disabled do
@@ -119,16 +117,19 @@ class Service < ActiveRecord::Base
     end
   end
 
-  def allowed_clone?
-    code_access.clone?
+  def allowed_clone?(key)
+    key_rel = service_key_service_relationships.where(service_key_id: key).first
+    rey_rel.clone?
   end
 
-  def allowed_push?
-    code_access.push?
+  def allowed_push?(key)
+    key_rel = service_key_service_relationships.where(service_key_id: key).first
+    key_rel.push?
   end
 
-  def allowed_protected_push?
-    code_access.protected_push?
+  def allowed_protected_push?(key)
+    key_rel = service_key_service_relationships.where(service_key_id: key).first
+    key_rel.protected_push?
   end
 
   def activated?

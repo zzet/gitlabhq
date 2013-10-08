@@ -4,11 +4,4 @@ class Service::Nix < Service
   default_title       'Nix'
   default_description 'Nix'
   service_name        'nix'
-
-  def fields
-    []
-  end
-
-  def execute
-  end
 end

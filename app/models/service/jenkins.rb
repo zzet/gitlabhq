@@ -9,6 +9,6 @@ class Service::Jenkins < Service
     []
   end
 
-  def execute
+  def execute(data)
   end
 end

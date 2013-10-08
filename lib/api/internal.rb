@@ -53,11 +53,11 @@ module API
 
           ability = case action
                     when :download_code
-                      service.allowed_clone?
+                      service.allowed_clone?(key)
                     when :push_code
-                      service.allowed_push?
+                      service.allowed_push?(key)
                     when :push_code_to_protected_branches
-                      service.allowed_push? # TODO: Add check for protected branch
+                      service.allowed_protected_push?(key)
                     else
                       false
                     end

@@ -37,6 +37,10 @@ class Service::GitlabCi < Service
     ]
   end
 
+  def execute(data)
+    system_hook.execute(data)
+  end
+
   def compose_service_hook
     hook = service_hook || build_service_hook
     hook.url = [project_url, "/build", "?token=#{token}"].join("")
