@@ -25,9 +25,15 @@ class Dispatcher
         new Activities()
       when 'projects:commit:show'
         new Commit()
-      when 'groups:show', 'projects:show', 'teams:show'
-        new Dashboard()
+      when 'groups:show'
         new Activities()
+        new GroupsSidebar()
+      when 'projects:show'
+        new Activities()
+        new ProjectsSidebar()
+      when 'teams:show'
+        new Activities()
+        new TeamsSidebar()
       when 'projects:new', 'projects:edit'
         new Project()
       when 'projects:walls:show'
