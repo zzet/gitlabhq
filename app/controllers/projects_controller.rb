@@ -82,12 +82,12 @@ class ProjectsController < Projects::ApplicationController
 
     respond_to do |format|
       format.html do
-        #if @project.empty_repo?
-        #  render "projects/empty"
-        #else
-        #  @last_push = current_user.recent_push(@project.id)
+        if @project.empty_repo?
+          render "projects/empty"
+        else
+          @last_push = current_user.recent_push(@project.id)
           render :show
-        #end
+        end
       end
       format.js
     end
