@@ -4,43 +4,52 @@ describe Admin::ServicesController do
 
   describe "GET 'index'" do
     it "returns http success" do
-      get 'index'
+      get :index
       response.should be_success
     end
   end
 
-  describe "GET 'show'" do
-    it "returns http success" do
-      get 'show'
-      response.should be_success
+  Service.descendants.map {|s| s.new }.each do |service|
+    describe "GET 'new' with #{service.to_param} service" do
+      it "returns http success" do
+        get :new, key: Service::BuildFace.new.to_param
+        response.should be_success
+      end
     end
-  end
 
-  describe "GET 'create'" do
-    it "returns http success" do
-      get 'create'
-      response.should be_success
+    describe "GET 'show' with #{service.to_param} service" do
+      it "returns http success" do
+        get :show
+        response.should be_success
+      end
     end
-  end
 
-  describe "GET 'edit'" do
-    it "returns http success" do
-      get 'edit'
-      response.should be_success
+    describe "POST 'create' with #{service.to_param} service" do
+      it "returns http success" do
+        post :create
+        response.should be_redirect
+      end
     end
-  end
 
-  describe "GET 'update'" do
-    it "returns http success" do
-      get 'update'
-      response.should be_success
+    describe "GET 'edit' with #{service.to_param} service" do
+      it "returns http success" do
+        get :edit
+        response.should be_success
+      end
     end
-  end
 
-  describe "GET 'destroy'" do
-    it "returns http success" do
-      get 'destroy'
-      response.should be_success
+    describe "PUT 'update' with #{service.to_param} service" do
+      it "returns http success" do
+        get :update
+        response.should be_redirect
+      end
+    end
+
+    describe "DELETE 'destroy' with #{service.to_param} service" do
+      it "returns http success" do
+        get :destroy
+        response.should be_redirect
+      end
     end
   end
 

@@ -18,14 +18,14 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
-  factory :event, :class => 'Event' do
+  factory :event, class: Event do
     author
     action Event.action.values.first
     data "MyText"
     source { create :project }
   end
 
-  factory :push_event, :class => 'Event' do
+  factory :push_event, class: Event do
     author
     action :pushed
     data { "{\"repository\": \"any\"}" }
