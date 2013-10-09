@@ -27,13 +27,15 @@ class Dispatcher
         new Commit()
       when 'groups:show'
         new Activities()
-        new GroupsSidebar()
+        new SidebarFilter()
+        new SidebarTabs('groups')
       when 'projects:show'
         new Activities()
-        new ProjectsSidebar()
+        new SidebarTabs('projects')
       when 'teams:show'
         new Activities()
-        new TeamsSidebar()
+        new SidebarFilter()
+        new SidebarTabs('teams')
       when 'projects:new', 'projects:edit'
         new Project()
       when 'projects:walls:show'

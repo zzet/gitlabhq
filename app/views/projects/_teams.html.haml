@@ -1,6 +1,6 @@
 .ui-box
   .title.clearfix
-  %ul.well-list.dash-list
+  %ul.well-list
   - teams.each do |team|
     %li.group-row
       = link_to team_path(id: team.path), class: dom_class(team) do

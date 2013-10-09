@@ -1,6 +1,6 @@
 .ui-box
   .title.clearfix
-  %ul.well-list.dash-list
+  %ul.well-list
     - owners.each do |member|
       %li.member-row
         = render "member", member: member, member_role: "Owner"
