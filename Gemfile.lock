@@ -92,7 +92,6 @@ GEM
     closure_tree (4.2.8)
       activerecord (>= 3.0.0)
       with_advisory_lock (>= 0.0.9)
-    cocoon (1.2.0)
     code_analyzer (0.3.2)
       sexp_processor
     coderay (1.0.9)
@@ -592,7 +591,6 @@ DEPENDENCIES
   carrierwave
   chosen-rails (= 1.0.0)
   closure_tree
-  cocoon
   coffee-rails
   colored
   coveralls
