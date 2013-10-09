@@ -7,7 +7,7 @@ class Service::Configuration::BuildFace < ActiveRecord::Base
     [
       { type: 'text', name: 'domain',           placeholder: 'http://build-face.undev.cc' },
       { type: 'text', name: 'system_hook_path', placeholder: '/hooks/gitlab' },
-      { type: 'text', name: 'web_hook_path',    placeholder: '/hooks/gitlab' },
+      { type: 'text', name: 'web_hook_path',    placeholder: '/hooks' },
     ]
   end
 end
