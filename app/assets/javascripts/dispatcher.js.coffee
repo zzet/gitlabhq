@@ -48,6 +48,9 @@ class Dispatcher
         new TreeView()
       when 'projects:blob:show'
         new BlobView()
+      when 'users:show'
+        new SidebarFilter()
+        new SidebarTabs('users')
 
     switch path.first()
       when 'admin' then new Admin()
