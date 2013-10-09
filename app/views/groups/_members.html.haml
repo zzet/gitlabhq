@@ -7,9 +7,26 @@
           %i.icon-plus
             Add member
   %ul.well-list.dash-list
-    - members.each do |member|
+    - owners.each do |member|
       %li.member-row
-        = render "member", member: member, member_role: @group.human_access_for(member)
-    - if members.blank?
+        = render "member", member: member, member_role: "Owner"
+
+    - masters.each do |member|
+      %li.member-row
+        = render "member", member: member, member_role: "Master"
+
+    - developers.each do |member|
+      %li.member-row
+        = render "member", member: member, member_role: "Developer"
+
+    - reporters.each do |member|
+      %li.member-row
+        = render "member", member: member, member_role: "Reporter"
+
+    - guests.each do |member|
+      %li.member-row
+        = render "member", member: member, member_role: "Guest"
+
+    - if owners.blank? && masters.blank? && developers.blank? && reporters.blank? && guests.blank?
       %li
         %h3.nothing_here_message You have no members yet.

@@ -40,8 +40,29 @@ class GroupsController < ApplicationController
 
     @teams = @group.teams
     @projects = @group.projects
-    @members = @group.users.includes(:users_groups).order("users_groups.group_access DESC")
+    
+    @owners = @group.owners
+    @masters = @group.masters
+    @developers = @group.developers
+    @reporters = @group.reporters
+    @guests = @group.guests
 
+    @teams.each do |team|
+      @owners += team.owners
+      @masters += team.masters
+      @developers += team.developers
+      @reporters += team.reporters
+      @guests += team.guests
+    end
+
+    @owners = @owners.uniq
+    @masters = (@masters - @owners).uniq
+    @developers = (@developers - (@owners + @masters)).uniq
+    @reporters = (@reporters - (@owners + @masters + @developers)).uniq
+    @guests = (@guests - (@owners + @masters + @developers + @reporters)).uniq
+
+    @members_count = @owners.count + @masters.count + @developers.count + @reporters.count + @guests.count
+    
     respond_to do |format|
       format.html
       format.js
