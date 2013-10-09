@@ -19,20 +19,13 @@
 class Service::Hipchat < Service
   include Servisable
 
-  attr_accessible :room
-
   default_title       'Hipchat'
   default_description 'Simple web-based real-time group chat'
   service_name        'hipchat'
 
-  validates :token, presence: true, if: :activated?
+  has_one :configuration, as: :service, class_name: Service::Configuration::Hipchat
 
-  def fields
-    [
-      { type: 'text', name: 'token',     placeholder: '' },
-      { type: 'text', name: 'room',      placeholder: '' }
-    ]
-  end
+  delegate :room, :token, to: :configuration, prefix: false
 
   def execute(push_data)
     gate[room].send('Gitlab', create_message(push_data))

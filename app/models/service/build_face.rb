@@ -22,16 +22,6 @@ class Service::BuildFace < Service
     state :disabled
   end
 
-  alias :activated? :enabled?
-
-  def fields
-    [
-      { type: 'text', name: 'domain',           placeholder: 'http://build-face.undev.cc' },
-      { type: 'text', name: 'system_hook_path', placeholder: '/hooks/gitlab' },
-      { type: 'text', name: 'web_hook_path',    placeholder: '/hooks/gitlab' },
-    ]
-  end
-
   def execute(data)
     service_hook.async_execute(data)
   end

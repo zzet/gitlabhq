@@ -19,21 +19,13 @@
 class Service::Campfire < Service
   include Servisable
 
-  attr_accessible :subdomain, :room
-
   default_title       'Campfire'
   default_description 'Simple web-based real-time group chat'
   service_name        'campfire'
 
-  validates :token, presence: true, if: :enabled?
+  has_one :configuration, as: :service, class_name: Service::Configuration::Campfire
 
-  def fields
-    [
-      { type: 'text', name: 'token',     placeholder: '' },
-      { type: 'text', name: 'subdomain', placeholder: '' },
-      { type: 'text', name: 'room',      placeholder: '' }
-    ]
-  end
+  delegate :token, :subdomain, :room, to: :configuration, prefix: false
 
   def execute(push_data)
     room = gate.find_room_by_name(self.room)

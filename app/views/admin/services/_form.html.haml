@@ -30,7 +30,7 @@
 - if @service.respond_to?(:configuration)
   - configuration = @service.configuration
   = f.fields_for :configuration, configuration do |config|
-    - @service.fields.each do |field|
+    - configuration.fields.each do |field|
       - name = field[:name]
       - type = field[:type]
       - placeholder = field[:placeholder]

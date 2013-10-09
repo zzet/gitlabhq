@@ -19,23 +19,15 @@
 class Service::GitlabCi < Service
   include Servisable
 
-  attr_accessible :project_url
-
   default_title       'Gitlab CI'
   default_description 'Continuous integration server from GitLab'
   service_name        'gitlab_ci'
 
-  validates :project_url, presence: true, if: :enabled?
-  validates :token, presence: true, if: :enabled?
+  has_one :configuration, as: :service, class_name: Service::Configuration::GitlabCi
+
+  delegate :project_url, :token, to: :configuration, prefix: false
 
   after_save :compose_service_hook, if: :enabled?
-
-  def fields
-    [
-      { type: 'text', name: 'token', placeholder: 'GitLab CI project specific token' },
-      { type: 'text', name: 'project_url', placeholder: 'http://ci.gitlabhq.com/projects/3'}
-    ]
-  end
 
   def execute(data)
     system_hook.execute(data)

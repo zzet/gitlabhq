@@ -31,7 +31,7 @@
     - configuration = @service.configuration
     - disable_state = @service.pattern.blank?
     = f.fields_for :configuration, configuration do |config|
-      - @service.fields.each do |field|
+      - configuration.fields.each do |field|
         - name = field[:name]
         - type = field[:type]
         - placeholder = field[:placeholder]
