@@ -195,8 +195,9 @@ FactoryGirl.define do
       "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="
     end
 
-    factory :deploy_key, class: 'DeployKey' do
-    end
+    factory :deploy_key, class: DeployKey do; end
+
+    factory :service_key, class: ServiceKey do; end
 
     factory :personal_key do
       user
