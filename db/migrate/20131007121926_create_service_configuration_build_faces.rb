@@ -6,6 +6,7 @@ class CreateServiceConfigurationBuildFaces < ActiveRecord::Migration
       t.string :token
       t.string :domain
       t.string :system_hook_path
+      t.string :web_hook_path
 
       t.timestamps
     end

@@ -36,7 +36,7 @@ module Servisable
       @description
     end
 
-    def service_name(attr)
+    def service_name(attr = nil)
       return @service_name if attr.nil?
       @service_name = attr
     end

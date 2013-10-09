@@ -5,7 +5,10 @@ FactoryGirl.define do
     type "Service::BuildFace"
     title
     description
-    project
+
+    after :create do |service|
+      service.create_configuration(attributes_for(:build_face_configuration))
+    end
 
     trait :public do
       public_state "published"
@@ -16,6 +19,7 @@ FactoryGirl.define do
     end
 
     trait :enabled do
+      project
       state "enabled"
     end
 

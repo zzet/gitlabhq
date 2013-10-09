@@ -36,15 +36,6 @@ ActiveRecord::Schema.define(:version => 20131007122617) do
 
   add_index "deploy_keys_projects", ["project_id"], :name => "index_deploy_keys_projects_on_project_id"
 
-  create_table "event_hierarchies", :id => false, :force => true do |t|
-    t.integer "ancestor_id",   :null => false
-    t.integer "descendant_id", :null => false
-    t.integer "generations",   :null => false
-  end
-
-  add_index "event_hierarchies", ["ancestor_id", "descendant_id", "generations"], :name => "event_anc_desc_udx", :unique => true
-  add_index "event_hierarchies", ["descendant_id"], :name => "event_desc_idx"
-
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
@@ -304,6 +295,7 @@ ActiveRecord::Schema.define(:version => 20131007122617) do
     t.string   "token"
     t.string   "domain"
     t.string   "system_hook_path"
+    t.string   "web_hook_path"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
   end

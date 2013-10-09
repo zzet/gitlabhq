@@ -11,7 +11,7 @@ class Services::UpdateContext < Services::BaseContext
     end
 
     if service.update_attributes(service_params)
-      service.configuration.update_attributes(service_configuration_params)
+      service.configuration.update_attributes(service_configuration_params) if service.respond_to?(:configuration)
     end
 
     service

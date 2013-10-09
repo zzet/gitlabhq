@@ -16,7 +16,7 @@ class Admin::ServicesController < Admin::ApplicationController
   def create
     @service = Services::CreateContext.new(@current_user, params[:service]).execute(:admin)
     if @service.persisted?
-      redirect_to :index
+      redirect_to admin_services_path
     else
       render :new
     end
@@ -36,6 +36,11 @@ class Admin::ServicesController < Admin::ApplicationController
   end
 
   def destroy
+    if Services::RemoveContext.new(@current_user, service).execute(:admin)
+      redirect_to admin_services_path
+    else
+      render :edit
+    end
   end
 
   private

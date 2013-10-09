@@ -27,7 +27,8 @@ class Service::BuildFace < Service
   def fields
     [
       { type: 'text', name: 'domain',           placeholder: 'http://build-face.undev.cc' },
-      { type: 'text', name: 'system_hook_path', placeholder: '/gitlab' },
+      { type: 'text', name: 'system_hook_path', placeholder: '/hooks/gitlab' },
+      { type: 'text', name: 'web_hook_path',    placeholder: '/hooks/gitlab' },
     ]
   end
 
@@ -38,7 +39,7 @@ class Service::BuildFace < Service
   def notify_build_face(action)
     action = "created" if action.is_a? StateMachine::Transition
 
-    url = "#{Gitlab.config.services.build_face.domain}/#{Gitlab.config.services.build_face.system_hook_path}"
+    url = "#{configuration.domain}/#{configuration.system_hook_path}"
     data = {
       action: action,
       repository: {
@@ -61,7 +62,7 @@ class Service::BuildFace < Service
 
   def compose_service_hook
     hook = service_hook || build_service_hook
-    hook.url = "#{Gitlab.config.services.build_face.domain}/#{Gitlab.config.services.build_face.web_hook_path}"
+    hook.url = "#{configuration.domain}/#{configuration.web_hook_path}"
     hook.save
   end
 

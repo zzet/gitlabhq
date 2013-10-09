@@ -14,7 +14,7 @@ class Services::CreateContext < ::BaseContext
     @service = Service.build_by_type(service_type)
 
     if @service.save
-      @service.create_configuration(service_configuration_params) if @service.respond_to(:configuration)
+      @service.create_configuration(service_configuration_params) if @service.respond_to?(:configuration)
     end
 
     @service
