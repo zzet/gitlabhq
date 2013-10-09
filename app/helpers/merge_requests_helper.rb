@@ -31,7 +31,7 @@ module MergeRequestsHelper
   end
 
   def ci_build_details_path merge_request
-    gitlab_ci_service  = merge_request.source_project.services.where(service_type: Service::GitlabCi).first
+    gitlab_ci_service  = merge_request.source_project.services.where(type: Service::GitlabCi).first
     gitlab_ci_service.build_page(merge_request.last_commit.sha)
   end
 

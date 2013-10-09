@@ -20,7 +20,7 @@ module Projects
           import_configuration(service, @project_service) if @project_service.respond_to?(:configuration)
 
           service.service_key_service_relationships.each do |kr|
-            @project_service.service_key_service_relationships.create(service_key_id: kr.service_key_id, code_access_state: kr.code_access_state)
+            @project_service.service_key_service_relationships.create(service_key: kr.service_key, code_access_state: kr.code_access_state)
           end
 
           service.children << @project_service

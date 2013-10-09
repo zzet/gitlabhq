@@ -77,8 +77,8 @@ class ProjectsController < Projects::ApplicationController
     # Normally it defined on push or during creation
     @project.discover_default_branch
 
-    @gitlab_ci_service  = @project.services.where(service_type: Service::GitlabCi).first
-    @build_face_service = @project.services.where(service_type: Service::BuildFace).first
+    @gitlab_ci_service  = @project.services.where(type: Service::GitlabCi).first
+    @build_face_service = @project.services.where(type: Service::BuildFace).first
 
     respond_to do |format|
       format.html do

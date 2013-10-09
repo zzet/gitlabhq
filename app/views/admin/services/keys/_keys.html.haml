@@ -19,7 +19,7 @@
       %strong= key.title
 
     %p.light.prepend-top-10
-      - key.services.map(&:title).each do |service_name|
+      - key.services.where(service_pattern_id: nil).map(&:title).each do |service_name|
         %span.label= service_name
       %small.pull-right
         Created #{time_ago_in_words(key.created_at)} ago

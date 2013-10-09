@@ -120,7 +120,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def ci_status
-    gitlab_ci_service  = project.services.where(service_type: Service::GitlabCi).first
+    gitlab_ci_service = project.services.where(type: Service::GitlabCi).first
     status = gitlab_ci_service.commit_status(merge_request.last_commit.sha)
     response = {status: status}
 

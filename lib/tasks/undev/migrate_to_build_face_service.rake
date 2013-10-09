@@ -9,8 +9,8 @@ namespace :undev do
     u   = User.find_by_username("zzet")
 
     p "Remove deploy keys".red
-
-    DeployKeysProject.where(deploy_key_id: [bfp.id, bfs.id]).destroy_all
+    DeployKeysProject.where(deploy_key_id: bfp).destroy_all if bfp
+    DeployKeysProject.where(deploy_key_id: bfs).destroy_all if bfs
 
     p "Remove project Hooks".red
     ProjectHook.where(url: "http://build-face.undev.cc/hooks").destroy_all
@@ -18,11 +18,17 @@ namespace :undev do
     p "Remove all Service::BuildFace".red
     Service::BuildFace.destroy_all
 
+    p "Remove all ServiceKey like prod and staging".red
+    ServiceKey.where(key: build_face_production_key).destroy_all
+    ServiceKey.where(key: build_face_staging_key).destroy_all
+
+    p "Create pattern services".green
     production_attrs = {
       title: "Build Face production",
       description: "Build face service",
       active_state_event: "activate",
       public_state_event: "publish",
+      service_type: "build_face",
       configuration: {
         domain: "http://build-face.undev.cc",
         system_hook_path: "/hooks/gitlab",
@@ -35,6 +41,7 @@ namespace :undev do
       description: "Build face service (staging)",
       active_state_event: "activate",
       public_state_event: "publish",
+      service_type: "build_face",
       configuration: {
         domain: "http://build-face-staging.undev.cc",
         system_hook_path: "/hooks/gitlab",
@@ -42,14 +49,16 @@ namespace :undev do
       }
     }
 
-    production_service  = Services::Context.new(u, production_attrs).execute(:admin)
-    staging_service     = Services::Context.new(u, staging_attrs).execute(:admin)
+    production_service  = Services::CreateContext.new(u, production_attrs).execute(:admin)
+    staging_service     = Services::CreateContext.new(u, staging_attrs).execute(:admin)
 
     bfpk = ServiceKey.create(title: "Build Face production", key: build_face_production_key)
     bfsk = ServiceKey.create(title: "Build Face staging", key: build_face_staging_key)
 
-    production_service.service_key_service_relationships.create(service_key_id: bfpk, sode_access_state: :clone)
-    production_service.service_key_service_relationships.create(service_key_id: bfsk, sode_access_state: :clone)
+    production_service.service_key_service_relationships.create(service_key: bfpk, code_access_state: :clone)
+    staging_service.service_key_service_relationships.create(service_key: bfsk, code_access_state: :clone)
+
+    p "Migrate projects to new services".green
 
    ["videosearch/videosearch-alg-backend","infrastructure/pypiserver","nptv-cloud/entry-point-resolver","backend/pyhls-prefetcher",
      "nptv/nptv-xfonts","storage/mogilefs-interesting-moments","storage/state_of_minutes","storage/mogilefs-resolver","backend/front-tail",
@@ -75,11 +84,20 @@ namespace :undev do
      "nptv-web-infrastructure/userbase-cas-authenticator","nptv/rengine-js-stdlib","nptv-web-infrastructure/cyber_lemmings"].each do |project_name|
        project = Project.find_with_namespace(project_name)
        if project.present?
+         print "Work with #{project_name}".yellow
+         print " ... "
+
          project_production_service = Projects::Services::ImportContext.new(u, project, production_service).execute
          project_staging_service    = Projects::Services::ImportContext.new(u, project, staging_service).execute
 
+         print "imported".green
+         print " ... "
+
          project_production_service.enable  unless project_production_service.enabled?
          project_staging_service.enable     unless project_staging_service.enabled?
+         p "enabled".green
+       else
+         p "Work with #{project_name} filed - no project - no work".red
        end
      end
   end

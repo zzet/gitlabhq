@@ -100,11 +100,11 @@ class Service < ActiveRecord::Base
       service_name == param
     end
 
-    def build_by_type(param)
+    def build_by_type(param, attrs = {})
       services = descendants.map { |s| s if s.can_build?(param) }.compact
 
       if services.one?
-        services.first.new
+        services.first.new(attrs)
       else
         raise ActiveRecord::RecordNotFound
       end
