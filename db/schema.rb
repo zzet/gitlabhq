@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131009135138) do
+ActiveRecord::Schema.define(:version => 20131009163824) do
 
   create_table "banners", :force => true do |t|
     t.string   "title"
@@ -348,14 +348,9 @@ ActiveRecord::Schema.define(:version => 20131009135138) do
   create_table "services", :force => true do |t|
     t.string   "type"
     t.string   "title"
-    t.string   "token"
     t.integer  "project_id"
-    t.datetime "created_at",                            :null => false
-    t.datetime "updated_at",                            :null => false
-    t.boolean  "active",             :default => false, :null => false
-    t.string   "project_url"
-    t.string   "subdomain"
-    t.string   "room"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
     t.string   "state"
     t.integer  "service_pattern_id"
     t.string   "public_state"

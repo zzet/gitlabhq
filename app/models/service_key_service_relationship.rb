@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: service_key_service_relationships
+#
+#  id                :integer          not null, primary key
+#  service_key_id    :integer          not null
+#  service_id        :integer          not null
+#  code_access_state :string(255)
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+
 class ServiceKeyServiceRelationship < ActiveRecord::Base
   attr_accessible :service_key_id, :service_id, :service_key, :code_access_state, :code_access_state_event
 
