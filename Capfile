@@ -4,9 +4,9 @@ load 'deploy'
 
 require 'bundler/capistrano'
 
-require "rvm/capistrano"
-
 require 'capistrano/ext/multistage'
+
+require 'undev/capistrano'
 
 # Maintance page with deploy
 require 'capistrano/maintenance'

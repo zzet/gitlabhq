@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-source "http://gems.undev.cc."
+source "http://gems.undev.cc"
 
 def darwin_only(require_as)
   RUBY_PLATFORM.include?('darwin') && require_as
