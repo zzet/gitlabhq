@@ -1,4 +1,5 @@
 require 'rake'
+require 'undev/capistrano'
 
 set :stages, %w(production staging)
 set :default_stage, "staging"
@@ -21,8 +22,7 @@ set :asset_env,      "RAILS_GROUPS=assets RAILS_RELATIVE_URL_ROOT=#{mount_point.
 #set :sidekiq_processes, 1
 
 set :application, "gitlab"
-set :rvm_type, :system
-set :rvm_ruby_string, 'ruby-1.9.3-p194'
+set :undev_ruby_version, '2.0.0-p247'
 
 set :scm, :git
 set :repository, "git://git.undev.cc/infrastructure/gitlab.git"

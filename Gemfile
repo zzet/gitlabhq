@@ -1,4 +1,5 @@
 source "https://rubygems.org"
+source "http://gems.undev.cc."
 
 def darwin_only(require_as)
   RUBY_PLATFORM.include?('darwin') && require_as
@@ -166,9 +167,9 @@ group :development do
   # Deploy with Capistrano
   gem "capi"
   gem 'capistrano'
-  gem 'rvm-capistrano'
   gem 'capistrano-ext'
   gem 'capistrano-maintenance'
+  gem 'undev', '>=0.2.1'
 end
 
 gem 'rb-inotify', require: linux_only('rb-inotify')
