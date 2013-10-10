@@ -9,13 +9,10 @@ class Projects::ServicesController < Projects::ApplicationController
   def index
     @project_services = @project.services
 
-    used_patters = @project_services.map {|ps| ps.pattern.id }
+    used_patters = @project_services.map {|ps| ps.pattern.id }.compact
+
     @services = Service.public_list
-
-    if used_patters.any?
-      @services = @services.where("id not in (:patterns)", patterns: used_patters)
-    end
-
+    @services = @services.where("id not in (:patterns)", patterns: used_patters) if used_patters.any?
     @services = @services + @project_services
   end
 

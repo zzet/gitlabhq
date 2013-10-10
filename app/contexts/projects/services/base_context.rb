@@ -1,6 +1,6 @@
 module Projects
   module Services
-    class BaseContext < ::BaseContext
+    class BaseContext < Projects::BaseContext
       attr_accessor :service, :project, :current_user, :params
 
       def initialize(user, project, service, params = {})

@@ -6,8 +6,9 @@ module Projects
       project.update_attributes(params[:project], as: role)
 
       if project.changes.include?("path")
-        if project.build_face_service && project.build_face_service.enabled?
-          project.build_face_service.notify_build_face("updated")
+        build_face_servcie = project.services.where(type: Service::BuildFace).first
+        if build_face_service && build_face_service.enabled?
+          build_face_service.notify_build_face("updated")
         end
       end
     end

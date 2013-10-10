@@ -17,11 +17,12 @@ module Projects
         if allowed_transfer && (namespace != project.namespace)
           old_namespace = project.namespace
 
-            if project.build_face_service && project.build_face_service.enabled?
-              project.build_face_service.notify_build_face("transfered")
+          if transfer_to(namespace)
+            build_face_servcie = project.services.where(type: Service::BuildFace).first
+            if build_face_service && build_face_service.enabled?
+              build_face_service.notify_build_face("transfered")
             end
 
-          if transfer_to(namespace)
             receive_delayed_notifications
           end
         end

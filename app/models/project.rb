@@ -254,8 +254,12 @@ class Project < ActiveRecord::Base
     self.issues_enabled && !self.used_default_issues_tracker?
   end
 
+  def gitlab_ci
+    @gitlab_ci_service ||= services.where(type: Service::GitlabCi).first
+  end
+
   def gitlab_ci?
-    services.where(type: Service::GitlabCi).any? && services.where(type: Service::GitlabCi).first.enabled?
+    gitlab_ci.present? && gitlab_ci.enabled?
   end
 
   # For compatibility with old code
