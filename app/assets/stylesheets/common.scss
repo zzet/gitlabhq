@@ -382,3 +382,45 @@ table {
   width: 50px;
   min-height: 100px;
 }
+
+.js-sidebar-tabs {
+  margin-bottom: 2px;
+  border: none;
+  margin: 0;
+
+  li {
+    &.active {
+      a {
+        @include linear-gradient(#f5f5f5, #eee);
+        border-bottom: 1px solid #EEE !important;
+        &:hover {
+          background: #eee;
+        }
+      }
+    }
+
+    a {
+      border-color: #CCC !important;
+    }
+  }
+}
+
+.js-sidebar-filter {
+  margin: 7px 0;
+  padding: 4px 6px;
+  width: 202px;
+  float: left;
+}
+
+@media (max-width: 1200px) {
+  .js-sidebar-filter {
+    width: 132px;
+  }
+}
+
+.tab-content {
+  .ui-box {
+    margin: 0px;
+    box-shadow: none;
+  }
+}
