@@ -1,5 +1,7 @@
 class Gitlab::Event::Notification::Creator::Note < Gitlab::Event::Notification::Creator::Default
   def create(event)
+    return [] if %(deleted updated).include?(event.action)
+
     notifications = super(event)
 
     notifications << create_notification_for_commit_author(event) if can_create_for_commit_author?(event)

@@ -141,6 +141,10 @@ class EventNotificationMailer < ActionMailer::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] [#{@branch.name}] Branch status was changed to protected mode")
   end
 
+  def deleted_project_protected_branch_email(notification)
+
+  end
+
   def added_project_service_email(notification)
     @notification = notification
     @event        = @notification.event
@@ -695,6 +699,7 @@ class EventNotificationMailer < ActionMailer::Base
     @user           = @event.author
     @note           = @source = @event.source
     @merge_request  = @event.target
+    @project        = @merge_request.target_project
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'commented',
@@ -740,7 +745,7 @@ class EventNotificationMailer < ActionMailer::Base
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'deleted',
             'X-Gitlab-Source' => 'key',
-            'In-Reply-To'     => "user-#{@updated_user.username}-key-#{@key.title}"
+            'In-Reply-To'     => "user-#{@updated_user.username}-key-#{@key['title']}"
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Key #{@key["title"]} was deleted from #{@updated_user.name} profile")
   end
