@@ -53,7 +53,7 @@ namespace :deploy do
     run "ln -nfs #{release_path}/config/unicorn.rb.undev #{release_path}/config/unicorn.rb"
   end
 
-  desc "Symlinks the unicorn.rb"
+  desc "Symlinks the puma.rb"
   task :symlink_puma, :roles => :app do
     run "ln -nfs #{release_path}/config/puma.rb.undev #{release_path}/config/puma.rb"
   end
@@ -71,7 +71,8 @@ before 'deploy:finalize_update',
   'deploy:symlink_db',
   'deploy:symlink_gitlab',
   'deploy:symlink_resque',
-  'deploy:symlink_puma'
+  'deploy:symlink_puma',
+  'deploy:symlink_unicorn'
 #after "deploy:restart", "unicorn:stop"
 #after "deploy:reload"
 after "deploy:update", "deploy:cleanup"
