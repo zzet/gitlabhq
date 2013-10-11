@@ -39,7 +39,7 @@ listen "127.0.0.1:#{(ENV['UNICORN_PORT'] || 8001).to_i}", backlog: (ENV['UNICORN
 timeout (ENV['UNICORN_TIMEOUT'] || 60).to_i
 
 # feel free to point this anywhere accessible on the filesystem
-pid project_home + "/../../shared/pids/unicorn.pid"
+pid ENV['UNICORN_PIDFILE'] || project_home + "/../../shared/pids/unicorn.pid"
 
 # By default, the Unicorn logger will write to stderr.
 # Additionally, ome applications/frameworks log to stderr or stdout,
