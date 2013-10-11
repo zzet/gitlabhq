@@ -63,6 +63,7 @@ namespace :deploy do
       runit expects 2 to tell it to send the USR2 signal to the process.
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
+    run "sudo sv restart /etc/service/gitlab-sidekiq-*"
     run "sudo sv restart /etc/service/gitlab-web-*"
   end
 end
