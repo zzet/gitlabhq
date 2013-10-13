@@ -2,10 +2,12 @@ namespace :undev do
   desc "Undev | migrate exist projects to build face service"
   task migrate_to_build_face: :environment do
 
+    ActiveRecord::Base.observers.disable(:all)
+
     build_face_production_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq3hiE+hNaWsAHGXEWthfwcOznlQJ7n3mvk+oXpSp0JQ1KD4FNf8CodG8XvVXeLYvrbbpW/DSDrdrKRefbhAzdBUVhHDXHwuSafm9eGM3/3VX64osv85MPJZDz/F8iAnCtw8a4uqmHGU5ejU4jadqWnl2ajxlaOKJlnJihJSste1jWdSvwBGLYxnJDHw2bvDobVtmPATxF1/5MFYrBIP9sbreIBhpvPNa1joHyMI5dyTcAMSPHAjZL5amXUbVYsVnhgsmVjlWPG5Kh+1EEDxi+gqsZQ4kqyfsowA5imwlGO1iZbYCbhmfSyIX2O0Vhx0M/iEoVTVVf/aHaHYjGUkGp build-face@undev.ru"
     build_face_staging_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4rEGgT4ABE8DND5JvA0bYTAc9mNIjSVdwdodiWvfoaoibnI0KInfIke8oMMOfXJWXiWHFnta70jqs/RFjGPXDC06Y0lq2EUnIkzy9dwPSKOPXdCUYbDhg4d06o0xNMo6Nz9oO4zHPstRFDMhqAcdXhest4fFGZhtKTONUNXw3Ti6M34+ROwttniFQ3kuita62HBOjq8OYVQrwH7Mxj9AcUTL36OZ9stnotYg1TmmaIaNbANT1Iv89Ud2oMdpEvbQfIkMOw0U7uVLUOsItmaY+GrjJCWoYHn1rvY8iV7t9OoEB+aVmjjpX4407ZiQI7ZvquqWWxR5TXxbLrzLTozhn poweruser@buildface-staging-01"
-    bfp = DeployKey.find_by_key(build_face_production_key)
     bfs = DeployKey.find_by_key(build_face_staging_key)
+    bfp = DeployKey.find_by_key(build_face_production_key)
     u   = User.find_by_username("zzet")
 
     p "Remove deploy keys".red
@@ -17,6 +19,10 @@ namespace :undev do
 
     p "Remove all Service::BuildFace".red
     Service::BuildFace.destroy_all
+
+    Service.where(type: "GitlabCiService").delete_all
+    Service.where(type: "CampfireService").delete_all
+    Service.where(type: "HipchatService").delete_all
 
     p "Remove all ServiceKey like prod and staging".red
     ServiceKey.where(key: build_face_production_key).destroy_all
@@ -53,7 +59,18 @@ namespace :undev do
     staging_service     = Services::CreateContext.new(u, staging_attrs).execute(:admin)
 
     bfpk = ServiceKey.create(title: "Build Face production", key: build_face_production_key)
-    bfsk = ServiceKey.create(title: "Build Face staging", key: build_face_staging_key)
+    unless bfpk.valid?
+      fingerprint = bfpk.fingerprint
+      Key.where(fingerprint: fingerprint).destroy_all
+      bfpk.save
+    end
+
+    bfsk = ServiceKey.create(title: "Build Face staging",    key: build_face_staging_key)
+    unless bfsk.valid?
+      fingerprint = bfsk.fingerprint
+      Key.where(fingerpint: fingerprint).destroy_all
+      bfsk.save
+    end
 
     production_service.service_key_service_relationships.create(service_key: bfpk, code_access_state: :clone)
     staging_service.service_key_service_relationships.create(service_key: bfsk, code_access_state: :clone)

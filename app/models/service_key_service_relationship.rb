@@ -11,7 +11,9 @@
 #
 
 class ServiceKeyServiceRelationship < ActiveRecord::Base
-  attr_accessible :service_key_id, :service_id, :service_key, :code_access_state, :code_access_state_event
+  attr_accessible :service_key_id, :service_key,
+                  :service_id,
+                  :code_access_state, :code_access_state_event
 
   belongs_to :service
   belongs_to :service_key

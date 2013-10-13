@@ -64,7 +64,7 @@ class Service::BuildFace < Service
       data[:repository][:tags] = project.repository.tags.map {|t| t.name}
     end
 
-    #WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
+    WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
   end
 
   def compose_service_hook
