@@ -88,11 +88,18 @@ class Service < ActiveRecord::Base
   scope :public_list, -> { avaliable.where(public_state: :published) }
 
   class << self
-    def descendants
-      # In production class cache :)
-      Dir[File.dirname(__FILE__) << "/service/*.rb"].each {|f| load f} if super.blank?
+    def implement_services
+      @services ||= []
+      if @services.blank?
+        @services = self.direct_descendants
+        if @services.blank?
+          # In production class cache :)
+          Dir[File.dirname(__FILE__) << "/service/*.rb"].each {|f| load f}
+          @services = self.direct_descendants
+        end
+      end
 
-      super
+      @services
     end
 
     def can_build?(param)
@@ -100,7 +107,7 @@ class Service < ActiveRecord::Base
     end
 
     def build_by_type(param, attrs = {})
-      services = descendants.map { |s| s if s.can_build?(param) }.compact
+      services = implement_services.map { |s| s if s.can_build?(param) }.compact
 
       if services.one?
         services.first.new(attrs)

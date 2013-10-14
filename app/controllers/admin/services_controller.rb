@@ -1,7 +1,7 @@
 class Admin::ServicesController < Admin::ApplicationController
 
   def index
-    @service_modules = Service.descendants.map { |s| s.new }
+    @service_modules = Service.implement_services.map { |s| s.new }
     @services = Service.where(service_pattern_id: nil)
   end
 

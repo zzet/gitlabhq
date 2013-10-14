@@ -7,7 +7,7 @@ describe Admin::Services::KeysController do
     sign_in user
   end
 
-  Service.descendants.map {|s| s.new }.each do |service|
+  Service.implement_services.map {|s| s.new }.each do |service|
     describe "Manage keys for #{service.to_param} service" do
       before do
         @service = create :"active_public_#{service.to_param}_service"

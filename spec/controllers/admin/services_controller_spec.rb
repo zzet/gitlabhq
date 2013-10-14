@@ -14,7 +14,7 @@ describe Admin::ServicesController do
     end
   end
 
-  Service.descendants.map {|s| s.new }.each do |service|
+  Service.implement_services.map {|s| s.new }.each do |service|
     describe "GET 'new' with #{service.to_param} service" do
       it "returns http success" do
         get :new, key: Service::BuildFace.new.to_param
