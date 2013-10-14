@@ -63,12 +63,11 @@ class Service::BuildFace < Service
     end
 
     begin
-      WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
+      result = WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
+      return result.success?
     rescue
       return false
     end
-
-    return true
   end
 
   def compose_service_hook
