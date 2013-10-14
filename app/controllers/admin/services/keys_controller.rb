@@ -41,7 +41,7 @@ class Admin::Services::KeysController < Admin::Services::ApplicationController
   def disable
     services = @service.children.pluck(:id)
     services << @service.id
-    ServiceKeyServiceRelationship.where(service_key_id: params[:id]).destroy_all
+    ServiceKeyServiceRelationship.where(service_key_id: params[:id], service_id: services).destroy_all
 
     redirect_to admin_service_keys_path(@service)
   end

@@ -16,8 +16,6 @@
 #
 
 class Service::Campfire < Service
-  include Servisable
-
   default_title       'Campfire'
   default_description 'Simple web-based real-time group chat'
   service_name        'campfire'

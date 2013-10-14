@@ -16,8 +16,6 @@
 #
 
 class Service::Hipchat < Service
-  include Servisable
-
   default_title       'Hipchat'
   default_description 'Simple web-based real-time group chat'
   service_name        'hipchat'

@@ -108,6 +108,27 @@ class Service < ActiveRecord::Base
         raise ActiveRecord::RecordNotFound
       end
     end
+
+    def default_title(attr)
+      @title = attr
+    end
+
+    def title
+      @title
+    end
+
+    def default_description(attr)
+      @description = attr
+    end
+
+    def description
+      @description
+    end
+
+    def service_name(attr = nil)
+      return @service_name if attr.nil?
+      @service_name = attr
+    end
   end
 
   def deactivate_childrens
@@ -135,16 +156,20 @@ class Service < ActiveRecord::Base
     active
   end
 
+  def to_param
+    read_attribute(:id) || self.class.service_name(nil)
+  end
+
   def title
-    # implement inside child
+    read_attribute(:title) || self.class.title
   end
 
   def description
-    # implement inside child
+    read_attribute(:description) || self.class.description
   end
 
-  def to_param
-    # implement inside child
+  def service_name
+    self.class.service_name
   end
 
   def fields

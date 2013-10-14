@@ -46,6 +46,12 @@ describe Projects::ServicesController do
         it "returns http redirect" do
           @service.children.should be_blank
 
+          if service.to_param == "build_face"
+            stub_request(:post, "http://build-face.undev.cc//hooks/gitlab").
+              with(:headers => {'Content-Type'=>'application/json'}).
+              to_return(:status => 200, :body => "", :headers => {})
+          end
+
           attrs = { state_event: :enable }
           put :update, project_id: @project.path_with_namespace, id: @service.to_param, service: attrs
           response.should be_redirect
@@ -66,6 +72,12 @@ describe Projects::ServicesController do
 
         it "returns http redirect" do
           @project_service.should be_disabled
+
+          if service.to_param == "build_face"
+            stub_request(:post, "http://build-face.undev.cc//hooks/gitlab").
+              with(:headers => {'Content-Type'=>'application/json'}).
+              to_return(:status => 200, :body => "", :headers => {})
+          end
 
           attrs = { state_event: :enable }
           put :update, project_id: @project.path_with_namespace, id: @project_service.to_param, service: attrs

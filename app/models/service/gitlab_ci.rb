@@ -16,8 +16,6 @@
 #
 
 class Service::GitlabCi < Service
-  include Servisable
-
   default_title       'Gitlab CI'
   default_description 'Continuous integration server from GitLab'
   service_name        'gitlab_ci'

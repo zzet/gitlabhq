@@ -16,13 +16,11 @@
 #
 
 class Service::BuildFace < Service
-  include Servisable
-
-  has_one :configuration, as: :service, class_name: Service::Configuration::BuildFace
-
   default_title       "Build Face"
   default_description "Build Face service"
   service_name        "build_face"
+
+  has_one :configuration, as: :service, class_name: Service::Configuration::BuildFace
 
   state_machine :state, initial: :disabled do
     event :enable do
