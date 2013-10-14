@@ -146,7 +146,7 @@ class Service < ActiveRecord::Base
 
   def allowed_clone?(key)
     key_rel = service_key_service_relationships.where(service_key_id: key).first
-    rey_rel.clone?
+    key_rel.clone?
   end
 
   def allowed_push?(key)
