@@ -57,7 +57,7 @@ class Service::BuildFace < Service
       }
     }
 
-    unless project.repository.nil?
+    if project.repository.respond_to?(:raw)
       data[:repository][:branches] = project.repository.branches.map {|br| br.name}
       data[:repository][:tags] = project.repository.tags.map {|t| t.name}
     end
@@ -67,6 +67,8 @@ class Service::BuildFace < Service
     rescue
       return false
     end
+
+    return true
   end
 
   def compose_service_hook
