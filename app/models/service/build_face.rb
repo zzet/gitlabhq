@@ -57,12 +57,16 @@ class Service::BuildFace < Service
       }
     }
 
-    if project.repository.nil?
+    unless project.repository.nil?
       data[:repository][:branches] = project.repository.branches.map {|br| br.name}
       data[:repository][:tags] = project.repository.tags.map {|t| t.name}
     end
 
-    WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
+    begin
+      WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
+    rescue
+      return false
+    end
   end
 
   def compose_service_hook
