@@ -39,6 +39,8 @@ class Dispatcher
         new TreeView()
       when 'projects:blob:show'
         new BlobView()
+      when 'profiles:subscriptions:index'
+        new ProfileSubscriptions()
 
     switch path.first()
       when 'admin' then new Admin()
