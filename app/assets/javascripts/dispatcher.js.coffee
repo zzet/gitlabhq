@@ -31,6 +31,7 @@ class Dispatcher
         new SidebarTabs('groups')
       when 'projects:show'
         new Activities()
+        new SidebarFilter()
         new SidebarTabs('projects')
       when 'teams:show'
         new Activities()
