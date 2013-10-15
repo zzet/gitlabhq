@@ -29,6 +29,8 @@ class Service < ActiveRecord::Base
   belongs_to :project
 
   has_one :service_hook
+  has_one :user,                      dependent: :destroy, through: :service_user_relationship
+  has_one :service_user_relationship, dependent: :destroy
 
   has_many :service_key_service_relationships, dependent: :destroy
   has_many :service_keys, through: :service_key_service_relationships
@@ -136,6 +138,16 @@ class Service < ActiveRecord::Base
       return @service_name if attr.nil?
       @service_name = attr
     end
+
+    def with_user(*args)
+      @user_params = args.first
+      raise ArgumentError, ":username must present!" if @user_params[:username].blank?
+      @user_params[:password] = Devise.friendly_token.first(8) if @user_params[:password].blank?
+    end
+
+    def user_params
+      @user_params || []
+    end
   end
 
   def deactivate_childrens
@@ -143,7 +155,6 @@ class Service < ActiveRecord::Base
       child.disable
     end
   end
-
   def allowed_clone?(key)
     key_rel = service_key_service_relationships.where(service_key_id: key).first
     key_rel.clone?
@@ -159,8 +170,8 @@ class Service < ActiveRecord::Base
     key_rel.protected_push?
   end
 
-  def activated?
-    active
+  def user_params
+    self.class.user_params
   end
 
   def to_param
@@ -194,5 +205,9 @@ class Service < ActiveRecord::Base
 
   def pattern
     parent
+  end
+
+  def user
+    pattern.present? ? pattern.user : super
   end
 end

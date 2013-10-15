@@ -19,4 +19,6 @@ class Service::Nix < Service
   default_title       'Nix'
   default_description 'Nix'
   service_name        'nix'
+
+  with_user name: "Nix service", username: "nix_service", email: "example@example.org"
 end

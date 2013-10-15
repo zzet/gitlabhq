@@ -16,6 +16,12 @@ module Services
 
       if @service.save
         @service.create_configuration(service_configuration_params) if @service.respond_to?(:configuration)
+
+        if @service.user_params.any?
+          @service_user = User.find_by_username(@service.user_params[:username])
+          @service_user = User.create!(@service.user_params) if @service_user.blank?
+          @service.create_service_user_relationship(user: @service_user)
+        end
       end
 
       @service

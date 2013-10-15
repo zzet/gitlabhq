@@ -16,7 +16,15 @@ module Gitlab
       elsif identifier =~ /\Akey-\d+\Z/
         # git push over ssh
         key_id = identifier.gsub("key-", "")
-        Key.find_by_id(key_id).try(:user)
+        key = Key.find_by_id(key_id)
+        case key
+        when Key
+          key.try(:user)
+        when ServiceKey
+          key.service.try(:user)
+        else
+          nil
+        end
       end
     end
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131009163824) do
+ActiveRecord::Schema.define(:version => 20131015141342) do
 
   create_table "banners", :force => true do |t|
     t.string   "title"
@@ -343,6 +343,13 @@ ActiveRecord::Schema.define(:version => 20131009163824) do
     t.string   "code_access_state"
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
+  end
+
+  create_table "service_user_relationships", :force => true do |t|
+    t.integer  "service_id"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "services", :force => true do |t|
