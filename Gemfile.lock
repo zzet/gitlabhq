@@ -495,6 +495,7 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.7.1)
     simplecov-html (0.7.1)
+    simplecov-vim (0.0.1)
     sinatra (1.4.3)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -667,6 +668,7 @@ DEPENDENCIES
   shoulda-matchers (~> 2.1.0)
   sidekiq
   simplecov
+  simplecov-vim
   sinatra
   six
   slim

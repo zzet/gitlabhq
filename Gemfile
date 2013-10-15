@@ -219,6 +219,7 @@ end
 
 group :test do
   gem "simplecov", require: false
+  gem 'simplecov-vim', require: false
   gem "shoulda-matchers", "~> 2.1.0"
   gem 'email_spec'
   gem "webmock"

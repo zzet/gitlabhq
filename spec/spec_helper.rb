@@ -2,7 +2,16 @@ require 'rubygems'
 require 'spork'
 
 Spork.prefork do
-  require 'simplecov' unless ENV['CI']
+  unless ENV['CI']
+    require 'simplecov'
+    require 'simplecov-vim/formatter'
+    SimpleCov.start 'rails' do
+      formatter SimpleCov::Formatter::MultiFormatter[
+        SimpleCov::Formatter::HTMLFormatter,
+        SimpleCov::Formatter::VimFormatter
+      ]
+    end
+  end
 
   if ENV['TRAVIS']
     require 'coveralls'

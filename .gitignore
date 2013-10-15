@@ -8,6 +8,7 @@ tmp/
 tmp_old/
 .sass-cache/
 coverage/*
+coverage.vim
 backups/*
 *.swp
 public/uploads/
