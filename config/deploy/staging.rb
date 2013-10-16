@@ -14,6 +14,7 @@ role :db,  "10.40.42.123", :primary => true
 namespace :deploy do
   desc "Generate mails"
   task :generate_mails, :roles => :app do
+    run "cd #{current_path} && RAILS_ENV=test bundle exec rake db:migrate"
     run "cd #{current_path}/tmp/ && ls . | grep -i \"^repositories\" | xargs rm -rf"
     run "cd #{current_path} && mkdir #{current_path}/tmp/repositories/"
     run "tar -xvf #{current_path}/spec/seed_project.tar.gz -C #{current_path}/tmp/repositories/"
