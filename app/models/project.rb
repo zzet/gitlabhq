@@ -64,7 +64,7 @@ class Project < ActiveRecord::Base
   has_many :services
 
   has_many :merge_requests,     dependent: :destroy, foreign_key: "target_project_id"
-  has_many :fork_merge_requests,dependent: :destroy, foreign_key: "source_project_id"
+  has_many :fork_merge_requests,dependent: :destroy, foreign_key: "source_project_id", class_name: MergeRequest
   has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
   has_many :milestones,         dependent: :destroy
   has_many :notes,              dependent: :destroy
