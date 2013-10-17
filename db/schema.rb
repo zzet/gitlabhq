@@ -11,7 +11,23 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131015141342) do
+ActiveRecord::Schema.define(:version => 20131017122134) do
+
+  create_table "ci_builds", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "target_project_id"
+    t.integer  "source_project_id"
+    t.integer  "merge_request_id"
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "source_sha"
+    t.string   "target_sha"
+    t.string   "state"
+    t.text     "trace"
+    t.text     "coverage"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -300,6 +316,17 @@ ActiveRecord::Schema.define(:version => 20131015141342) do
     t.string   "room"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
+  end
+
+  create_table "service_configuration_jenkins", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "host"
+    t.string   "push_path"
+    t.string   "merge_request_path"
+    t.text     "branches"
+    t.boolean  "merge_request_enabled"
+    t.datetime "created_at",            :null => false
+    t.datetime "updated_at",            :null => false
   end
 
   create_table "service_hierarchies", :id => false, :force => true do |t|
