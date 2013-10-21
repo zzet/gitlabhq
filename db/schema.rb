@@ -320,6 +320,7 @@ ActiveRecord::Schema.define(:version => 20131017122134) do
 
   create_table "service_configuration_jenkins", :force => true do |t|
     t.integer  "service_id"
+    t.string   "service_type"
     t.string   "host"
     t.string   "push_path"
     t.string   "merge_request_path"

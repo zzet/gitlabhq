@@ -72,4 +72,8 @@ class CiBuild < ActiveRecord::Base
   def merge_request_build?
     merge_request.present? && source_project.present? && target_project.presen? && !source_sha.blank? && !target_sha.blank?
   end
+
+  def correct_token?(token)
+    true
+  end
 end

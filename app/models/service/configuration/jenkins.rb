@@ -1,7 +1,7 @@
 class Service::Configuration::Jenkins < ActiveRecord::Base
   attr_accessible :branches, :host, :merge_request_enabled, :merge_request_path, :push_path, :service_id
 
-  belongs_to :service
+  belongs_to :service, polymorphic: true
 
   def fields
     [
