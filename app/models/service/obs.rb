@@ -15,10 +15,10 @@
 #  description        :text
 #
 
-class Service::Nix < Service
-  default_title       'Nix'
-  default_description 'Nix'
-  service_name        'nix'
+class Service::Obs < Service
+  default_title       'Obs'
+  default_description 'Obs'
+  service_name        'obs'
 
-  with_user name: "Nix service", username: "nix_service", email: "example_nix@example.org"
+  with_user name: "Obs service", username: "obs_service", email: "example_obs@example.org"
 end
