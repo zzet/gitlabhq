@@ -13,20 +13,6 @@
 
 ActiveRecord::Schema.define(:version => 20131015141342) do
 
-  create_table "banners", :force => true do |t|
-    t.string   "title"
-    t.text     "description"
-    t.string   "category"
-    t.string   "state"
-    t.datetime "start_date"
-    t.datetime "end_date"
-    t.integer  "author_id"
-    t.integer  "entity_id"
-    t.string   "entity_type"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
-  end
-
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
     t.integer  "project_id",    :null => false
@@ -39,12 +25,12 @@ ActiveRecord::Schema.define(:version => 20131015141342) do
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
+    t.datetime "created_at",                               :null => false
+    t.datetime "updated_at",                               :null => false
     t.boolean  "adjacent_changes"
     t.boolean  "brave"
-    t.boolean  "subscribe_if_owner"
-    t.boolean  "subscribe_if_developer"
+    t.boolean  "subscribe_if_owner",     :default => true
+    t.boolean  "subscribe_if_developer", :default => true
   end
 
   create_table "event_subscription_notifications", :force => true do |t|
@@ -276,18 +262,6 @@ ActiveRecord::Schema.define(:version => 20131015141342) do
   end
 
   add_index "protected_branches", ["project_id"], :name => "index_protected_branches_on_project_id"
-
-  create_table "pushes", :force => true do |t|
-    t.integer  "project_id"
-    t.string   "ref"
-    t.string   "before"
-    t.string   "after"
-    t.text     "data"
-    t.integer  "user_id"
-    t.integer  "commits_count"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-  end
 
   create_table "service_configuration_build_faces", :force => true do |t|
     t.integer  "service_id"

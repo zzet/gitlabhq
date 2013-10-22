@@ -33,7 +33,11 @@ class Admin::Services::KeysController < Admin::Services::ApplicationController
   end
 
   def enable
-    service.service_keys << available_keys.find(params[:id])
+    key = available_keys.find(params[:id])
+    service.service_keys << key
+    service.children.each do |srv|
+      srv.service_keys << key
+    end
 
     redirect_to admin_service_keys_path(@service)
   end

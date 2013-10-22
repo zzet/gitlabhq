@@ -1,2 +1,50 @@
-%h1 Admin::Services#show
-%p Find me in app/views/admin/services/show.html.haml
+= render "service_head"
+
+.span5
+  .ui-box
+    .title
+      Service info:
+    %ul.well-list
+      %li
+        %span.light Global state
+        %strong= @service.human_active_state_name
+
+      %li
+        %span.light Published state
+        %strong= @service.human_public_state_name
+
+      %li
+        %span.light Keys
+        %br
+        - @service.service_key_service_relationships.each do |key_relation|
+          - key = key_relation.service_key
+          %strong
+            = key.title
+            = "(#{key_relation.human_code_access_state_name})"
+          %br
+
+      - if @service.respond_to?(:configuration)
+        - configuration = @service.configuration
+        %li
+          %span.light Default configuration
+          %div
+            - configuration.fields.each do |field|
+              %strong= field[:name]
+              %span= configuration.send(field[:name])
+              %br
+
+.span6
+  .ui-box
+    .title
+      Projects:
+    %ul.well-list
+      - @projects.each do |project|
+        %li
+          .pull-right
+            = link_to "" do
+              .btn.btn-small
+                %i.icon-edit
+            = link_to "", method: :delete do
+              .btn.btn-small.btn-danger
+                %i.icon-remove
+          = link_to project.name_with_namespace, admin_project_path(project)

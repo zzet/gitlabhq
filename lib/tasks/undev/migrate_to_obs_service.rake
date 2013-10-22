@@ -4,13 +4,13 @@ namespace :undev do
 
     ActiveRecord::Base.observers.disable(:all)
 
-    obs_production_key = ""
+    obs_production_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDom4X636YRZ3yDRNmGNXSDWzfw5eii02RntPJ5hh/GQHv2FzUHMQ1vqLNKDkz2XJMjVgV0Y+TQteAFeL/eVccFY62WNoAQKYMVx1G7MLanD1QGs8iVZbVNKEKb0YC8hiP02rl+/lh8YRi52rE+de3O+j3mgZbXxVFuSqrXkCXK0Bu/UCuhBb1HjqHG3/0+hxl4teFaGTY28hW8ls9RLIC30hFjaSjcO+HfBJTdHizX/u7geNs6bUZ8UdEozq9tVoLeMqChOtZ4MEPm3smGAUsaQfrZanjvFdpqiyPxGJn2VtXqdSu9KddDQxdAGSoBzx1gI94h8iGZ9BY7ulgS4cI1 root@build"
 
-    np = DeployKey.find_by_key(obs_production_key)
+    op = DeployKey.find_by_key(obs_production_key)
     u   = User.find_by_username("zzet")
 
     p "Remove deploy keys".red
-    DeployKeysProject.where(deploy_key_id: np).destroy_all if np
+    DeployKeysProject.where(deploy_key_id: op).destroy_all if op
 
     p "Remove all Service::Obs".red
     Service::Obs.destroy_all
@@ -33,14 +33,14 @@ namespace :undev do
 
     production_service  = Services::CreateContext.new(u, production_attrs).execute(:admin)
 
-    npk = ServiceKey.create(title: "Obs production", key: obs_production_key)
-    unless bfpk.valid?
-      fingerprint = npk.fingerprint
+    opk = ServiceKey.create(title: "Obs production", key: obs_production_key)
+    unless opk.valid?
+      fingerprint = opk.fingerprint
       Key.where(fingerprint: fingerprint).destroy_all
-      npk.save
+      opk.save
     end
 
-    production_service.service_key_service_relationships.create(service_key: npk, code_access_state: :clone)
+    production_service.service_key_service_relationships.create(service_key: opk, code_access_state: :clone)
 
     p "Migrate projects to new services".green
 

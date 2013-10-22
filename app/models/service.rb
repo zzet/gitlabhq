@@ -35,6 +35,8 @@ class Service < ActiveRecord::Base
   has_many :service_key_service_relationships, dependent: :destroy
   has_many :service_keys, through: :service_key_service_relationships
 
+  has_many :child_projects, through: :children, source: :project
+
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions

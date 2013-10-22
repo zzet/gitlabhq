@@ -33,7 +33,7 @@ namespace :undev do
     production_service  = Services::CreateContext.new(u, production_attrs).execute(:admin)
 
     npk = ServiceKey.create(title: "Nix production", key: nix_production_key)
-    unless bfpk.valid?
+    unless npk.valid?
       fingerprint = npk.fingerprint
       Key.where(fingerprint: fingerprint).destroy_all
       npk.save

@@ -7,6 +7,7 @@ class Admin::ServicesController < Admin::ApplicationController
 
   def show
     service
+    @projects = service.child_projects.includes(:namespace).order("namespaces.path, projects.name ASC")
   end
 
   def new
@@ -14,7 +15,7 @@ class Admin::ServicesController < Admin::ApplicationController
   end
 
   def create
-    @service = Services::CreateContext.new(@current_user, params[:service]).execute(:admin)
+    @service = ::Services::CreateContext.new(@current_user, params[:service]).execute(:admin)
     if @service.persisted?
       redirect_to admin_services_path
     else
@@ -27,7 +28,7 @@ class Admin::ServicesController < Admin::ApplicationController
   end
 
   def update
-    @service = Services::UpdateContext.new(@current_user, service, params[:service]).execute(:admin)
+    @service = ::Services::UpdateContext.new(@current_user, service, params[:service]).execute(:admin)
     if @service.errors.blank?
       redirect_to admin_service_path(@service.id)
     else
@@ -36,7 +37,7 @@ class Admin::ServicesController < Admin::ApplicationController
   end
 
   def destroy
-    if Services::RemoveContext.new(@current_user, service).execute(:admin)
+    if ::Services::RemoveContext.new(@current_user, service).execute(:admin)
       redirect_to admin_services_path
     else
       render :edit

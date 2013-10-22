@@ -9,13 +9,13 @@
       %li
         .pull-right
           = link_to admin_service_keys_path(service.id), class: "btn" do
-            %i.icon-wrench
+            %i.icon-key
 
-          .btn
-            - if service.published?
-              %i.icon-eye-close.cred
-            - else
-              %i.icon-eye-open.cgreen
+          -#.btn
+            -#- if service.published?
+              -#%i.icon-eye-close.cred
+            -#- else
+              -#%i.icon-eye-open.cgreen
 
           = link_to edit_admin_service_path(service.id), class: "btn" do
             %i.icon-edit
