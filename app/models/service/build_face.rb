@@ -95,7 +95,7 @@ class Service::BuildFace < Service
   end
 
   def project_path
-    "#{Gitlab.config.services.build_face.domain}/#{project.path_with_namespace}"
+    "#{configuration.domain}/#{project.path_with_namespace}"
   end
 
   def status_img_path
