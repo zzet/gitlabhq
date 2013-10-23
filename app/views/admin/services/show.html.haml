@@ -41,10 +41,7 @@
       - @projects.each do |project|
         %li
           .pull-right
-            = link_to "" do
+            = link_to project_services_path(project) do
               .btn.btn-small
                 %i.icon-edit
-            = link_to "", method: :delete do
-              .btn.btn-small.btn-danger
-                %i.icon-remove
           = link_to project.name_with_namespace, admin_project_path(project)
