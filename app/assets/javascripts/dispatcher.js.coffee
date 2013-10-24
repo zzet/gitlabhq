@@ -52,6 +52,8 @@ class Dispatcher
       when 'users:show'
         new SidebarFilter()
         new SidebarTabs('users')
+      when 'profiles:subscriptions:index'
+        new ProfileSubscriptions()
 
     switch path.first()
       when 'admin' then new Admin()
