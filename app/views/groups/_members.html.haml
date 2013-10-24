@@ -1,12 +1,12 @@
 .ui-box
   .title.clearfix
-    = search_field_tag :filter_member, nil, placeholder: 'Filter by name', class: 'dash-filter'
+    = search_field_tag :filter_member, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter'
     - if can? current_user, :manage_group, @group
       %span.pull-right
         = link_to group_members_path(@group), class: "btn btn-new" do
           %i.icon-plus
             Add member
-  %ul.well-list.dash-list
+  %ul.well-list.js-sidebar-list
     - members.each do |member|
       %li.member-row
         = render "member", member: member, member_role: @group.human_access_for(member)

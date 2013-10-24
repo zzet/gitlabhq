@@ -1,10 +1,11 @@
 .ui-box
-  %h5.title Teams
-  %ul.well-list
+  .title.clearfix
+    = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter'
+  %ul.well-list.js-sidebar-list
     - @teams.each do |team|
       %li
         = link_to team_path(team), class: dom_class(team) do
-          %strong.well-title= team.name
+          %strong.well-title.filter-title= team.name
           %span.pull-right.light
             - if team.creator == user
               %i.icon-wrench

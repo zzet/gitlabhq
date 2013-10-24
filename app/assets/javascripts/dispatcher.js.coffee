@@ -25,8 +25,18 @@ class Dispatcher
         new Activities()
       when 'projects:commit:show'
         new Commit()
-      when 'groups:show', 'projects:show', 'teams:show'
+      when 'groups:show'
         new Activities()
+        new SidebarFilter()
+        new SidebarTabs('groups')
+      when 'projects:show'
+        new Activities()
+        new SidebarFilter()
+        new SidebarTabs('projects')
+      when 'teams:show'
+        new Activities()
+        new SidebarFilter()
+        new SidebarTabs('teams')
       when 'projects:new', 'projects:edit'
         new Project()
       when 'projects:walls:show'
@@ -39,6 +49,9 @@ class Dispatcher
         new TreeView()
       when 'projects:blob:show'
         new BlobView()
+      when 'users:show'
+        new SidebarFilter()
+        new SidebarTabs('users')
 
     switch path.first()
       when 'admin' then new Admin()
