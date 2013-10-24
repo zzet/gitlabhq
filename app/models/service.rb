@@ -159,12 +159,12 @@ class Service < ActiveRecord::Base
   end
   def allowed_clone?(key)
     key_rel = service_key_service_relationships.where(service_key_id: key).first
-    key_rel.clone?
+    key_rel.clone? || key_rel.push? || key_rel.protected_push?
   end
 
   def allowed_push?(key)
     key_rel = service_key_service_relationships.where(service_key_id: key).first
-    key_rel.push?
+    key_rel.push? || key_rel.protected_push?
   end
 
   def allowed_protected_push?(key)
