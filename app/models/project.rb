@@ -49,9 +49,7 @@ class Project < ActiveRecord::Base
   belongs_to :namespace
 
   has_one :last_event, class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
-  has_one :gitlab_ci_service, dependent: :destroy
-  has_one :campfire_service, dependent: :destroy
-  has_one :hipchat_service, dependent: :destroy
+
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
@@ -63,8 +61,10 @@ class Project < ActiveRecord::Base
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
-  has_many :services,           dependent: :destroy
+  has_many :services
+
   has_many :merge_requests,     dependent: :destroy, foreign_key: "target_project_id"
+  has_many :fork_merge_requests,dependent: :destroy, foreign_key: "source_project_id", class_name: MergeRequest
   has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
   has_many :milestones,         dependent: :destroy
   has_many :notes,              dependent: :destroy
@@ -175,7 +175,7 @@ class Project < ActiveRecord::Base
   end
 
   def repository
-    @repository ||= Repository.new(path_with_namespace, default_branch)
+    @repository ||= ::Repository.new(path_with_namespace, default_branch)
   end
 
   def saved?
@@ -254,22 +254,12 @@ class Project < ActiveRecord::Base
     self.issues_enabled && !self.used_default_issues_tracker?
   end
 
-  def build_missing_services
-    available_services_names.each do |service_name|
-      service = services.find { |service| service.to_param == service_name }
-
-      # If service is available but missing in db
-      # we should create an instance. Ex `create_gitlab_ci_service`
-      service = self.send :"create_#{service_name}_service" if service.nil?
-    end
-  end
-
-  def available_services_names
-    %w(gitlab_ci campfire hipchat)
+  def gitlab_ci
+    @gitlab_ci_service ||= services.where(type: Service::GitlabCi).first
   end
 
   def gitlab_ci?
-    gitlab_ci_service && gitlab_ci_service.active
+    gitlab_ci.present? && gitlab_ci.enabled?
   end
 
   # For compatibility with old code
@@ -334,7 +324,7 @@ class Project < ActiveRecord::Base
     services.each do |service|
 
       # Call service hook only if it is active
-      service.execute(data) if service.active
+      service.execute(data) if service.enabled?
     end
   end
 
@@ -351,8 +341,10 @@ class Project < ActiveRecord::Base
     branch_name = ref.gsub("refs/heads/", "")
     c_ids = self.repository.commits_between(oldrev, newrev).map(&:id)
 
-    # Update code for merge requests
+    # Update code for merge requests in project
     mrs = self.merge_requests.opened.by_branch(branch_name).all
+    # Update code for merge requests in project
+    mrs += self.fork_merge_requests.opened.by_branch(branch_name).all
     mrs.each { |merge_request| merge_request.reload_code; merge_request.mark_as_unchecked }
 
     # Close merge requests

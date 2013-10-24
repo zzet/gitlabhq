@@ -95,7 +95,7 @@ class DashboardController < ApplicationController
   protected
 
   def load_projects
-    @projects = current_user.projects.sorted_by_push_date
+    @projects = current_user.authorized_projects.sorted_by_push_date
     @authorized_projects = @projects.count < 20 ? current_user.authorized_projects.where("projects.id not in (?)", @projects.pluck(:id)).sorted_by_push_date.limit(10) : []
   end
 end

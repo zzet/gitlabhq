@@ -86,6 +86,17 @@ Gitlab::Application.routes.draw do
 
     resources :teams
 
+    resources :services do
+      scope module: :services do
+        resources :keys do
+          member do
+            put :enable
+            put :disable
+          end
+        end
+      end
+    end
+
     resources :hooks, only: [:index, :create, :destroy] do
       get :test
     end

@@ -1,0 +1,25 @@
+- keys.each do |key|
+  %li
+    .pull-right
+      - if @available_keys.include?(key)
+        = link_to enable_admin_service_key_path(@service, key), class: 'btn btn-small', method: :put do
+          %i.icon-plus
+          Enable
+      - else
+        - if key.services.count > 1
+          = link_to disable_admin_service_key_path(@service, key), class: 'btn btn-small', method: :put do
+            %i.icon-off
+            Disable
+        - else
+          = link_to 'Remove', admin_service_key_path(@service, key), confirm: 'You are going to remove service key. Are you sure?', method: :delete, class: "btn btn-remove delete-key btn-small pull-right"
+
+
+    = link_to admin_service_key_path(key.services.include?(@service) ? @service : key.services.first, key) do
+      %i.icon-key
+      %strong= key.title
+
+    %p.light.prepend-top-10
+      - key.services.where(service_pattern_id: nil).map(&:title).each do |service_name|
+        %span.label= service_name
+      %small.pull-right
+        Created #{time_ago_in_words(key.created_at)} ago

@@ -1,18 +1,19 @@
 .ui-box
   .title.clearfix
-    = search_field_tag :filter_project, nil, placeholder: 'Filter by name', class: 'dash-filter'
+    = search_field_tag :filter_project, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter'
     - if can? current_user, :manage_group, @group
       %span.pull-right
         = link_to new_project_path(namespace_id: @group.id), class: "btn btn-new" do
           %i.icon-plus
           New project
-  %ul.well-list
+
+  %ul.well-list.js-sidebar-list
     - if projects.blank?
       %p.nothing_here_message This groups has no projects yet
     - projects.each do |project|
       %li.project-row
         = link_to project_path(project), class: dom_class(project) do
-          %span.project-name
+          %span.project-name.filter-title
             = truncate(project.name, length: 25)
           %span.arrow
             %i.icon-angle-right

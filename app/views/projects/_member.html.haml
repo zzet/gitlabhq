@@ -1,6 +1,6 @@
 = image_tag gravatar_icon(member.email, 16), class: "avatar s16"
 = link_to user_path(member), class: dom_class(member) do
-  %strong= member.name
+  %strong.filter-title= member.name
   %span.cgray= member.username
 - if member == current_user
   %span.label.label-success It's you

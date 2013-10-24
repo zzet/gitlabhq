@@ -1,0 +1,13 @@
+%h3.page-title
+  Service key:
+  = @key.title
+  %small
+    created at
+    = @key.created_at.stamp("Aug 21, 2011")
+.back-link
+  = link_to admin_service_keys_path(@service) do
+    &larr; To keys list
+%hr
+%pre= @key.key
+.pull-right
+  = link_to 'Remove', admin_service_key_path(@service, @key), confirm: 'Are you sure?', method: :delete, class: "btn-remove btn delete-key"

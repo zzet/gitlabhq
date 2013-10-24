@@ -1,6 +1,7 @@
 .ui-box
   .title.clearfix
-  %ul.well-list.dash-list
+    = search_field_tag :filter_team, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter'
+  %ul.well-list.js-sidebar-list
     - owners.each do |member|
       %li.member-row
         = render "member", member: member, member_role: "Owner"

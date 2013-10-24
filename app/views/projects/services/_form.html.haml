@@ -1,5 +1,5 @@
 %h3.page-title
-  - if @service.activated?
+  - if @service.enabled?
     %span.cgreen
       %i.icon-circle
   - else
@@ -22,27 +22,33 @@
         - @service.errors.full_messages.each do |msg|
           %li= msg
 
-
   .control-group
-    = f.label :active, "Active", class: "control-label"
+    = f.label :state_event, "State", class: "control-label"
     .controls
-      = f.check_box :active
+      = f.select(:state_event, @service.state_transitions.map {|s| [s.human_event, s.event]}, include_blank: @service.human_state_name)
 
-  - @service.fields.each do |field|
-    - name = field[:name]
-    - type = field[:type]
-    - placeholder = field[:placeholder]
+  - if @service.respond_to?(:configuration)
+    - configuration = @service.configuration
+    - disable_state = @service.pattern.blank?
+    = f.fields_for :configuration, configuration do |config|
+      - configuration.fields.each do |field|
+        - name = field[:name]
+        - type = field[:type]
+        - placeholder = field[:placeholder]
 
-    .control-group
-      = f.label name, class: "control-label"
-      .controls
-        - if type == 'text'
-          = f.text_field name, class: "input-xlarge", placeholder: placeholder
-        - elsif type == 'checkbox'
-          = f.check_box name
+        .control-group
+          = config.label name, class: "control-label"
+          .controls
+            - if type == 'text'
+              = config.text_field name, class: "input-xlarge", placeholder: placeholder, disabled: disable_state
+            - elsif type == 'checkbox'
+              = config.check_box name, disabled: disable_state
+
+  = f.fields_for :service_key_service_relationships do |sksr|
+    = render "service_key_service_relationships", f: sksr
 
   .form-actions
     = f.submit 'Save', class: 'btn btn-save'
     &nbsp;
-    - if @service.valid? && @service.activated? && @service.can_test?
-      = link_to 'Test settings', test_project_service_path(@project, @service.to_param), class: 'btn btn-small'
+    - if @service.valid? && @service.enabled? && @service.can_test?
+      = link_to 'Test settings', test_project_service_path(@project.path_with_namespace, @service.id), class: 'btn btn-small'
