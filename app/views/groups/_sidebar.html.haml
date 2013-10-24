@@ -10,7 +10,7 @@
   %li
     = link_to '#members', 'data-toggle' => 'tab', id: 'sidebar-members-tab' do
       Members
-      %span.badge= @members.count
+      %span.badge= @members_count
 
 
 .tab-content
@@ -19,7 +19,7 @@
   .tab-pane#teams
     = render "teams", teams: @teams
   .tab-pane#members
-    = render "members", members: @members
+    = render "members", owners: @owners, masters: @masters, developers: @developers, reporters: @reporters, guests: @guests
 
 %hr
 = render 'shared/promo'
