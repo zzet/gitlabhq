@@ -68,7 +68,7 @@ namespace :undev do
     bfsk = ServiceKey.create(title: "Build Face staging",    key: build_face_staging_key)
     unless bfsk.valid?
       fingerprint = bfsk.fingerprint
-      Key.where(fingerpint: fingerprint).destroy_all
+      Key.where(fingerprint: fingerprint).destroy_all
       bfsk.save
     end
 

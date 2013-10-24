@@ -56,7 +56,7 @@ namespace :undev do
     bfsk = ServiceKey.create(title: "Jenkins ci61", key: jenkins_ci61_key)
     unless bfsk.valid?
       fingerprint = bfsk.fingerprint
-      Key.where(fingerpint: fingerprint).destroy_all
+      Key.where(fingerprint: fingerprint).destroy_all
       bfsk.save
     end
 
