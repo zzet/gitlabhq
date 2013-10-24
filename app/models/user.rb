@@ -107,8 +107,9 @@ class User < ActiveRecord::Base
   has_many :master_teams,                    through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
   has_many :team_project_relationships,      through: :teams
   has_many :team_group_relationships,        through: :teams
-  has_many :team_projects,                   through: :team_project_relationships
+  has_many :team_projects,                   through: :team_project_relationships,      source: :project
   has_many :team_groups,                     through: :team_group_relationships,        source: :group
+  has_many :team_group_grojects,             through: :team_groups,                     source: :projects
   has_many :master_team_group_relationships, through: :teams, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team_group_relationships
   has_many :master_team_groups,              through: :master_team_group_relationships, source: :group
 
@@ -290,13 +291,13 @@ class User < ActiveRecord::Base
   # Projects user has access to
   def authorized_projects
     @authorized_projects ||= begin
-                               project_ids = (owned_projects.pluck(:id) + groups_projects.pluck(:id) + projects.pluck(:id)).uniq
+                               project_ids = (owned_projects.pluck(:id) + groups_projects.pluck(:id) + projects.pluck(:id) + team_projects.pluck(:id) + team_group_grojects.pluck(:id)).uniq
                                Project.where(id: project_ids).joins(:namespace).order('namespaces.name ASC')
                              end
   end
 
   def known_projects
-    @project_ids ||= (owned_projects.pluck(:id) + groups_projects.pluck(:id) + projects.pluck(:id) + Project.public_only.pluck(:id)).uniq
+    @project_ids ||= (owned_projects.pluck(:id) + groups_projects.pluck(:id) + projects.pluck(:id) + team_projects.pluck(:id) + team_group_grojects.pluck(:id) + Project.public_only.pluck(:id)).uniq
     Project.where(id: @project_ids)
   end
 
