@@ -28,27 +28,46 @@ module API
         git_cmd = params[:action]
         return false unless project
 
+        action = case git_cmd
+                 when 'git-upload-pack', 'git-upload-archive'
+                   then :download_code
+                 when 'git-receive-pack'
+                   then
+                   if project.protected_branch?(params[:ref])
+                     :push_code_to_protected_branches
+                   else
+                     :push_code
+                   end
+                 end
 
-        if key.is_a? DeployKey
-          key.projects.include?(project) && DOWNLOAD_COMMANDS.include?(git_cmd)
+        # Verify key and action
+        case key
+        when DeployKey
+          key.for_project?(project) && action == :download_code
+        when ServiceKey
+          return false unless key.for_project?(project)
+
+          service = key.services.with_project(project).first
+
+          return false if service.disabled?
+
+          ability = case action
+                    when :download_code
+                      service.allowed_clone?(key)
+                    when :push_code
+                      service.allowed_push?(key)
+                    when :push_code_to_protected_branches
+                      service.allowed_protected_push?(key)
+                    else
+                      false
+                    end
+
+          return ability
         else
           user = key.user
 
           return false if user.blocked?
-
-          action = case git_cmd
-                   when *DOWNLOAD_COMMANDS
-                     then :download_code
-                   when *PUSH_COMMANDS
-                     then
-                     if project.protected_branch?(params[:ref])
-                       :push_code_to_protected_branches
-                     else
-                       :push_code
-                     end
-                   end
-
-          user.can?(action, project)
+          return user.can?(action, project)
         end
       end
 

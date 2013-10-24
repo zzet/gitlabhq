@@ -36,6 +36,31 @@ describe PostReceive do
     end
   end
 
+  context "push from" do
+    let(:project) { create(:project_with_code) }
+    let(:key) { create(:service_key) }
+    let(:key_id) { key.shell_id }
+    Service.implement_services.map {|s| s.new }.each do |service|
+      describe "#{service.to_param} service" do
+        before do
+          @service = create :"active_public_#{service.to_param}_service"
+          if @service.user_params.any?
+            @service.service_keys << key
+            @service_user = User.find_by_username(@service.user_params[:username])
+            @service_user = User.create!(@service.user_params) if @service_user.blank?
+            @service.create_service_user_relationship(user: @service_user)
+          end
+        end
+
+        it "should receive data" do
+          if @service.user_params.any?
+            PostReceive.new.perform(pwd(project), 'sha-old', 'sha-new', 'refs/heads/master', key_id)
+          end
+        end
+      end
+    end
+  end
+
   def pwd(project)
     File.join(Gitlab.config.gitlab_shell.repos_path, project.path_with_namespace)
   end

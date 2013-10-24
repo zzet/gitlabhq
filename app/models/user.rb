@@ -422,6 +422,11 @@ class User < ActiveRecord::Base
     DeployKey.in_projects(self.known_projects).uniq
   end
 
+  def accessible_service_keys
+    p "Fix accessible_service_keys !!!"
+    ServiceKey.for_projects(self.known_projects).uniq
+  end
+
   def created_by
     User.find_by_id(created_by_id) if created_by_id
   end
