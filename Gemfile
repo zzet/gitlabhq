@@ -52,6 +52,9 @@ gem "stamp"
 # Enumeration fields
 gem 'enumerize'
 
+# Tree data structure
+gem 'closure_tree'
+
 # Pagination
 gem "kaminari", "~> 0.14.1"
 
@@ -217,6 +220,7 @@ end
 
 group :test do
   gem "simplecov", require: false
+  gem 'simplecov-vim', require: false
   gem "shoulda-matchers", "~> 2.1.0"
   gem 'email_spec'
   gem "webmock"

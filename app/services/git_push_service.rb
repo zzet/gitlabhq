@@ -43,6 +43,7 @@ class GitPushService
 
     if push_tag?(ref, oldrev)
       project.execute_hooks(@push_data.dup)
+      project.execute_services(@push_data.dup)
       Rails.cache.delete(project.repository.cache_key(:tag_names))
     end
 

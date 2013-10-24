@@ -1,0 +1,34 @@
+%h3.page-title
+  Service keys allow access to the repository
+
+  = link_to new_admin_service_key_path(@service), class: "btn btn-new pull-right", title: "New Service Key" do
+    %i.icon-plus
+    New Service Key
+
+%p.light
+  Service keys can be used for CI, staging or production servers.
+  You can create a service key or add an existing one
+
+%hr.clearfix
+
+.row
+  .span5.enabled-keys
+    %h5
+      %strong.cgreen Enabled service keys
+      for this service
+    %ul.bordered-list
+      - if @enabled_keys.blank?
+        .light-well
+          %p.nothing_here_message Create a #{link_to 'new service key', new_admin_service_key_path(@service)} or add an existing one
+      - else
+        = render "keys", keys: @enabled_keys
+  .span5.available-keys
+    %h5
+      %strong Service keys
+      from another services
+    %ul.bordered-list
+      - if @available_keys.blank?
+        .light-well
+          %p.nothing_here_message Service keys from another services you have access to will be displayed here
+      - else
+        = render "keys", keys: @available_keys

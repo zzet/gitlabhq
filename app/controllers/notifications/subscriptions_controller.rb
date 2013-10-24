@@ -6,7 +6,8 @@ class Notifications::SubscriptionsController < Notifications::ApplicationControl
     SubscriptionService.subscribe(@current_user, :all, params[:category], @source)   if @category.blank? && params[:category].present?
 
     respond_to do |format|
-      format.json { head :created }
+      #NOTE было :created, но для issue 29418 было изменено на :no_content (если нет контента, и др.статус, то jquery выдает ошибку parseerror)
+      format.json { head :no_content }
       format.html { redirect_to profile_subscriptions_path }
     end
   end

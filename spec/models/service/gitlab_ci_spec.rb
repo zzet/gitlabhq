@@ -2,23 +2,22 @@
 #
 # Table name: services
 #
-#  id          :integer          not null, primary key
-#  type        :string(255)
-#  title       :string(255)
-#  token       :string(255)
-#  project_id  :integer          not null
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  active      :boolean          default(FALSE), not null
-#  project_url :string(255)
-#  subdomain   :string(255)
-#  room        :string(255)
-#  state       :string(255)
+#  id                 :integer          not null, primary key
+#  type               :string(255)
+#  title              :string(255)
+#  project_id         :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  state              :string(255)
+#  service_pattern_id :integer
+#  public_state       :string(255)
+#  active_state       :string(255)
+#  description        :text
 #
 
 require 'spec_helper'
 
-describe GitlabCiService do
+describe Service::GitlabCi do
   describe "Associations" do
     it { should belong_to :project }
     it { should have_one :service_hook }
@@ -30,7 +29,7 @@ describe GitlabCiService do
 
   describe 'commits methods' do
     before do
-      @service = GitlabCiService.new
+      @service = Service::GitlabCi.new
       @service.stub(
         service_hook: true,
         project_url: 'http://ci.gitlab.org/projects/2',

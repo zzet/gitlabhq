@@ -2,43 +2,27 @@
 #
 # Table name: services
 #
-#  id          :integer          not null, primary key
-#  type        :string(255)
-#  title       :string(255)
-#  token       :string(255)
-#  project_id  :integer          not null
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  active      :boolean          default(FALSE), not null
-#  project_url :string(255)
-#  subdomain   :string(255)
-#  room        :string(255)
-#  state       :string(255)
+#  id                 :integer          not null, primary key
+#  type               :string(255)
+#  title              :string(255)
+#  project_id         :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  state              :string(255)
+#  service_pattern_id :integer
+#  public_state       :string(255)
+#  active_state       :string(255)
+#  description        :text
 #
 
-class HipchatService < Service
-  attr_accessible :room
+class Service::Hipchat < Service
+  default_title       'Hipchat'
+  default_description 'Simple web-based real-time group chat'
+  service_name        'hipchat'
 
-  validates :token, presence: true, if: :activated?
+  has_one :configuration, as: :service, class_name: Service::Configuration::Hipchat
 
-  def title
-    'Hipchat'
-  end
-
-  def description
-    'Simple web-based real-time group chat'
-  end
-
-  def to_param
-    'hipchat'
-  end
-
-  def fields
-    [
-      { type: 'text', name: 'token',     placeholder: '' },
-      { type: 'text', name: 'room',      placeholder: '' }
-    ]
-  end
+  delegate :room, :token, to: :configuration, prefix: false
 
   def execute(push_data)
     gate[room].send('Gitlab', create_message(push_data))

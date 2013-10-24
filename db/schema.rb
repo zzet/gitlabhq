@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130909132950) do
+ActiveRecord::Schema.define(:version => 20131015141342) do
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -25,12 +25,12 @@ ActiveRecord::Schema.define(:version => 20130909132950) do
   create_table "event_subscription_notification_settings", :force => true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
+    t.datetime "created_at",                               :null => false
+    t.datetime "updated_at",                               :null => false
     t.boolean  "adjacent_changes"
     t.boolean  "brave"
-    t.boolean  "subscribe_if_owner"
-    t.boolean  "subscribe_if_developer"
+    t.boolean  "subscribe_if_owner",     :default => true
+    t.boolean  "subscribe_if_developer", :default => true
   end
 
   create_table "event_subscription_notifications", :force => true do |t|
@@ -263,29 +263,80 @@ ActiveRecord::Schema.define(:version => 20130909132950) do
 
   add_index "protected_branches", ["project_id"], :name => "index_protected_branches_on_project_id"
 
-  create_table "pushes", :force => true do |t|
-    t.integer  "project_id"
-    t.string   "ref"
-    t.string   "before"
-    t.string   "after"
-    t.text     "data"
+  create_table "service_configuration_build_faces", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.string   "domain"
+    t.string   "system_hook_path"
+    t.string   "web_hook_path"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  create_table "service_configuration_campfires", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.string   "subdomain"
+    t.string   "room"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  create_table "service_configuration_gitlab_cis", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.string   "project_url"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  create_table "service_configuration_hipchats", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.string   "room"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  create_table "service_hierarchies", :id => false, :force => true do |t|
+    t.integer "ancestor_id",   :null => false
+    t.integer "descendant_id", :null => false
+    t.integer "generations",   :null => false
+  end
+
+  add_index "service_hierarchies", ["ancestor_id", "descendant_id", "generations"], :name => "service_anc_desc_udx", :unique => true
+  add_index "service_hierarchies", ["descendant_id"], :name => "service_desc_idx"
+
+  create_table "service_key_service_relationships", :force => true do |t|
+    t.integer  "service_key_id",    :null => false
+    t.integer  "service_id",        :null => false
+    t.string   "code_access_state"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
+
+  create_table "service_user_relationships", :force => true do |t|
+    t.integer  "service_id"
     t.integer  "user_id"
-    t.integer  "commits_count"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "services", :force => true do |t|
     t.string   "type"
     t.string   "title"
-    t.string   "token"
-    t.integer  "project_id",                     :null => false
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
-    t.boolean  "active",      :default => false, :null => false
-    t.string   "project_url"
-    t.string   "subdomain"
-    t.string   "room"
+    t.integer  "project_id"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+    t.string   "state"
+    t.integer  "service_pattern_id"
+    t.string   "public_state"
+    t.string   "active_state"
+    t.text     "description"
   end
 
   add_index "services", ["project_id"], :name => "index_services_on_project_id"

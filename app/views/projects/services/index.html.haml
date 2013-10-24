@@ -6,7 +6,7 @@
   - @services.each do |service|
     %li
       %h4
-        - if service.activated?
+        - if service.enabled?
           %span.cgreen
             %i.icon-circle
         - else

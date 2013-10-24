@@ -21,12 +21,17 @@ class Group < Namespace
   has_many :admins,                   through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: [Team::OWNER, Team::MASTER] } }
 
   has_many :users_groups, dependent: :destroy
-  has_many :users, through: :users_groups, conditions: { users: { state: :active } }
+  has_many :users,      through: :users_groups, conditions: { users: { state: :active } }
+  has_many :guests,     through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::GUEST } }
+  has_many :reporters,  through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::REPORTER } }
+  has_many :developers, through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::DEVELOPER } }
+  has_many :masters,    through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } }
 
   has_many :events,         as: :source
   has_many :subscriptions,  as: :target, class_name: Event::Subscription
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
+
 
   actions_to_watch [:created, :deleted, :updated, :transfer]
 

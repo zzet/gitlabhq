@@ -10,8 +10,13 @@
           %td
             - if type.downcase.to_sym == :group
               - if subscription.with_adjacent_for?(current_user, :project)
-                = link_to "Projects", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name }, source: :project ), method: :delete, format: :json, class: "btn btn-small btn-remove"
+                = link_to "Projects", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name }, source: :project ), method: :delete, remote: true, format: :json, class: "btn btn-small btn-remove js-projects-unsubscribe"
               - else
-                = link_to "Projects", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name }, source: :project ), method: :post, format: :json, class: "btn btn-small btn-primary"
+                = link_to "Projects", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name }, source: :project ), method: :post, remote: true, format: :json, class: "btn btn-small btn-primary js-projects-subscribe"
 
-            = link_to "Unsubscribe", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name } ), method: :delete, format: :json, class: "btn btn-small btn-remove"
+              %script.project-unsubscribe-link{type: "text/template"}
+                = link_to "Projects", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name }, source: :project ), method: :delete, remote: true, format: :json, class: "btn btn-small btn-remove js-projects-unsubscribe"
+              %script.project-subscribe-link{type: "text/template"}
+                = link_to "Projects", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name }, source: :project ), method: :post, remote: true, format: :json, class: "btn btn-small btn-primary js-projects-subscribe"
+
+            = link_to "Unsubscribe", notifications_subscription_path(entity: { id: subscription.target.id, type: subscription.target.class.name } ), method: :delete, remote: true, format: :json, class: "btn btn-small btn-remove js-unsubscribe"
