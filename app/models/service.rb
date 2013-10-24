@@ -197,7 +197,7 @@ class Service < ActiveRecord::Base
     []
   end
 
-  def execute
+  def execute(data)
     # implement inside child
   end
 
