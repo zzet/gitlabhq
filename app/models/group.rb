@@ -5,7 +5,7 @@
 #  id          :integer          not null, primary key
 #  name        :string(255)      not null
 #  path        :string(255)      not null
-#  owner_id    :integer          not null
+#  owner_id    :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  type        :string(255)
@@ -37,31 +37,27 @@ class Group < Namespace
 
   scope :without_team, ->(team) { team.groups.present? ? where("namespaces.id NOT IN (:ids)", ids: team.groups.pluck(:id)) : scoped }
 
-  after_create :add_owner
-
   def human_name
     name
   end
 
   def owners
-    @owners ||= (users_groups.owners.map(&:user) << owner).uniq
+    @owners ||= users_groups.owners.map(&:user)
   end
 
   def add_users(user_ids, group_access)
     user_ids.compact.each do |user_id|
-      self.users_groups.create(user_id: user_id, group_access: group_access)
+      user = self.users_groups.find_or_initialize_by_user_id(user_id)
+      user.update_attributes(group_access: group_access)
     end
   end
 
-  def change_owner(user)
-    self.owner = user
-    membership = users_groups.where(user_id: user.id).first
+  def add_user(user, group_access)
+    self.users_groups.create(user_id: user.id, group_access: group_access)
+  end
 
-    if membership
-      membership.update_attributes(group_access: UsersGroup::OWNER)
-    else
-      add_owner
-    end
+  def add_owner(user)
+    self.add_user(user, UsersGroup::OWNER)
   end
 
   def human_access_for entity
@@ -77,9 +73,17 @@ class Group < Namespace
     end
   end
 
+  def has_owner?(user)
+    owners.include?(user) || admins.include?(user)
+  end
+
+  def last_owner?(user)
+    has_owner?(user) && owners.size == 1
+  end
+
   private
 
-  def add_owner
-    self.add_users([owner.id], UsersGroup::OWNER)
+  def members
+    users_groups
   end
 end

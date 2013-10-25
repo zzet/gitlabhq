@@ -26,8 +26,6 @@
 #  import_url             :string(255)
 #
 
-require "grit"
-
 class Project < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
@@ -110,6 +108,7 @@ class Project < ActiveRecord::Base
             :wiki_enabled, inclusion: { in: [true, false] }
   validates :issues_tracker_id, length: { within: 0..255 }
 
+  validates :namespace, presence: true
   validates_uniqueness_of :name, scope: :namespace_id
   validates_uniqueness_of :path, scope: :namespace_id
 
@@ -199,11 +198,7 @@ class Project < ActiveRecord::Base
   end
 
   def to_param
-    if namespace
-      namespace.path + "/" + path
-    else
-      path
-    end
+    namespace.path + "/" + path
   end
 
   def web_url
@@ -277,10 +272,10 @@ class Project < ActiveRecord::Base
   end
 
   def owner
-    if namespace
-      namespace_owner
+    if group
+      group
     else
-      creator
+      namespace.try(:owner)
     end
   end
 
@@ -302,10 +297,6 @@ class Project < ActiveRecord::Base
                                  name
                                end
                              end
-  end
-
-  def namespace_owner
-    namespace.try(:owner)
   end
 
   def path_with_namespace
@@ -341,10 +332,11 @@ class Project < ActiveRecord::Base
     branch_name = ref.gsub("refs/heads/", "")
     c_ids = self.repository.commits_between(oldrev, newrev).map(&:id)
 
-    # Update code for merge requests in project
+    # Update code for merge requests into project between project branches
     mrs = self.merge_requests.opened.by_branch(branch_name).all
-    # Update code for merge requests in project
+    # Update code for merge requests between project and project fork
     mrs += self.fork_merge_requests.opened.by_branch(branch_name).all
+
     mrs.each { |merge_request| merge_request.reload_code; merge_request.mark_as_unchecked }
 
     # Close merge requests

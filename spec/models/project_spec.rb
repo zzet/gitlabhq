@@ -29,8 +29,8 @@
 require 'spec_helper'
 
 describe Project do
-  before(:each) { enable_observers }
-  after(:each) { disable_observers }
+  before { enable_observers }
+  after { disable_observers }
 
   describe "Associations" do
     it { should belong_to(:group) }
@@ -69,6 +69,7 @@ describe Project do
     it { should ensure_length_of(:description).is_within(0..2000) }
     it { should validate_presence_of(:creator) }
     it { should ensure_length_of(:issues_tracker_id).is_within(0..255) }
+    it { should validate_presence_of(:namespace) }
 
     it "should not allow new projects beyond user limits" do
       project2 = build(:project)
@@ -86,7 +87,6 @@ describe Project do
     it { should respond_to(:execute_hooks) }
     it { should respond_to(:transfer) }
     it { should respond_to(:name_with_namespace) }
-    it { should respond_to(:namespace_owner) }
     it { should respond_to(:owner) }
     it { should respond_to(:path_with_namespace) }
   end
@@ -135,17 +135,17 @@ describe Project do
 
     it "should close merge request if last commit from source branch was pushed to target branch" do
       @merge_request.reloaded_commits
-      @merge_request.last_commit.id.should == "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
-      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a", "refs/heads/stable", @key.user)
+      @merge_request.last_commit.id.should == "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828"
+      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828", "refs/heads/stable", @key.user)
       @merge_request.reload
       @merge_request.merged?.should be_true
     end
 
     it "should update merge request commits with new one if pushed to source branch" do
       @merge_request.last_commit.should == nil
-      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a", "refs/heads/master", @key.user)
+      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828", "refs/heads/master", @key.user)
       @merge_request.reload
-      @merge_request.last_commit.id.should == "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
+      @merge_request.last_commit.id.should == "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828"
     end
   end
 

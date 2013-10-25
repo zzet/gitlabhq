@@ -15,6 +15,7 @@
 #  noteable_id   :integer
 #  system        :boolean          default(FALSE), not null
 #  st_diff       :text
+#  system        :boolean          default(FALSE), not null
 #
 
 require 'spec_helper'

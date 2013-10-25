@@ -86,13 +86,6 @@ span.update-author {
   font-weight: bold;
 }
 
-.label {
-  padding: 1px 4px;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: normal;
-}
-
 .field_with_errors {
   display: inline;
 }
@@ -136,29 +129,12 @@ p.time {
   }
 }
 
-.highlight_word {
-  border-bottom: 2px solid #F90;
+.highlight {
+  text-shadow: none;
 }
 
-.status_info {
-  font-size: 14px;
-  padding: 5px 15px;
-  line-height: 26px;
-  text-align: center;
-  float: right;
-  position: relative;
-  top: -5px;
-  @include border-radius(4px);
-
-  &.success {
-    background: #4A4;
-    color: #FFF;
-  }
-
-  &.error {
-    background: #DA4E49;
-    color: #FFF;
-  }
+.highlight_word {
+  border-bottom: 2px solid #F90;
 }
 
 .thin_area{
@@ -268,27 +244,6 @@ li.note {
   &.centered {
     text-align: center;
   }
-}
-
-.oauth_select_holder {
-  padding: 20px;
-  img {
-    padding: 5px;
-    margin-right: 10px;
-  }
-  .active {
-    img {
-      border: 1px solid #ccc;
-      background: $hover;
-      @include border-radius(5px);
-    }
-  }
-}
-
-.btn-build-token {
-  float: left;
-  padding: 6px 20px;
-  margin-right: 12px;
 }
 
 .gitlab-promo {
@@ -423,4 +378,8 @@ table {
     margin: 0px;
     box-shadow: none;
   }
+
+.navbar-gitlab .navbar-inner .nav > li .btn-sign-in {
+  @extend .btn-new;
+  padding: 5px 15px;
 }

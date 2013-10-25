@@ -29,9 +29,9 @@ module API
         return false unless project
 
         action = case git_cmd
-                 when 'git-upload-pack', 'git-upload-archive'
+                 when *DOWNLOAD_COMMANDS
                    then :download_code
-                 when 'git-receive-pack'
+                 when *PUSH_COMMANDS
                    then
                    if project.protected_branch?(params[:ref])
                      :push_code_to_protected_branches
@@ -67,7 +67,9 @@ module API
           user = key.user
 
           return false if user.blocked?
-          return user.can?(action, project)
+          return false if user.ldap_user? && Gitlab::LDAP::User.blocked?(user.extern_uid)
+
+          user.can?(action, project)
         end
       end
 

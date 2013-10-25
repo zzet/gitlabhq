@@ -31,7 +31,7 @@ class SearchContext < BaseContext
 
     result[:projects] = projects.search(query)
 
-    # Search inside singe project
+    # Search inside single project
     project = projects.first if projects.length == 1
 
     if params[:search_code].present?
