@@ -284,7 +284,7 @@ Gitlab::Application.routes.draw do
       resources :tags, only: [:index, :new, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
       resources :protected_branches, only: [:index, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
 
-        resources :refs, only: [] do
+      resources :refs, only: [] do
         collection do
           get "switch"
         end
@@ -299,6 +299,7 @@ Gitlab::Application.routes.draw do
               path: /.*/
             }
         end
+      end
 
       resources :merge_requests, constraints: {id: /\d+/}, except: [:destroy] do
         member do
