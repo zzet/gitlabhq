@@ -28,7 +28,7 @@ class Profile < Spinach::FeatureSteps
 
   step 'I should see new avatar' do
     @user.avatar.should be_instance_of AttachmentUploader
-    @user.avatar.url.should == "/uploads/user/avatar/#{ @user.id }/gitlab_logo.png"
+    @user.avatar.url.should == "/system/uploads/user/avatar/#{ @user.id }/gitlab_logo.png"
   end
 
   step 'I try change my password w/o old one' do

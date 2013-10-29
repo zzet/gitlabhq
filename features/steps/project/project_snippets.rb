@@ -14,7 +14,7 @@ class ProjectSnippets < Spinach::FeatureSteps
   end
 
   And 'project "Shop" have no "Snippet two" snippet' do
-    create(:snippet,
+    create(:personal_snippet,
            title: "Snippet two",
            content: "Test content",
            file_name: "snippet.rb",

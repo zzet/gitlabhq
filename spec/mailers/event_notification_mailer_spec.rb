@@ -169,8 +169,7 @@ describe EventNotificationMailer do
 
       note = create :note, project: project, noteable: merge_request
 
-      #FIXME need search bugs on notification for merge request
-      ActionMailer::Base.deliveries.should be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about update merge request in project" do
@@ -226,10 +225,13 @@ describe EventNotificationMailer do
       ActionMailer::Base.deliveries.count.should == 1
     end
 
-    it "should send email about create service in project" do
-      service = create :service, project: project
+    Service.implement_services.map {|s| s.new }.each do |service|
+      it "should send email about create service in project" do
+        @new_service = create :"#{service.to_param}_service"
+        #service = create :service, project: project
 
-      ActionMailer::Base.deliveries.count.should == 1
+        ActionMailer::Base.deliveries.count.should == 1
+      end
     end
 
     it "should send email about create snippet in project" do
@@ -409,7 +411,7 @@ describe EventNotificationMailer do
       EventSubscriptionCleanWorker.any_instance.stub(:perform).and_return(true)
       ::Teams::RemoveContext.new(@another_user, team).execute
 
-      ActionMailer::Base.deliveries.should be_blank
+      ActionMailer::Base.deliveries.count.should == 1
     end
 
     it "should send email about assigned team to group" do
