@@ -1,4 +1,4 @@
-class Groups < Spinach::FeatureSteps
+class GroupPages < Spinach::FeatureSteps
   include SharedAuthentication
   include SharedPaths
   include Select2Helper

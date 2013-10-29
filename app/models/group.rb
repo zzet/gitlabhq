@@ -81,8 +81,6 @@ class Group < Namespace
     has_owner?(user) && owners.size == 1
   end
 
-  private
-
   def members
     users_groups
   end

@@ -22,7 +22,7 @@ module SharedPaths
   end
 
   step 'I visit group members page' do
-    visit members_group_path(current_group)
+    visit group_members_path(current_group)
   end
 
   step 'I visit group settings page' do
