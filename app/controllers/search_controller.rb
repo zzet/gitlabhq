@@ -2,6 +2,7 @@ class SearchController < ApplicationController
   def show
     result = SearchContext.new(@current_user, params).execute
 
+    @project        = result[:project] if result[:blobs].any?
     @projects       = result[:projects]
     @merge_requests = result[:merge_requests]
     @issues         = result[:issues]

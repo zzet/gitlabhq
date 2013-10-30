@@ -29,6 +29,7 @@ class SearchContext < BaseContext
 
     return result unless query.present?
 
+    result[:project] = projects.first if project_id.present?
     result[:projects] = projects.search(query)
 
     # Search inside single project
