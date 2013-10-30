@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-source "http://gems.undev.cc"
+source "http://gems.undev.cc" unless ENV["TRAVIS"]
 
 def darwin_only(require_as)
   RUBY_PLATFORM.include?('darwin') && require_as
@@ -175,17 +175,22 @@ group :development do
   # thin instead webrick
   gem 'thin'
 
+end
+
+group :undev do
   # Deploy with Capistrano
   gem "capi"
   gem 'capistrano'
   gem 'capistrano-ext'
   gem 'capistrano-maintenance'
+
   gem 'undev', '>=0.2.1'
 end
 
-gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
 gem 'newrelic_rpm'
+
+gem 'rb-inotify', require: linux_only('rb-inotify')
 
 group :development, :staging, :test do
   # Visual email testing

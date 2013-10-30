@@ -1,4 +1,5 @@
 language: ruby
+bundler_args: --without undev
 env:
   - DB=mysql TRAVIS=true
   - DB=postgresql TRAVIS=true
