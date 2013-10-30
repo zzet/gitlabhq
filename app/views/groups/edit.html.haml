@@ -29,11 +29,15 @@
         %i.icon-warning-sign
         Dangerous settings
       %p Group settings below may result in data loss!
+      = link_to '#', class: 'btn js-toggle-visibility-link' do
+        Show it to me
+        %i.icon-chevron-down
 
+    .js-toggle-visibility-container.hide
       .ui-box.ui-box-danger
         .title Remove group
         .ui-box-body
-          - if current_user.can?(@group, :manage_group)
+          - if can?(current_user, :manage_group, @group)
             %p
               Removing group will cause all child projects and resources to be removed.
             %p
