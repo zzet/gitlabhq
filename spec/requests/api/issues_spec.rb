@@ -106,7 +106,7 @@ describe API::API do
     after { disable_observers }
 
     it "should create an activity event when an issue is closed" do
-      Event.should_receive(:create)
+      OldEvent.should_receive(:create)
 
       put api("/projects/#{project.id}/issues/#{issue.id}", user),
         state_event: "close"

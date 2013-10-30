@@ -15,18 +15,11 @@ describe IssueObserver do
   subject { IssueObserver.instance }
 
   describe '#after_create' do
-    it 'trigger notification to send emails' do
-      subject.should_receive(:notification)
-
-      subject.after_create(mock_issue)
-    end
-
     it 'should create cross-reference notes' do
       other_issue = create(:issue)
       mock_issue.stub(references: [other_issue])
 
-      Note.should_receive(:create_cross_reference_note).with(other_issue, mock_issue,
-        some_user, mock_issue.project)
+      Note.should_receive(:create_cross_reference_note).with(other_issue, mock_issue, some_user, mock_issue.project)
       subject.after_create(mock_issue)
     end
   end
@@ -38,11 +31,6 @@ describe IssueObserver do
       it 'note is created if the issue is being closed' do
         Note.should_receive(:create_status_change_note).with(mock_issue, mock_issue.project, some_user, 'closed', nil)
 
-        subject.after_close(mock_issue, nil)
-      end
-
-      it 'trigger notification to send emails' do
-        subject.notification.should_receive(:close_issue).with(mock_issue, some_user)
         subject.after_close(mock_issue, nil)
       end
 
@@ -75,15 +63,11 @@ describe IssueObserver do
     context 'notification' do
       it 'triggered if the issue is being reassigned' do
         mock_issue.should_receive(:is_being_reassigned?).and_return(true)
-        subject.should_receive(:notification)
-
         subject.after_update(mock_issue)
       end
 
       it 'is not triggered if the issue is not being reassigned' do
         mock_issue.should_receive(:is_being_reassigned?).and_return(false)
-        subject.should_not_receive(:notification)
-
         subject.after_update(mock_issue)
       end
     end

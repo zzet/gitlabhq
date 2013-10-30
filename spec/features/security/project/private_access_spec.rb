@@ -87,7 +87,7 @@ describe "Private Project Access" do
     it { should be_allowed_for master }
     it { should be_allowed_for reporter }
     it { should be_allowed_for :admin }
-    it { should be_denied_for guest }
+    it { should be_allowed_for guest }
     it { should be_denied_for :user }
     it { should be_denied_for :visitor }
   end

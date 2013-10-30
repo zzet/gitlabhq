@@ -265,8 +265,8 @@ FactoryGirl.define do
 
   factory :service do
     type ""
-    title "GitLab CI"
-    token "x56olispAND34ng"
+    title
+    description
     project
   end
 

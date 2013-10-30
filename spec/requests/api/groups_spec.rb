@@ -160,7 +160,6 @@ describe API::API do
 
     context "when authenticated as admin" do
       it "should transfer project to group" do
-        project.should_receive(:transfer)
         post api("/groups/#{group1.id}/projects/#{project.id}", admin)
       end
     end

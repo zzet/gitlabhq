@@ -46,7 +46,7 @@ describe ApplicationHelper do
       user = create(:user)
       user.avatar = File.open(avatar_file_path)
       user.save!
-      avatar_icon(user.email).to_s.should == "/uploads/user/avatar/#{ user.id }/gitlab_logo.png"
+      avatar_icon(user.email).to_s.should == "/system/uploads/user/avatar/#{ user.id }/gitlab_logo.png"
     end
 
     it "should call gravatar_icon when no avatar is present" do
@@ -71,6 +71,7 @@ describe ApplicationHelper do
 
     it "should return default gravatar url" do
       stub!(:request).and_return(double(:ssl? => false))
+      stub!(:gitlab_config).and_return(double(:https => false))
       gravatar_icon(user_email).should match('http://www.gravatar.com/avatar/b58c6f14d292556214bd64909bcdb118')
     end
 
@@ -81,6 +82,7 @@ describe ApplicationHelper do
 
     it "should return custom gravatar path when gravatar_url is set" do
       stub!(:request).and_return(double(:ssl? => false))
+      stub!(:gitlab_config).and_return(double(:https => false))
       Gitlab.config.gravatar.stub(:plain_url).and_return('http://example.local/?s=%{size}&hash=%{hash}')
       gravatar_icon(user_email, 20).should == 'http://example.local/?s=20&hash=b58c6f14d292556214bd64909bcdb118'
     end

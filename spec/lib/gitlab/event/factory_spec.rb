@@ -118,7 +118,7 @@ describe Gitlab::Event::Factory do
       @project_targeted_events = @current_events.with_target(@project)
       @project_targeted_events.should_not be_blank
       @project_targeted_events.count.should == 1
-      @project_targeted_events.first.action.to_sym.should == :commented_related
+      @project_targeted_events.first.action.to_sym.should == :commented_issue
     end
   end
 
@@ -131,7 +131,7 @@ describe Gitlab::Event::Factory do
       @user = create :user
       @another_user = create :user
       @project = create :project, creator: @user
-      @team = create :team, owner: @another_user
+      @team = create :team, creator: @another_user
 
       ActiveRecord::Base.observers.disable :all
       #User.observers.enable :activity_observer
@@ -256,7 +256,8 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with create team_user_relationship" do
-      @team.add_member @user, UsersProject::MASTER, false
+
+      add_users_with_role([@user], Gitlab::Access::MASTER)
 
       @team_user_relationship = TeamUserRelationship.find_by_user_id_and_team_id(@user, @team)
 
@@ -281,11 +282,11 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with update team_user_relationship" do
-      @team.add_member @user, UsersProject::MASTER, false
+      add_users_with_role([@user], Gitlab::Access::MASTER)
 
       @team_user_relationship = TeamUserRelationship.find_by_user_id_and_team_id(@user, @team)
 
-      @team_user_relationship.permission = UsersProject::DEVELOPER
+      @team_user_relationship.team_access = UsersProject::DEVELOPER
       @team_user_relationship.save
 
       Event.with_source(@team_user_relationship).destroy_all
@@ -309,7 +310,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with remove team_user_relationship" do
-      @team.add_member @user, UsersProject::MASTER, false
+      add_users_with_role([@user], Gitlab::Access::MASTER)
 
       @team_user_relationship = TeamUserRelationship.find_by_user_id_and_team_id(@user, @team)
 
@@ -589,7 +590,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build MergeRequest events for :create" do
-      @merge_request = create(:merge_request, project: @project)
+      @merge_request = create :merge_request, source_project: @project, target_project: @project
       Event.with_source(@merge_request).destroy_all
 
       @action = 'gitlab.created.merge_request'
@@ -612,7 +613,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build MergeRequest events for Update" do
-      @merge_request = create(:merge_request, project: @project)
+      @merge_request = create :merge_request, source_project: @project, target_project: @project
 
       @merge_request.title = "#{@merge_request.title}_updated"
       @merge_request.save
@@ -639,7 +640,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build events from new merge_request note" do
-      @merge_request = create(:merge_request, project: @project)
+      @merge_request = create :merge_request, source_project: @project, target_project: @project
       @note = create(:note, noteable: @merge_request, project: @project)
 
       Event.with_source(@note).destroy_all
@@ -664,7 +665,7 @@ describe Gitlab::Event::Factory do
       @project_targeted_events = @current_events.with_target(@project)
       @project_targeted_events.should_not be_blank
       @project_targeted_events.count.should == 1
-      @project_targeted_events.first.action.to_sym.should == :commented_related
+      @project_targeted_events.first.action.to_sym.should == :commented_merge_request
     end
   end
 
@@ -680,11 +681,11 @@ describe Gitlab::Event::Factory do
       #Team.observers.enable :activity_observer
 
       @project = create :project, creator: @user
-      @team = create(:team, owner: @user)
+      @team = create(:team, creator: @user)
     end
 
     it "should build Team events for :create" do
-      @team = create(:team, owner: @user)
+      @team = create(:team, creator: @user)
       Event.with_source(@team).destroy_all
 
       @action = 'gitlab.created.team'
@@ -703,7 +704,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build Team events for Update" do
-      @team = create(:team, owner: @user)
+      @team = create(:team, creator: @user)
 
       @team.name = "#{@team.name}_updated"
       @team.save
@@ -726,7 +727,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with create team_user_relationship" do
-      @team.add_member @user, UsersProject::MASTER, false
+      add_users_with_role([@user], Gitlab::Access::MASTER)
 
       @team_user_relationship = TeamUserRelationship.find_by_user_id_and_team_id(@user, @team)
 
@@ -751,11 +752,11 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with update team_user_relationship" do
-      @team.add_member @user, UsersProject::MASTER, false
+      add_users_with_role([@user], Gitlab::Access::MASTER)
 
       @team_user_relationship = TeamUserRelationship.find_by_user_id_and_team_id(@user, @team)
 
-      @team_user_relationship.permission = UsersProject::DEVELOPER
+      @team_user_relationship.team_access = UsersProject::DEVELOPER
       @team_user_relationship.save
 
       Event.with_source(@team_user_relationship).destroy_all
@@ -779,7 +780,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with remove team_user_relationship" do
-      @team.add_member @user, UsersProject::MASTER, false
+      add_users_with_role([@user], Gitlab::Access::MASTER)
 
       @team_user_relationship = TeamUserRelationship.find_by_user_id_and_team_id(@user, @team)
 
@@ -806,7 +807,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with create team_project_relationship" do
-      @team.assign_to_project @project, UsersProject::MASTER
+      Teams::Projects::CreateRelationContext.new(@user, @team, {project_ids: "#{@project.id}"}).execute
 
       @team_project_relationship = TeamProjectRelationship.find_by_project_id_and_team_id(@project, @team)
 
@@ -831,12 +832,9 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with update team_project_relationship" do
-      @team.assign_to_project @project, UsersProject::MASTER
+      Teams::Projects::CreateRelationContext.new(@user, @team, {project_ids: "#{@project.id}"}).execute
 
       @team_project_relationship = TeamProjectRelationship.find_by_project_id_and_team_id(@project, @team)
-
-      @team_project_relationship.greatest_access = UsersProject::DEVELOPER
-      @team_project_relationship.save
 
       Event.with_source(@team_project_relationship).destroy_all
 
@@ -859,7 +857,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with remove team_project_relationship" do
-      @team.assign_to_project @project, UsersProject::MASTER
+      Teams::Projects::CreateRelationContext.new(@user, @team, {project_ids: "#{@project.id}"}).execute
 
       @team_project_relationship = TeamProjectRelationship.find_by_project_id_and_team_id(@project, @team)
 
@@ -886,7 +884,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build Team events for Deleted" do
-      @team = create(:team, owner: @user)
+      @team = create(:team, creator: @user)
       @team.destroy
 
       Event.with_source(@team).destroy_all
@@ -919,7 +917,7 @@ describe Gitlab::Event::Factory do
       #Project.observers.enable :activity_observer
 
       @project = create :project, creator: @user
-      @team = create(:team, owner: @user)
+      @team = create(:team, creator: @user)
     end
 
     it "should build Project events for :create" do
@@ -964,9 +962,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with create team_project_relationship" do
-      @team.assign_to_project @project, UsersProject::MASTER
-
-      @team_project_relationship = TeamProjectRelationship.find_by_project_id_and_team_id(@project, @team)
+      Teams::Projects::CreateRelationContext.new(@user, @team, {project_ids: "#{@project.id}"}).execute
 
       Event.with_source(@team_project_relationship).destroy_all
 
@@ -989,12 +985,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with update team_project_relationship" do
-      @team.assign_to_project @project, UsersProject::MASTER
-
-      @team_project_relationship = TeamProjectRelationship.find_by_project_id_and_team_id(@project, @team)
-
-      @team_project_relationship.greatest_access = UsersProject::DEVELOPER
-      @team_project_relationship.save
+      Teams::Projects::CreateRelationContext.new(@user, @team, {project_ids: "#{@project.id}"}).execute
 
       Event.with_source(@team_project_relationship).destroy_all
 
@@ -1017,7 +1008,7 @@ describe Gitlab::Event::Factory do
     end
 
     it "should build User events with remove team_project_relationship" do
-      @team.assign_to_project @project, UsersProject::MASTER
+      Teams::Projects::CreateRelationContext.new(@user, @team, {project_ids: "#{@project.id}"}).execute
 
       @team_project_relationship = TeamProjectRelationship.find_by_project_id_and_team_id(@project, @team)
 
@@ -1150,7 +1141,7 @@ describe Gitlab::Event::Factory do
 
     before do
       @user = create :user
-      @project = create :project, creator: @user
+      @project = create :project_with_code, creator: @user
       @service = GitPushService.new
       @oldrev = 'b98a310def241a6fd9c9a9a3e7934c48e498fe81'
       @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
@@ -1176,5 +1167,15 @@ describe Gitlab::Event::Factory do
       it { @current_events.should_not be_nil }
     end
 
+  end
+
+  def add_users_with_role(users, role)
+    @user_ids = users.map{ |u| u.id }.join(",")
+    @params = {
+      user_ids: @user_ids,
+      team_access: role
+    }
+
+    Teams::Users::CreateRelationContext.new(@user, @team, @params).execute
   end
 end

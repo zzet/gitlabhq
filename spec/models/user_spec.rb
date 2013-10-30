@@ -47,7 +47,8 @@ describe User do
     it { should have_many(:users_projects).dependent(:destroy) }
     it { should have_many(:groups) }
     it { should have_many(:keys).dependent(:destroy) }
-    it { should have_many(:events).dependent(:destroy) }
+    it { should have_many(:events) }
+    it { should have_many(:old_events).dependent(:destroy) }
     it { should have_many(:recent_events).class_name('OldEvent') }
     it { should have_many(:issues).dependent(:destroy) }
     it { should have_many(:notes).dependent(:destroy) }
@@ -119,7 +120,7 @@ describe User do
     it { @user.authorized_projects.should include(@project_2) }
     it { @user.authorized_projects.should include(@project_3) }
     it { @user.owned_projects.should include(@project) }
-    it { @user.owned_projects.should_not include(@project_2) }
+    it { @user.owned_projects.should include(@project_2) }
     it { @user.owned_projects.should_not include(@project_3) }
     it { @user.personal_projects.should include(@project) }
     it { @user.personal_projects.should_not include(@project_2) }

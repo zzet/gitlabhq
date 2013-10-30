@@ -212,7 +212,8 @@ class User < ActiveRecord::Base
     end
 
     def by_username_or_id(name_or_id)
-      where('username = ? OR id = ?', name_or_id, name_or_id).first
+      field = (name_or_id.to_s == name_or_id.to_i.to_s ? "id" : "username")
+      where(:"#{field}" => name_or_id).first
     end
 
     def build_user(attrs = {}, options= {})

@@ -1,5 +1,5 @@
-  .alert.alert-block
 - if @suppress_diff
+  .alert.alert-block
     %p
       %strong Warning! Large commit with more than #{Commit::DIFF_SAFE_FILES} files changed or contain more than #{Commit::DIFF_SAFE_LINES} lines of code.
     %p To prevent performance issue we rejected diff information.
@@ -37,8 +37,8 @@
   - diffs.each_with_index do |diff, i|
     - next if diff.diff.empty?
     - file = @repository.blob_at(@commit.id, diff.new_path)
-    - file = @repository.blob_at(@commit.parent_id, diff.old_path) unless file.exists?
-    - next unless file.exists?
+    - file = @repository.blob_at(@commit.parent_id, diff.old_path) unless file
+    - next unless file
     %br
     %table{id: "diff-#{i}", cellspacing: '0', cellpadding: '0', style: "border:1px solid #ccc; color: #444; width:100%"}
       %tr

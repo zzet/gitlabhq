@@ -37,7 +37,8 @@ describe Project do
     it { should belong_to(:namespace) }
     it { should belong_to(:creator).class_name('User') }
     it { should have_many(:users) }
-    it { should have_many(:events).dependent(:destroy) }
+    it { should have_many(:events) }
+    it { should have_many(:old_events).dependent(:destroy) }
     it { should have_many(:merge_requests).dependent(:destroy) }
     it { should have_many(:issues).dependent(:destroy) }
     it { should have_many(:milestones).dependent(:destroy) }
@@ -85,7 +86,6 @@ describe Project do
     it { should respond_to(:satellite) }
     it { should respond_to(:update_merge_requests) }
     it { should respond_to(:execute_hooks) }
-    it { should respond_to(:transfer) }
     it { should respond_to(:name_with_namespace) }
     it { should respond_to(:owner) }
     it { should respond_to(:path_with_namespace) }
@@ -115,7 +115,7 @@ describe Project do
 
     describe 'last_activity_date' do
       it 'returns the creation date of the project\'s last event if present' do
-        last_activity_event = create(:event, project: project)
+        last_activity_event = create(:old_event, project: project)
         project.last_activity_at.to_i.should == last_event.created_at.to_i
       end
 

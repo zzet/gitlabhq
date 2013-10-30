@@ -9,6 +9,7 @@ require 'securerandom'
 
 def find_secure_token
   token_file = Rails.root.join('../../shared/.secret')
+  token_file = Rails.root.join('./.secret') if Rails.env == 'test'
   if File.exist? token_file
     # Use the existing token.
     File.read(token_file).chomp
