@@ -1,66 +1,47 @@
-.row
-  .span2
-    %ul.nav.nav-pills.nav-stacked.nav-stacked-menu
-      %li.active
-        = link_to '#tab-edit', 'data-toggle' => 'tab' do
-          %i.icon-edit
-          Edit Group
-      %li
-        = link_to '#tab-projects', 'data-toggle' => 'tab' do
-          %i.icon-folder-close
-          Projects
-      %li
-        = link_to 'Remove', '#tab-remove', 'data-toggle' => 'tab'
+.project-edit-container
+  .project-edit-errors
+  .project-edit-content
+    %div
+      %h3.page-title
+        %strong= @group.name
+        group settings:
+      %div.form-holder
+        = form_for @group do |f|
+          - if @group.errors.any?
+            .alert.alert-error
+              %span= @group.errors.full_messages.first
+          .control-group
+            = f.label :name do
+              Group name
+            .controls
+              = f.text_field :name, placeholder: "Ex. OpenSource", class: "input-xxlarge left"
 
-  .span10
-    .tab-content
-      .tab-pane.active#tab-edit
-        .ui-box
-          .title
-            %strong= @group.name
-            group settings:
-          %div.form-holder
-            = form_for @group do |f|
-              - if @group.errors.any?
-                .alert.alert-error
-                  %span= @group.errors.full_messages.first
-              .control-group
-                = f.label :name do
-                  Group name
-                .controls
-                  = f.text_field :name, placeholder: "Ex. OpenSource", class: "input-xxlarge left"
+          .control-group.group-description-holder
+            = f.label :description, "Details"
+            .controls
+              = f.text_area :description, maxlength: 250, class: "input-xxlarge js-gfm-input", rows: 4
 
-              .control-group.group-description-holder
-                = f.label :description, "Details"
-                .controls
-                  = f.text_area :description, maxlength: 250, class: "input-xxlarge js-gfm-input", rows: 4
-
-              .form-actions
-                = f.submit 'Save group', class: "btn btn-save"
+          .form-actions
+            = f.submit 'Save group', class: "btn btn-save"
 
     %center.light.prepend-top-20.padded
       %h3
         %i.icon-warning-sign
         Dangerous settings
       %p Group settings below may result in data loss!
-      = link_to '#', class: 'btn js-toggle-visibility-link' do
-        Show it to me
-        %i.icon-chevron-down
 
-      .tab-pane#tab-remove
-        .ui-box.ui-box-danger
-          .title Remove group
-          .ui-box-body
-            - if current_user.can?(@group, :manage_group)
-              %p
-                Removing group will cause all child projects and resources to be removed.
-              %p
-                %strong Removed group can not be restored!
+      .ui-box.ui-box-danger
+        .title Remove group
+        .ui-box-body
+          - if current_user.can?(@group, :manage_group)
+            %p
+              Removing group will cause all child projects and resources to be removed.
+            %p
+              %strong Removed group can not be restored!
+            = link_to 'Remove Group', @group, confirm: 'Removed group can not be restored! Are you sure?', method: :delete, class: "btn btn-remove"
 
-              = link_to 'Remove Group', @group, confirm: 'Removed group can not be restored! Are you sure?', method: :delete, class: "btn btn-remove"
-
-            - else
-              %p.nothing_here_message Only the group owner can transfer or remove group
+          - else
+            %p.nothing_here_message Only the group owner can transfer or remove group
 
 .save-project-loader.hide
   %center

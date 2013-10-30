@@ -30,11 +30,11 @@
 
         .repo-info
           - unless project.empty_repo?
-            = link_to pluralize(project.repository.round_commit_count, 'commit'), project_commits_path(project, project.default_branch)
+            = link_to pluralize(project.repository.round_commit_count, 'commit'), project_commits_path(project.path_with_namespace, project.default_branch)
             &middot;
-            = link_to pluralize(project.repository.branch_names.count, 'branch'), project_branches_path(project)
+            = link_to pluralize(project.repository.branch_names.count, 'branch'), project_branches_path(project.path_with_namespace)
             &middot;
-            = link_to pluralize(project.repository.tag_names.count, 'tag'), project_tags_path(project)
+            = link_to pluralize(project.repository.tag_names.count, 'tag'), project_tags_path(project.path_with_namespace)
           - else
             %i.icon-warning-sign
             Empty repository
