@@ -1,7 +1,6 @@
 language: ruby
 bundler_args: --without undev
 env:
-  - DB=mysql TRAVIS=true
   - DB=postgresql TRAVIS=true
 before_install:
   - sudo apt-get install libicu-dev -y
