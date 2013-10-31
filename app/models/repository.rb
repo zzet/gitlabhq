@@ -137,7 +137,7 @@ class Repository
 
   def graph_log
     Rails.cache.fetch(cache_key(:graph_log)) do
-      stats = Gitlab::Git::GitStats.new(raw, root_ref)
+      stats = Gitlab::Git::GitStats.new(raw, root_ref, 180)
       stats.parsed_log
     end
   end
