@@ -158,7 +158,7 @@ class Ability
     def group_abilities user, group
       rules = []
 
-      if group.users.include?(user) || group.projects.inject(false) { |res, pr| res || pr.membesr.include?(user) } || user.admin?
+      if group.users.include?(user) || group.projects.inject(false) { |res, pr| res || pr.team.members.include?(user) } || user.admin?
         rules << :read_group
       end
 
