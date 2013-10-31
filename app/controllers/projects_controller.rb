@@ -105,7 +105,7 @@ class ProjectsController < ApplicationController
     ::Projects::RemoveContext.new(current_user, project, params).execute
 
     respond_to do |format|
-      format.html { redirect_to root_path }
+      format.html { redirect_to project.group.present? ? group_path(project.group) : root_path }
     end
   end
 

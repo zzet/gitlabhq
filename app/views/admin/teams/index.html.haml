@@ -63,7 +63,7 @@
                 = link_to edit_team_path(team), id: "edit_#{dom_id(team)}", class: "btn btn-small", title: "Edit team" do
                   %i.icon-edit
                 %nbsp
-                = link_to [team], confirm: remove_team_message(team), method: :delete, class: "btn btn-small btn-remove" do
+                = link_to [:admin, team], confirm: remove_team_message(team), method: :delete, class: "btn btn-small btn-remove" do
                   %i.icon-trash
             = link_to team_path(team), class: dom_class(team) do
               %span
