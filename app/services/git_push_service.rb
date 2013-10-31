@@ -123,6 +123,7 @@ class GitPushService
   #   ref: String,
   #   user_id: String,
   #   user_name: String,
+  #   project_id: String,
   #   repository: {
   #     name: String,
   #     url: String,
@@ -135,8 +136,6 @@ class GitPushService
   #
   def post_receive_data(oldrev, newrev, ref)
     begin
-      push_commits = project.repository.commits_between(oldrev, newrev)
-
       # Total commits count
       push_commits_count = push_commits.size
 
@@ -150,14 +149,15 @@ class GitPushService
         ref: ref,
         user_id: user.id,
         user_name: user.name,
+        project_id: project.id,
         repository: {
           name: project.name,
           url: project.url_to_repo,
           description: project.description,
           homepage: project.web_url,
         },
-      commits: [],
-      total_commits_count: push_commits_count
+        commits: [],
+        total_commits_count: push_commits_count
       }
 
       # For performance purposes maximum 20 latest commits

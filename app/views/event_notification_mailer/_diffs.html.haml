@@ -36,9 +36,9 @@
 - unless @suppress_diff
   - diffs.each_with_index do |diff, i|
     - next if diff.diff.empty?
-    - file = Gitlab::Git::Blob.new(@repository, @commit.id, @ref, diff.new_path)
-    - file = Gitlab::Git::Blob.new(@repository, @commit.parent_id, @ref, diff.old_path) unless file.exists?
-    - next unless file.exists?
+    - file = @repository.blob_at(@commit.id, diff.new_path)
+    - file = @repository.blob_at(@commit.parent_id, diff.old_path) unless file
+    - next unless file
     %br
     %table{id: "diff-#{i}", cellspacing: '0', cellpadding: '0', style: "border:1px solid #ccc; color: #444; width:100%"}
       %tr

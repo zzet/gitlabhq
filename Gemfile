@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-source "http://gems.undev.cc"
+source "http://gems.undev.cc" unless ENV["TRAVIS"]
 
 def darwin_only(require_as)
   RUBY_PLATFORM.include?('darwin') && require_as
@@ -9,14 +9,14 @@ def linux_only(require_as)
   RUBY_PLATFORM.include?('linux') && require_as
 end
 
-gem "rails", "3.2.13"
+gem "rails", "3.2.15"
 
 # Supported DBs
-gem "mysql2", group: :mysql
 gem "pg", group: :postgres
 
 # Auth
 gem "devise", '~> 2.2'
+gem "devise-async"
 gem 'omniauth', "~> 1.1.3"
 gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
@@ -24,7 +24,7 @@ gem 'omniauth-github'
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
-gem "gitlab_git", '2.3.1'
+gem "gitlab_git", github: "gitlabhq/gitlab_git", branch: "master"
 
 # Ruby/Rack Git Smart-HTTP Server Handler
 gem 'gitlab-grack', '~> 1.0.1', require: 'grack'
@@ -119,6 +119,9 @@ gem 'tinder', '~> 1.9.2'
 # HipChat integration
 gem "hipchat", "~> 0.9.0"
 
+# Flowdock integration
+gem "gitlab-flowdock-git-hook", "~> 0.4.2"
+
 # d3
 gem "d3_rails", "~> 3.1.4"
 
@@ -127,6 +130,9 @@ gem "underscore-rails", "~> 1.4.4"
 
 # Sanitize user input
 gem "sanitize"
+
+# Protect against bruteforcing
+gem "rack-attack"
 
 group :assets do
   gem "sass-rails"
@@ -151,10 +157,11 @@ group :assets do
 end
 
 group :development do
-  gem "annotate", git: "https://github.com/ctran/annotate_models.git"
+  gem "annotate", "~> 2.6.0.beta2"
   gem "letter_opener"
   gem 'quiet_assets', '~> 1.0.1'
   gem 'rack-mini-profiler'
+
   # Better errors handler
   gem 'better_errors'
   gem 'binding_of_caller'
@@ -167,17 +174,22 @@ group :development do
   # thin instead webrick
   gem 'thin'
 
+end
+
+group :undev do
   # Deploy with Capistrano
   gem "capi"
   gem 'capistrano'
   gem 'capistrano-ext'
   gem 'capistrano-maintenance'
+
   gem 'undev', '>=0.2.1'
 end
 
-gem 'rb-inotify', require: linux_only('rb-inotify')
 gem 'airbrake'
 gem 'newrelic_rpm'
+
+gem 'rb-inotify', require: linux_only('rb-inotify')
 
 group :development, :staging, :test do
   # Visual email testing

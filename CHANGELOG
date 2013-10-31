@@ -1,13 +1,40 @@
+v 6.3.0
+  - Init script now waits for pids to appear after (re)starting before reporting status (Rovanion Luckey)
+v 6.2.0
+  - Public project pages are now visible to everyone (files, issues, wik, etc.)
+    THIS MEANS YOUR ISSUES AND WIKI FOR PUBLIC PROJECTS ARE PUBLICLY VISIBLE AFTER THE UPGRADE
+  - Add group access to permissions page
+  - Require current password to change one
+  - Group owner or admin can remove other group owners
+  - Remove group transfer since we have multiple owners
+  - Respect authorization in Repository API
+  - Improve UI for Project#files page
+  - Add more security specs
+  - Added search for projects by name to api (Izaak Alpert)
+  - Make default user theme configurable (Izaak Alpert)
+  - Update logic for validates_merge_request for tree of MR (Andrew Kumanyaev)
+  - Rake tasks for web hooks management (Jonhnny Weslley)
+  - Extended User API to expose admin and can_create_group for user creation/updating (Boyan Tabakov)
+  - API: Remove group
+  - API: Remove project
+  - Avatar upload on profile page with a maximum of 100KB (Steven Thonus)
+  - Store the sessions in Redis instead of the cookie store
+  - Fixed relative links in markdown
+  - User must confirm his email if signup enabled
+  - User must confirm changed email 
+
 v 6.1.0
+  - Project specific IDs for issues, mr, milestones
+    Above items will get a new id and for example all bookmarked issue urls will change.
+    Old issue urls are redirected to the new one if the issue id is too high for an internal id.
   - Description field added to Merge Request
   - API: Sudo api calls (Izaak Alpert)
   - API: Group membership api (Izaak Alpert)
   - Improved commit diff
   - Improved large commit handling (Boyan Tabakov)
-  - Rewrite: Init script now less prone to errors and keeps better track of the service.
-  - Link issues, merge requests, and commits when they reference each other with GFM
+  - Rewrite: Init script now less prone to errors and keeps better track of the service (Rovanion Luckey)
+  - Link issues, merge requests, and commits when they reference each other with GFM (Ash Wilson)
   - Close issues automatically when pushing commits with a special message
-  - Project internal ids for issues, mr, milestones
   - Improve user removal from admin area
   - Invalidate events cache when project was moved
   - Remove deprecated classes and rake tasks

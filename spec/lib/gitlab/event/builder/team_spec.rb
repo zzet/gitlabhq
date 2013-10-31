@@ -4,8 +4,8 @@ describe Gitlab::Event::Builder::Team do
   before do
     ActiveRecord::Base.observers.disable :all
 
-    @team = create :team
     @user = create :user
+    @team = create :team, creator: @user
     @data = {source: @team, user: @user, data: @team}
     @action = "gitlab.created.team"
   end

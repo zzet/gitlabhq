@@ -18,7 +18,7 @@ describe DeployKeysProject do
   end
 
   describe "Validation" do
-    it { should validate_presence_of(:project_id) }
-    it { should validate_presence_of(:deploy_key_id) }
+    it { should validate_presence_of(:project) }
+    it { should validate_presence_of(:deploy_key) }
   end
 end

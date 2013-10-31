@@ -29,15 +29,16 @@
 require 'spec_helper'
 
 describe Project do
-  before(:each) { enable_observers }
-  after(:each) { disable_observers }
+  before { enable_observers }
+  after { disable_observers }
 
   describe "Associations" do
     it { should belong_to(:group) }
     it { should belong_to(:namespace) }
     it { should belong_to(:creator).class_name('User') }
     it { should have_many(:users) }
-    it { should have_many(:events).dependent(:destroy) }
+    it { should have_many(:events) }
+    it { should have_many(:old_events).dependent(:destroy) }
     it { should have_many(:merge_requests).dependent(:destroy) }
     it { should have_many(:issues).dependent(:destroy) }
     it { should have_many(:milestones).dependent(:destroy) }
@@ -69,6 +70,7 @@ describe Project do
     it { should ensure_length_of(:description).is_within(0..2000) }
     it { should validate_presence_of(:creator) }
     it { should ensure_length_of(:issues_tracker_id).is_within(0..255) }
+    it { should validate_presence_of(:namespace) }
 
     it "should not allow new projects beyond user limits" do
       project2 = build(:project)
@@ -84,9 +86,7 @@ describe Project do
     it { should respond_to(:satellite) }
     it { should respond_to(:update_merge_requests) }
     it { should respond_to(:execute_hooks) }
-    it { should respond_to(:transfer) }
     it { should respond_to(:name_with_namespace) }
-    it { should respond_to(:namespace_owner) }
     it { should respond_to(:owner) }
     it { should respond_to(:path_with_namespace) }
   end
@@ -115,7 +115,7 @@ describe Project do
 
     describe 'last_activity_date' do
       it 'returns the creation date of the project\'s last event if present' do
-        last_activity_event = create(:event, project: project)
+        last_activity_event = create(:old_event, project: project)
         project.last_activity_at.to_i.should == last_event.created_at.to_i
       end
 
@@ -135,17 +135,17 @@ describe Project do
 
     it "should close merge request if last commit from source branch was pushed to target branch" do
       @merge_request.reloaded_commits
-      @merge_request.last_commit.id.should == "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
-      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a", "refs/heads/stable", @key.user)
+      @merge_request.last_commit.id.should == "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828"
+      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828", "refs/heads/stable", @key.user)
       @merge_request.reload
       @merge_request.merged?.should be_true
     end
 
     it "should update merge request commits with new one if pushed to source branch" do
       @merge_request.last_commit.should == nil
-      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a", "refs/heads/master", @key.user)
+      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828", "refs/heads/master", @key.user)
       @merge_request.reload
-      @merge_request.last_commit.id.should == "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
+      @merge_request.last_commit.id.should == "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828"
     end
   end
 

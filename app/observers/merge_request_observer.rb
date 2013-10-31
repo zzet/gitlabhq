@@ -5,6 +5,8 @@ class MergeRequestObserver < OldActivityObserver
     if merge_request.author_id
       create_event(merge_request, OldEvent.determine_action(merge_request))
     end
+
+    merge_request.create_cross_references!(merge_request.project, current_user)
   end
 
   def after_close(merge_request, transition)

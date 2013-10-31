@@ -4,8 +4,9 @@ describe Gitlab::Event::Builder::TeamUserRelationship do
   before do
     ActiveRecord::Base.observers.disable :all
 
-    @team_user_relationship = create :team_user_relationship
     @user = create :user
+    @team = create :team, creator: @user
+    @team_user_relationship = create :team_user_relationship, team: @team, user: @user
     @data = {source: @team_user_relationship, user: @user, data: @team_user_relationship}
     @action = "gitlab.created.team_user_relationship"
   end

@@ -23,6 +23,11 @@ class Admin::ProjectsController < Admin::ApplicationController
     check_git_protocol
   end
 
+  def destroy
+    ::Projects::RemoveContext.new(current_user, project).execute
+    redirect_to admin_projects_path
+  end
+
   protected
 
   def project

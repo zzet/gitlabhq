@@ -26,6 +26,7 @@ describe GitPushService do
     it { should include(ref: @ref) }
     it { should include(user_id: user.id) }
     it { should include(user_name: user.name) }
+    it { should include(project_id: project.id) }
 
     context "with repository data" do
       subject { @push_data[:repository] }
@@ -63,12 +64,12 @@ describe GitPushService do
   describe "Push Event" do
     before do
       service.execute(project, user, @oldrev, @newrev, @ref)
-      @event = Event.last
+      @event = OldEvent.last
     end
 
     it { @event.should_not be_nil }
     it { @event.project.should == project }
-    it { @event.action.should == Event::PUSHED }
+    it { @event.action.should == OldEvent::PUSHED }
     it { @event.data.should == service.push_data }
   end
 
@@ -104,7 +105,7 @@ describe GitPushService do
       end
 
       it "when pushing tags" do
-        @project_hook.should_not_receive(:async_execute)
+        @project_hook.should_receive(:async_execute)
         service.execute(project, user, 'newrev', 'newrev', 'refs/tags/v1.0.0')
       end
     end
@@ -191,7 +192,7 @@ describe GitPushService do
     it "passes the closing commit as a thread-local" do
       service.execute(project, user, @oldrev, @newrev, @ref)
 
-      Thread.current[:current_commit].should == closing_commit
+      RequestStore.store[:current_commit].should == closing_commit
     end
 
     it "doesn't create cross-reference notes for a closing reference" do

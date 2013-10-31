@@ -4,10 +4,12 @@ describe Gitlab::Event::Builder::TeamProjectRelationship do
   before do
     ActiveRecord::Base.observers.disable :all
 
-    @team_project_relationship = create :team_project_relationship
-    @user = create :user
-    @data = {source: @team_project_relationship, user: @user, data: @team_project_relationship}
-    @action = "gitlab.created.team_project_relationship"
+    @user     = create :user
+    @team     = create :team, creator: @user
+    @project  = create :project, creator: @user
+    @team_project_relationship = create :team_project_relationship, team: @team, project: @project
+    @data     = {source: @team_project_relationship, user: @user, data: @team_project_relationship}
+    @action   = "gitlab.created.team_project_relationship"
   end
 
   it "should respond that can build this data into action" do

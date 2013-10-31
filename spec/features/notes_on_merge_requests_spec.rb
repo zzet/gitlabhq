@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe "On a merge request", js: true do
-  let!(:project) { create(:project_with_code) }
+  let!(:group) { create(:group)}
+  let!(:project) { create(:project_with_code, namespace: group) }
   let!(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
   let!(:note) { create(:note_on_merge_request_with_attachment,  project: project) }
 
@@ -135,7 +136,8 @@ describe "On a merge request", js: true do
 end
 
 describe "On a merge request diff", js: true, focus: true do
-  let!(:project) { create(:source_project_with_code) }
+  let!(:group) { create(:group)}
+  let!(:project) { create(:source_project_with_code, namespace: group) }
   let!(:merge_request) { create(:merge_request_with_diffs, source_project: project, target_project: project) }
 
   before do
@@ -213,12 +215,6 @@ describe "On a merge request diff", js: true, focus: true do
         within("tr[id='342e16cbbd482ac2047dc679b2749d248cc1428f_18_17'] + .js-temp-notes-holder") do
           fill_in "note[note]", with: "Another comment on line 17"
           click_button("Add Comment")
-        end
-      end
-
-      it do
-        within("tr[id='342e16cbbd482ac2047dc679b2749d248cc1428f_18_17'] + .js-temp-notes-holder") do
-          should have_no_css(".js-temp-notes-holder")
         end
       end
 

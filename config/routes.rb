@@ -39,6 +39,7 @@ Gitlab::Application.routes.draw do
   get 'help/web_hooks'      => 'help#web_hooks'
   get 'help/workflow'       => 'help#workflow'
   get 'help/shortcuts'
+  get 'help/security'
 
   #
   # Global snippets
@@ -56,8 +57,6 @@ Gitlab::Application.routes.draw do
   #
   namespace :public do
     resources :projects, only: [:index]
-    resources :projects, constraints: { id: /[a-zA-Z.\/0-9_\-]+/ }, only: [:show]
-
     root to: "projects#index"
   end
 
@@ -103,7 +102,7 @@ Gitlab::Application.routes.draw do
 
     resource :logs, only: [:show]
     resource :background_jobs, controller: 'background_jobs', only: [:show]
-    resources :projects, constraints: { id: /[a-zA-Z.\/0-9_\-]+/ }, only: [:index, :show]
+    resources :projects, constraints: { id: /[a-zA-Z.\/0-9_\-]+/ }, only: [:index, :show, :destroy]
     root to: "dashboard#index"
   end
 
@@ -131,12 +130,9 @@ Gitlab::Application.routes.draw do
   #
   resource :profile, only: [:show, :update] do
     member do
-      get :account
       get :history
-      get :token
       get :design
 
-      put :update_password
       put :reset_private_token
       put :update_username
 
@@ -148,8 +144,13 @@ Gitlab::Application.routes.draw do
     end
 
     scope module: :profiles do
+      resource :account, only: [:show, :update]
       resource :notifications, only: [:show, :update]
-      resource :password, only: [:new, :create]
+      resource :password, only: [:new, :create, :edit, :update] do
+        member do
+          put :reset
+        end
+      end
       resources :keys
       resources :groups, only: [:index] do
         member do
@@ -274,31 +275,31 @@ Gitlab::Application.routes.draw do
         end
       end
 
-      resources :branches, only: [:index, :new, :create, :destroy], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ } do
+      resources :branches, only: [:index, :new, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex } do
         collection do
-        get :recent
+          get :recent, constraints: { id: Gitlab::Regex.git_reference_regex }
         end
       end
 
-      resources :tags, only: [:index, :new, :create, :destroy], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ }
-        resources :protected_branches, only: [:index, :create, :destroy], constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ }
+      resources :tags, only: [:index, :new, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
+      resources :protected_branches, only: [:index, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
 
-        resources :refs, only: [] do
+      resources :refs, only: [] do
         collection do
           get "switch"
         end
 
         member do
           # tree viewer logs
-          get "logs_tree", constraints: { id: /[a-zA-Z.\/0-9_\-#%+]+/ }
-            get "logs_tree/:path" => "refs#logs_tree",
+          get "logs_tree", constraints: { id: Gitlab::Regex.git_reference_regex }
+          get "logs_tree/:path" => "refs#logs_tree",
             as: :logs_file,
             constraints: {
-            id:   /[a-zA-Z.0-9\/_\-#%+]+/,
-            path: /.*/
-          }
+              id:   Gitlab::Regex.git_reference_regex,
+              path: /.*/
+            }
         end
-        end
+      end
 
       resources :merge_requests, constraints: {id: /\d+/}, except: [:destroy] do
         member do

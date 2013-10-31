@@ -20,6 +20,7 @@ module Projects
           result[:note] = project.build_commit_note(commit)
           result[:line_notes] = line_notes
           result[:notes_count] = project.notes.for_commit_id(commit.id).count
+          result[:branches] = project.repository.branch_names_contains(commit.id)
 
           begin
             result[:suppress_diff] = true if commit.diff_suppress? && !params[:force_show_diff]

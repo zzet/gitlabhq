@@ -25,27 +25,7 @@
             = @group.description
 
         %li
-          %span.light Owned by:
-          %strong
-            - if @group.owner
-              = link_to @group.owner_name, admin_user_path(@group.owner)
-            - else
-              (deleted)
-          .pull-right
-            = link_to "#", class: "btn btn-small change-owner-link" do
-              %i.icon-edit
-              Change owner
-        %li.change-owner-holder.hide.bgred
-          .form-holder
-            %strong.cred New Owner:
-            = form_for [:admin, @group] do |f|
-              = users_select_tag(:"group[owner_id]")
-              .prepend-top-10
-                = f.submit 'Change Owner', class: "btn btn-remove"
-                = link_to "Cancel", "#", class: "btn change-owner-cancel-link"
-
-        %li
-          %span.light Created at:
+          %span.light Created on:
           %strong
             = @group.created_at.stamp("March 1, 1999")
 
@@ -92,27 +72,5 @@
               = link_to user.name, admin_user_path(user)
             %span.pull-right.light
               = member.human_access
-
--#-# Our table
--#%ul#group-relations.nav.nav-tabs
-  -#%li= link_to("Projects (#{@group_projects.count})", "#projects-list", "data-toggle" => "tab")
-  -#%li= link_to("Members (#{@members.count})", "#members-list", "data-toggle" => "tab")
-  -#%li= link_to("Teams (#{@teams.count})", "#teams-list", "data-toggle" => "tab")
--#.tab-content
-  -#= render "projects_list"
-  -#= render "members_list"
-  -#= render "teams_list"
-
--#:javascript
-  -#$(function(){
-    -#var modal = $('.change-owner-holder');
-    -#$('.change-owner-link').bind("click", function(){
-      -#$(this).hide();
-      -#modal.show();
-    -#});
-    -#$('.change-owner-cancel-link').bind("click", function(){
-      -#modal.hide();
-      -#$('.change-owner-link').show();
-    -#})
-    -#$('#group-relations a:first').tab('show')
-  -#})
+              = link_to group_users_group_path(@group, member), confirm: remove_user_from_group_message(@group, user), method: :delete, remote: true, class: "btn-tiny btn btn-remove", title: 'Remove user from group' do
+                %i.icon-minus.icon-white

@@ -22,7 +22,7 @@ module SharedPaths
   end
 
   step 'I visit group members page' do
-    visit members_group_path(current_group)
+    visit group_members_path(current_group)
   end
 
   step 'I visit group settings page' do
@@ -65,8 +65,12 @@ module SharedPaths
     visit profile_path
   end
 
+  step 'I visit profile password page' do
+    visit edit_profile_password_path
+  end
+
   step 'I visit profile account page' do
-    visit account_profile_path
+    visit profile_account_path
   end
 
   step 'I visit profile SSH keys page' do

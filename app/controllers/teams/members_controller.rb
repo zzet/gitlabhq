@@ -13,15 +13,15 @@ class Teams::MembersController < Teams::ApplicationController
 
   def update
     if ::Teams::Users::UpdateRelationContext.new(@current_user, team, team_member, params[:team_user_relationship]).execute
-      redirect_to edit_team_path(team), notice: "Membership for #{team_member.name} was successfully updated in Team of users."
+      redirect_to team_members_path(team), notice: "Membership for #{team_member.name} was successfully updated in Team of users."
     else
-      redirect_to edit_team_path(team), notice: "Membership for #{team_member.name} was nat updated in Team of users."
+      redirect_to team_members_path(team), notice: "Membership for #{team_member.name} was nat updated in Team of users."
     end
   end
 
   def destroy
     ::Teams::Users::RemoveRelationContext.new(@current_user, team, team_member).execute
-    redirect_to team_path(team), notice: "Member #{team_member.name} was successfully removed from Team of users."
+    redirect_to team_members_path(team), notice: "Member #{team_member.name} was successfully removed from Team of users."
   end
 
   protected

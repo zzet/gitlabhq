@@ -15,13 +15,6 @@ describe UsersProjectObserver do
       create(:users_project)
     end
 
-    it "should send email to user" do
-      subject.should_receive(:notification)
-      OldEvent.stub(create: true)
-
-      create(:users_project)
-    end
-
     it "should create new event" do
       OldEvent.should_receive(:create)
 
@@ -42,6 +35,32 @@ describe UsersProjectObserver do
     it "should create new event" do
       OldEvent.should_receive(:create)
       @users_project.destroy
+    end
+  end
+
+  describe "#after_create" do
+    context 'wiki_enabled creates repository directory' do
+      context 'wiki_enabled true creates wiki repository directory' do
+        before do
+          @project = create(:project, wiki_enabled: true)
+          @path = GollumWiki.new(@project, user).send(:path_to_repo)
+        end
+
+        after do
+          FileUtils.rm_rf(@path)
+        end
+
+        it { File.exists?(@path).should be_true }
+      end
+
+      context 'wiki_enabled false does not create wiki repository directory' do
+        before do
+          @project = create(:project, wiki_enabled: false)
+          @path = GollumWiki.new(@project, user).send(:path_to_repo)
+        end
+
+        it { File.exists?(@path).should be_false }
+      end
     end
   end
 end

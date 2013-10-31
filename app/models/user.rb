@@ -38,15 +38,18 @@
 #  created_by_id          :integer
 #
 
+require 'carrierwave/orm/activerecord'
+require 'file_size_validator'
+
 class User < ActiveRecord::Base
   include Watchable
 
-  devise :database_authenticatable, :token_authenticatable, :lockable,
-         :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :registerable
+  devise :database_authenticatable, :token_authenticatable, :lockable, :async,
+         :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :confirmable, :registerable
 
   attr_accessible :email, :password, :password_confirmation, :remember_me, :bio, :name, :username,
                   :skype, :linkedin, :twitter, :color_scheme_id, :theme_id, :force_random_password,
-                  :extern_uid, :provider, :password_expires_at,
+                  :extern_uid, :provider, :password_expires_at, :avatar,
                   as: [:default, :admin]
 
   attr_accessible :projects_limit, :can_create_group,
@@ -141,6 +144,8 @@ class User < ActiveRecord::Base
                       message: "only letters, digits & '_' '-' '.' allowed. Letter should be first" }
   validate :namespace_uniq, if: ->(user) { user.username_changed? }
 
+  validates :avatar, file_size: { maximum: 100.kilobytes.to_i }
+
   before_validation :generate_password, on: :create
   before_validation :sanitize_attrs
 
@@ -159,6 +164,8 @@ class User < ActiveRecord::Base
       transition blocked: :active
     end
   end
+
+  mount_uploader :avatar, AttachmentUploader
 
   # Scopes
   scope :admins, -> { where(admin:  true) }
@@ -180,7 +187,7 @@ class User < ActiveRecord::Base
   # Class methods
   #
   class << self
-    # Devise method overridden to allow sing in with email or username
+    # Devise method overridden to allow sign in with email or username
     def find_for_database_authentication(warden_conditions)
       conditions = warden_conditions.dup
       if login = conditions.delete(:login)
@@ -205,11 +212,8 @@ class User < ActiveRecord::Base
     end
 
     def by_username_or_id(name_or_id)
-      if (name_or_id.is_a?(Integer))
-        User.find_by_id(name_or_id)
-      else
-        User.find_by_username(name_or_id)
-      end
+      field = (name_or_id.to_s == name_or_id.to_i.to_s ? "id" : "username")
+      where(:"#{field}" => name_or_id).first
     end
 
     def build_user(attrs = {}, options= {})
@@ -224,7 +228,7 @@ class User < ActiveRecord::Base
       {
         projects_limit: Gitlab.config.gitlab.default_projects_limit,
         can_create_group: Gitlab.config.gitlab.default_can_create_group,
-        theme_id: Gitlab::Theme::MARS
+        theme_id: Gitlab.config.gitlab.default_theme
       }
     end
   end

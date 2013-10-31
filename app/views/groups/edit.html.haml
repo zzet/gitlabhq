@@ -3,17 +3,16 @@
   .project-edit-content
     %div
       %h3.page-title
-        Group settings:
-      %p.light Some settings, such as "Transfer Group", are hidden inside the danger area below
-      %hr
-      .form-holder
+        %strong= @group.name
+        group settings:
+      %div.form-holder
         = form_for @group do |f|
           - if @group.errors.any?
             .alert.alert-error
               %span= @group.errors.full_messages.first
           .control-group
             = f.label :name do
-              Group name is
+              Group name
             .controls
               = f.text_field :name, placeholder: "Ex. OpenSource", class: "input-xxlarge left"
 
@@ -35,29 +34,18 @@
         %i.icon-chevron-down
 
     .js-toggle-visibility-container.hide
-      - if can?(current_user, :manage_namespace, @group)
-        .ui-box.ui-box-danger
-          .title Transfer group
-          .ui-box-body
+      .ui-box.ui-box-danger
+        .title Remove group
+        .ui-box-body
+          - if can?(current_user, :manage_group, @group)
             %p
-              Transferring group will cause loss of admin control over group and all child projects
-            = form_for @group do |f|
-              = users_select_tag(:'group[owner_id]')
-              %hr
-              = f.submit 'Transfer group', class: "btn btn-small btn-remove"
-
-        .ui-box.ui-box-danger
-          .title Remove group
-          .ui-box-body
-            %p
-              Remove of group will cause removing all child projects and resources.
+              Removing group will cause all child projects and resources to be removed.
             %p
               %strong Removed group can not be restored!
-
             = link_to 'Remove Group', @group, confirm: 'Removed group can not be restored! Are you sure?', method: :delete, class: "btn btn-remove"
 
-      - else
-        %p.nothing_here_message Only the group owner can transfer or remove group
+          - else
+            %p.nothing_here_message Only the group owner can transfer or remove group
 
 .save-project-loader.hide
   %center
