@@ -18,7 +18,7 @@ class SearchContext < BaseContext
         projects = @group.projects.where(id: projects)
       elsif team_id.present?
         @team = Team.find(team_id)
-        projects = (@team.projects.where(id: projects) + @team.groups_projects.where(id: projects)).uniq
+        projects = projects.where(id: (@team.projects.pluck(:id) + @team.groups_projects.pluck(:id)).uniq)
       elsif project_id.present?
         @project = Project.find(project_id)
         projects = projects.where(id: @project)
@@ -26,12 +26,14 @@ class SearchContext < BaseContext
     end
 
     query = params[:search]
+    query = Shellwords.shellescape(query) if query.present?
 
     return result unless query.present?
 
+    result[:project] = projects.first if project_id.present?
     result[:projects] = projects.search(query)
 
-    # Search inside singe project
+    # Search inside single project
     project = projects.first if projects.length == 1
 
     if params[:search_code].present?

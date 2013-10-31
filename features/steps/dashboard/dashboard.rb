@@ -60,7 +60,6 @@ class Dashboard < Spinach::FeatureSteps
   And 'I have group with projects' do
     @group   = create(:group)
     @project = create(:project, namespace: @group)
-    @event   = create(:closed_issue_event, project: @project)
 
     @project.team << [current_user, :master]
   end

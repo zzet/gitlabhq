@@ -6,7 +6,7 @@ describe Gitlab::Event::Notification::Factory do
       ActiveRecord::Base.observers.disable :all
 
       @user = create :user
-      @project = create :project
+      @project = create :project_with_code
 
       @event = create :event, { action: :created, source: @project, author: @user, data: "", target: @project }
     end
@@ -50,7 +50,7 @@ describe Gitlab::Event::Notification::Factory do
       ActiveRecord::Base.observers.disable :all
 
       @user = create :user
-      @project = create :project, { path: 'gitlabhq' }
+      @project = create :project_with_code, { path: 'gitlabhq' }
 
       @data = GitPushService.new.sample_data(@project, @user).to_json
 

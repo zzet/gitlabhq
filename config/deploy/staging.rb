@@ -28,4 +28,4 @@ namespace :deploy do
 end
 
 after "deploy:update_code", "deploy:migrate"
-after "deploy:update", "deploy:cleanup", "deploy:generate_mails"
+after "deploy:update", "deploy:cleanup"#, "deploy:generate_mails"

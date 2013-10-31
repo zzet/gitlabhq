@@ -2,17 +2,14 @@ require 'spec_helper'
 
 describe Teams::Projects::RemoveRelationContext do
   before do
-    @user = create :user
+    ActiveRecord::Base.observers.enable(:user_observer) do
+      @user = create :user
+    end
     @team_opts = { name: "Team", description: "Team description" }
     @team = Teams::CreateContext.new(@user, @team_opts).execute
   end
 
   context 'non admin user' do
-    before do
-      @user.admin = false
-      @user.save
-    end
-
     context 'assign team on own project' do
       before do
         project_opts = { name: "Gitlab" }

@@ -11,7 +11,7 @@ describe Gitlab::Event::Subscription::Team do
     end
 
     it "should subscribe user on exist team changes" do
-      source = create :team
+      source = create :team, creator: @user
       target = source
       action = :updated
 
@@ -24,7 +24,7 @@ describe Gitlab::Event::Subscription::Team do
 
     it "should subscribe user on all teams changes by subscribe with symbol" do
       source = :team
-      target = create :team
+      target = create :team, creator: @user
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
@@ -36,7 +36,7 @@ describe Gitlab::Event::Subscription::Team do
 
     it "should subscribe user on all teams changes by subscribe with Class name" do
       source = Team
-      target = create :team
+      target = create :team, creator: @user
       action = :created
 
       Gitlab::Event::Subscription.subscribe(@user, action, target, source)
@@ -47,7 +47,7 @@ describe Gitlab::Event::Subscription::Team do
     end
 
     it "should subscribe user on exist team :users_project adds" do
-      target = create :team
+      target = create :team, creator: @user
       source = :users_project
       action = :created
 

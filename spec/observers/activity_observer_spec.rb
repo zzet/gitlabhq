@@ -17,7 +17,8 @@ describe ActivityObserver do
   end
 
   before do
-    RequestStore.store[:current_user] = current_user
+    @action_user = create :user
+    RequestStore.store[:current_user] = @action_user
   end
 
 
@@ -36,7 +37,6 @@ describe ActivityObserver do
     end
 
     it "Should generate :created event" do
-
       data = notification_data_for(/gitlab/) do
         @key = create(:key, user: @user)
       end
@@ -137,7 +137,7 @@ describe ActivityObserver do
     it "Should generate :created event" do
 
       data = notification_data_for(/gitlab/) do
-        @merge_request = create(:merge_request, project: @project)
+        @merge_request = create(:merge_request, source_project: @project, target_project: @project)
       end
 
       data[:name].should match(/created/)
@@ -145,7 +145,7 @@ describe ActivityObserver do
     end
 
     it "Should generate :updated event" do
-      @merge_request = create(:merge_request, project: @project)
+      @merge_request = create(:merge_request, source_project: @project, target_project: @project)
 
       data = notification_data_for(/gitlab/) do
         @merge_request.title = "#{@merge_request.title}_updated"
@@ -157,7 +157,7 @@ describe ActivityObserver do
     end
 
     it "Should generate :deleted event" do
-      @merge_request = create(:merge_request, project: @project)
+      @merge_request = create(:merge_request, source_project: @project, target_project: @project)
 
       data = notification_data_for(/gitlab/) do
         @merge_request.destroy
@@ -484,7 +484,7 @@ describe ActivityObserver do
     it "Should generate :created event" do
 
       data = notification_data_for(/gitlab/) do
-        @snippet = create(:snippet, project: @project)
+        @snippet = create(:project_snippet, project: @project)
       end
 
       data[:name].should match(/created/)
@@ -492,7 +492,7 @@ describe ActivityObserver do
     end
 
     it "Should generate :updated event" do
-      @snippet = create(:snippet, project: @project)
+      @snippet = create(:project_snippet, project: @project)
 
       data = notification_data_for(/gitlab/) do
         @snippet.title = "#{@snippet.title}_updated"
@@ -504,7 +504,7 @@ describe ActivityObserver do
     end
 
     it "Should generate :deleted event" do
-      @snippet = create(:snippet, project: @project)
+      @snippet = create(:project_snippet, project: @project)
 
       data = notification_data_for(/gitlab/) do
         @snippet.destroy
@@ -584,7 +584,7 @@ describe ActivityObserver do
     it "Should generate :created event" do
 
       data = notification_data_for(/gitlab/) do
-        @team = create(:team, owner: @user)
+        @team = create(:team, creator: @user)
       end
 
       data[:name].should match(/created/)
@@ -592,7 +592,7 @@ describe ActivityObserver do
     end
 
     it "Should generate :updated event" do
-      @team = create(:team, owner: @user)
+      @team = create(:team, creator: @user)
 
       data = notification_data_for(/gitlab/) do
         @team.name = "#{@team.name}_updated"
@@ -604,7 +604,7 @@ describe ActivityObserver do
     end
 
     it "Should generate :deleted event" do
-      @team = create(:team, owner: @user)
+      @team = create(:team, creator: @user)
 
       data = notification_data_for(/gitlab/) do
         @team.destroy
@@ -627,34 +627,22 @@ describe ActivityObserver do
       TeamProjectRelationship.observers.enable :activity_observer
 
       @user = create :user
-
+      @team = create :team, creator: @user
       @project = create :project, creator: @user
     end
 
     it "Should generate :created event" do
 
       data = notification_data_for(/gitlab/) do
-        @team_project_relationship = create(:team_project_relationship, project: @project)
+        @team_project_relationship = create(:team_project_relationship, team: @team, project: @project)
       end
 
       data[:name].should match(/created/)
       data[:data][:source].should be_kind_of ::TeamProjectRelationship
     end
 
-    it "Should generate :updated event" do
-      @team_project_relationship = create(:team_project_relationship, project: @project)
-
-      data = notification_data_for(/gitlab/) do
-        @team_project_relationship.greatest_access = (UsersProject.access_roles.values - [@team_project_relationship.greatest_access]).first
-        @team_project_relationship.save
-      end
-
-      data[:name].should match(/updated/)
-      data[:data][:source].should be_kind_of ::TeamProjectRelationship
-    end
-
     it "Should generate :deleted event" do
-      @team_project_relationship = create(:team_project_relationship, project: @project)
+      @team_project_relationship = create(:team_project_relationship, team: @team, project: @project)
 
       data = notification_data_for(/gitlab/) do
         @team_project_relationship.destroy
@@ -677,6 +665,8 @@ describe ActivityObserver do
       TeamUserRelationship.observers.enable :activity_observer
 
       @user = create :user
+      @user_2 = create :user
+      @team = create :team, creator: @user
 
       @project = create :project, creator: @user
     end
@@ -684,7 +674,7 @@ describe ActivityObserver do
     it "Should generate :created event" do
 
       data = notification_data_for(/gitlab/) do
-        @team_user_relationship = create(:team_user_relationship, user: @user)
+        @team_user_relationship = create(:team_user_relationship, team: @team, user: @user_2)
       end
 
       data[:name].should match(/created/)
@@ -692,10 +682,10 @@ describe ActivityObserver do
     end
 
     it "Should generate :updated event" do
-      @team_user_relationship = create(:team_user_relationship, user: @user)
+      @team_user_relationship = create(:team_user_relationship, team: @team, user: @user_2)
 
       data = notification_data_for(/gitlab/) do
-        @team_user_relationship.permission = (UsersProject.access_roles.values - [@team_user_relationship.permission]).first
+        @team_user_relationship.team_access = (UsersProject.access_roles.values - [@team_user_relationship.team_access]).first
         @team_user_relationship.save
       end
 
@@ -704,7 +694,7 @@ describe ActivityObserver do
     end
 
     it "Should generate :deleted event" do
-      @team_user_relationship = create(:team_user_relationship, user: @user)
+      @team_user_relationship = create(:team_user_relationship, team: @team, user: @user_2)
 
       data = notification_data_for(/gitlab/) do
         @team_user_relationship.destroy
@@ -865,6 +855,7 @@ describe ActivityObserver do
 
   describe "Ignore system notes" do
     let(:author) { create(:user) }
+    let(:project) { create(:project_with_code, creator: author) }
     let!(:issue) { create(:issue, project: project) }
     let!(:other) { create(:issue) }
 
@@ -873,7 +864,7 @@ describe ActivityObserver do
         Note.observers.enable :activity_observer do
           Note.create_status_change_note(issue, project, author, 'reopened', nil)
         end
-      end.to_not change { Event.count }
+      end.to change { Event.count }
     end
 
     it "should not create events for cross-reference notes" do
@@ -881,7 +872,7 @@ describe ActivityObserver do
         Note.observers.enable :activity_observer do
           Note.create_cross_reference_note(issue, other, author, issue.project)
         end
-      end.to_not change { Event.count }
+      end.to change { Event.count }
     end
   end
 end

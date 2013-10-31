@@ -1,4 +1,4 @@
-Feature: Groups
+Feature: Group Pages
   Background:
     Given I sign in as a user
 

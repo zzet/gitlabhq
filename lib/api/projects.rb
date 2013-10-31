@@ -73,16 +73,16 @@ module API
       post do
         required_attributes! [:name]
         attrs = attributes_for_keys [:name,
-                                    :path,
-                                    :description,
-                                    :default_branch,
-                                    :issues_enabled,
-                                    :wall_enabled,
-                                    :merge_requests_enabled,
-                                    :wiki_enabled,
-                                    :snippets_enabled,
-                                    :namespace_id,
-                                    :public]
+                                     :path,
+                                     :description,
+                                     :default_branch,
+                                     :issues_enabled,
+                                     :wall_enabled,
+                                     :merge_requests_enabled,
+                                     :wiki_enabled,
+                                     :snippets_enabled,
+                                     :namespace_id,
+                                     :public]
         @project = ::Projects::CreateContext.new(current_user, attrs).execute
         if @project.saved?
           present @project, with: Entities::Project
@@ -113,14 +113,14 @@ module API
         authenticated_as_admin!
         user = User.find(params[:user_id])
         attrs = attributes_for_keys [:name,
-                                    :description,
-                                    :default_branch,
-                                    :issues_enabled,
-                                    :wall_enabled,
-                                    :merge_requests_enabled,
-                                    :wiki_enabled,
-                                    :snippets_enabled,
-                                    :public]
+                                     :description,
+                                     :default_branch,
+                                     :issues_enabled,
+                                     :wall_enabled,
+                                     :merge_requests_enabled,
+                                     :wiki_enabled,
+                                     :snippets_enabled,
+                                     :public]
         @project = ::Projects::CreateContext.new(user, attrs).execute
         if @project.saved?
           present @project, with: Entities::Project
@@ -129,6 +129,16 @@ module API
         end
       end
 
+      # Remove project
+      #
+      # Parameters:
+      #   id (required) - The ID of a project
+      # Example Request:
+      #   DELETE /projects/:id
+      delete ":id" do
+        authorize! :remove_project, user_project
+        user_project.destroy
+      end
 
       # Mark this project as forked from another
       #
@@ -164,7 +174,6 @@ module API
           user_project.forked_project_link.destroy
         end
       end
-
 
       # Get a project team members
       #
@@ -263,242 +272,18 @@ module API
         end
       end
 
-      # Get project hooks
+      # search for projects current_user has access to
       #
       # Parameters:
-      #   id (required) - The ID of a project
+      #   query (required) - A string contained in the project name
+      #   per_page (optional) - number of projects to return per page
+      #   page (optional) - the page to retrieve
       # Example Request:
-      #   GET /projects/:id/hooks
-      get ":id/hooks" do
-        authorize! :admin_project, user_project
-        @hooks = paginate user_project.hooks
-        present @hooks, with: Entities::Hook
-      end
-
-      # Get a project hook
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   hook_id (required) - The ID of a project hook
-      # Example Request:
-      #   GET /projects/:id/hooks/:hook_id
-      get ":id/hooks/:hook_id" do
-        authorize! :admin_project, user_project
-        @hook = user_project.hooks.find(params[:hook_id])
-        present @hook, with: Entities::Hook
-      end
-
-
-      # Add hook to project
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   url (required) - The hook URL
-      # Example Request:
-      #   POST /projects/:id/hooks
-      post ":id/hooks" do
-        authorize! :admin_project, user_project
-        required_attributes! [:url]
-
-        @hook = user_project.hooks.new({"url" => params[:url]})
-        if @hook.save
-          present @hook, with: Entities::Hook
-        else
-          if @hook.errors[:url].present?
-            error!("Invalid url given", 422)
-          end
-          not_found!
-        end
-      end
-
-      # Update an existing project hook
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   hook_id (required) - The ID of a project hook
-      #   url (required) - The hook URL
-      # Example Request:
-      #   PUT /projects/:id/hooks/:hook_id
-      put ":id/hooks/:hook_id" do
-        @hook = user_project.hooks.find(params[:hook_id])
-        authorize! :admin_project, user_project
-        required_attributes! [:url]
-
-        attrs = attributes_for_keys [:url]
-        if @hook.update_attributes attrs
-          present @hook, with: Entities::Hook
-        else
-          if @hook.errors[:url].present?
-            error!("Invalid url given", 422)
-          end
-          not_found!
-        end
-      end
-
-      # Deletes project hook. This is an idempotent function.
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   hook_id (required) - The ID of hook to delete
-      # Example Request:
-      #   DELETE /projects/:id/hooks/:hook_id
-      delete ":id/hooks/:hook_id" do
-        authorize! :admin_project, user_project
-        required_attributes! [:hook_id]
-
-        begin
-          @hook = ProjectHook.find(params[:hook_id])
-          @hook.destroy
-        rescue
-          # ProjectHook can raise Error if hook_id not found
-        end
-      end
-
-      # Get a project snippets
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      # Example Request:
-      #   GET /projects/:id/snippets
-      get ":id/snippets" do
-        present paginate(user_project.snippets), with: Entities::ProjectSnippet
-      end
-
-      # Get a project snippet
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   snippet_id (required) - The ID of a project snippet
-      # Example Request:
-      #   GET /projects/:id/snippets/:snippet_id
-      get ":id/snippets/:snippet_id" do
-        @snippet = user_project.snippets.find(params[:snippet_id])
-        present @snippet, with: Entities::ProjectSnippet
-      end
-
-      # Create a new project snippet
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   title (required) - The title of a snippet
-      #   file_name (required) - The name of a snippet file
-      #   lifetime (optional) - The expiration date of a snippet
-      #   code (required) - The content of a snippet
-      # Example Request:
-      #   POST /projects/:id/snippets
-      post ":id/snippets" do
-        authorize! :write_snippet, user_project
-        required_attributes! [:title, :file_name, :code]
-
-        attrs = attributes_for_keys [:title, :file_name]
-        attrs[:expires_at] = params[:lifetime] if params[:lifetime].present?
-        attrs[:content] = params[:code] if params[:code].present?
-        @snippet = user_project.snippets.new attrs
-        @snippet.author = current_user
-
-        if @snippet.save
-          present @snippet, with: Entities::ProjectSnippet
-        else
-          not_found!
-        end
-      end
-
-      # Update an existing project snippet
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   snippet_id (required) - The ID of a project snippet
-      #   title (optional) - The title of a snippet
-      #   file_name (optional) - The name of a snippet file
-      #   lifetime (optional) - The expiration date of a snippet
-      #   code (optional) - The content of a snippet
-      # Example Request:
-      #   PUT /projects/:id/snippets/:snippet_id
-      put ":id/snippets/:snippet_id" do
-        @snippet = user_project.snippets.find(params[:snippet_id])
-        authorize! :modify_snippet, @snippet
-
-        attrs = attributes_for_keys [:title, :file_name]
-        attrs[:expires_at] = params[:lifetime] if params[:lifetime].present?
-        attrs[:content] = params[:code] if params[:code].present?
-
-        if @snippet.update_attributes attrs
-          present @snippet, with: Entities::ProjectSnippet
-        else
-          not_found!
-        end
-      end
-
-      # Delete a project snippet
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   snippet_id (required) - The ID of a project snippet
-      # Example Request:
-      #   DELETE /projects/:id/snippets/:snippet_id
-      delete ":id/snippets/:snippet_id" do
-        begin
-          @snippet = user_project.snippets.find(params[:snippet_id])
-          authorize! :modify_snippet, user_project
-          @snippet.destroy
-        rescue
-        end
-      end
-
-      # Get a raw project snippet
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   snippet_id (required) - The ID of a project snippet
-      # Example Request:
-      #   GET /projects/:id/snippets/:snippet_id/raw
-      get ":id/snippets/:snippet_id/raw" do
-        @snippet = user_project.snippets.find(params[:snippet_id])
-        content_type 'text/plain'
-        present @snippet.content
-      end
-
-      # Get a specific project's keys
-      #
-      # Example Request:
-      #   GET /projects/:id/keys
-      get ":id/keys" do
-        present user_project.deploy_keys, with: Entities::SSHKey
-      end
-
-      # Get single key owned by currently authenticated user
-      #
-      # Example Request:
-      #   GET /projects/:id/keys/:id
-      get ":id/keys/:key_id" do
-        key = user_project.deploy_keys.find params[:key_id]
-        present key, with: Entities::SSHKey
-      end
-
-      # Add new ssh key to currently authenticated user
-      #
-      # Parameters:
-      #   key (required) - New SSH Key
-      #   title (required) - New SSH Key's title
-      # Example Request:
-      #   POST /projects/:id/keys
-      post ":id/keys" do
-        attrs = attributes_for_keys [:title, :key]
-        key = DeployKey.new attrs
-        if key.valid? && user_project.deploy_keys << key
-          present key, with: Entities::SSHKey
-        else
-          not_found!
-        end
-      end
-
-      # Delete existed ssh key of currently authenticated user
-      #
-      # Example Request:
-      #   DELETE /projects/:id/keys/:id
-      delete ":id/keys/:key_id" do
-        key = user_project.deploy_keys.find params[:key_id]
-        key.destroy
+      #   GET /projects/search/:query
+      get "/search/:query" do
+        ids = current_user.authorized_projects.map(&:id)
+        projects = Project.where("(id in (?) OR public = true) AND (name LIKE (?))", ids, "%#{params[:query]}%")
+        present paginate(projects), with: Entities::Project
       end
     end
   end
