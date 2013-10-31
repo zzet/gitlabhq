@@ -102,10 +102,11 @@ class ProjectsController < ApplicationController
   def destroy
     return access_denied! unless can?(current_user, :remove_project, project)
 
+    group = project.group
     ::Projects::RemoveContext.new(current_user, project, params).execute
 
     respond_to do |format|
-      format.html { redirect_to project.group.present? ? group_path(project.group) : root_path }
+      format.html { redirect_to group.present? ? group_path(project.group) : root_path }
     end
   end
 
