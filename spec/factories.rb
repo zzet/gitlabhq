@@ -17,6 +17,8 @@ FactoryGirl.define do
     sequence(:username) { |n| "#{Faker::Internet.user_name}#{n}" }
     password "123456"
     password_confirmation { password }
+    confirmed_at { Time.now }
+    confirmation_token { nil }
 
     trait :admin do
       admin true
@@ -71,7 +73,6 @@ FactoryGirl.define do
   factory :group do
     sequence(:name) { |n| "group#{n}" }
     path { name.downcase.gsub(/\s/, '_') }
-    owner
     type 'Group'
   end
 
@@ -264,8 +265,8 @@ FactoryGirl.define do
 
   factory :service do
     type ""
-    title "GitLab CI"
-    token "x56olispAND34ng"
+    title
+    description
     project
   end
 

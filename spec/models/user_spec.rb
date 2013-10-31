@@ -47,7 +47,8 @@ describe User do
     it { should have_many(:users_projects).dependent(:destroy) }
     it { should have_many(:groups) }
     it { should have_many(:keys).dependent(:destroy) }
-    it { should have_many(:events).dependent(:destroy) }
+    it { should have_many(:events) }
+    it { should have_many(:old_events).dependent(:destroy) }
     it { should have_many(:recent_events).class_name('OldEvent') }
     it { should have_many(:issues).dependent(:destroy) }
     it { should have_many(:notes).dependent(:destroy) }
@@ -119,7 +120,7 @@ describe User do
     it { @user.authorized_projects.should include(@project_2) }
     it { @user.authorized_projects.should include(@project_3) }
     it { @user.owned_projects.should include(@project) }
-    it { @user.owned_projects.should_not include(@project_2) }
+    it { @user.owned_projects.should include(@project_2) }
     it { @user.owned_projects.should_not include(@project_3) }
     it { @user.personal_projects.should include(@project) }
     it { @user.personal_projects.should_not include(@project_2) }
@@ -130,11 +131,12 @@ describe User do
     before do
       ActiveRecord::Base.observers.enable(:user_observer)
       @user = create :user
-      @group = create :group, owner: @user
+      @group = create :group
+      @group.add_owner(@user)
     end
 
     it { @user.several_namespaces?.should be_true }
-    it { @user.namespaces.should include(@user.namespace, @group) }
+    it { @user.namespaces.should include(@user.namespace) }
     it { @user.authorized_groups.should == [@group] }
     it { @user.owned_groups.should == [@group] }
   end
@@ -144,9 +146,10 @@ describe User do
       ActiveRecord::Base.observers.enable(:user_observer)
       @user = create :user
       @user2 = create :user
-      @group = create :group, owner: @user
+      @group = create :group
+      @group.add_owner(@user)
 
-      @group.add_users([@user2.id], UsersGroup::OWNER)
+      @group.add_user(@user2, UsersGroup::OWNER)
     end
 
     it { @user2.several_namespaces?.should be_true }
@@ -221,9 +224,9 @@ describe User do
         let(:user) { User.build_user({}, as: :admin) }
 
         it "should apply defaults to user" do
-          user.projects_limit.should == 42
-          user.can_create_group.should be_false
-          user.theme_id.should == Gitlab::Theme::MARS
+          user.projects_limit.should == Gitlab.config.gitlab.default_projects_limit
+          user.can_create_group.should == Gitlab.config.gitlab.default_can_create_group
+          user.theme_id.should == Gitlab.config.gitlab.default_theme
         end
       end
 
@@ -231,6 +234,9 @@ describe User do
         let(:user) { User.build_user({projects_limit: 123, can_create_group: true, can_create_team: true, theme_id: Gitlab::Theme::BASIC}, as: :admin) }
 
         it "should apply defaults to user" do
+          Gitlab.config.gitlab.default_projects_limit.should_not == 123
+          Gitlab.config.gitlab.default_can_create_group.should_not be_true
+          Gitlab.config.gitlab.default_theme.should_not == Gitlab::Theme::BASIC
           user.projects_limit.should == 123
           user.can_create_group.should be_true
           user.theme_id.should == Gitlab::Theme::BASIC
@@ -243,9 +249,9 @@ describe User do
         let(:user) { User.build_user }
 
         it "should apply defaults to user" do
-          user.projects_limit.should == 42
-          user.can_create_group.should be_false
-          user.theme_id.should == Gitlab::Theme::MARS
+          user.projects_limit.should == Gitlab.config.gitlab.default_projects_limit
+          user.can_create_group.should == Gitlab.config.gitlab.default_can_create_group
+          user.theme_id.should == Gitlab.config.gitlab.default_theme
         end
       end
 
@@ -253,9 +259,9 @@ describe User do
         let(:user) { User.build_user(projects_limit: 123, can_create_group: true, theme_id: Gitlab::Theme::BASIC) }
 
         it "should apply defaults to user" do
-          user.projects_limit.should == 42
-          user.can_create_group.should be_false
-          user.theme_id.should == Gitlab::Theme::MARS
+          user.projects_limit.should == Gitlab.config.gitlab.default_projects_limit
+          user.can_create_group.should == Gitlab.config.gitlab.default_can_create_group
+          user.theme_id.should == Gitlab.config.gitlab.default_theme
         end
       end
     end

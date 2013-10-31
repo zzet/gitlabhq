@@ -8,6 +8,6 @@ class BaseObserver < ActiveRecord::Observer
   end
 
   def current_commit
-    RequestStore.current[:current_commit]
+    RequestStore.store[:current_commit]
   end
 end

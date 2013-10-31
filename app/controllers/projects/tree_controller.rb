@@ -8,6 +8,8 @@ class Projects::TreeController < Projects::ApplicationController
   before_filter :require_non_empty_project
 
   def show
+    return not_found! if tree.entries.empty?
+
     @file_token = FileToken.for_project(@project).find_by_file(@path)
 
     respond_to do |format|

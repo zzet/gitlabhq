@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe MergeRequestObserver do
+  let(:admin) { create :admin }
   let(:some_user) { create :user }
   let(:assignee) { create :user }
   let(:author) { create :user }
@@ -19,17 +20,12 @@ describe MergeRequestObserver do
   before { mr_mock.stub(:create_cross_references!).and_return(true) }
   before { Repository.any_instance.stub(commit: nil) }
 
-  before(:each) { enable_observers }
+  before(:each) { enable_observers; ActiveRecord::Base.observers.disable(:activity_observer) }
   after(:each) { disable_observers }
 
   subject { MergeRequestObserver.instance }
 
   describe '#after_create' do
-    it 'trigger notification service' do
-      subject.should_receive(:notification)
-      subject.after_create(mr_mock)
-    end
-
     it 'creates cross-reference notes' do
        project = create :project
        mr_mock.stub(title: "this mr references !#{assigned_mr.id}", project: project)
@@ -100,7 +96,7 @@ describe MergeRequestObserver do
     before do
       TestEnv.enable_observers
       @merge_request = create(:merge_request, source_project: project, target_project: project)
-      @event = Event.last
+      @event = OldEvent.last
     end
 
     after do
@@ -108,7 +104,7 @@ describe MergeRequestObserver do
     end
 
     it_should_be_valid_event
-    it { @event.action.should == Event::CREATED }
+    it { @event.action.should == OldEvent::CREATED }
     it { @event.target.should == @merge_request }
   end
 

@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Notifications::SubscriptionsController do
   let(:project)   { create(:project) }
   let(:group)     { create(:group) }
-  let(:team) { create(:team) }
   let(:user)      { create(:user) }
+  let(:team)      { create(:team, creator: user) }
 
   before do
     sign_in(user)

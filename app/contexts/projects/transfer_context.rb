@@ -18,7 +18,7 @@ module Projects
           old_namespace = project.namespace
 
           if transfer_to(namespace)
-            build_face_servcie = project.services.where(type: Service::BuildFace).first
+            build_face_service = project.services.where(type: Service::BuildFace).first
             if build_face_service && build_face_service.enabled?
               build_face_service.notify_build_face("transfered")
             end

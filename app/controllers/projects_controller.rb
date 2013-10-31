@@ -1,6 +1,7 @@
-class ProjectsController < Projects::ApplicationController
-  skip_before_filter :project, only: [:new, :create]
-  skip_before_filter :repository, only: [:new, :create]
+class ProjectsController < ApplicationController
+  skip_before_filter :authenticate_user!, only: [:show]
+  before_filter :project, except: [:new, :create]
+  before_filter :repository, except: [:new, :create]
 
   # Authorize
   before_filter :authorize_read_project!, except: [:index, :new, :create]
@@ -56,7 +57,10 @@ class ProjectsController < Projects::ApplicationController
   end
 
   def show
+    return authenticate_user! unless @project.public || current_user
+
     check_git_protocol
+
     limit = (params[:limit] || 20).to_i
 
     @events = @project.old_events.recent
@@ -83,10 +87,12 @@ class ProjectsController < Projects::ApplicationController
     respond_to do |format|
       format.html do
         if @project.empty_repo?
-          render "projects/empty"
+          render "projects/empty", layout: user_layout
         else
-          @last_push = current_user.recent_push(@project.id)
-          render :show
+          if current_user
+            @last_push = current_user.recent_push(@project.id)
+          end
+          render :show, layout: user_layout
         end
       end
       format.js
@@ -96,10 +102,11 @@ class ProjectsController < Projects::ApplicationController
   def destroy
     return access_denied! unless can?(current_user, :remove_project, project)
 
+    group = project.group
     ::Projects::RemoveContext.new(current_user, project, params).execute
 
     respond_to do |format|
-      format.html { redirect_to root_path }
+      format.html { redirect_to group.present? ? group_path(project.group) : root_path }
     end
   end
 
@@ -141,5 +148,9 @@ class ProjectsController < Projects::ApplicationController
 
   def set_title
     @title = 'New Project'
+  end
+
+  def user_layout
+    current_user ? "projects" : "public_projects"
   end
 end

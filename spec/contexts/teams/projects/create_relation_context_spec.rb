@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe Teams::Projects::CreateRelationContext do
   before do
-    @user = create :user
+    ActiveRecord::Base.observers.enable(:user_observer) do
+      @user = create :user
+    end
     @team_opts = { name: "Team", description: "Team description" }
     @team = Teams::CreateContext.new(@user, @team_opts).execute
   end
@@ -17,7 +19,7 @@ describe Teams::Projects::CreateRelationContext do
       end
 
       it "user should have" do
-        allowed_project_ids = (@user.own_projects.pluck(:id) + @user.owned_projects.pluck(:id)).uniq
+        allowed_project_ids = (@user.master_projects.pluck(:id) + @user.own_projects.pluck(:id) + @user.owned_projects.pluck(:id)).uniq
         allowed_project_ids.include?(@project.id).should be_true
       end
 
