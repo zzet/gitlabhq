@@ -56,5 +56,4 @@ class Service::Hipchat < Service
 
     message
   end
-
 end

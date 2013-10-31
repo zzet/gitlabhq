@@ -1,13 +1,3 @@
-GIT
-  remote: git://github.com/gitlabhq/gitlab_git.git
-  revision: 275af374667a4a56394dff74c5ff12faf894bab1
-  branch: master
-  specs:
-    gitlab_git (3.0.0.rc1)
-      activesupport (~> 3.2.13)
-      github-linguist (~> 2.3.4)
-      gitlab-grit (~> 2.6.0)
-
 GEM
   remote: https://rubygems.org/
   remote: http://gems.undev.cc/
@@ -201,7 +191,7 @@ GEM
       stringex (~> 1.5.1)
     gitlab-grack (1.0.1)
       rack (~> 1.4.1)
-    gitlab-grit (2.6.0)
+    gitlab-grit (2.6.1)
       charlock_holmes (~> 0.6.9)
       diff-lcs (~> 1.1)
       mime-types (~> 1.15)
@@ -209,6 +199,10 @@ GEM
     gitlab-pygments.rb (0.3.2)
       posix-spawn (~> 0.3.6)
       yajl-ruby (~> 1.1.0)
+    gitlab_git (3.0.0.rc2)
+      activesupport (~> 3.2.13)
+      github-linguist (~> 2.3.4)
+      gitlab-grit (~> 2.6.1)
     gitlab_meta (6.0)
     gitlab_omniauth-ldap (1.0.3)
       net-ldap (~> 0.3.1)
@@ -634,7 +628,7 @@ DEPENDENCIES
   gitlab-gollum-lib (~> 1.0.1)
   gitlab-grack (~> 1.0.1)
   gitlab-pygments.rb (~> 0.3.2)
-  gitlab_git!
+  gitlab_git (~> 3.0.0.rc2)
   gitlab_meta (= 6.0)
   gitlab_omniauth-ldap (= 1.0.3)
   gon
