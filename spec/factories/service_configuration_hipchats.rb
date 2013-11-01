@@ -15,6 +15,7 @@
 
 FactoryGirl.define do
   factory :hipchat_configuration, class: Service::Configuration::Hipchat do
+    service factory: :hipchat_service
     token "secret_token"
     room "developers"
   end

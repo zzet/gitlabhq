@@ -226,7 +226,7 @@ describe EventNotificationMailer do
     end
 
     Service.implement_services.map {|s| s.new }.each do |service|
-      it "should send email about create service in project" do
+      it "should send email about create #{service.to_param} service in project" do
         @new_service = create :"#{service.to_param}_service"
         #service = create :service, project: project
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131015141342) do
+ActiveRecord::Schema.define(:version => 20131101182116) do
 
   create_table "deploy_keys_projects", :force => true do |t|
     t.integer  "deploy_key_id", :null => false
@@ -284,6 +284,14 @@ ActiveRecord::Schema.define(:version => 20131015141342) do
     t.datetime "updated_at",   :null => false
   end
 
+  create_table "service_configuration_flowdocks", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
   create_table "service_configuration_gitlab_cis", :force => true do |t|
     t.integer  "service_id"
     t.string   "service_type"
@@ -298,6 +306,14 @@ ActiveRecord::Schema.define(:version => 20131015141342) do
     t.string   "service_type"
     t.string   "token"
     t.string   "room"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  create_table "service_configuration_pivotal_trackers", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
   end

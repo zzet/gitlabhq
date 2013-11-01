@@ -19,7 +19,8 @@
 FactoryGirl.define do
   factory :file_token do
     user
-    project
+    project factory: :project_with_code
+    source_ref "master"
     token { Digest::MD5.hexdigest(Time.now.to_s) }
     file "MyString"
     last_usage_at "2013-04-09 10:49:24"

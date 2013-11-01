@@ -15,7 +15,7 @@
 
 require 'spec_helper'
 
-describe FlowdockService do
+describe Service::Flowdock do
   describe "Associations" do
     it { should belong_to :project }
     it { should have_one :service_hook }
@@ -26,7 +26,7 @@ describe FlowdockService do
     let(:project) { create(:project_with_code) }
 
     before do
-      @flowdock_service = FlowdockService.new
+      @flowdock_service = Service::Flowdock.new
       @flowdock_service.stub(
         project_id: project.id,
         project: project,

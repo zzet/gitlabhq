@@ -16,6 +16,7 @@
 
 FactoryGirl.define do
   factory :team do
+    creator factory: :user
     name
     description
     sequence(:path) { |n| "team-path-#{n}"}

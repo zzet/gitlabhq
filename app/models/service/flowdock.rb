@@ -15,30 +15,18 @@
 
 require "flowdock-git-hook"
 
-class FlowdockService < Service
-  validates :token, presence: true, if: :activated?
+class Service::Flowdock < Service
+  default_title       'Flowdock'
+  default_description 'Flowdock is a collaboration web app for technical teams.'
+  service_name        'flowdock'
 
-  def title
-    'Flowdock'
-  end
+  has_one :configuration, as: :service, class_name: Service::Configuration::Flowdock
 
-  def description
-    'Flowdock is a collaboration web app for technical teams.'
-  end
-
-  def to_param
-    'flowdock'
-  end
-
-  def fields
-    [
-      { type: 'text', name: 'token',     placeholder: '' }
-    ]
-  end
+  delegate :token, to: :configuration, prefix: false
 
   def execute(push_data)
     repo_path = File.join(Gitlab.config.gitlab_shell.repos_path, "#{project.path_with_namespace}.git")
-    Flowdock::Git.post(
+    ::Flowdock::Git.post(
       push_data[:ref],
       push_data[:before],
       push_data[:after],

@@ -15,28 +15,16 @@
 #  room        :string(255)
 #
 
-class PivotaltrackerService < Service
+class Service::PivotalTracker < Service
   include HTTParty
 
-  validates :token, presence: true, if: :activated?
+  default_title       'PivotalTracker'
+  default_description 'Project Management Software (Source Commits Endpoint)'
+  service_name        'pivotal_tracker'
 
-  def title
-    'PivotalTracker'
-  end
+  has_one :configuration, as: :service, class_name: Service::Configuration::PivotalTracker
 
-  def description
-    'Project Management Software (Source Commits Endpoint)'
-  end
-
-  def to_param
-    'pivotaltracker'
-  end
-
-  def fields
-    [
-      { type: 'text', name: 'token', placeholder: '' }
-    ]
-  end
+  delegate :token, to: :configuration, prefix: false
 
   def execute(push)
     url = 'https://www.pivotaltracker.com/services/v5/source_commits'
