@@ -8,7 +8,6 @@ before_install:
 rvm:
   - 2.0.0
 services:
-  - mysql
   - postgresql
 before_script:
   - "cp config/database.yml.$DB config/database.yml"
