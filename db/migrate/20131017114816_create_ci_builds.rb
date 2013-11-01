@@ -12,6 +12,7 @@ class CreateCiBuilds < ActiveRecord::Migration
       t.string :state
       t.text :trace
       t.text :coverage
+      t.text :data
 
       t.timestamps
     end

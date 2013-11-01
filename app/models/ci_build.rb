@@ -1,11 +1,11 @@
 class CiBuild < ActiveRecord::Base
   attr_accessible :source_project_id, :source_project,
-    :target_project_id, :target_project,
-    :merge_request_id,
-    :source_sha, :target_sha,
-    :user_id, :user,
-    :service_id, :service_type,
-    :state, :coverage, :trace
+                  :target_project_id, :target_project,
+                  :merge_request_id,  :merge_request,
+                  :source_sha, :target_sha,
+                  :user_id, :user,
+                  :service_id, :service_type,
+                  :state, :coverage, :trace, :data
 
   belongs_to :service, polymorphic: true
 

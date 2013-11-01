@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(:version => 20131017122134) do
     t.string   "state"
     t.text     "trace"
     t.text     "coverage"
+    t.text     "data"
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
   end
