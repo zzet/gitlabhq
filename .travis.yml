@@ -6,24 +6,8 @@ env:
     - TRAVIS=true
   matrix:
     - TASK=spinach
-    - TASK="spec -I contexts -p"
-    - TASK="spec -I controllers -p"
-    - TASK="spec -I factories -p"
-    - TASK="spec -I features -p"
-    - TASK="spec -I fixtures -p"
-    - TASK="spec -I helpers -p"
-    - TASK="spec -I javascripts -p"
-    - TASK="spec -I lib -p"
-    - TASK="spec -I mailers -p"
-    - TASK="spec -I models -p"
-    - TASK="spec -I observers -p"
-    - TASK="spec -I requests -p"
-    - TASK="spec -I routing -p"
-    - TASK="spec -I services -p"
-    - TASK="spec -I support -p"
-    - TASK="spec -I tasks -p"
-    - TASK="spec -I workers -p"
     - TASK=jasmine:ci
+    - TASK="spec -p"
 before_install:
   - sudo apt-get install libicu-dev -y
   - gem install charlock_holmes -v="0.6.9"
