@@ -97,6 +97,7 @@ describe Project do
       end
 
       it "should deny for masters admin-specific actions" do
+        #binding.pry
         [admin_actions - master_actions].each do |action|
           @abilities.allowed?(@u2, action, @p1).should be_false
         end

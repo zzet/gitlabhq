@@ -116,6 +116,7 @@ module API
       # Example Request:
       #   DELETE /users/:id
       delete ":id" do
+        #binding.pry
         authenticated_as_admin!
         user = User.find_by_id(params[:id])
 

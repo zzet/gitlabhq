@@ -122,7 +122,7 @@ module API
       #   GET /projects/:id/repository/commits/:sha/diff
       get ":id/repository/commits/:sha/diff" do
         sha = params[:sha]
-        result = CommitLoadContext.new(user_project, current_user, {id: sha}).execute
+        result = ::Projects::Commits::LoadContext.new(user_project, current_user, {id: sha}).execute
         not_found! "Commit" unless result[:commit]
         result[:commit].diffs
       end
