@@ -83,7 +83,6 @@ describe API::API do
 
   describe "PUT /projects/:id/milestones/:milestone_id to close milestone" do
     it "should update a project milestone" do
-      binding.pry
       put api("/projects/#{project.id}/milestones/#{milestone.id}", user),
         state_event: 'close'
 
