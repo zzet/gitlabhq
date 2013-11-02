@@ -60,18 +60,6 @@ describe IssueObserver do
       mock_issue.stub(:is_being_reassigned?).and_return(false)
     end
 
-    context 'notification' do
-      it 'triggered if the issue is being reassigned' do
-        mock_issue.should_receive(:is_being_reassigned?).and_return(true)
-        subject.after_update(mock_issue)
-      end
-
-      it 'is not triggered if the issue is not being reassigned' do
-        mock_issue.should_receive(:is_being_reassigned?).and_return(false)
-        subject.after_update(mock_issue)
-      end
-    end
-
     context 'cross-references' do
       it 'notices added references' do
         mock_issue.should_receive(:notice_added_references)
