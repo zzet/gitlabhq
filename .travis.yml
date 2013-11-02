@@ -1,9 +1,13 @@
 language: ruby
 bundler_args: --without undev
 env:
-  - TASK=spinach DB=postgresql TRAVIS=true
-  - TASK=spec DB=postgresql TRAVIS=true
-  - TASK=jasmine:ci DB=postgresql TRAVIS=true
+  global:
+    - DB=postgresql
+    - TRAVIS=true
+  matrix:
+    - TASK=spinach
+    - TASK="spec -p -b"
+    - TASK=jasmine:ci
 before_install:
   - sudo apt-get install libicu-dev -y
   - gem install charlock_holmes -v="0.6.9"
