@@ -227,10 +227,10 @@ describe EventNotificationMailer do
 
     Service.implement_services.map {|s| s.new }.each do |service|
       it "should send email about create #{service.to_param} service in project" do
-        @new_service = create :"#{service.to_param}_service"
+        @service = create :"#{service.to_param}_service"
         #service = create :service, project: project
 
-        ActionMailer::Base.deliveries.count.should == 1
+        ActionMailer::Base.deliveries.count.should == 0
       end
     end
 
