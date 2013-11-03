@@ -29,9 +29,6 @@ Gitlab::Application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
-  ActiveRecord::Base.logger = Logger.new('/dev/null')
-  config.logger = Logger.new('/dev/null')
-
   # Raise exception on mass assignment protection for Active Record models
   # config.active_record.mass_assignment_sanitizer = :strict
 
