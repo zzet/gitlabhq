@@ -116,12 +116,11 @@ module API
       # Example Request:
       #   DELETE /users/:id
       delete ":id" do
-        #binding.pry
         authenticated_as_admin!
         user = User.find_by_id(params[:id])
 
         if user
-          Users::RemoveContext.new(current_user, user).execute
+          ::Users::RemoveContext.new(current_user, user).execute
         else
           not_found!
         end

@@ -71,9 +71,14 @@ FactoryGirl.define do
   end
 
   factory :group do
+    owner factory: :user
     sequence(:name) { |n| "group#{n}" }
     path { name.downcase.gsub(/\s/, '_') }
     type 'Group'
+
+    after :create do |group|
+      group.add_owner(group.owner)
+    end
   end
 
   factory :namespace do

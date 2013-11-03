@@ -193,7 +193,7 @@ describe API::API do
             get api("/groups/#{group_with_members.id}/members", user)
             response.status.should == 200
             json_response.should be_an Array
-            json_response.size.should == 5
+            json_response.size.should == 6
             json_response.find { |e| e['id']==owner.id }['access_level'].should == UsersGroup::OWNER
             json_response.find { |e| e['id']==reporter.id }['access_level'].should == UsersGroup::REPORTER
             json_response.find { |e| e['id']==developer.id }['access_level'].should == UsersGroup::DEVELOPER
