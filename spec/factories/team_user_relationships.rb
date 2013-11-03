@@ -1,12 +1,13 @@
 # == Schema Information
 #
-# Table name: team_group_relationships
+# Table name: team_user_relationships
 #
-#  id         :integer          not null, primary key
-#  team_id    :integer
-#  group_id   :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id          :integer          not null, primary key
+#  user_id     :integer
+#  team_id     :integer
+#  team_access :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
 #
 
 # Read about factories at https://github.com/thoughtbot/factory_girl
