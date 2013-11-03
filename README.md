@@ -2,9 +2,11 @@
 
 ![logo](https://raw.github.com/gitlabhq/gitlabhq/master/public/gitlab_logo.png)
 
-## Attention!!! Undev version:
-
+# Attention!!! Undev version
+[![Undev logo](https://pp.vk.me/c304809/v304809664/5141/7lcNmyRVoa0.jpg)](http://undev.ru)
 ![undev_logo](https://raw.github.com/zzet/gitlabhq/d75ecd787b477b3cb08a38f22767eeb106b90f26/public/undev_gitlab_logo.png)
+
+### Screenshots
 
 ![animated-screenshots](https://gist.github.com/fnkr/2f9badd56bfe0ed04ee7/raw/4f48806fbae97f556c2f78d8c2d299c04500cb0d/compiled.gif)
 
