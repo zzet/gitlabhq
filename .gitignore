@@ -37,3 +37,4 @@ doc/code/*
 .secret
 *.log
 public/uploads.*
+public/system/

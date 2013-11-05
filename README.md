@@ -2,6 +2,10 @@
 
 ![logo](https://raw.github.com/gitlabhq/gitlabhq/master/public/gitlab_logo.png)
 
+## Attention!!! Undev version:
+
+![undev_logo](https://raw.github.com/zzet/gitlabhq/d75ecd787b477b3cb08a38f22767eeb106b90f26/public/undev_gitlab_logo.png)
+
 ![animated-screenshots](https://gist.github.com/fnkr/2f9badd56bfe0ed04ee7/raw/4f48806fbae97f556c2f78d8c2d299c04500cb0d/compiled.gif)
 
 ### GitLab allows you to
@@ -17,6 +21,10 @@
 * used by more than 25.000 organizations to keep their code secure
 
 ### Code status
+
+* [![Build Status master](https://travis-ci.org/zzet/gitlabhq.png?branch=master)](https://travis-ci.org/zzet/gitlabhq)
+
+* [![Build Status develop](https://travis-ci.org/zzet/gitlabhq.png?branch=develop)](https://travis-ci.org/zzet/gitlabhq)
 
 * [![build status](http://ci.gitlab.org/projects/1/status.png?ref=master)](http://ci.gitlab.org/projects/1?ref=master) on ci.gitlab.org (master branch)
 
@@ -99,7 +107,7 @@ Start it with [Foreman](https://github.com/ddollar/foreman)
 or start each component separately
 
     bundle exec rails s
-    bundle exec rake sidekiq:start
+    script/background_jobs start
 
 ### Run the tests
 

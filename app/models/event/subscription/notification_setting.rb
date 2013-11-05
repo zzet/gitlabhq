@@ -9,8 +9,8 @@
 #  updated_at             :datetime         not null
 #  adjacent_changes       :boolean
 #  brave                  :boolean
-#  subscribe_if_owner     :boolean
-#  subscribe_if_developer :boolean
+#  subscribe_if_owner     :boolean          default(TRUE)
+#  subscribe_if_developer :boolean          default(TRUE)
 #
 
 class Event::Subscription::NotificationSetting < ActiveRecord::Base

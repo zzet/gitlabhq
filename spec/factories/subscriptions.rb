@@ -3,8 +3,8 @@
 FactoryGirl.define do
   factory :subscription, class: Event::Subscription do
     user
-    action "MyString"
-    target { create :project }
+    action Event.action.values.first
+    target factory: :project
     notification_interval 1
     last_notified_at "2013-02-12 16:52:26"
   end
@@ -12,7 +12,7 @@ FactoryGirl.define do
   factory :push_subscription, class: Event::Subscription do
     user
     action :pushed
-    target { create :project }
+    target factory: :project
     source_category :all
     notification_interval 1
     last_notified_at "2013-02-12 16:52:26"

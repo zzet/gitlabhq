@@ -44,6 +44,7 @@ end
 
 Spinach.hooks.after_scenario do
   DatabaseCleaner.clean
+  sleep 0.2
 end
 
 Spinach.hooks.before_run do

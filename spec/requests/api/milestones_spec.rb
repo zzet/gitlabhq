@@ -85,6 +85,7 @@ describe API::API do
     it "should update a project milestone" do
       put api("/projects/#{project.id}/milestones/#{milestone.id}", user),
         state_event: 'close'
+
       response.status.should == 200
 
       json_response['state'].should == 'closed'
@@ -96,7 +97,7 @@ describe API::API do
     after { disable_observers }
 
     it "should create an activity event when an milestone is closed" do
-      Event.should_receive(:create)
+      OldEvent.should_receive(:create)
 
       put api("/projects/#{project.id}/milestones/#{milestone.id}", user),
           state_event: 'close'

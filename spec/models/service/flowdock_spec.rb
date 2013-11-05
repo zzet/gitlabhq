@@ -2,20 +2,22 @@
 #
 # Table name: services
 #
-#  id          :integer          not null, primary key
-#  type        :string(255)
-#  title       :string(255)
-#  token       :string(255)
-#  project_id  :integer          not null
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  active      :boolean          default(FALSE), not null
-#  project_url :string(255)
+#  id                 :integer          not null, primary key
+#  type               :string(255)
+#  title              :string(255)
+#  project_id         :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  state              :string(255)
+#  service_pattern_id :integer
+#  public_state       :string(255)
+#  active_state       :string(255)
+#  description        :text
 #
 
 require 'spec_helper'
 
-describe FlowdockService do
+describe Service::Flowdock do
   describe "Associations" do
     it { should belong_to :project }
     it { should have_one :service_hook }
@@ -26,7 +28,7 @@ describe FlowdockService do
     let(:project) { create(:project_with_code) }
 
     before do
-      @flowdock_service = FlowdockService.new
+      @flowdock_service = Service::Flowdock.new
       @flowdock_service.stub(
         project_id: project.id,
         project: project,

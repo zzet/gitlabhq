@@ -614,15 +614,15 @@ class EventNotificationMailer < ActionMailer::Base
     @member               = User.find(data["user_id"])
     @changes              = data["previous_changes"]
     unless @changes.blank?
-      @previous_permission  = UsersGroup.access_roles.key(@changes["group_access"].first)
-      @current_permission   = UsersGroup.access_roles.key(@changes["group_access"].last)
+      @previous_permission  = UsersGroup.group_access_roles.key(@changes["group_access"].first)
+      @current_permission   = UsersGroup.group_access_roles.key(@changes["group_access"].last)
 
       headers 'X-Gitlab-Entity' => 'group',
               'X-Gitlab-Action' => 'updated',
               'X-Gitlab-Source' => 'group-user-relationship',
-              'In-Reply-To'     => "group-#{@group.path_with_namespace}-user-#{@member.username}"
+              'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
 
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@group.path_with_namespace}] Permissions for user '#{ @member.name }' was updated")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@group.path}] Permissions for user '#{ @member.name }' was updated")
     end
   end
 
