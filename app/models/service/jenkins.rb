@@ -22,10 +22,10 @@ class Service::Jenkins < Service
 
   has_one :configuration, as: :service, class_name: Service::Configuration::Jenkins
 
-  has_many :builds,   class_name: CiBuild
+  has_many :builds,   class_name: CiBuild, as: :service
 
   def execute(data)
-    return true unless ref =~ /heads/
+    return true unless data[:ref] =~ /heads/
 
     # Create build for push
     branches = configuration.branches.split(",")
@@ -33,7 +33,7 @@ class Service::Jenkins < Service
     user = User.find(data[:user_id])
 
     if branches.include?(branch_name)
-      bild = builds.create(target_project: project, target_sha: data[:after], user: user)
+      build = builds.create(target_project: project, target_sha: data[:after], user: user)
       build.run
     end
 
@@ -43,6 +43,7 @@ class Service::Jenkins < Service
         merge_request.check_if_can_be_merged
         if merge_request.can_be_merged?
           attrs = {
+            merge_request: merge_request,
             target_project: project,
             source_project: project,
             target_sha: merge_request.commits.last.parent_id,
@@ -63,6 +64,7 @@ class Service::Jenkins < Service
         merge_request.check_if_can_be_merged
         if merge_request.can_be_merged?
           attrs = {
+            merge_request: merge_request,
             target_project: merge_request.target_project,
             source_project: project,
             target_sha: merge_request.commits.last.parent_id,

@@ -11,6 +11,7 @@ class CiBuild < ActiveRecord::Base
 
   belongs_to :target_project, foreign_key: :target_project_id, class_name: Project
   belongs_to :source_project, foreign_key: :source_project_id, class_name: Project
+  belongs_to :user
 
   belongs_to :merge_request,  foreign_key: :merge_request_id,  class_name: MergeRequest
 
@@ -54,8 +55,8 @@ class CiBuild < ActiveRecord::Base
       build_id:   id,
       target_sha: target_sha,
       source_sha: source_sha,
-      target_uri: target_project.url_ro_repo,
-      source_uri: source_project.url_ro_repo
+      target_uri: target_project.url_to_repo,
+      source_uri: source_project.url_to_repo
     }
   end
 
@@ -64,8 +65,8 @@ class CiBuild < ActiveRecord::Base
       build_id:   id,
       target_sha: target_sha,
       source_sha: source_sha,
-      target_uri: target_project.url_ro_repo,
-      source_uri: source_project.url_ro_repo
+      target_uri: target_project.url_to_repo,
+      source_uri: source_project.url_to_repo
     }
   end
 

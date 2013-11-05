@@ -114,7 +114,9 @@ class Service < ActiveRecord::Base
       services = implement_services.map { |s| s if s.can_build?(param) }.compact
 
       if services.one?
-        services.first.new(attrs)
+        service = services.first.new(attrs)
+        service.build_configuration if service.respond_to?(:configuration)
+        return service
       else
         raise ActiveRecord::RecordNotFound
       end
