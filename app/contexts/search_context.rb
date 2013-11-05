@@ -32,10 +32,9 @@ class SearchContext < BaseContext
 
     result[:project] = projects.first if project_id.present?
     result[:projects] = projects.search(query)
-    result[:projects] = Project.where("projects.id in (?) OR projects.public = true", project_ids).search(query).limit(20)
 
     # Search inside single project
-    single_project_search(Project.where(id: project_ids), query)
+    single_project_search(projects, query)
     result
   end
 
