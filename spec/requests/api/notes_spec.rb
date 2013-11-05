@@ -182,7 +182,7 @@ describe API::API do
     after { disable_observers }
 
     it "should create an activity event when an issue note is created" do
-      Event.should_receive(:create)
+      OldEvent.should_receive(:create)
 
       post api("/projects/#{project.id}/issues/#{issue.id}/notes", user), body: 'hi!'
     end

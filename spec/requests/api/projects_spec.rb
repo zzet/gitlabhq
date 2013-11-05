@@ -471,6 +471,7 @@ describe API::API do
     end
 
     it "should return a 405 error if hook id not given" do
+      #binding.pry
       delete api("/projects/#{project.id}/hooks", user)
       response.status.should == 405
     end

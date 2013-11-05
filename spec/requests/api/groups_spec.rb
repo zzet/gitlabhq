@@ -113,9 +113,9 @@ describe API::API do
         response.status.should == 200
       end
 
-      it "should not remove a group if not an owner" do
+      it "should not remove a group if not an owner or master" do
         user3 = create(:user)
-        group1.add_user(user3, Gitlab::Access::MASTER)
+        group1.add_user(user3, Gitlab::Access::DEVELOPER)
         delete api("/groups/#{group1.id}", user3)
         response.status.should == 403
       end
@@ -193,7 +193,7 @@ describe API::API do
             get api("/groups/#{group_with_members.id}/members", user)
             response.status.should == 200
             json_response.should be_an Array
-            json_response.size.should == 5
+            json_response.size.should == 6
             json_response.find { |e| e['id']==owner.id }['access_level'].should == UsersGroup::OWNER
             json_response.find { |e| e['id']==reporter.id }['access_level'].should == UsersGroup::REPORTER
             json_response.find { |e| e['id']==developer.id }['access_level'].should == UsersGroup::DEVELOPER

@@ -1,7 +1,7 @@
 class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
   class << self
     def prioritet
-      5
+      0
     end
 
     def can_build?(action, data)
@@ -44,7 +44,7 @@ class Gitlab::Event::Builder::Group < Gitlab::Event::Builder::Base
 
           case meta[:action]
           when :created
-            actions << :added if source.group == target
+            actions << :added if target.present?
           when :updated
             changes = source.changes
 

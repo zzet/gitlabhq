@@ -18,7 +18,7 @@ class Group < Namespace
   has_many :team_group_relationships, dependent: :destroy
   has_many :teams,                    through: :team_group_relationships
   has_many :team_user_relationships,  through: :teams
-  has_many :admins,                   through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: [Team::OWNER, Team::MASTER] } }
+  has_many :admins,                   through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }
 
   has_many :users_groups, dependent: :destroy
   has_many :users,      through: :users_groups, conditions: { users: { state: :active } }
@@ -74,11 +74,11 @@ class Group < Namespace
   end
 
   def has_owner?(user)
-    owners.include?(user) || admins.include?(user)
+    owners.include?(user) || admins.include?(user) || masters.include?(user)
   end
 
   def last_owner?(user)
-    has_owner?(user) && owners.size == 1
+    owners.include?(user) && owners.size == 1
   end
 
   def members

@@ -16,19 +16,19 @@ describe Notifications::SubscriptionsController do
     it "should register subscription on project" do
       post :create, :entity => { id: project.id,  type: :project}, format: :html
 
-      project.watched_by?(user).should be_true 
+      project.watched_by?(user).should be_true
     end
 
     it "should register subscription on group" do
       post :create, :entity => { id: group.id,  type: :group}, format: :html
 
-      group.watched_by?(user).should be_true 
+      group.watched_by?(user).should be_true
     end
 
     it "should register subscription on team" do
       post :create, :entity => { id: team.id,  type: :team}, format: :html
 
-      team.watched_by?(user).should be_true 
+      team.watched_by?(user).should be_true
     end
 
     it "should unregister subscription on project" do
@@ -36,7 +36,7 @@ describe Notifications::SubscriptionsController do
 
       delete :destroy, :entity => { id: project.id,  type: :project}, format: :html
 
-      project.watched_by?(user).should be_false 
+      project.watched_by?(user).should be_false
     end
 
     it "should unregister subscription on group" do
@@ -44,7 +44,7 @@ describe Notifications::SubscriptionsController do
 
       delete :destroy, :entity => { id: group.id,  type: :group}, format: :html
 
-      group.watched_by?(user).should be_false 
+      group.watched_by?(user).should be_false
     end
 
     it "should unregister subscription on team" do
@@ -52,7 +52,7 @@ describe Notifications::SubscriptionsController do
 
       delete :destroy, :entity => { id: team.id,  type: :team}, format: :html
 
-      team.watched_by?(user).should be_false 
+      team.watched_by?(user).should be_false
     end
   end
 end

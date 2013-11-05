@@ -69,7 +69,9 @@ module TestEnv
       remove_repository: true,
       update_repository_head: true,
       add_key: true,
-      remove_key: true
+      remove_key: true,
+      enable_git_protocol: true,
+      disable_git_protocol: true
     )
 
     Gitlab::Satellite::Satellite.any_instance.stub(

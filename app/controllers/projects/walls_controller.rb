@@ -15,6 +15,8 @@ class Projects::WallsController < Projects::ApplicationController
 
   def module_enabled
     return render_404 unless @project.wall_enabled
+
+    authorize_read_project!
   end
 end
 

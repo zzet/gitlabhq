@@ -49,13 +49,11 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_user_for_thread
-    Thread.current[:current_user] = current_user
     RequestStore.store[:current_user] = current_user
     begin
       yield
     ensure
       RequestStore.store[:current_user] = nil
-      Thread.current[:current_user] = nil
     end
   end
 

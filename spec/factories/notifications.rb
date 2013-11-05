@@ -6,5 +6,9 @@ FactoryGirl.define do
     subscription
     notification_state "new"
     notified_at "2013-02-12 16:19:47"
+
+    after :build do |notification|
+      notification.subscriber = notification.subscription.user
+    end
   end
 end

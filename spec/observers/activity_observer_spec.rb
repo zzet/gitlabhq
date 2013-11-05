@@ -2,18 +2,17 @@ require 'spec_helper'
 
 describe ActivityObserver do
 
-  def notification_data_for(notification)
-    test_info = {}
+  def notification_data_for(notification, store = {})
+    test_info = []
     subscription = ActiveSupport::Notifications.subscribe notification do |name, start, finish, id, _payload|
-      test_info[:name] = name
-      test_info[:data] = _payload
+      test_info << { name: name, data: _payload }
     end
 
     yield
 
     ActiveSupport::Notifications.unsubscribe(subscription)
 
-    return test_info
+    return test_info.first
   end
 
   before do
