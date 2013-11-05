@@ -13,13 +13,23 @@ describe SearchContext do
 
   describe '#execute' do
     it 'public projects should be searchable' do
-      context = SearchContext.new(user, [found_project.id], {search_code:  false, search: "searchable"})
+      params = {
+        search_code:  false,
+        search: "searchable",
+        project_ids: [found_project.id]
+      }
+      context = SearchContext.new(user, params)
       results = context.execute
       results[:projects].should == [found_project, public_project]
     end
 
     it 'namespace name should be searchable' do
-      context = SearchContext.new(user, [found_project.id], {search_code:  false, search: "searchable namespace"})
+      params = {
+        search_code:  false,
+        search: "searchable namespace",
+        project_ids: [found_project.id]
+      }
+      context = SearchContext.new(user, params)
       results = context.execute
       results[:projects].should == [found_project]
     end
