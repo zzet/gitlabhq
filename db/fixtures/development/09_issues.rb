@@ -13,7 +13,7 @@ Gitlab::Seeder.quiet do
     user_id = user.id
 
     begin
-      Thread.current[:current_user] = user
+      RequestStore.store[:current_user] = user
 
       Issue.seed(:id, [{
         id: i,
@@ -26,7 +26,7 @@ Gitlab::Seeder.quiet do
         description: Faker::Lorem.sentence
       }])
     ensure
-      Thread.current[:current_user] = nil
+      RequestStore.store[:current_user] = nil
     end
     print('.')
   end

@@ -249,7 +249,6 @@ describe API::API do
       delete api("/users/#{user.id}", admin)
       response.status.should == 200
       expect { User.find(user.id) }.to raise_error ActiveRecord::RecordNotFound
-      json_response['email'].should == user.email
     end
 
     it "should not delete for unauthenticated user" do

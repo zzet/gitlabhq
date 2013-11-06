@@ -11,8 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131017122134) do
-
+ActiveRecord::Schema.define(:version => 20131101182116) do
   create_table "ci_builds", :force => true do |t|
     t.integer  "user_id"
     t.integer  "target_project_id"
@@ -73,6 +72,23 @@ ActiveRecord::Schema.define(:version => 20131017122134) do
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
     t.string   "target_category"
+  end
+
+  create_table "event_summaries", :force => true do |t|
+    t.string   "title"
+    t.string   "user_id"
+    t.string   "state"
+    t.string   "period"
+    t.datetime "last_send_date"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
+
+  create_table "event_summary_subscription_relationships", :force => true do |t|
+    t.integer  "summary_id"
+    t.integer  "subscription_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "events", :force => true do |t|
@@ -301,6 +317,14 @@ ActiveRecord::Schema.define(:version => 20131017122134) do
     t.datetime "updated_at",   :null => false
   end
 
+  create_table "service_configuration_flowdocks", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
   create_table "service_configuration_gitlab_cis", :force => true do |t|
     t.integer  "service_id"
     t.string   "service_type"
@@ -329,6 +353,14 @@ ActiveRecord::Schema.define(:version => 20131017122134) do
     t.boolean  "merge_request_enabled"
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
+  end
+
+  create_table "service_configuration_pivotal_trackers", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
   create_table "service_hierarchies", :id => false, :force => true do |t|

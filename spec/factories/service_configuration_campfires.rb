@@ -16,6 +16,7 @@
 
 FactoryGirl.define do
   factory :campfire_configuration, class: Service::Configuration::Campfire do
+    service factory: :campfire_service
     subdomain "gitlab1"
     token 'secret_token'
     room 'developers'

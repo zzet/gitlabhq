@@ -8,19 +8,6 @@ describe OldActivityObserver do
     it { @event.project.should == project }
   end
 
-  describe "Merge Request created" do
-    before do
-      MergeRequest.observers.enable :old_activity_observer do
-        @merge_request = create(:merge_request, source_project: project, target_project: project)
-        @event = OldEvent.last
-      end
-    end
-
-    it_should_be_valid_event
-    it { @event.action.should == OldEvent::CREATED }
-    it { @event.target.should == @merge_request }
-  end
-
   describe "Issue created" do
     before do
       Issue.observers.enable :old_activity_observer do

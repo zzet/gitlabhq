@@ -136,7 +136,7 @@ describe "On a merge request", js: true do
 end
 
 describe "On a merge request diff", js: true, focus: true do
-  let!(:group) { create(:group)}
+  let!(:group) { create(:group) }
   let!(:project) { create(:source_project_with_code, namespace: group) }
   let!(:merge_request) { create(:merge_request_with_diffs, source_project: project, target_project: project) }
 
@@ -186,7 +186,8 @@ describe "On a merge request diff", js: true, focus: true do
   end
 
   describe "with muliple note forms" do
-    let!(:project) { create(:source_project_with_code) }
+    let!(:group) { create(:group) }
+    let!(:project) { create(:source_project_with_code, namespace: group) }
     let!(:merge_request) { create(:merge_request_with_diffs, source_project: project, target_project: project) }
 
     before do

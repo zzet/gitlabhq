@@ -38,6 +38,5 @@ module API
     mount ProjectSnippets
     mount DeployKeys
     mount ProjectHooks
-    mount Services
   end
 end

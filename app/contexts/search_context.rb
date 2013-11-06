@@ -34,6 +34,11 @@ class SearchContext < BaseContext
     result[:projects] = projects.search(query)
 
     # Search inside single project
+    single_project_search(projects, query)
+    result
+  end
+
+  def single_project_search(projects, query)
     project = projects.first if projects.length == 1
 
     if params[:search_code].present?
@@ -43,8 +48,6 @@ class SearchContext < BaseContext
       result[:issues]         = Issue.where(project_id: projects).search(query).order('updated_at DESC').limit(20)
       result[:wiki_pages] = []
     end
-
-    result
   end
 
   def result

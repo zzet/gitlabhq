@@ -18,7 +18,7 @@ Gitlab::Seeder.quiet do
 
     user_id = user.id
     begin
-      Thread.current[:current_user] = user
+      RequestStore.store[:current_user] = user
 
       MergeRequest.seed(:id, [{
         id: i,
@@ -32,7 +32,7 @@ Gitlab::Seeder.quiet do
         title: Faker::Lorem.sentence(6)
       }])
     ensure
-      Thread.current[:current_user] = nil
+      RequestStore.store[:current_user] = nil
     end
     print('.')
   end

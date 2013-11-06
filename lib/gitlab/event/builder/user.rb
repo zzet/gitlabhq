@@ -1,7 +1,7 @@
 class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
   class << self
     def prioritet
-      6
+      0
     end
 
     def can_build?(action, data)

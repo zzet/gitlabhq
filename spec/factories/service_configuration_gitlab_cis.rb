@@ -15,6 +15,7 @@
 
 FactoryGirl.define do
   factory :gitlab_ci_configuration, class: Service::Configuration::GitlabCi do
+    service factory: :gitlab_ci_service
     token "verySecret"
     project_url "http://ci.gitlab.org/projects/2"
   end
