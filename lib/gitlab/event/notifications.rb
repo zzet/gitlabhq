@@ -9,14 +9,25 @@ class Gitlab::Event::Notifications
         target = stored_notification.event.target_type.underscore
         source = stored_notification.event.source_type.underscore
 
-        mail_method = "#{action}_#{target}_#{source}_email"
+        mail_sender = "Emails::#{target.camelize}::#{source.camelize}"
+        mail_sender = begin
+                        mail_sender.constantize
+                      rescue
+                        EventNotificationMailer
+                      end
+        mail_method = "#{action}_email"
 
         if stored_notification.process
           begin
-            if EventNotificationMailer.respond_to?(mail_method)
-              EventNotificationMailer.send(mail_method, stored_notification).deliver!
+            if mail_sender.respond_to?(mail_method)
+              mail_sender.send(mail_method, stored_notification).deliver!
             else
-              raise RuntimeError, "Undefined mail_method in notifications: #{mail_method}"
+              mail_method_old = "#{action}_#{target}_#{source}_email"
+              if EventNotificationMailer.respond_to?(mail_method_old)
+                EventNotificationMailer.send(mail_method_old, stored_notification).deliver!
+              else
+                raise RuntimeError, "Undefined mail_method in notifications: #{mail_method} for #{mail_sender.class.name}"
+              end
             end
 
             stored_notification.deliver
@@ -24,7 +35,7 @@ class Gitlab::Event::Notifications
             stored_notification.save
           rescue Exception => ex
             stored_notification.failing
-            raise RuntimeError, "Can't send notification. Email error in #{mail_method}. \r\n#{ex.message}\r\n#{ex.backtrace.join("\r\n")}"
+            raise RuntimeError, "Can't send notification. Email error in #{mail_method} for #{mail_sender.class.name}. \r\n#{ex.message}\r\n#{ex.backtrace.join("\r\n")}"
           end
         end
 

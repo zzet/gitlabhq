@@ -61,12 +61,12 @@ class Gitlab::Event::Builder::Team < Gitlab::Event::Builder::Base
 
         case meta[:action]
         when :created
-          actions << :joined
+          actions << :assigned
         when :updated
           actions << :updated
           temp_data[:previous_changes] = source.changes
         when :deleted
-          actions << :left
+          actions << :resigned
         end
 
       end
