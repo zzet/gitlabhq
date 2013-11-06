@@ -253,8 +253,20 @@ class Project < ActiveRecord::Base
     @gitlab_ci_service ||= services.where(type: Service::GitlabCi).first
   end
 
+  def gitlab_ci
+    @jenkins_ci_service ||= services.where(type: Service::Jenkins).first
+  end
+
   def gitlab_ci?
     gitlab_ci.present? && gitlab_ci.enabled?
+  end
+
+  def jenkins_ci?
+    jenkins_ci.present? && jenkins_ci.enabled?
+  end
+
+  def jenkins_ci_with_mr?
+    jenkins_ci? && jenkins_ci.configuration && jenkins_ci.configuration.merge_request_enabled
   end
 
   # For compatibility with old code

@@ -47,6 +47,8 @@ class Service::Jenkins < Service
             merge_request: merge_request,
             target_project: project,
             source_project: project,
+            target_branch: merge_request.target_branch,
+            source_branch: merge_request.source_branch,
             target_sha: merge_request.commits.last.parent_id,
             source_sha: merge_request.commits.first.id,
             user: user
@@ -60,20 +62,24 @@ class Service::Jenkins < Service
     # Update code for merge requests in project
     mrs = project.fork_merge_requests.opened.by_branch(branch_name).scoped
     mrs.each do |merge_request|
-      project_service = merge_request.target_project.services.where(type: Service::Jenkins).first
-      if project_service.present? && project_service.configuration.merge_request_enabled
-        merge_request.check_if_can_be_merged
-        if merge_request.can_be_merged?
-          attrs = {
-            merge_request: merge_request,
-            target_project: merge_request.target_project,
-            source_project: project,
-            target_sha: merge_request.commits.last.parent_id,
-            source_sha: merge_request.commits.first.id,
-            user: user
-          }
-          build = builds.create(attrs)
-          build.run
+      if source_project != target_project
+        project_service = merge_request.target_project.services.where(type: Service::Jenkins).first
+        if project_service.present? && project_service.configuration.merge_request_enabled
+          merge_request.check_if_can_be_merged
+          if merge_request.can_be_merged?
+            attrs = {
+              merge_request: merge_request,
+              target_project: merge_request.target_project,
+              source_project: project,
+              target_branch: merge_request.target_branch,
+              source_branch: merge_request.source_branch,
+              target_sha: merge_request.commits.last.parent_id,
+              source_sha: merge_request.commits.first.id,
+              user: user
+            }
+            build = builds.create(attrs)
+            build.run
+          end
         end
       end
     end

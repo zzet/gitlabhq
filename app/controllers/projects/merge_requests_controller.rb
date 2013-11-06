@@ -21,9 +21,12 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     assignee_id, milestone_id = params[:assignee_id], params[:milestone_id]
     @assignee = @project.team.find(assignee_id) if assignee_id.present? && !assignee_id.to_i.zero?
     @milestone = @project.milestones.find(milestone_id) if milestone_id.present? && !milestone_id.to_i.zero?
+    @ci_builds = CiBuild.for_merge_requests(@merge_requests)
   end
 
   def show
+    @ci_builds = @merge_requests.ci_builds
+
     respond_to do |format|
       format.html
       format.js

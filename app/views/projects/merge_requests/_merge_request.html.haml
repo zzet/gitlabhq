@@ -31,7 +31,9 @@
       %span
         %i.icon-time
         = merge_request.milestone.title
-
+    - if merge_request.ci_builds.any?
+      %span
+        last build: #{ci_builds.last.state}
 
     .pull-right
       %small updated #{time_ago_in_words(merge_request.updated_at)} ago

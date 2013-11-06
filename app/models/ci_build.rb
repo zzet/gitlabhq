@@ -2,7 +2,8 @@ class CiBuild < ActiveRecord::Base
   attr_accessible :source_project_id, :source_project,
                   :target_project_id, :target_project,
                   :merge_request_id,  :merge_request,
-                  :source_sha, :target_sha,
+                  :source_sha, :source_branch,
+                  :target_sha, :target_branch,
                   :user_id, :user,
                   :service_id, :service_type,
                   :state, :coverage, :trace, :data
@@ -21,17 +22,34 @@ class CiBuild < ActiveRecord::Base
 
   state_machine :state, initial: :build do
     event :to_success do
-      transition [:build] => :success
+      transition [:build, :skipped, :aborted, :unstable] => :success
     end
 
     event :to_fail do
       transition [:build] => :fail
     end
 
+    event :to_skipped do
+      transition [:build] => :skipped
+    end
+
+    event :to_abort do
+      transition [:build] => :aborted
+    end
+
+    event :to_unstable do
+      transition [:build] => :unstable
+    end
+
     state :build
     state :fail
+    state :skipped
+    state :aborted
     state :success
+    state :unstable
   end
+
+  scope :for_merge_requests, ->(merge_requests) { where(source_sha: merge_requests.map { |mr| mr.commits.first.id }, merge_request_id: merge_requests.map { |mr| mr.id }) }
 
   def run
     configuration = service.configuration
@@ -52,26 +70,30 @@ class CiBuild < ActiveRecord::Base
 
   def data_to_push_build
     {
-      build_id:   id,
-      target_sha: target_sha,
-      source_sha: source_sha,
-      target_uri: target_project.url_to_repo,
-      source_uri: source_project.url_to_repo
+      build_id:      id,
+      target_branch: target_branch,
+      source_branch: source_branch,
+      target_sha:    target_sha,
+      source_sha:    source_sha,
+      target_uri:    target_project.url_to_repo,
+      source_uri:    source_project.url_to_repo
     }
   end
 
   def data_to_merge_requst_build
     {
-      build_id:   id,
-      target_sha: target_sha,
-      source_sha: source_sha,
-      target_uri: target_project.url_to_repo,
-      source_uri: source_project.url_to_repo
+      build_id:      id,
+      target_branch: target_branch,
+      source_branch: source_branch,
+      target_sha:    target_sha,
+      source_sha:    source_sha,
+      target_uri:    target_project.url_to_repo,
+      source_uri:    source_project.url_to_repo
     }
   end
 
   def merge_request_build?
-    merge_request.present? && source_project.present? && target_project.presen? && !source_sha.blank? && !target_sha.blank?
+    merge_request.present? && source_project.present? && target_project.present? && !source_sha.blank? && !target_sha.blank?
   end
 
   def correct_token?(token)
