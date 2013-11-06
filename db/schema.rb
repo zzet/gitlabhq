@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(:version => 20131101182116) do
     t.integer  "merge_request_id"
     t.integer  "service_id"
     t.string   "service_type"
+    t.string   "source_branch"
+    t.string   "target_branch"
     t.string   "source_sha"
     t.string   "target_sha"
     t.string   "state"
