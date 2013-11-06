@@ -10,6 +10,13 @@
         %span.badge.badge-info
           %i.icon-comment
           = notes.count
+    - if build_status.present?
+      .build_status.pull-right
+        .badge{class: "badge-#{build_status.success? ? "success" : "important"}"}
+          - if build_status.success?
+            %i.icon-ok
+          - else
+            %i.icon-remove-sign
 
   .commit-row-info
     = commit_author_link(commit, avatar: true, size: 16)

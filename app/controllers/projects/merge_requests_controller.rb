@@ -25,7 +25,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def show
-    @ci_builds = @merge_requests.ci_builds
+    @ci_builds = @merge_request.ci_builds
 
     respond_to do |format|
       format.html

@@ -253,7 +253,7 @@ class Project < ActiveRecord::Base
     @gitlab_ci_service ||= services.where(type: Service::GitlabCi).first
   end
 
-  def gitlab_ci
+  def jenkins_ci
     @jenkins_ci_service ||= services.where(type: Service::Jenkins).first
   end
 

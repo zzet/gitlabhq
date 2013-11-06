@@ -62,7 +62,7 @@ class Service::Jenkins < Service
     # Update code for merge requests in project
     mrs = project.fork_merge_requests.opened.by_branch(branch_name).scoped
     mrs.each do |merge_request|
-      if source_project != target_project
+      if merge_request.source_project != merge_request.target_project
         project_service = merge_request.target_project.services.where(type: Service::Jenkins).first
         if project_service.present? && project_service.configuration.merge_request_enabled
           merge_request.check_if_can_be_merged

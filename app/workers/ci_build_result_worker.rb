@@ -11,9 +11,9 @@ class CiBuildResultWorker
     parser = Gitlab::Ci::Jenkins.new(data)
     parser.parse
 
-    builds = CiBuild.where(target_sha: parser.commits)
+    builds = CiBuild.where(source_sha: parser.commits)
     builds.each do |build|
-      if build.target_sha != parser.last_sha
+      if build.source_sha != parser.last_sha
         build.to_skipped
       else
         case parser.status

@@ -49,7 +49,8 @@ class CiBuild < ActiveRecord::Base
     state :unstable
   end
 
-  scope :for_merge_requests, ->(merge_requests) { where(source_sha: merge_requests.map { |mr| mr.commits.first.id }, merge_request_id: merge_requests.map { |mr| mr.id }) }
+  scope :for_merge_requests, ->(merge_requests) { where(source_sha: merge_requests.map { |mr| mr.commits.first.id if mr.commits.any? }.compact, merge_request_id: merge_requests.map { |mr| mr.id }) }
+  scope :with_commit, ->(commit) { where(source_sha: commit.id) }
 
   def run
     configuration = service.configuration
@@ -71,10 +72,10 @@ class CiBuild < ActiveRecord::Base
   def data_to_push_build
     {
       build_id:      id,
-      target_branch: target_branch,
-      source_branch: source_branch,
-      target_sha:    target_sha,
-      source_sha:    source_sha,
+      target_sha:    target_branch,
+      source_sha:    source_branch,
+      target_branch: target_sha,
+      source_branch: source_sha,
       target_uri:    target_project.url_to_repo,
       source_uri:    source_project.url_to_repo
     }
@@ -83,10 +84,10 @@ class CiBuild < ActiveRecord::Base
   def data_to_merge_requst_build
     {
       build_id:      id,
-      target_branch: target_branch,
-      source_branch: source_branch,
-      target_sha:    target_sha,
-      source_sha:    source_sha,
+      target_sha:    target_branch,
+      source_sha:    source_branch,
+      target_branch: target_sha,
+      source_branch: source_sha,
       target_uri:    target_project.url_to_repo,
       source_uri:    source_project.url_to_repo
     }
