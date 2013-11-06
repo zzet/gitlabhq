@@ -25,6 +25,7 @@ class Service::Jenkins < Service
   has_many :builds,   class_name: CiBuild, as: :service
 
   def execute(data)
+    return true unless configuration.present?
     return true unless data[:ref] =~ /heads/
 
     # Create build for push
