@@ -10,7 +10,7 @@
         %span.badge.badge-info
           %i.icon-comment
           = notes.count
-    - if build_status.present?
+    - if defined?(build_status) && build_status.present?
       .build_status.pull-right
         .badge{class: "badge-#{build_status.success? ? "success" : (build_status.build? ? "warning" : "important")}"}
           - if build_status.success?

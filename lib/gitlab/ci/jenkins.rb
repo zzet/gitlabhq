@@ -48,7 +48,7 @@ module Gitlab
     end
 
     def status
-      test_result[:total].zero? ? "errored" : build_result["result"].downcase
+      build_result["result"].downcase
     end
 
     def last_sha
