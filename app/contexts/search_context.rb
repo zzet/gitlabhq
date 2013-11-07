@@ -30,7 +30,7 @@ class SearchContext < BaseContext
 
     return result unless query.present?
 
-    result[:project] = projects.first if project_id.present?
+    result[:project]  = projects.first if project_id.present?
     result[:projects] = projects.search(query)
 
     # Search inside single project
@@ -42,11 +42,11 @@ class SearchContext < BaseContext
     project = projects.first if projects.length == 1
 
     if params[:search_code].present?
-      result[:blobs] = project.repository.search_files(query, params[:repository_ref]) unless project.empty_repo?
+      result[:blobs]          = project.repository.search_files(query, params[:repository_ref]) unless project.empty_repo?
     else
       result[:merge_requests] = MergeRequest.in_projects(projects).search(query).order('updated_at DESC').limit(20)
       result[:issues]         = Issue.where(project_id: projects).search(query).order('updated_at DESC').limit(20)
-      result[:wiki_pages] = []
+      result[:wiki_pages]     = []
     end
   end
 
