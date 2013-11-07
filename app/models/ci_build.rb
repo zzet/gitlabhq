@@ -71,25 +71,25 @@ class CiBuild < ActiveRecord::Base
 
   def data_to_push_build
     {
-      build_id:      id,
-      target_sha:    target_branch,
-      source_sha:    source_branch,
-      target_branch: target_sha,
-      source_branch: source_sha,
-      target_uri:    target_project.url_to_repo,
-      source_uri:    source_project.url_to_repo
+      build_id:       id,
+      target_branch:  target_branch,
+      source_branch:  source_branch,
+      target_sha:     target_sha,
+      source_sha:     source_sha,
+      target_uri:     target_project.url_to_repo,
+      source_uri:     source_project.url_to_repo
     }
   end
 
   def data_to_merge_requst_build
     {
-      build_id:      id,
-      target_sha:    target_branch,
-      source_sha:    source_branch,
-      target_branch: target_sha,
-      source_branch: source_sha,
-      target_uri:    target_project.url_to_repo,
-      source_uri:    source_project.url_to_repo
+      build_id:       id,
+      target_branch:  target_branch,
+      source_branch:  source_branch,
+      target_sha:     target_sha,
+      source_sha:     source_sha,
+      target_uri:     target_project.url_to_repo,
+      source_uri:     source_project.url_to_repo
     }
   end
 

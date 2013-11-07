@@ -12,13 +12,8 @@
           = notes.count
     - if defined?(build_status) && build_status.present?
       .build_status.pull-right
-        .badge{class: "badge-#{build_status.success? ? "success" : (build_status.build? ? "warning" : "important")}"}
-          - if build_status.success?
-            %i.icon-ok
-          - elsif build_status.build?
-            %i.icon-repeat
-          - else
-            %i.icon-remove-sign
+        .badge{class: "badge-#{ci_build_status_class(build_status.state)}"}
+          %i{class: ci_build_status_image(build_status.state)}
 
   .commit-row-info
     = commit_author_link(commit, avatar: true, size: 16)

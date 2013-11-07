@@ -3,21 +3,22 @@
   - if last_build.success?
     .ci_widget.ci-success
       .alert.alert-success
-        %i.icon-ok
+        %i{class: ci_build_status_image(last_build.state) }
         %strong CI build passed
         for #{@merge_request.last_commit_short_sha}.
 
-  - if last_build.fail?
+  - elsif last_build.fail?
     .ci_widget.ci-failed
       .alert.alert-error
-        %i.icon-remove
+        %i{class: ci_build_status_image(last_build.state) }
         %strong CI build failed
         for #{@merge_request.last_commit_short_sha}.
 
-  - [:build, :skipped, :aborted, :unstable].each do |status|
-    - if last_build.send(:"#{status}?")
-      .ci_widget{class: "ci-#{status}", style: "display:none"}
-        .alert
-          %i.icon-time
-          %strong CI build #{status}
-          for #{@merge_request.last_commit_short_sha}.
+  - else
+    - [:build, :skipped, :aborted, :unstable].each do |status|
+      - if last_build.send(:"#{status}?")
+        .ci_widget{class: "ci-#{status}"}
+          .alert
+            %i{class: ci_build_status_image(last_build.state) }
+            %strong CI build status: #{status}
+            for #{@merge_request.last_commit_short_sha}.
