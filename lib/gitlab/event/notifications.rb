@@ -26,7 +26,7 @@ class Gitlab::Event::Notifications
               if EventNotificationMailer.respond_to?(mail_method_old)
                 EventNotificationMailer.send(mail_method_old, stored_notification).deliver!
               else
-                raise RuntimeError, "Undefined mail_method in notifications: #{mail_method} for #{mail_sender.class.name}"
+                raise RuntimeError, "Undefined mail_method in notifications: #{mail_method} for #{mail_sender.name}\r\n\r\n"
               end
             end
 
