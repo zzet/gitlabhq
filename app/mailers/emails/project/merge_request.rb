@@ -1,5 +1,5 @@
 class Emails::Project::MergeRequest < Emails::Project::Base
-  def opened_project_merge_request_email(notification)
+  def opened_email(notification)
     @notification  = notification
     @event         = @notification.event
     @user          = @event.author
@@ -14,7 +14,7 @@ class Emails::Project::MergeRequest < Emails::Project::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@merge_request.title}' (##{@merge_request.id})")
   end
 
-  def merged_project_merge_request_email(notification)
+  def merged_email(notification)
     @notification   = notification
     @event          = @notification.event
     @user           = @event.author
