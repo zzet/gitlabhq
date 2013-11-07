@@ -34,28 +34,14 @@ class Service::Jenkins < Service
     user = User.find(data[:user_id])
 
     if branches.include?(branch_name)
-      build = builds.create(target_project: project, target_sha: data[:after], user: user)
+      build = builds.create(target_project: project, source_sha: data[:after], user: user)
       build.run
     end
 
     if configuration.merge_request_enabled
       mrs = project.merge_requests.opened.by_branch(branch_name).scoped
       mrs.each do |merge_request|
-        merge_request.check_if_can_be_merged
-        if merge_request.can_be_merged?
-          attrs = {
-            merge_request: merge_request,
-            target_project: project,
-            source_project: project,
-            target_branch: merge_request.target_branch,
-            source_branch: merge_request.source_branch,
-            target_sha: merge_request.commits.last.parent_id,
-            source_sha: merge_request.commits.first.id,
-            user: user
-          }
-          build = builds.create(attrs)
-          build.run
-        end
+        build_merge_request(merge_request, user, :project)
       end
     end
 
@@ -65,24 +51,28 @@ class Service::Jenkins < Service
       if merge_request.source_project != merge_request.target_project
         project_service = merge_request.target_project.services.where(type: Service::Jenkins).first
         if project_service.present? && project_service.configuration.merge_request_enabled
-          merge_request.check_if_can_be_merged
-          if merge_request.can_be_merged?
-            attrs = {
-              merge_request: merge_request,
-              target_project: merge_request.target_project,
-              source_project: project,
-              target_branch: merge_request.target_branch,
-              source_branch: merge_request.source_branch,
-              target_sha: merge_request.commits.last.parent_id,
-              source_sha: merge_request.commits.first.id,
-              user: user
-            }
-            build = builds.create(attrs)
-            build.run
-          end
+          build_merge_request(merge_request, user, :fork)
         end
       end
     end
 
+  end
+
+  def build_merge_request(merge_request, user, merge_request_type = :project)
+    merge_request.check_if_can_be_merged
+    if merge_request.can_be_merged?
+      attrs = {
+        merge_request: merge_request,
+        target_project: merge_request_type == :project ? project : merge_request.target_project,
+        source_project: project,
+        target_branch: merge_request.target_branch,
+        source_branch: merge_request.source_branch,
+        target_sha: merge_request.commits.last.parent_id,
+        source_sha: merge_request.commits.first.id,
+        user: user
+      }
+      build = builds.create(attrs)
+      build.run
+    end
   end
 end
