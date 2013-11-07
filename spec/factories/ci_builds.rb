@@ -2,12 +2,13 @@
 
 FactoryGirl.define do
   factory :ci_build do
-    target_project_id 1
-    source_project_id 1
-    merge_request_id 1
+    target_project factory: :project
+    source_project factory: :project
+    merge_request factory: :merge_request
+    user
     source_sha "MyString"
     target_sha "MyString"
-    state "MyString"
+    state "build"
     trace "MyText"
     coverage "MyText"
   end
