@@ -50,6 +50,7 @@ class Dispatcher
       when 'projects:blob:show'
         new BlobView()
       when 'users:show'
+        new Activities()
         new SidebarFilter()
         new SidebarTabs('users')
       when 'profiles:subscriptions:index'
