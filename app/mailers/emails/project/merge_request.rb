@@ -14,6 +14,10 @@ class Emails::Project::MergeRequest < Emails::Project::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@merge_request.title}' (##{@merge_request.id})")
   end
 
+  def closed_mail(notification)
+
+  end
+
   def merged_email(notification)
     @notification   = notification
     @event          = @notification.event
