@@ -2,7 +2,7 @@ namespace :undev do
   desc "Undev | migrate exist projects to redmine service"
   task migrate_to_redmine: :environment do
 
-    ActiveRecord::Base.redmineervers.disable(:all)
+    ActiveRecord::Base.observers.disable(:all)
 
     redmine_production_key = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEArAqshTNeuBeRaGZle86N/zvql0YncCqqZIOV2yWJ0I7lmnxQhCr6GF65ljhBjm9djNdM+dXi1fbIiEv7EGXxrzlQnN4EDkaHSIGejhOySoPBnCrHVsCdkvFzC05drYmehtQmMSjCU6oddJEDzzIaoWLQEuqF/YffHu4Xy4XGotAduK36ViJ79v77hvcksdrw7Ki/LFh0z9ZOEkuFfjgzjWK43V9o65RxFt7g8yLoyuyyP3s5SSNS6CF74/tom5TZBjpzAs71LVx7mejrpChRZpgCXF5AopYU05ecZEKC6rIB0SMscgs53vtdx1fjFX7ntgm2FznQQH3EXe/tPIqLhQ== redmine@hw01"
 
