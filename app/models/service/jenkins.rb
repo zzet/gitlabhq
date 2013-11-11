@@ -34,7 +34,7 @@ class Service::Jenkins < Service
     user = User.find(data[:user_id])
 
     if branches.include?(branch_name)
-      build = builds.create(target_project: project, source_sha: data[:after], user: user)
+      build = builds.create(target_project: project, source_branch: branch_name, source_sha: data[:after], user: user)
       build.run
     end
 

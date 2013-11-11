@@ -55,30 +55,16 @@ class CiBuild < ActiveRecord::Base
   def run
     configuration = service.configuration
 
-    data, path = {}, ""
     if merge_request_build?
       data = data_to_merge_requst_build
-      path = configuration.merge_request_path
+      url = configuration.host + configuration.merge_request_path
+      WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
     else
-      data = data_to_push_build
-      path = configuration.push_path
+      url = configuration.host + configuration.push_path
+      WebHook.get(url, options: {url: target_project.url_to_repo, branches: source_branch})
     end
 
-    url = configuration.host + path
-
-    WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
-  end
-
-  def data_to_push_build
-    {
-      build_id:       id,
-      target_branch:  target_branch,
-      source_branch:  source_branch,
-      target_sha:     target_sha,
-      source_sha:     source_sha,
-      target_uri:     target_project.url_to_repo,
-      source_uri:     source_project.url_to_repo
-    }
+    true
   end
 
   def data_to_merge_requst_build
