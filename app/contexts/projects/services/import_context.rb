@@ -3,12 +3,14 @@ module Projects
     class ImportContext < Projects::Services::BaseContext
       def execute(role = :user)
         service_params = params
-        service_configuration_params = service_params.delete(:configuration)
+        service_params.delete(:configuration)
 
         if role != :admin
           service_params.delete(:avtive_state_event)
           service_params.delete(:publish_state_event)
         end
+
+        service_state = service_params.delete(:state_event)
 
         @project_service = service.class.new
         @project_service.title = service.title
@@ -26,7 +28,7 @@ module Projects
           service.children << @project_service
           project.services << @project_service
 
-          @project_service.state_event = service_params[:state_event]
+          @project_service.state_event = service_state
           @project_service.save
         end
 
@@ -40,7 +42,7 @@ module Projects
           attrs.delete(key)
         end
 
-        config = @project_service.create_configuration(attrs)
+        @project_service.create_configuration(attrs)
       end
     end
   end
