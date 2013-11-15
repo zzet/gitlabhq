@@ -999,6 +999,8 @@ describe EventNotificationMailer do
       end
 
       context "when event source - push action" do
+        include FreezingEmail::Rspec
+
         before do
           @service = GitPushService.new
           @oldrev = 'b98a310def241a6fd9c9a9a3e7934c48e498fe81'
