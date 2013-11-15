@@ -25,7 +25,7 @@ class Emails::Group::Project < Emails::Group::Base
     headers 'X-Gitlab-Entity' => 'group',
             'X-Gitlab-Action' => 'updated',
             'X-Gitlab-Source' => 'project',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}"
+            'In-Reply-To'     => "group-#{@group.path}-project-#{@project.path_with_namespace}"
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Project was updated")
   end

@@ -38,9 +38,9 @@ class Emails::Project::Project < Emails::Project::Base
 
     if @namespace
       headers 'X-Gitlab-Entity' => 'project',
-        'X-Gitlab-Action' => 'deleted',
-        'X-Gitlab-Source' => 'project',
-        'In-Reply-To'     => "project-#{@namespace.path}/#{@project["path"]}"
+              'X-Gitlab-Action' => 'deleted',
+              'X-Gitlab-Source' => 'project',
+              'In-Reply-To'     => "project-#{@namespace.path}/#{@project["path"]}"
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@namespace.path}/#{@project["path"]}] Project was removed")
     end

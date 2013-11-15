@@ -74,6 +74,4 @@ class Emails::User::User < Emails::User::Base
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@deleted_user['name']}' was removed")
   end
-
-
 end

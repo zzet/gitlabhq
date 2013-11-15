@@ -40,11 +40,27 @@ class Emails::Project::Note < Emails::Project::Base
     headers 'X-Gitlab-Entity' => 'project',
       'X-Gitlab-Action' => 'commented',
       'X-Gitlab-Source' => 'note',
-      'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
+      'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.iid}"
 
     if @note && @project && @merge_request
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@merge_request.title}' (##{@merge_request.id})")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@merge_request.title}' (##{@merge_request.iid})")
     end
+  end
+
+  def commented_issue_email(notification)
+    @notification   = notification
+    @event          = @notification.event
+    @user           = @event.author
+    @note           = @event.source
+    @project        = @event.target
+    @issue          = @note.noteable
+
+    headers 'X-Gitlab-Entity' => 'project',
+      'X-Gitlab-Action' => 'commented',
+      'X-Gitlab-Source' => 'note',
+      'In-Reply-To'     => "project-#{@project.path_with_namespace}-issue-#{@issue.iid}"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@issue.title}' (##{@issue.iid})")
   end
 
   def commented_email(notification)

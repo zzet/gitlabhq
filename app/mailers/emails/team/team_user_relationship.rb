@@ -4,16 +4,17 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
     @event        = @notification.event
     @user         = @event.author
     @utur         = @event.source
-    @team         = @event.target
+    @team         = @utur.team
     @member       = @utur.user
     @projects     = @team.projects
+    @permission   = Gitlab::Access.options_with_owner.key(@utur.team_access)
 
     headers 'X-Gitlab-Entity' => 'team',
             'X-Gitlab-Action' => 'joined',
             'X-Gitlab-Source' => 'team-user-relationship',
             'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was added to '#{@team.name}' team")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.name}' membership in '#{@team.name}' team")
   end
 
   def updated_email(notification)
@@ -21,7 +22,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
     @event        = @notification.event
     @user         = @event.author
     @utur         = @event.source
-    @team         = @event.target
+    @team         = @utur.team
     @member       = @utur.user
     @changes      = JSON.load(@event.data).to_hash["previous_changes"]
 
@@ -30,7 +31,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
             'X-Gitlab-Source' => 'team-user-relationship',
             'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Membership settings for user '#{@member.name}' in team '#{@team.name}' was updated")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.name}' membership in '#{@team.name}' team")
   end
 
   def left_email(notification)
@@ -38,7 +39,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
     @event        = @notification.event
     @up           = JSON.load(@event.data)
     @user         = @event.author
-    @team         = @event.target
+    @team         = Team.find(@up["team_id"])
     @member       = User.find(@up["user_id"])
 
     headers 'X-Gitlab-Entity' => 'team',
@@ -47,7 +48,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
             'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
 
     if @team && @member
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was removed from '#{@team.name}' team")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.name}' membership in '#{@team.name}' team")
     end
   end
 end

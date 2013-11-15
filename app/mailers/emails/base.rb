@@ -4,9 +4,9 @@ class Emails::Base < ActionMailer::Base
   default from: "Gitlab messenger <#{Gitlab.config.gitlab.email_from}>",
           return_path: Gitlab.config.gitlab.email_from
 
-  default_url_options[:host]     = Gitlab.config.gitlab.host
-  default_url_options[:protocol] = Gitlab.config.gitlab.protocol
-  default_url_options[:port]     = Gitlab.config.gitlab.port if Gitlab.config.gitlab_on_non_standard_port?
+  default_url_options[:host]        = Gitlab.config.gitlab.host
+  default_url_options[:protocol]    = Gitlab.config.gitlab.protocol
+  default_url_options[:port]        = Gitlab.config.gitlab.port if Gitlab.config.gitlab_on_non_standard_port?
   default_url_options[:script_name] = Gitlab.config.gitlab.relative_url_root
 
   # Just send email with 6 seconds delay
