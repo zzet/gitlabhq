@@ -5,6 +5,7 @@ class Emails::Project::PushSummary < Emails::Project::Base
     @user         = @event.author
     @source       = @event.source_type
     @project      = @event.target
+    @repository   = @project.repository
     @push_data    = JSON.load(@event.data).to_hash
     @branch       = @push_data["ref"]
     @branch.slice!("refs/heads/")
