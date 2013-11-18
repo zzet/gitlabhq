@@ -97,7 +97,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << :reopened
         when :merged
           # FIXME
-          if Event.where(action: :merged, source_id: source.id, source_type: source.type, author_id: user.id).empty?
+          if Event.where(action: :merged, source_id: source.id, source_type: source.class.name, author_id: user.id).empty?
             actions << :merged
           end
         end

@@ -2,6 +2,8 @@
 %tr{style: "margin: 1px; background: #{color}"}
   %td
     = link_to commit.short_id(8), project_commit_url(@project.path_with_namespace, commit.id)
+  %td
+    = raw @project.repository.branch_names_contains(commit.id).each {|br| "#{ link_to br, project_commits_url(@project.path_with_namespace, br) }" }.join(", ")
   %td{title: commit.message.truncate(100)}
     = simple_format(commit.message)
   %td
