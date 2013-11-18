@@ -15,7 +15,8 @@
     .clearfix
     %hr
     %h4 User Activity:
-    = render @events
+    .activities
+      = render 'activities'
   .span4
     = render 'profile', user: @user
 
@@ -33,6 +34,3 @@
         = render "groups",   user: @user
       .tab-pane#teams
         = render "teams",    user: @user
-
-:javascript
-  userPage();
