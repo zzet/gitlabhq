@@ -1,8 +1,0 @@
-%br
-= markdown(@note.note)
-%br
-= "---"
-%br
-Click
-= link_to_gfm "here", project_commit_url(@note.project, id: @commit.id, anchor: "note_#{@note.id}")
-to view it on Gitlab
