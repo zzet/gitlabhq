@@ -13,6 +13,7 @@ class Projects::CommitsController < Projects::ApplicationController
     @limit, @offset = (params[:limit] || 40), (params[:offset] || 0)
 
     @commits = @repo.commits(@ref, @path, @limit, @offset)
+    @ci_builds = CiBuild.for_project_push(@project).with_commits(@commits)
 
     respond_to do |format|
       format.html # index.html.erb
