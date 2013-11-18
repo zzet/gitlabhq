@@ -1,10 +1,6 @@
 class Notify < ActionMailer::Base
-  include Emails::Issues
-  include Emails::MergeRequests
-  include Emails::Notes
   include Emails::Projects
   include Emails::Profile
-  include Emails::Groups
 
   add_template_helper ApplicationHelper
   add_template_helper GitlabMarkdownHelper

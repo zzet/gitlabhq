@@ -108,7 +108,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_code_access!
-    return access_denied! unless can?(current_user, :download_code, project) or project.public?
+    return access_denied! unless can?(current_user, :download_code, project) || project.public?
   end
 
   def authorize_push!
