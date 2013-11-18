@@ -155,7 +155,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :updated
           actions << :updated
         when :deleted
-          actions << :reassigned
+          actions << :resigned
         end
 
       when ::UsersProject

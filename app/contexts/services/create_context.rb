@@ -15,7 +15,7 @@ module Services
       @service = Service.build_by_type(service_type, service_params)
 
       if @service.save
-        @service.create_configuration(service_configuration_params) if @service.respond_to?(:configuration)
+        @service.configuration.update_attributes(service_configuration_params) if @service.respond_to?(:configuration)
 
         if @service.user_params.any?
           @service_user = User.find_by_username(@service.user_params[:username])

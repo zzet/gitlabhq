@@ -9,8 +9,9 @@
           %span.public-label Private
 
     .span8
-      .project-home-dropdown
-        = render "dropdown"
+      - if can? current_user, :download_code, @project
+        .project-home-dropdown
+          = render "dropdown"
       .form-horizontal
         = render "shared/clone_panel"
 

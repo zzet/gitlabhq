@@ -21,9 +21,12 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     assignee_id, milestone_id = params[:assignee_id], params[:milestone_id]
     @assignee = @project.team.find(assignee_id) if assignee_id.present? && !assignee_id.to_i.zero?
     @milestone = @project.milestones.find(milestone_id) if milestone_id.present? && !milestone_id.to_i.zero?
+    @ci_builds = CiBuild.for_merge_requests(@merge_requests)
   end
 
   def show
+    @ci_builds = @merge_request.ci_builds
+
     respond_to do |format|
       format.html
       format.js
@@ -40,6 +43,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     @comments_target = {noteable_type: 'MergeRequest',
                         noteable_id: @merge_request.id}
     @line_notes = @merge_request.notes.where("line_code is not null")
+
+    @ci_builds = @merge_request.ci_builds
 
     diff_line_count = Commit::diff_line_count(@merge_request.diffs)
     @suppress_diff = Commit::diff_suppress?(@merge_request.diffs, diff_line_count) && !params[:force_show_diff]
