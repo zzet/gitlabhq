@@ -8,5 +8,5 @@
     .span10
       %ul.well-list
         - commits.each do |commit|
-          = render commits, commit: commit, project: @project, build_status: @ci_builds.with_commit(commit).last
+          = render commit, project: @project, build_status: @ci_builds.with_commit(commit).last
   %hr.lists-separator
