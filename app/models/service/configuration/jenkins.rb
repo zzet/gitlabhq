@@ -12,4 +12,8 @@ class Service::Configuration::Jenkins < ActiveRecord::Base
       { type: 'checkbox', name: 'merge_request_enabled',  placeholder: '' },
     ]
   end
+
+  def branches_list
+    branches.split(",").map { |branch| branch.strip }
+  end
 end

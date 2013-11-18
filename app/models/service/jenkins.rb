@@ -29,7 +29,7 @@ class Service::Jenkins < Service
     return true unless data[:ref] =~ /heads/
 
     # Create build for push
-    branches = configuration.branches.split(",")
+    branches = configuration.branches_list
     branch_name = data[:ref].gsub("refs/heads/", "")
     user = User.find(data[:user_id])
 
