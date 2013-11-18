@@ -16,8 +16,8 @@ class CiBuild < ActiveRecord::Base
 
   belongs_to :merge_request,  foreign_key: :merge_request_id,  class_name: MergeRequest
 
-  validates :target_project, presence: true
-  validates :target_sha,     presence: true
+  validates :source_project, presence: true
+  validates :source_sha,     presence: true
   validates :user,           presence: true
 
   state_machine :state, initial: :build do
@@ -49,22 +49,31 @@ class CiBuild < ActiveRecord::Base
     state :unstable
   end
 
+  scope :for_project_push,   ->(project) { where(source_project_id: project, target_project_id: nil) }
+  scope :with_commits,       ->(commits) { where(source_sha: commits.map { |commit| commit.id })}
+  scope :with_commit,        ->(commit)  { where(source_sha: commit.id) }
   scope :for_merge_requests, ->(merge_requests) { where(source_sha: merge_requests.map { |mr| mr.commits.first.id if mr.commits.any? }.compact, merge_request_id: merge_requests.map { |mr| mr.id }) }
-  scope :with_commit, ->(commit) { where(source_sha: commit.id) }
 
   def run
     configuration = service.configuration
 
     if merge_request_build?
-      data = data_to_merge_requst_build
       url = configuration.host + configuration.merge_request_path
-      WebHook.post(url, body: data.to_json, headers: { "Content-Type" => "application/json" })
+      WebHook.post(url, body: data_to_merge_requst_build.to_json, headers: { "Content-Type" => "application/json" })
     else
       url = configuration.host + configuration.push_path
-      WebHook.get(url, options: {url: target_project.url_to_repo, branches: source_branch})
+      WebHook.post(url, body: data_to_push_build.to_json, headers: { "Content-Type" => "application/json" })
     end
 
     true
+  end
+
+  def data_to_push_build
+    {
+      build_id: self.id,
+      uri: source_project.url_to_repo,
+      sha: source_sha
+    }
   end
 
   def data_to_merge_requst_build
@@ -84,6 +93,12 @@ class CiBuild < ActiveRecord::Base
   end
 
   def correct_token?(token)
+    valid_token = if merge_request_build?
+                    Digest::MD5.hexdigest("#{id}#{source_project.url_to_repo}#{source_sha}#{target_project.url_to_repo}#{target_sha}")
+                  else
+                    Digest::MD5.hexdigest("#{id}#{source_project.url_to_repo}#{source_sha}")
+                  end
+    valid_token == token
     true
   end
 end

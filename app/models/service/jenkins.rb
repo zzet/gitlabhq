@@ -29,31 +29,36 @@ class Service::Jenkins < Service
     return true unless data[:ref] =~ /heads/
 
     # Create build for push
-    branches = configuration.branches.split(",")
+    branches = configuration.branches_list
     branch_name = data[:ref].gsub("refs/heads/", "")
     user = User.find(data[:user_id])
 
     if branches.include?(branch_name)
-      build = builds.create(target_project: project, source_branch: branch_name, source_sha: data[:after], user: user)
+
+      build = builds.create(source_project: project, source_branch: branch_name, source_sha: data[:after], user: user)
       build.run
-    end
 
-    if configuration.merge_request_enabled
-      mrs = project.merge_requests.opened.by_branch(branch_name).scoped
-      mrs.each do |merge_request|
-        build_merge_request(merge_request, user, :project)
-      end
-    end
+    else
 
-    # Update code for merge requests in project
-    mrs = project.fork_merge_requests.opened.by_branch(branch_name).scoped
-    mrs.each do |merge_request|
-      if merge_request.source_project != merge_request.target_project
-        project_service = merge_request.target_project.services.where(type: Service::Jenkins).first
-        if project_service.present? && project_service.configuration.merge_request_enabled
-          build_merge_request(merge_request, user, :fork)
+      if configuration.merge_request_enabled
+        # Update code for merge requests in project
+        mrs = project.merge_requests.opened.by_branch(branch_name).scoped
+        mrs.each do |merge_request|
+          build_merge_request(merge_request, user)
         end
       end
+
+      # Update code for merge requests to project from forks
+      mrs = project.fork_merge_requests.opened.by_branch(branch_name).scoped
+      mrs.each do |merge_request|
+        if merge_request.source_project != merge_request.target_project
+          project_service = merge_request.target_project.services.where(type: Service::Jenkins).first
+          if project_service.present? && project_service.configuration.merge_request_enabled
+            build_merge_request(merge_request, user, :fork)
+          end
+        end
+      end
+
     end
 
   end
