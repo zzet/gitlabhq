@@ -1,0 +1,15 @@
+= link_to group_url(@group.path) do
+  = @group.name
+was updated:
+%br
+%table
+  %tr
+    %th Attribute
+    %th New value
+    %th Old value
+  - @changes.each do |key, values|
+    %tr
+      %td= key
+      %td= values.last
+      %td= values.first
+%br

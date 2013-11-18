@@ -4,15 +4,15 @@ class Emails::Team::TeamProjectRelationship < Emails::Team::Base
     @event        = @notification.event
     @user         = @event.author
     @tpr          = @event.source
-    @team         = @event.target
+    @team         = @tpr.team
     @project      = @tpr.project
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'assigned',
             'X-Gitlab-Source' => 'project-team-relationship',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-team-#{@team.path}"
+            'In-Reply-To'     => "team-#{@team.path}-project-#{@project.path_with_namespace}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was assigned on '#{@project.path_with_namespace}' project")
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' assignation on '#{@project.path_with_namespace}' project")
   end
 
   def resigned_email(notification)
@@ -21,15 +21,15 @@ class Emails::Team::TeamProjectRelationship < Emails::Team::Base
     @user         = @event.author
     @source       = JSON.load(@event.data).to_hash
     @project      = Project.find_by_id(@source["project_id"])
-    @team         = @event.target
+    @team         = Team.find_by_id(@source["team_id"])
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'assigned',
-            'X-Gitlab-Source' => 'project-team-relationship',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-team-#{@team.path}"
+    if @project && @team
+      headers 'X-Gitlab-Entity' => 'team',
+              'X-Gitlab-Action' => 'assigned',
+              'X-Gitlab-Source' => 'project-team-relationship',
+              'In-Reply-To'     => "team-#{@team.path}-project-#{@project.path_with_namespace}"
 
-    if @project
-      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was resigned from '#{@project.path_with_namespace}' project")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' assignation on '#{@project.path_with_namespace}' project")
     end
   end
 end

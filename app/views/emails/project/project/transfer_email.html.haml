@@ -1,0 +1,18 @@
+%p Project was moved to another location
+%p
+  Old location was
+  = "'#{@old_owner.path} ' #{@old_owner.type == 'Group' ? 'group' : 'user'}"
+%p
+  The project is now located under
+  = link_to project_url(@project.path_with_namespace) do
+    = @project.name_with_namespace
+%p
+  To update the remote url in your local repository run:
+%p{ style: "background:#f5f5f5; padding:10px; border:1px solid #ddd" }
+  git remote set-url origin #{@project.ssh_url_to_repo}
+%br
+
+- if @old_owner.type == 'Group'
+  %p After moving the project from the group - all assigned on a group of project teams have been resigned from the project.
+- if @new_owner.type == 'Group'
+  %p After moving the project to the new group - all assigned on a new group of project teams have been assigned to the project.

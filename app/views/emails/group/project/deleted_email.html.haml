@@ -1,0 +1,6 @@
+%p
+  = @project["name"]
+  was removed from
+  = link_to group_url(@group.path) do
+    = "#{ @group.name } (#{ @group.path })"
+  group.

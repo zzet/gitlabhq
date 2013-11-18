@@ -5,7 +5,7 @@ class Emails::User::UsersProject < Emails::User::Base
     @user         = @event.author
     @up           = @event.source
     @project      = @up.project
-    @member       = @event.target
+    @member       = @up.user
     @member       = @up.user if @member.is_a?(UsersProject)
 
     headers 'X-Gitlab-Entity' => 'user',
@@ -21,7 +21,7 @@ class Emails::User::UsersProject < Emails::User::Base
     @event               = @notification.event
     @user                = @event.author
     @upr                 = @event.source
-    @member              = @event.target
+    @member              = @upr.user
     @project             = @upr.project
     data                 = JSON.load(@event.data)
     @changes             = data["previous_changes"]

@@ -1004,6 +1004,7 @@ class EventNotificationMailer < ActionMailer::Base
     @project      = @up.project
     @member       = @event.target
     @member       = @up.user if @member.is_a?(UsersProject)
+    @permission   = UsersProject.access_roles.key(@up.access_field)
 
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'joined',
@@ -1267,7 +1268,7 @@ class EventNotificationMailer < ActionMailer::Base
   # Commented_Related action
   #
 
-  def commented_related_project_issue_email(notification)
+  def commented_issue_project_note_email(notification)
     @notification = notification
     @event = @notification.event
     @user = @event.author
@@ -1348,6 +1349,18 @@ class EventNotificationMailer < ActionMailer::Base
             'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.id}"
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@merge_request.title}' (##{@merge_request.id})")
+  end
+
+  def closed_project_issue_email(notification)
+
+  end
+
+  def closed_project_milestone_email(notification)
+
+  end
+
+  def updated_project_web_hook_email(notification)
+
   end
 
   def opened_project_issue_email(notification)

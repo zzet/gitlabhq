@@ -1,0 +1,14 @@
+= raw "#{ link_to @user.name, user_url(@user.username) } imported members to #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project team from another project"
+%br
+%table
+  %caption Project team members now
+  %tr
+    %th Name
+    %td Project access
+    %td Repo access
+  - @project.users_projects.each do |pm|
+    %tr
+      %td= link_to pm.user.name, user_url(pm.user.username)
+      %td= pm.project_access_human
+      %td= pm.repo_access_human
+%br

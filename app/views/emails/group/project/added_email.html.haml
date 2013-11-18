@@ -1,0 +1,8 @@
+%p
+  Project
+  = link_to project_url(@project.path_with_namespace) do
+    = "#{ @project.name_with_namespace } (#{ @project.path_with_namespace })"
+  was added to
+  = link_to group_url(@group.path) do
+    = "#{ @group.name } (#{ @group.path })"
+  group of projects.

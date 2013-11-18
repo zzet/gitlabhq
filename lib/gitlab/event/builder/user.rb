@@ -6,7 +6,10 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
 
     def can_build?(action, data)
       known_action = known_action? action, ::User.available_actions
-      known_sources = [::User, ::TeamUserRelationship, ::UsersProject, ::Key]
+      known_sources = [::User,
+                       ::TeamUserRelationship,
+                       ::UsersProject,
+                       ::UsersGroup]
       known_source = known_sources.include? data.class
       known_source && known_action
     end
@@ -40,17 +43,19 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
           actions << :deleted
         end
 
-      when ::Key
+      when ::UsersGroup
         target = source.user
 
         case meta[:action]
         when :created
-          actions << :added
+          actions << :joined
         when :updated
           actions << :updated
+          temp_data["previous_changes"] = changes
         when :deleted
-          actions << :deleted
+          actions << :left
         end
+
       when ::UsersProject
         target = source.user
 
@@ -63,6 +68,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
         when :deleted
           actions << :left
         end
+
       when ::TeamUserRelationship
         target = source.user
 
@@ -75,6 +81,7 @@ class Gitlab::Event::Builder::User < Gitlab::Event::Builder::Base
         when :deleted
           actions << :left
         end
+
         # TODO.
         # Add support with Issue, MergeRequest, Milestone, Note, ProjectHook, ProtectedBranch, Service, Snippet
         # All models, which contain User

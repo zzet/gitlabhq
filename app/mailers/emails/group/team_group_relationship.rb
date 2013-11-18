@@ -4,13 +4,13 @@ class Emails::Group::TeamGroupRelationship < Emails::Group::Base
     @event        = @notification.event
     @user         = @event.author
     @utgr         = @event.source
-    @group        = @event.target
+    @group        = @utgr.group
     @team         = @utgr.team
 
     headers 'X-Gitlab-Entity' => 'group',
             'X-Gitlab-Action' => 'created',
             'X-Gitlab-Source' => 'team-group-relationship',
-            'In-Reply-To'     => "group-#{@group.path}-team-group-relationship-#{@utgr.id}"
+            'In-Reply-To'     => "group-#{@group.path}-team-#{@team.path}"
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was assigned to '#{@group.name}' group")
   end
@@ -21,12 +21,12 @@ class Emails::Group::TeamGroupRelationship < Emails::Group::Base
     @user         = @event.author
     @source       = JSON.load(@event.data).to_hash
     @team         = Team.find(@source["team_id"])
-    @group        = @event.target
+    @group        = Group.find(@source["group_id"])
 
     headers 'X-Gitlab-Entity' => 'group',
             'X-Gitlab-Action' => 'resigned',
             'X-Gitlab-Source' => 'team-group-relationship',
-            'In-Reply-To'     => "team-#{@team.path}-group-#{@group.path}"
+            'In-Reply-To'     => "group-#{@group.path}-team-#{@team.path}"
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was resigned from '#{@group.name}' group")
   end

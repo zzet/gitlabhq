@@ -9,26 +9,23 @@ module Projects
         assignee_id  = update_data[:assignee_id]
         status       = update_data[:status]
 
-        new_state = nil
-
-        if status.present?
-          if status == 'closed'
-            new_state = :close
-          else
-            new_state = :reopen
-          end
-        end
-
         opts = {}
         opts[:milestone_id] = milestone_id if milestone_id.present?
         opts[:assignee_id] = assignee_id if assignee_id.present?
+
+        if status.present?
+          if status == 'closed'
+            opts[:state_event] = "close"
+          else
+            opts[:state_event] = "reopen"
+          end
+        end
 
         issues = Issue.where(id: issues_ids).all
         issues = issues.select { |issue| can?(current_user, :modify_issue, issue) }
 
         issues.each do |issue|
-          issue.update_attributes(opts)
-          issue.send new_state if new_state
+          Projects::Issues::UpdateContext.new(current_user, issue.project, issue, opts).execute
         end
 
         {
