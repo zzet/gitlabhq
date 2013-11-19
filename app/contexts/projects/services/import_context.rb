@@ -42,7 +42,8 @@ module Projects
           attrs.delete(key)
         end
 
-        @project_service.create_configuration(attrs)
+        @project_service.build_configuration(attrs)
+        @project_service.configuration.save
       end
     end
   end
