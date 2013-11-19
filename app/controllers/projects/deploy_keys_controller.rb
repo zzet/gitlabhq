@@ -56,6 +56,6 @@ class Projects::DeployKeysController < Projects::ApplicationController
   protected
 
   def available_keys
-    @available_keys ||= current_user.accessible_deploy_keys
+    @available_keys ||= current_user.present? ? current_user.accessible_deploy_keys : []
   end
 end
