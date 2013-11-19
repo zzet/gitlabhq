@@ -26,6 +26,7 @@ class Service::Jenkins < Service
 
   def execute(data)
     return true unless configuration.present?
+    return true if configuration.host.blank?
     return true unless data[:ref] =~ /heads/
 
     # Create build for push
