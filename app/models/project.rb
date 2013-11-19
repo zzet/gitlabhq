@@ -66,8 +66,8 @@ class Project < ActiveRecord::Base
   has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
   has_many :milestones,         dependent: :destroy
   has_many :notes,              dependent: :destroy
-  has_many :snippets,           dependent: :destroy, class_name: "ProjectSnippet"
-  has_many :hooks,              dependent: :destroy, class_name: "ProjectHook"
+  has_many :snippets,           dependent: :destroy, class_name: ProjectSnippet
+  has_many :hooks,              dependent: :destroy, class_name: ProjectHook
   has_many :protected_branches, dependent: :destroy
 
   has_many :file_tokens,        dependent: :destroy
@@ -253,8 +253,20 @@ class Project < ActiveRecord::Base
     @gitlab_ci_service ||= services.where(type: Service::GitlabCi).first
   end
 
+  def jenkins_ci
+    @jenkins_ci_service ||= services.where(type: Service::Jenkins).first
+  end
+
   def gitlab_ci?
     gitlab_ci.present? && gitlab_ci.enabled?
+  end
+
+  def jenkins_ci?
+    jenkins_ci.present? && jenkins_ci.enabled?
+  end
+
+  def jenkins_ci_with_mr?
+    jenkins_ci? && jenkins_ci.configuration && jenkins_ci.configuration.merge_request_enabled
   end
 
   # For compatibility with old code

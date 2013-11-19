@@ -7,5 +7,6 @@
       %p= pluralize(commits.count, 'commit')
     .span10
       %ul.well-list
-        = render commits, project: @project
+        - commits.each do |commit|
+          = render commit, project: @project, build_status: @ci_builds.with_commit(commit).last
   %hr.lists-separator

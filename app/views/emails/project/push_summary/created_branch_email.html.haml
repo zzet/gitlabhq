@@ -1,0 +1,22 @@
+New branch
+= @branch
+was created in
+= link_to project_url(@project.path_with_namespace) do
+  = "#{ @project.name_with_namespace } (#{ @project.path_with_namespace })"
+project
+
+- if @commits.present?
+  %br
+  %br
+  Commits, which was pushed with branch, but not present in
+  = @project.default_branch
+  branch:
+  %br
+  = render "commits"
+
+%br
+\---
+%br
+All branches you can check on
+= link_to project_branches_url(@project.path_with_namespace) do
+  project branches list

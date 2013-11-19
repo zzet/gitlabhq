@@ -1,0 +1,24 @@
+- if @merge_request.ci_builds.any?
+  - last_build = @merge_request.ci_builds.last
+  - if last_build.success?
+    .ci_widget.ci-success
+      .alert.alert-success
+        %i{class: ci_build_status_image(last_build.state) }
+        %strong CI build passed
+        for #{@merge_request.last_commit_short_sha}.
+
+  - elsif last_build.fail?
+    .ci_widget.ci-failed
+      .alert.alert-error
+        %i{class: ci_build_status_image(last_build.state) }
+        %strong CI build failed
+        for #{@merge_request.last_commit_short_sha}.
+
+  - else
+    - [:build, :skipped, :aborted, :unstable].each do |status|
+      - if last_build.send(:"#{status}?")
+        .ci_widget{class: "ci-#{status}"}
+          .alert
+            %i{class: ci_build_status_image(last_build.state) }
+            %strong CI build status: #{status}
+            for #{@merge_request.last_commit_short_sha}.

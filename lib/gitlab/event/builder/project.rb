@@ -52,11 +52,11 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :updated
           # Any changes?
         when :closed
-          actions << meta[:action]
+          actions << :closed
         when :reopened
-          actions << meta[:action]
+          actions << :reopened
         when :deleted
-          actions << meta[:action]
+          actions << :deleted
         end
 
       when ::Milestone
@@ -92,11 +92,14 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           # Any changes?
           # For example if code base is updated?
         when :closed
-          actions << meta[:action]
+          actions << :closed
         when :reopened
-          actions << meta[:action]
+          actions << :reopened
         when :merged
-          actions << meta[:action]
+          # FIXME
+          if Event.where(action: :merged, source_id: source.id, source_type: source.class.name, author_id: user.id).empty?
+            actions << :merged
+          end
         end
 
       when ::Snippet
@@ -111,16 +114,16 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
           actions << meta[:action]
         end
 
-      when ::ProjectHook
+      when ::WebHook, ::ProjectHook
         target = source.project
 
         case meta[:action]
         when :created
           actions << :added
         when :updated
-          actions << meta[:action]
+          actions << :updated
         when :deleted
-          actions << meta[:action]
+          actions << :deleted
         end
 
       when ::ProtectedBranch
@@ -155,7 +158,7 @@ class Gitlab::Event::Builder::Project < Gitlab::Event::Builder::Base
         when :updated
           actions << :updated
         when :deleted
-          actions << :reassigned
+          actions << :resigned
         end
 
       when ::UsersProject

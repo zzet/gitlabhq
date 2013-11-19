@@ -67,9 +67,9 @@ namespace :deploy do
     run "sudo sv restart /etc/service/gitlab-web-*"
   end
 
-  desc "Migrate to Redmine service"
-  task :migrate_to_redmine, roles: :app do
-    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} undev:migrate_to_redmine"
+  desc "Migrate to Jenkins service"
+  task :migrate_to_jenkins, roles: :app do
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} undev:enable_jenkins_pusher"
   end
 end
 
@@ -81,4 +81,4 @@ before 'deploy:finalize_update',
   'deploy:symlink_unicorn'
 #after "deploy:restart", "unicorn:stop"
 #after "deploy:reload"
-after "deploy:update", "deploy:cleanup", "deploy:migrate_to_redmine"
+after "deploy:update", "deploy:cleanup", "deploy:migrate_to_jenkins"

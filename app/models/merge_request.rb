@@ -36,6 +36,7 @@ class MergeRequest < ActiveRecord::Base
 
   belongs_to :target_project, foreign_key: :target_project_id, class_name: Project
   belongs_to :source_project, foreign_key: :source_project_id, class_name: Project
+  has_many :ci_builds
 
   attr_mentionable :title
 
@@ -178,7 +179,7 @@ class MergeRequest < ActiveRecord::Base
 
   def closed_event
     self.target_project.old_events.where(target_id: self.id, target_type: MergeRequest, action: OldEvent::CLOSED).last
- end
+  end
 
   def commits
     load_commits(st_commits || [])
@@ -309,5 +310,9 @@ class MergeRequest < ActiveRecord::Base
 
   def broken_diffs
     [Gitlab::Git::Diff::BROKEN_DIFF]
+  end
+
+  def ci_status
+    ci_builds.last.state
   end
 end
