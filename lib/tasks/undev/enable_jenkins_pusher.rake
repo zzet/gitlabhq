@@ -15,7 +15,7 @@ namespace :undev do
 
       configuration.host = "http://ci01.undev.cc"
       configuration.push_path = "/push/build"
-      configuration.push_path = "/merge-request/build"
+      configuration.merge_request_path = "/merge-request/build"
       configuration.branches = "master, develop, staging"
       configuration.merge_request_enabled = true
       configuration.save
