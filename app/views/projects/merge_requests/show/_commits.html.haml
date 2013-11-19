@@ -7,19 +7,19 @@
       - if @commits.count > 8
         %ul.first-commits.well-list
           - @commits.first(8).each do |commit|
-            = render "projects/commits/commit", commit: commit, project: @merge_request.source_project
+            = render "projects/commits/commit", commit: commit, project: @merge_request.source_project, build_status: @ci_builds.with_commit(commit).last
           %li.bottom
             8 of #{@commits.count} commits displayed.
             %strong
               %a.show-all-commits Click here to show all
         %ul.all-commits.hide.well-list
           - @commits.each do |commit|
-            = render "projects/commits/commit", commit: commit, project: @merge_request.source_project
+            = render "projects/commits/commit", commit: commit, project: @merge_request.source_project, build_status: @ci_builds.with_commit(commit).last
 
       - else
         %ul.well-list
           - @commits.each do |commit|
-            = render "projects/commits/commit", commit: commit, project: @merge_request.source_project
+            = render "projects/commits/commit", commit: commit, project: @merge_request.source_project, build_status: @ci_builds.with_commit(commit).last
 
 - else
   %h4.nothing_here_message

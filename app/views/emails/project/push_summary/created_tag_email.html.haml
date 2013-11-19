@@ -1,0 +1,12 @@
+New tag
+= link_to project_commits_url(@project.path_with_namespace, @tag) do
+  = @tag
+was created in
+= link_to project_url(@project.path_with_namespace) do
+  = "#{ @project.name_with_namespace } (#{ @project.path_with_namespace })"
+%br
+\---
+%br
+All tags you can check on
+= link_to project_tags_url(@project.path_with_namespace) do
+  project tags list

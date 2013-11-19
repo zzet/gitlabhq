@@ -13,20 +13,6 @@
 
 ActiveRecord::Schema.define(:version => 20131101182116) do
 
-  create_table "banners", :force => true do |t|
-    t.string   "title"
-    t.text     "description"
-    t.string   "category"
-    t.string   "state"
-    t.datetime "start_date"
-    t.datetime "end_date"
-    t.integer  "author_id"
-    t.integer  "entity_id"
-    t.string   "entity_type"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
-  end
-
   create_table "ci_builds", :force => true do |t|
     t.integer  "user_id"
     t.integer  "target_project_id"
@@ -34,6 +20,8 @@ ActiveRecord::Schema.define(:version => 20131101182116) do
     t.integer  "merge_request_id"
     t.integer  "service_id"
     t.string   "service_type"
+    t.string   "source_branch"
+    t.string   "target_branch"
     t.string   "source_sha"
     t.string   "target_sha"
     t.string   "state"
@@ -87,23 +75,6 @@ ActiveRecord::Schema.define(:version => 20131101182116) do
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
     t.string   "target_category"
-  end
-
-  create_table "event_summaries", :force => true do |t|
-    t.string   "title"
-    t.string   "user_id"
-    t.string   "state"
-    t.string   "period"
-    t.datetime "last_send_date"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
-  end
-
-  create_table "event_summary_subscription_relationships", :force => true do |t|
-    t.integer  "summary_id"
-    t.integer  "subscription_id"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
   end
 
   create_table "events", :force => true do |t|

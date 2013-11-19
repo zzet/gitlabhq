@@ -10,6 +10,10 @@
         %span.badge.badge-info
           %i.icon-comment
           = notes.count
+    - if defined?(build_status) && build_status.present?
+      .build_status.pull-right
+        .badge{class: "badge-#{ci_build_status_class(build_status.state)}"}
+          %i{class: ci_build_status_image(build_status.state)}
 
   .commit-row-info
     = commit_author_link(commit, avatar: true, size: 16)

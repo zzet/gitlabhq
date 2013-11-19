@@ -75,7 +75,7 @@ module Gitlab
         end
 
         def unsubscribe_from_adjacent_sources(user)
-          subscriptions = user.personal_subscriprions.where("source_category NOT IN ('all', 'new')")
+          subscriptions = user.personal_subscriptions.where("source_category NOT IN ('all', 'new')")
 
           subscriptions.destroy_all
         end

@@ -1,0 +1,14 @@
+%p
+  Issue was opened by
+  = link_to user_url(@user.username) do
+    = "#{ @user.name } (#{ @user.username })"
+  in
+  = link_to project_url(@project.path_with_namespace) do
+    = "#{ @project.name_with_namespace } (#{ @project.path_with_namespace })"
+  project
+
+%p
+  \---
+%p
+  = "Issue ##{@issue.iid}"
+  = link_to_gfm truncate(@issue.title, length: 45), project_issue_url(@issue.project, @issue), title: @issue.title

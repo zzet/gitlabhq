@@ -1,0 +1,31 @@
+%p
+  Project
+  = link_to project_url(@project.path_with_namespace) do
+    = "#{ @project.name_with_namespace } (#{ @project.path_with_namespace })"
+  was transfered
+
+%p
+  From:
+
+  - if @old_owner.is_a?(Group)
+    = link_to group_url(@old_owner.path) do
+      = "#{ @old_owner.name } (#{ @old_owner.path })"
+    group
+
+  - else
+    = link_to user_url(@old_owner.username) do
+      = "#{ @old_owner.name } (#{ @old_owner.username })"
+    user
+
+%p
+  To:
+
+  - if @new_owner.is_a?(Group)
+    = link_to group_url(@new_owner.path) do
+      = "#{ @new_owner.name } (#{ @new_owner.path })"
+    group
+
+  - else
+    = link_to user_url(@new_owner.username) do
+      = "#{ @new_owner.name } (#{ @new_owner.username })"
+    user

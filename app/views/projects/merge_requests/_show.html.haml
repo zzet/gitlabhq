@@ -5,6 +5,9 @@
   = render "projects/merge_requests/show/mr_accept"
   - if @merge_request.source_project.gitlab_ci?
     = render "projects/merge_requests/show/mr_ci"
+  - else
+    - if @merge_request.source_project.jenkins_ci_with_mr?
+      = render "projects/merge_requests/show/mr_ci_status"
   = render "projects/merge_requests/show/commits"
 
   - if @commits.present?
