@@ -27,7 +27,7 @@ describe EventNotificationMailer do
   let!(:group)   { g  = create :group,             owner:   @another_user;                                     clear_prepare_data; g }
   let!(:project) { pr = create :project_with_code, creator: @another_user, namespace: group; clear_prepare_data; pr }
 
-  before :all do
+  before do
     ActiveRecord::Base.observers.enable(:user_observer) do
       @user = create :user
       @another_user = create :user
@@ -40,13 +40,13 @@ describe EventNotificationMailer do
     ActiveRecord::Base.observers.enable :all
   end
 
-  after :all do
-    clean_destroy do
-      @commiter_user.destroy
-      @another_user.destroy
-      @user.destroy
-    end
-  end
+  #after do
+    #clean_destroy do
+      #@commiter_user.destroy
+      #@another_user.destroy
+      #@user.destroy
+    #end
+  #end
 
   describe "Project mails" do
     before { SubscriptionService.subscribe(@user, :all, :project, :all) }
