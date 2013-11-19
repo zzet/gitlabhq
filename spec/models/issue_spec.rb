@@ -48,6 +48,7 @@ describe Issue do
   describe '#is_being_reassigned?' do
     it 'returns issues assigned to user' do
       user = create :user
+      RequestStore.store[:current_user] = user
 
       2.times do
         issue = create :issue, assignee: user
