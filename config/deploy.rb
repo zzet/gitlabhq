@@ -69,7 +69,7 @@ namespace :deploy do
 
   desc "Migrate to Jenkins service"
   task :migrate_to_jenkins, roles: :app do
-    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} undev:migrate_to_jenkins"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} #{rake} undev:enable_jenkins_pusher"
   end
 end
 
