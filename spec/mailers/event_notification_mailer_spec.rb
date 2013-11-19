@@ -24,8 +24,8 @@ describe EventNotificationMailer do
     yield
   end
 
-  let!(:group)   { g  = create :group,             owner:   @another_user;                                     clear_prepare_data; g }
-  let!(:project) { pr = create :project_with_code, creator: @another_user, namespace: group; clear_prepare_data; pr }
+  let(:group)   { g  = create :group,             owner:   @another_user;                                     clear_prepare_data; g }
+  let(:project) { pr = create :project_with_code, creator: @another_user, namespace: group; clear_prepare_data; pr }
 
   before do
     ActiveRecord::Base.observers.enable(:user_observer) do
