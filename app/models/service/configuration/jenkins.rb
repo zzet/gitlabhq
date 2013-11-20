@@ -14,6 +14,7 @@ class Service::Configuration::Jenkins < ActiveRecord::Base
   end
 
   def branches_list
+    return [] if branches.blank?
     branches.split(",").map { |branch| branch.strip }
   end
 end
