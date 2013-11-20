@@ -7,6 +7,16 @@
   }
 }
 
+.project {
+  .light-well {
+    span.build-status {
+      .label {
+        a { color: #FFF; }
+      }
+    }
+  }
+}
+
 .project-name-holder {
   .help-inline {
     vertical-align: top;

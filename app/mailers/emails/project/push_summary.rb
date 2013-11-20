@@ -136,7 +136,8 @@ class Emails::Project::PushSummary < Emails::Project::Base
 
     if diff_result.nil?
       diff_result = {}
-      diff_result[:suppress_diff] = project.repository.commits_between(oldrev, newrev).inject(false) { |mem, var| mem || var.diff_suppress? }
+      diff_result[:commits] = project.repository.commits_between(oldrev, newrev)
+      diff_result[:suppress_diff] = diff_result[:commits].inject(false) { |mem, var| mem || var.diff_suppress? }
 
       key        = "#{user.id}-#{project.id}-#{oldrev}-#{newrev}"
       before_key = "#{key}-#{oldrev}"
