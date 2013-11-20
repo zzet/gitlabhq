@@ -87,7 +87,7 @@
           - if last_commit.present?
             - build = @project.jenkins_ci.builds.with_commit(last_commit).last
             - if build.present?
-              %span
+              %span.build-status
                 .label{class: "label-#{ci_build_status_class(build.state)}"}
                   %i{class: ci_build_status_image(build.state)}
                   = link_to project_commits_path(@project.path_with_namespace, branch) do

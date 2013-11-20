@@ -38,7 +38,8 @@ class Service::BuildFace < Service
   end
 
   def execute(data)
-    service_hook.async_execute(data)
+    compose_service_hook unless service_hook.present?
+    service_hook.async_execute(data) if service_hook.present?
   end
 
   def notify_build_face(action)
