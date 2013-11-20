@@ -9,7 +9,7 @@ GIT
       gitlab-grit (~> 2.6.1)
 
 GEM
-  remote: https://rubygems.org/
+  remote: http://rubygems.org/
   remote: http://gems.undev.cc/
   specs:
     actionmailer (3.2.15)

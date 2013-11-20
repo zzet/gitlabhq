@@ -67,18 +67,20 @@ class Service::Jenkins < Service
   def build_merge_request(merge_request, user, merge_request_type = :project)
     merge_request.check_if_can_be_merged
     if merge_request.can_be_merged?
-      attrs = {
-        merge_request: merge_request,
-        target_project: merge_request_type == :project ? project : merge_request.target_project,
-        source_project: project,
-        target_branch: merge_request.target_branch,
-        source_branch: merge_request.source_branch,
-        target_sha: merge_request.commits.last.parent_id,
-        source_sha: merge_request.commits.first.id,
-        user: user
-      }
-      build = builds.create(attrs)
-      build.run
+      if merge_request.commits.any?
+        attrs = {
+          merge_request: merge_request,
+          target_project: merge_request_type == :project ? project : merge_request.target_project,
+          source_project: project,
+          target_branch: merge_request.target_branch,
+          source_branch: merge_request.source_branch,
+          target_sha: merge_request.commits.last.parent_id,
+          source_sha: merge_request.commits.first.id,
+          user: user
+        }
+        build = builds.create(attrs)
+        build.run
+      end
     end
   end
 end
