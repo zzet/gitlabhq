@@ -38,11 +38,13 @@ Capybara.ignore_hidden_elements = false
 DatabaseCleaner.strategy = :truncation
 
 Spinach.hooks.before_scenario do
+  sleep 0.2
   TestEnv.setup_stubs
   DatabaseCleaner.start
 end
 
 Spinach.hooks.after_scenario do
+  sleep 0.2
   DatabaseCleaner.clean
   sleep 0.2
 end
