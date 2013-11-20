@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source "http://rubygems.org"
 source "http://gems.undev.cc" unless ENV["TRAVIS"]
 
 def darwin_only(require_as)
