@@ -15,7 +15,7 @@ class Emails::Project::PushSummary < Emails::Project::Base
     @before_commit = diff_data[:before_commit]
     @after_commit  = diff_data[:after_commit]
     @commits       = diff_data[:commits]
-    @commit        = diff_data[:commit]
+    @commit        = diff_data[:commit] || @after_commit
     @diffs         = diff_data[:diffs]
     @refs_are_same = diff_data[:same]
     @suppress_diff = diff_data[:suppress_diff]

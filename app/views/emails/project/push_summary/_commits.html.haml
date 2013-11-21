@@ -16,7 +16,7 @@
       Author
   = render partial: "emails/project/push_summary/commit", collection: @commits
 
-- unless @diffs.empty?
+- unless @diffs.blank?
   %h4 Diff
   = render "emails/project/push_summary/diffs", diffs: @diffs
 
