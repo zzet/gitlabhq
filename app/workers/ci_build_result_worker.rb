@@ -29,8 +29,9 @@ class CiBuildResultWorker
           build.to_unstable
         end
 
+        build.data     = data
+        build.trace    = parser.build_log
         build.coverage = parser.coverage if parser.coverage.present?
-        build.trace = parser.build_log
         build.save
       end
     end
