@@ -17,7 +17,7 @@
 
 class Service::Hipchat < Service
   default_title       'Hipchat'
-  default_description 'Simple web-based real-time group chat'
+  default_description 'Private group chat and IM'
   service_name        'hipchat'
 
   has_one :configuration, as: :service, class_name: Service::Configuration::Hipchat
