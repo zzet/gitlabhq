@@ -18,6 +18,7 @@ class CiBuild < ActiveRecord::Base
 
   validates :source_project, presence: true
   validates :source_sha,     presence: true
+  validates :source_branch,  presence: true
   validates :user,           presence: true
 
   state_machine :state, initial: :build do
@@ -70,9 +71,10 @@ class CiBuild < ActiveRecord::Base
 
   def data_to_push_build
     {
-      build_id: self.id,
-      uri: source_project.url_to_repo,
-      sha: source_sha
+      build_id: id,
+      uri:      source_project.url_to_repo,
+      branch:   source_branch,
+      sha:      source_sha
     }
   end
 
