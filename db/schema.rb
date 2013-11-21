@@ -12,6 +12,14 @@
 # It's strongly recommended to check this file into your version control system.
 
 ActiveRecord::Schema.define(:version => 20131112114325) do
+  create_table "broadcast_messages", :force => true do |t|
+    t.text     "message",    :null => false
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.integer  "alert_type"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "ci_builds", :force => true do |t|
     t.integer  "user_id"
@@ -30,14 +38,6 @@ ActiveRecord::Schema.define(:version => 20131112114325) do
     t.text     "data"
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
-
-  create_table "broadcast_messages", :force => true do |t|
-    t.text     "message",    :null => false
-    t.datetime "starts_at"
-    t.datetime "ends_at"
-    t.integer  "alert_type"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
   create_table "deploy_keys_projects", :force => true do |t|
