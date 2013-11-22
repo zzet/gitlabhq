@@ -12,6 +12,7 @@
 # It's strongly recommended to check this file into your version control system.
 
 ActiveRecord::Schema.define(:version => 20131112114325) do
+
   create_table "broadcast_messages", :force => true do |t|
     t.text     "message",    :null => false
     t.datetime "starts_at"

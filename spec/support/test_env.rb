@@ -71,7 +71,7 @@ module TestEnv
       add_key: true,
       remove_key: true,
       enable_git_protocol: true,
-      disable_git_protocol: true
+      disable_git_protocol: true,
       version: '6.3.0'
     )
 

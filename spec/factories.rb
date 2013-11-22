@@ -20,6 +20,10 @@ FactoryGirl.define do
     confirmed_at { Time.now }
     confirmation_token { nil }
 
+    after :create do |user|
+      user.create_namespace!(path: user.username, name: user.username) unless user.namespace
+    end
+
     trait :admin do
       admin true
     end

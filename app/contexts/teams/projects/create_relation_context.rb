@@ -5,7 +5,7 @@ module Teams
         project_ids = params[:project_ids].respond_to?(:each) ? params[:project_ids] : params[:project_ids].split(',')
 
         unless current_user.admin?
-          allowed_project_ids = (current_user.master_projects.pluck(:id) + current_user.own_projects.pluck(:id) + current_user.owned_projects.pluck(:id)).uniq
+          allowed_project_ids = (current_user.master_projects.pluck(:id) + current_user.created_projects.pluck(:id) + current_user.owned_projects.pluck(:id)).uniq
           project_ids.select! { |id| allowed_project_ids.include?(id.to_i) }
         end
 

@@ -27,18 +27,24 @@ describe "Admin::Users" do
     end
 
     it "should create new user" do
-      expect { click_button "Create user" }.to change {User.count}.by(1)
+      ActiveRecord::Base.observers.enable(:user_observer) do
+        expect { click_button "Create user" }.to change {User.count}.by(1)
+      end
     end
 
     it "should apply defaults to user" do
-      click_button "Create user"
+      ActiveRecord::Base.observers.enable(:user_observer) do
+        click_button "Create user"
+      end
       user = User.last
       user.projects_limit.should == Gitlab.config.gitlab.default_projects_limit
       user.can_create_group.should == Gitlab.config.gitlab.default_can_create_group
     end
 
     it "should create user with valid data" do
-      click_button "Create user"
+      ActiveRecord::Base.observers.enable(:user_observer) do
+        click_button "Create user"
+      end
       user = User.last
       user.name.should ==  "Big Bang"
       user.email.should == "bigbang@mail.com"

@@ -19,7 +19,7 @@ describe Teams::Projects::CreateRelationContext do
       end
 
       it "user should have" do
-        allowed_project_ids = (@user.master_projects.pluck(:id) + @user.own_projects.pluck(:id) + @user.owned_projects.pluck(:id)).uniq
+        allowed_project_ids = (@user.master_projects.pluck(:id) + @user.created_projects.pluck(:id) + @user.owned_projects.pluck(:id)).uniq
         allowed_project_ids.include?(@project.id).should be_true
       end
 

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Projects::TreeController do
   let(:project) { create(:project_with_code) }
-  let(:user)    { create(:user) }
+  let(:user)    { ActiveRecord::Base.observers.enable(:user_observer) { create(:user) } }
 
   before do
     sign_in(user)
