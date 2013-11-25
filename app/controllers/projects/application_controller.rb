@@ -3,17 +3,18 @@ class Projects::ApplicationController < ApplicationController
   before_filter :repository
   layout :determine_layout
 
-  def authenticate_user!
+  def authenticate_user!(options = {})
     # Restrict access to Projects area only
     # for non-signed users
+    options[:force] ||= false
     if !current_user
       id = params[:project_id] || params[:id]
       @project = Project.find_with_namespace(id)
 
-      return if @project && @project.public
+      return if @project && @project.public && !options[:force]
     end
 
-    super
+    super()
   end
 
   def determine_layout

@@ -54,6 +54,7 @@ production: &base
   ## External issues trackers
   issues_tracker:
     redmine:
+      title: "Redmine (pm.undev.cc)"
       ## If not nil, link 'Issues' on project page will be replaced tp this
       ## Use placeholders:
       ##  :project_id        - Gitlab project identifier

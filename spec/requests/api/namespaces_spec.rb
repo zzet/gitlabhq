@@ -23,8 +23,8 @@ describe API::API do
         response.status.should == 200
         json_response.should be_an Array
 
-        # Admin namespace + 2 group namespaces
-        json_response.length.should == 3
+        # Admin namespace + 2 group namespaces + 2 users namespaces
+        json_response.length.should == 5
       end
     end
   end

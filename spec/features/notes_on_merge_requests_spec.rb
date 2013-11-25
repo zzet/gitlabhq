@@ -7,11 +7,11 @@ describe "On a merge request", js: true do
   let!(:note) { create(:note_on_merge_request_with_attachment,  project: project) }
 
   before do
-    ActiveRecord::Base.observers.enable(:user_observer)
     login_as :user
     project.team << [@user, :master]
 
     visit project_merge_request_path(project, merge_request)
+    page.wait_for_ajax_to_complete
   end
 
   subject { page }

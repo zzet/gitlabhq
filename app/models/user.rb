@@ -267,8 +267,8 @@ class User < ActiveRecord::Base
   end
 
   def owned_projects
-    @project_ids ||= (Project.where(namespace_id: owned_groups).pluck(:id) + master_projects.pluck(:id)).uniq
-    Project.where(id: @project_ids)
+    @project_ids ||= (Project.where(namespace_id: ([owned_groups.pluck(:id)] + [namespace.try(:id)])).pluck(:id) + master_projects.pluck(:id)).uniq
+    Project.where(id: @project_ids).joins(:namespace)
   end
 
   # Groups user has access to
@@ -312,12 +312,6 @@ class User < ActiveRecord::Base
   def known_teams
     @known_teams_ids ||= (personal_teams.pluck(:id) + owned_teams.pluck(:id) + master_teams.pluck(:id) + teams.pluck(:id) + Team.where(public: true).pluck(:id)).uniq
     Team.where(id: @known_teams_ids)
-  end
-
-  def owned_projects
-    @owned_projects ||= begin
-                          Project.where(namespace_id: owned_groups.pluck(:id).push(namespace.id)).joins(:namespace)
-                        end
   end
 
   # Team membership in authorized projects
