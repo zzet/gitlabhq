@@ -1,5 +1,7 @@
 class Admin::ProjectsController < Admin::ApplicationController
-  before_filter :project, only: [:edit, :show, :update, :destroy, :team_update]
+  before_filter :project, only: [:show, :transfer]
+  before_filter :group, only: [:show, :transfer]
+  before_filter :repository, only: [:show, :transfer]
 
   def index
     owner_id = params[:owner_id]
@@ -15,9 +17,6 @@ class Admin::ProjectsController < Admin::ApplicationController
   end
 
   def show
-    @repository = @project.repository
-    @group = @project.group
-
     @users = User.active
     @users = @users.not_in_project(@project) if @project.users.present?
     check_git_protocol
@@ -28,6 +27,16 @@ class Admin::ProjectsController < Admin::ApplicationController
     redirect_to admin_projects_path
   end
 
+  def transfer
+    result = ::Projects::TransferContext.new(@project, current_user, project: params).execute(:admin)
+
+    if result
+      redirect_to [:admin, @project]
+    else
+      render :show
+    end
+  end
+
   protected
 
   def project
@@ -35,6 +44,14 @@ class Admin::ProjectsController < Admin::ApplicationController
 
     @project = Project.find_with_namespace(id)
     @project || render_404
+  end
+
+  def group
+    @group ||= project.group
+  end
+
+  def repository
+    @repository ||= project.repository
   end
 
   def check_git_protocol

@@ -77,10 +77,6 @@ class ProjectsController < ApplicationController
 
     @teams = (@project.teams + @project.group_teams).uniq
 
-    # Ensure project default branch is set if it possible
-    # Normally it defined on push or during creation
-    @project.discover_default_branch
-
     @gitlab_ci_service  = @project.services.where(type: Service::GitlabCi).first
     @build_face_service = @project.services.where(type: Service::BuildFace).first
 

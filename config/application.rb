@@ -82,7 +82,6 @@ module Gitlab
     #
     # config.relative_url_root = "/gitlab"
 
-    # Uncomment to enable rack attack middleware
-    # config.middleware.use Rack::Attack
+    config.middleware.use Rack::Attack
   end
 end

@@ -26,7 +26,7 @@ class Team < ActiveRecord::Base
 
   has_many :projects,         through: :team_project_relationships
   has_many :groups,           through: :team_group_relationships
-  has_many :groups_projects,  through: :groups, source: :projects
+  has_many :accessed_projects,through: :groups, source: :projects
   has_many :members,          through: :team_user_relationships, source: :user, conditions: { users: { state: :active } }
 
   has_many :guests,           through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: Team::GUEST } }

@@ -76,42 +76,38 @@ class User < ActiveRecord::Base
   # Namespace for personal projects
   has_one :namespace, dependent: :destroy, foreign_key: :owner_id, class_name: "Namespace", conditions: 'type IS NULL'
 
-  # Namespaces (owned groups and own namespace)
-  has_many :namespaces, foreign_key: :owner_id
-
   # Profile
   has_many :keys, dependent: :destroy
 
   # Groups
-  has_many :own_groups,   class_name: Group, foreign_key: :owner_id
-  has_many :owned_groups, through: :users_groups, source: :group, conditions: { users_groups: { group_access: UsersGroup::OWNER } }
-
-  has_many :users_groups, dependent: :destroy
-  has_many :groups, through: :users_groups
+  has_many :users_groups,             dependent: :destroy
+  has_many :groups,                   through: :users_groups
+  has_many :owned_groups,             through: :users_groups, source: :group, conditions: { users_groups: { group_access: UsersGroup::OWNER } }
+  has_many :created_groups,           class_name: Group, foreign_key: :owner_id
 
   # Projects
   has_many :users_projects,           dependent: :destroy
 
   has_many :projects,                 through: :users_projects
   has_many :personal_projects,        through: :namespace, source: :projects
-  has_many :own_projects,             foreign_key: :creator_id, class_name: Project
-  has_many :accessed_projects,        through: :namespaces, source: :projects
-  has_many :groups_projects,          through: :groups, source: :projects
+  has_many :created_projects,         foreign_key: :creator_id, class_name: Project
   has_many :master_projects,          through: :users_projects, source: :project,
                                       conditions: { users_projects: { project_access: UsersProject::MASTER } }
 
-  has_many :snippets,                 dependent: :destroy, foreign_key: :author_id, class_name: "Snippet"
-  has_many :issues,                   dependent: :destroy, foreign_key: :author_id
+  has_many :snippets,                 dependent: :destroy, foreign_key: :author_id, class_name: Snippet
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
-  has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
+
+  has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: Issue
+
+  has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
   has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: MergeRequest
 
   # Teams
   has_many :team_user_relationships,         dependent: :destroy
   has_many :teams,                           through: :team_user_relationships
   has_many :personal_teams,                  through: :team_user_relationships, foreign_key: :creator_id, source: :team
-  has_many :own_teams,                       through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
+  has_many :owned_teams,                     through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
   has_many :master_teams,                    through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
   has_many :team_project_relationships,      through: :teams
   has_many :team_group_relationships,        through: :teams
@@ -134,6 +130,7 @@ class User < ActiveRecord::Base
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
 
   has_many :file_tokens
+
 
   #
   # Validations
@@ -269,22 +266,14 @@ class User < ActiveRecord::Base
    Group.where(id: @group_ids)
   end
 
-  def owned_teams
-    own_teams
-  end
-
   def owned_projects
-    @project_ids ||= (Project.where(namespace_id: owned_groups).pluck(:id) + master_projects.pluck(:id) + accessed_projects.pluck(:id)).uniq
-    Project.where(id: @project_ids)
+    @project_ids ||= (Project.where(namespace_id: ([owned_groups.pluck(:id)] + [namespace.try(:id)])).pluck(:id) + master_projects.pluck(:id)).uniq
+    Project.where(id: @project_ids).joins(:namespace)
   end
 
   # Groups user has access to
   def authorized_groups
-    agroups = Group.scoped
-    unless self.admin?
-      agroups = personal_groups
-    end
-    agroups
+    @authorized_groups ||= (self.admin? ? Group.scoped : personal_groups)
   end
 
   def personal_groups
@@ -300,13 +289,15 @@ class User < ActiveRecord::Base
   # Projects user has access to
   def authorized_projects
     @authorized_projects ||= begin
-                               project_ids = (owned_projects.pluck(:id) + groups_projects.pluck(:id) + projects.pluck(:id) + team_projects.pluck(:id) + team_group_grojects.pluck(:id)).uniq
+                               project_ids = (personal_projects.pluck(:id) + projects.pluck(:id) + owned_projects.pluck(:id) +
+                                              team_projects.pluck(:id)   + team_group_grojects.pluck(:id)).uniq
                                Project.where(id: project_ids).joins(:namespace).order('namespaces.name ASC')
                              end
   end
 
   def known_projects
-    @project_ids ||= (owned_projects.pluck(:id) + groups_projects.pluck(:id) + projects.pluck(:id) + team_projects.pluck(:id) + team_group_grojects.pluck(:id) + Project.public_only.pluck(:id)).uniq
+    @project_ids ||= (personal_projects.pluck(:id) + owned_projects.pluck(:id) + projects.pluck(:id) +
+                      team_projects.pluck(:id)  + team_group_grojects.pluck(:id) + Project.public_only.pluck(:id)).uniq
     Project.where(id: @project_ids)
   end
 
@@ -319,7 +310,7 @@ class User < ActiveRecord::Base
   end
 
   def known_teams
-    @known_teams_ids ||= (personal_teams.pluck(:id) + own_teams.pluck(:id) + master_teams.pluck(:id) + teams.pluck(:id) + Team.where(public: true).pluck(:id)).uniq
+    @known_teams_ids ||= (personal_teams.pluck(:id) + owned_teams.pluck(:id) + master_teams.pluck(:id) + teams.pluck(:id) + Team.where(public: true).pluck(:id)).uniq
     Team.where(id: @known_teams_ids)
   end
 
@@ -395,7 +386,7 @@ class User < ActiveRecord::Base
   end
 
   def several_namespaces?
-    namespaces.many? || owned_groups.any?
+    owned_groups.any?
   end
 
   def namespace_id
@@ -460,5 +451,10 @@ class User < ActiveRecord::Base
     end
 
     self
+  end
+
+  def can_leave_project?(project)
+    project.namespace != namespace &&
+      project.project_member(self)
   end
 end

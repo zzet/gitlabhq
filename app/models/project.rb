@@ -9,7 +9,6 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  creator_id             :integer
-#  default_branch         :string(255)
 #  issues_enabled         :boolean          default(TRUE), not null
 #  wall_enabled           :boolean          default(TRUE), not null
 #  merge_requests_enabled :boolean          default(TRUE), not null
@@ -33,13 +32,17 @@ class Project < ActiveRecord::Base
 
   extend Enumerize
 
-  attr_accessible :name, :path, :description, :default_branch, :issues_tracker, :label_list,
+  ActsAsTaggableOn.strict_case_match = true
+
+  attr_accessible :name, :path, :description, :issues_tracker, :label_list,
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
     :wiki_enabled, :git_protocol_enabled, :public, :import_url, :last_activity_at, :last_pushed_at, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
 
   acts_as_taggable_on :labels, :issues_default_labels
+
+  attr_accessor :new_default_branch
 
   # Relations
   belongs_to :creator,      foreign_key: "creator_id", class_name: "User"
@@ -153,7 +156,7 @@ class Project < ActiveRecord::Base
     end
 
     def search query
-      joins(:namespace).where("projects.name LIKE :query OR projects.path LIKE :query OR namespaces.name LIKE :query", query: "%#{query}%")
+      joins(:namespace).where("projects.name LIKE :query OR projects.path LIKE :query OR namespaces.name LIKE :query OR projects.description LIKE :query", query: "%#{query}%")
     end
 
     def find_with_namespace(id)
@@ -174,7 +177,7 @@ class Project < ActiveRecord::Base
   end
 
   def repository
-    @repository ||= ::Repository.new(path_with_namespace, default_branch)
+    @repository ||= ::Repository.new(path_with_namespace)
   end
 
   def saved?
@@ -331,14 +334,6 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def discover_default_branch
-    # Discover the default branch, but only if it hasn't already been set to
-    # something else
-    if repository.exists? && default_branch.nil?
-      update_attributes(default_branch: self.repository.discover_default_branch)
-    end
-  end
-
   def update_merge_requests(oldrev, newrev, ref, user)
     return true unless ref =~ /heads/
     branch_name = ref.gsub("refs/heads/", "")
@@ -480,5 +475,13 @@ class Project < ActiveRecord::Base
     OldEvent.where(project_id: self.id).
       order('id DESC').limit(100).
       update_all(updated_at: Time.now)
+  end
+
+  def project_member(user)
+    users_projects.where(user_id: user).first
+  end
+
+  def default_branch
+    @default_branch ||= repository.root_ref if repository.exists?
   end
 end

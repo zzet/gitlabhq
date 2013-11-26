@@ -45,12 +45,6 @@ class ProjectObserver < BaseObserver
         )
       end
     end
-
-    GitlabShellWorker.perform_async(
-      :update_repository_head,
-      project.path_with_namespace,
-      project.default_branch
-    ) if project.default_branch_changed?
   end
 
   def before_destroy(project)

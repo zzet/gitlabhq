@@ -13,7 +13,7 @@
       %p.nothing_here_message Projects activity will be displayed here
     .loading.hide
   .side.span4
-    .light-well
+    %div
       -#- if can? current_user, :manage_team, @team
         -#.dropdown.pull-right
           -#%a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
@@ -44,7 +44,7 @@
       - else
         %p Team not assigned to any projects
       - if @team.groups.any?
-        %p Assigned on #{@team.groups.count} groups (access to #{@team.groups_projects.count} projects)
+        %p Assigned on #{@team.groups.count} groups (access to #{@team.accessed_projects.count} projects)
       - else
         %p Team not assigned to any groups
       %p Created on: #{@team.created_at.stamp('Aug 22, 2013')}

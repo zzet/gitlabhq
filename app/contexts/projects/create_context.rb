@@ -45,14 +45,11 @@ module Projects
       @project.creator = current_user
 
       if @project.save
-        @project.discover_default_branch
-
-        master_permission = @project.users_projects.find_by_user_id(current_user)
-
-        if master_permission.blank?
-          @project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
-        else
-          master_permission.update_attribute(:project_access, UsersProject::MASTER) if master_permission.project_access != UsersProject::MASTER
+        unless @project.group
+          @project.users_projects.create(
+            project_access: UsersProject::MASTER,
+            user: current_user
+          )
         end
 
         if current_user.notification_setting && current_user.notification_setting.subscribe_if_owner
@@ -65,7 +62,6 @@ module Projects
 
       @project
     rescue => ex
-      @project.errors.add(:base, ex.message)
       @project.errors.add(:base, "Can't save project. Please try again later")
       @project
     end

@@ -18,7 +18,7 @@ class SearchContext < BaseContext
         projects = @group.projects.where(id: projects)
       elsif team_id.present?
         @team = Team.find(team_id)
-        projects = projects.where(id: (@team.projects.pluck(:id) + @team.groups_projects.pluck(:id)).uniq)
+        projects = projects.where(id: (@team.projects.pluck(:id) + @team.accessed_projects.pluck(:id)).uniq)
       elsif project_id.present?
         @project = Project.find(project_id)
         projects = projects.where(id: @project)
