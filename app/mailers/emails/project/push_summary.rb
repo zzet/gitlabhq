@@ -106,6 +106,7 @@ class Emails::Project::PushSummary < Emails::Project::Base
     @after_commit  = diff_data[:after_commit]
     @commits       = diff_data[:commits]
     @commit        = diff_data[:commit]
+    @commit        = @after_commit if @commit.blank?
     @diffs         = diff_data[:diffs]
     @refs_are_same = diff_data[:same]
     @suppress_diff = diff_data[:suppress_diff]
