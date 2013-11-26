@@ -1,23 +1,31 @@
 .row
   .span8
     = render "events/event_last_push", event: @last_push
+    = link_to dashboard_path, class: 'btn btn-tiny' do
+      &larr; To dashboard
+    &nbsp;
+    %span.cgray You will only see events from projects in this group
+    %hr
     = render 'shared/event_filter'
     .content_list
     .loading.hide
   .span4
     -#.light-well
     .project-side
+      - if can? current_user, :download_code, @project
+        .project-home-dropdown
+          = render "dropdown"
       = render "shared/watch_button", current_entity: @project
       %h3.page-title
-        = @project.name_with_namespace
+        %span.public-label
         - if @project.public
-          %span.public-label Public
+          Public
         - else
-          %span.public-label Private
+          Private
 
-        -#= @project.name
       - if @project.description.present?
-        %p.light= @project.description
+        .clearfix
+          %p.light= @project.description
 
       .clearfix
         - if @project.forked_from_project
@@ -44,29 +52,27 @@
             = link_to project_compare_index_path(@project, from: @repository.root_ref, to: @ref || @repository.root_ref), class: 'btn btn-block' do
               Compare code
 
-      .prepend-top-10
-        - if can? current_user, :download_code, @project
-          .project-home-dropdown
-            = render "dropdown"
+      .clearfix
         .form-horizontal
           = render "shared/clone_panel"
 
-      .prepend-top-10
-      %p
-        %span.light Created on
-        #{@project.created_at.stamp('Aug 22, 2013')}
-      %p
-        %span.light Owned by
-        - if @project.group
-          #{link_to @project.group.name, @project.group} Group
-        - else
-          #{link_to @project.owner_name, @project.owner}
+      .clearfix.prepend-top-10
+        .project-home-links
+          = link_to pluralize(@repository.round_commit_count, 'commit'), project_commits_path(@project, @ref || @repository.root_ref)
+          = link_to pluralize(@repository.branch_names.count, 'branch'), project_branches_path(@project)
+          = link_to pluralize(@repository.tag_names.count, 'tag'), project_tags_path(@project)
+          %span.light.prepend-left-20= repository_size
 
-      .project-home-links
-        = link_to pluralize(@repository.round_commit_count, 'commit'), project_commits_path(@project, @ref || @repository.root_ref)
-        = link_to pluralize(@repository.branch_names.count, 'branch'), project_branches_path(@project)
-        = link_to pluralize(@repository.tag_names.count, 'tag'), project_tags_path(@project)
-        %span.light.prepend-left-20= repository_size
+      .prepend-top-10
+        %p
+          %span.light Created on
+          #{@project.created_at.stamp('Aug 22, 2013')}
+        %p
+          %span.light Owned by
+          - if @project.group
+            #{link_to @project.group.name, @project.group} Group
+          - else
+            #{link_to @project.owner_name, @project.owner}
 
       - if @project.gitlab_ci?
         %hr
