@@ -17,7 +17,7 @@
 
 require 'spec_helper'
 
-describe AssemblaService do
+describe Service::Assembla do
   describe "Associations" do
     it { should belong_to :project }
     it { should have_one :service_hook }
@@ -28,7 +28,7 @@ describe AssemblaService do
     let(:project) { create(:project_with_code) }
 
     before do
-      @assembla_service = AssemblaService.new
+      @assembla_service = Service::Assembla.new
       @assembla_service.stub(
         project_id: project.id,
         project: project,
