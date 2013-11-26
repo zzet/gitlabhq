@@ -11,7 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131101182116) do
+ActiveRecord::Schema.define(:version => 20131125201752) do
+
+  create_table "broadcast_messages", :force => true do |t|
+    t.text     "message",    :null => false
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.integer  "alert_type"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "ci_builds", :force => true do |t|
     t.integer  "user_id"
@@ -251,7 +260,6 @@ ActiveRecord::Schema.define(:version => 20131101182116) do
     t.datetime "created_at",                                   :null => false
     t.datetime "updated_at",                                   :null => false
     t.integer  "creator_id"
-    t.string   "default_branch"
     t.boolean  "issues_enabled",         :default => true,     :null => false
     t.boolean  "wall_enabled",           :default => true,     :null => false
     t.boolean  "merge_requests_enabled", :default => true,     :null => false
@@ -281,6 +289,14 @@ ActiveRecord::Schema.define(:version => 20131101182116) do
   end
 
   add_index "protected_branches", ["project_id"], :name => "index_protected_branches_on_project_id"
+
+  create_table "service_configuration_assemblas", :force => true do |t|
+    t.string   "token"
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
 
   create_table "service_configuration_build_faces", :force => true do |t|
     t.integer  "service_id"

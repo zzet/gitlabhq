@@ -59,7 +59,7 @@ class DashboardController < ApplicationController
                 when 'joined' then
                   current_user.teams
                 when 'owned' then
-                  current_user.own_teams
+                  current_user.owned_teams
                 else
                   current_user.authorized_teams
                 end

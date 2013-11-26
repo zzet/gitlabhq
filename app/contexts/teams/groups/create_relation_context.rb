@@ -5,7 +5,7 @@ module Teams
         group_ids = params[:group_ids].respond_to?(:each) ? params[:group_ids] : params[:group_ids].split(',')
 
         unless current_user.admin?
-          allowed_group_ids = (current_user.own_groups.pluck(:id) + current_user.owned_groups.pluck(:id)).uniq
+          allowed_group_ids = (current_user.created_groups.pluck(:id) + current_user.owned_groups.pluck(:id)).uniq
           group_ids.select! { |id| allowed_group_ids.include?(id.to_i) }
         end
 

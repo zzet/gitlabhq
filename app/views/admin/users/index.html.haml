@@ -3,6 +3,7 @@
     .admin-filter
       = form_tag admin_users_path, method: :get, class: 'form-inline' do
         = search_field_tag :name, params[:name], placeholder: 'Name, email or username', class: 'search-text-input span2'
+        = hidden_field_tag :filter, params[:filter]
         = button_tag type: 'submit', class: 'btn' do
           %i.icon-search
       %ul.nav.nav-pills.nav-stacked

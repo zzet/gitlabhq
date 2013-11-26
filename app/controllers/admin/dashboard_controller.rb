@@ -2,6 +2,8 @@ class Admin::DashboardController < Admin::ApplicationController
   def index
     @projects       = Project.order("created_at DESC").limit(10)
     @users          = User.order("created_at DESC").limit(10)
+    @groups         = Group.order("created_at DESC").limit(10)
+    @teams          = Team.order("created_at DESC").limit(10)
 
     @projects_count = Project.count
     @users_count    = User.count

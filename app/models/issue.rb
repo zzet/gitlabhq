@@ -22,6 +22,8 @@ class Issue < ActiveRecord::Base
   include InternalId
   include Watchable
 
+  ActsAsTaggableOn.strict_case_match = true
+
   belongs_to :project
   validates :project, presence: true
 

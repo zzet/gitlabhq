@@ -15,10 +15,14 @@ FactoryGirl.define do
     email { Faker::Internet.email }
     name
     sequence(:username) { |n| "#{Faker::Internet.user_name}#{n}" }
-    password "123456"
+    password "12345678"
     password_confirmation { password }
     confirmed_at { Time.now }
     confirmation_token { nil }
+
+    after :create do |user|
+      user.create_namespace!(path: user.username, name: user.username) unless user.namespace
+    end
 
     trait :admin do
       admin true
@@ -66,6 +70,7 @@ FactoryGirl.define do
 
     after :create do |project|
       TestEnv.clear_repo_dir(project.namespace, project.path)
+      TestEnv.reset_satellite_dir
       TestEnv.create_repo(project.namespace, project.path)
     end
   end

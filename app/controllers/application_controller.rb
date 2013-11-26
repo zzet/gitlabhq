@@ -100,7 +100,7 @@ class ApplicationController < ActionController::Base
   def authorize_project!(action)
     unless can?(current_user, action, project)
       if current_user.nil?
-        authenticate_user!
+        authenticate_user!(force: true)
       else
         return access_denied!
       end

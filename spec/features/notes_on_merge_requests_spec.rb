@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "On a merge request", js: true do
-  let!(:group) { create(:group)}
+  let!(:group) { create(:group) }
   let!(:project) { create(:project_with_code, namespace: group) }
   let!(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
   let!(:note) { create(:note_on_merge_request_with_attachment,  project: project) }
@@ -11,6 +11,7 @@ describe "On a merge request", js: true do
     project.team << [@user, :master]
 
     visit project_merge_request_path(project, merge_request)
+    page.wait_for_ajax_to_complete
   end
 
   subject { page }

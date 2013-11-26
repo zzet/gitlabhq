@@ -4,7 +4,7 @@ class Emails::Project::Note < Emails::Project::Base
     @event        = @notification.event
     @user         = @event.author
     @note         = @event.source
-    @project      = @event.target
+    @project      = @note.project
 
     if @note.present?
       @commit_sha = @note.commit_id
@@ -34,7 +34,7 @@ class Emails::Project::Note < Emails::Project::Base
     @event          = @notification.event
     @user           = @event.author
     @note           = @event.source
-    @project        = @event.target
+    @project        = @note.project
     @merge_request  = @note.noteable
 
     headers 'X-Gitlab-Entity' => 'project',
@@ -52,7 +52,7 @@ class Emails::Project::Note < Emails::Project::Base
     @event          = @notification.event
     @user           = @event.author
     @note           = @event.source
-    @project        = @event.target
+    @project        = @note.project
     @issue          = @note.noteable
 
     headers 'X-Gitlab-Entity' => 'project',
@@ -68,7 +68,7 @@ class Emails::Project::Note < Emails::Project::Base
     @event        = @notification.event
     @user         = @event.author
     @note         = @event.source
-    @project      = @event.target
+    @project      = @note.project
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'commented',
