@@ -13,7 +13,7 @@ class Projects::BlobController < Projects::ApplicationController
   end
 
   def destroy
-    result = Projects::Files::RemoveContext.new(@project, current_user, params, @ref, @path).execute
+    result = Projects::Files::RemoveContext.new(current_user, @project, params, @ref, @path).execute
 
     if result[:status] == :success
       flash[:notice] = "Your changes have been successfully commited"
