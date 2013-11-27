@@ -394,6 +394,24 @@ table {
   padding: 5px 15px;
 }
 
+.navbar-spinner {
+  height: 46px;
+  width: 100%;
+
+  .turbolink-spinner {
+    width: 100%;
+    background-color: #BBB;
+    opacity: 0.5;
+
+    .container {
+      margin: auto;
+      width: 100px;
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+  }
+}
+
 .broadcast-message {
   padding: 10px;
   text-align: center;
