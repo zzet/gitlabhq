@@ -9,11 +9,6 @@
       %h1.project_name= title
       %ul.nav
         %li
-          %a
-            %div.hide.turbolink-spinner
-              %i.icon-refresh.icon-spin
-              Loading...
-        %li
           = render "layouts/search"
         %li
           = link_to "skype:?chat&blob=eGjOvcNshTTHGKuUXYWojG-ohpbm4aQTUCOdlfp3EG5hzZjWJZX1NbHAC-wb4UWj1BjWNOcR5xl6Kt8r5fAybXOAXyIV7xX17sZCXY7Q3mQzduTFym1PR1eGAeQIHLUMbu69eq9iqDsYelz9rxp1FYj0JEfdk1dPEbLaqB22rBqHtTqjLWU5D1Hk9Sqjmj1dhysUvfQYpDVCPSCr5pD_HJvtGlB-", title: "Чат багрепортинга", class: 'has_bottom_tooltip', 'data-original-title' => 'Чат багрепортинга' do
@@ -41,3 +36,9 @@
         %li
           = link_to current_user, class: "profile-pic", id: 'profile-pic' do
             = image_tag avatar_icon(current_user.email, 26), alt: 'User activity'
+
+.navbar.navbar-fixed-top.navbar-spinner
+  .turbolink-spinner.hide
+    .container
+      %i.icon-refresh.icon-spin
+      Loading...
