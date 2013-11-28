@@ -32,4 +32,4 @@ Tag was removed from
           %br
   %tr
     %td Branches with commit
-    %td= @project.repository.branch_names_contains(@commit.id).join(", ")
+    %td= commit_branches_links(@project, @project.repository.branch_names_contains(@commit.id))
