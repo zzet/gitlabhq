@@ -84,7 +84,7 @@ class Note < ActiveRecord::Base
       commit_id: (noteable.sha if noteable.respond_to? :sha),
       project: project,
       author: author,
-      note: "_mentioned in #{mentioner.gfm_reference}_",
+      note: "_This #{noteable.class.name.underscore.gsub("_", " ")} was mentioned in #{mentioner.gfm_reference}_",
       system: true
     }, without_protection: true)
   end
