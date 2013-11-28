@@ -14,7 +14,8 @@ Tag was removed from
   %tr
     %td Commit
     %td
-      = @commit.id
+      = link_to project_commit_url(@project.path_with_namespace, @commit.id) do
+        = @commit.id
       %br
       = @commit.message
   %tr
@@ -23,7 +24,8 @@ Tag was removed from
       - @commit.parent_ids.each do |parent_id|
         - parent_commit = @project.repository.commit(parent_id)
         - if parent_commit.present?
-          = parent_commit.id
+          = link_to project_commit_url(@project.path_with_namespace, parent_commit.id) do
+            = parent_commit.id
           %br
           = parent_commit.message
           %br
