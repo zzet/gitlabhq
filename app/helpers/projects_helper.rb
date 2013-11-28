@@ -44,10 +44,10 @@ module ProjectsHelper
     ssh_match     = submodule_url.match(/\A(\w*)@([\w\.]*):([\w\/-]*)\.git\z/)
 
     url = if ssh_match
-            if ssh_match[1] == Gitlab.config.gitlab.host
-              "#{Gitlab.config.gitlab.url}/#{ssh_match.last}/tree/#{item.id}"
+            if ssh_match[2] == Gitlab.config.gitlab.host
+              "#{Gitlab.config.gitlab.url}/#{ssh_match[3]}/tree/#{item.id}"
             else
-              "http://#{ssh_match[1]}/#{ssh_match.last}"
+              "http://#{ssh_match[2]}/#{ssh_match[3]}"
             end
           else
             uri = URI.parse(submodule_url)
