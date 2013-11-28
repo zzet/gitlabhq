@@ -79,6 +79,8 @@ class Emails::Project::PushSummary < Emails::Project::Base
     @tag          = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
+    @commit = @project.repository.commit(@push_data["before"])
+
     headers 'X-Gitlab-Entity' => 'project',
       'X-Gitlab-Action' => 'deleted_tag',
       'X-Gitlab-Source' => 'push',

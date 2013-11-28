@@ -1,4 +1,33 @@
-Tag '#{@tag}' was removed from
+Tag was removed from
 = link_to project_url(@project.path_with_namespace) do
   = "#{ @project.name_with_namespace } (#{ @project.path_with_namespace })"
 
+%br
+%br
+%table
+  %tr
+    %td Tag
+    %td= @tag
+  %tr
+    %td Date
+    %td= @event.created_at
+  %tr
+    %td Commit
+    %td
+      = @commit.id
+      %br
+      = @commit.message
+  %tr
+    %td Parents
+    %td
+      - @commit.parent_ids.each do |parent_id|
+        - parent_commit = @project.repository.commit(parent_id)
+        - if parent_commit.present?
+          = parent_commit.id
+          %br
+          = parent_commit.message
+          %br
+          %br
+  %tr
+    %td Branches with commit
+    %td= @project.repository.branch_names_contains(@commit.id).join(", ")
