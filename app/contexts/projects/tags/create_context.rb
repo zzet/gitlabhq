@@ -10,7 +10,7 @@ module Projects
           @push_data = {
             before: "0000000000000000000000000000000000000000",
             after: new_tag.commit.id,
-            ref: "refs/tags/" << new_tag,
+            ref: "refs/tags/" << new_tag.name,
             user_id: current_user.id,
             user_name: current_user.name,
             project_id: project.id,

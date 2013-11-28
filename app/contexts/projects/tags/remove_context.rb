@@ -8,7 +8,7 @@ module Projects
           @push_data = {
             before: tag.commit.id,
             after: "0000000000000000000000000000000000000000",
-            ref: "refs/tags/" << tag,
+            ref: "refs/tags/" << tag.name,
             user_id: current_user.id,
             user_name: current_user.name,
             project_id: project.id,
