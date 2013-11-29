@@ -24,7 +24,7 @@
         = link_to teams_dashboard_path(scope: 'owned') do
           Owned
           %span.pull-right
-            = current_user.own_teams.count
+            = current_user.owned_teams.count
 
     - if @groups.present?
       %fieldset

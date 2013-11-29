@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: old_events
+# Table name: events
 #
 #  id          :integer          not null, primary key
 #  target_type :string(255)
@@ -16,7 +16,7 @@
 
 class OldEvent < ActiveRecord::Base
   attr_accessible :project, :action, :data, :author_id, :project_id,
-    :target_id, :target_type
+                  :target_id, :target_type
 
   default_scope where("author_id IS NOT NULL")
 
@@ -30,11 +30,11 @@ class OldEvent < ActiveRecord::Base
   JOINED    = 8 # User joined project
   LEFT      = 9 # User left project
 
-  delegate :name, :email, to: :author, prefix: true, allow_nil: true
-  delegate :title, to: :issue, prefix: true, allow_nil: true
-  delegate :title, to: :merge_request, prefix: true, allow_nil: true
+  delegate :name, :email, to: :author,        prefix: true, allow_nil: true
+  delegate :title,        to: :issue,         prefix: true, allow_nil: true
+  delegate :title,        to: :merge_request, prefix: true, allow_nil: true
 
-  belongs_to :author, class_name: "User"
+  belongs_to :author, class_name: User
   belongs_to :project
   belongs_to :target, polymorphic: true
 
@@ -49,9 +49,9 @@ class OldEvent < ActiveRecord::Base
   class << self
     def determine_action(record)
       if [Issue, MergeRequest].include? record.class
-        CREATED
+        OldEvent::CREATED
       elsif record.kind_of? Note
-        COMMENTED
+        OldEvent::COMMENTED
       end
     end
 
@@ -66,12 +66,12 @@ class OldEvent < ActiveRecord::Base
 
       OldEvent.create(
         project: project,
-        action: PUSHED,
+        action: OldEvent::PUSHED,
         data: {
-        ref: "#{prefix}/#{ref.name}",
-        before: before,
-          after: after
-      },
+          ref: "#{prefix}/#{ref.name}",
+          before: before,
+            after: after
+        },
         author_id: user.id
       )
     end
@@ -168,7 +168,7 @@ class OldEvent < ActiveRecord::Base
   end
 
   def valid_push?
-    data[:ref]
+    data[:ref] && ref_name.present?
   rescue => ex
     false
   end
@@ -223,7 +223,7 @@ class OldEvent < ActiveRecord::Base
 
   # Max 20 commits from push DESC
   def commits
-    @commits ||= data[:commits].reverse
+    @commits ||= (data[:commits] || []).reverse
   end
 
   def commits_count

@@ -14,11 +14,7 @@ class Projects::TagsController < Projects::ApplicationController
   end
 
   def create
-    @repository.add_tag(params[:tag_name], params[:ref])
-
-    if new_tag = @repository.find_tag(params[:tag_name])
-      Event.create_ref_event(@project, current_user, new_tag, 'add', 'refs/tags')
-    end
+    Projects::Tags::CreateContext.new(current_user, @project, params).execute
 
     redirect_to project_tags_path(@project)
   end
@@ -26,9 +22,7 @@ class Projects::TagsController < Projects::ApplicationController
   def destroy
     tag = @repository.find_tag(params[:id])
 
-    if tag && @repository.rm_tag(tag.name)
-      Event.create_ref_event(@project, current_user, tag, 'rm', 'refs/tags')
-    end
+    Projects::Tags::RemoveContext.new(current_user, @project, tag).execute
 
     respond_to do |format|
       format.html { redirect_to project_tags_path }

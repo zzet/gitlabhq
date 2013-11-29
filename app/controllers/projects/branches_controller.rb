@@ -16,11 +16,7 @@ class Projects::BranchesController < Projects::ApplicationController
   end
 
   def create
-    @repository.add_branch(params[:branch_name], params[:ref])
-
-    if new_branch = @repository.find_branch(params[:branch_name])
-      OldEvent.create_ref_event(@project, current_user, new_branch, 'add')
-    end
+    Projects::Branches::CreateContext.new(current_user, @project, params).execute
 
     redirect_to project_branches_path(@project)
   end
@@ -28,9 +24,7 @@ class Projects::BranchesController < Projects::ApplicationController
   def destroy
     branch = @repository.find_branch(params[:id])
 
-    if branch && @repository.rm_branch(branch.name)
-      OldEvent.create_ref_event(@project, current_user, branch, 'rm')
-    end
+    Projects::Branches::RemoveContext.new(current_user, @project, branch).execute
 
     respond_to do |format|
       format.html { redirect_to project_branches_path(@project) }
