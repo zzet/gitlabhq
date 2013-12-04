@@ -1,0 +1,16 @@
+.ui-box
+  .title
+    %strong All members (#{@all_members.count})
+  %ul.well-list
+    - @all_members.each do |user|
+      %li
+        = image_tag avatar_icon(user.email, 16), class: "avatar s16"
+        %p
+          %strong= user.name
+        %span.cgray= user.username
+
+        %span.pull-right
+          - access = @accesses[user.id].first
+          %strong= access[:human_access]
+          %span.cgray (#{access[:from]})
+
