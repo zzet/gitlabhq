@@ -15,8 +15,6 @@
         %i.icon-edit
       = link_to team_member_path(team, user.username), confirm: remove_user_from_team_message(team, user), method: :delete, class: "btn-tiny btn btn-remove", title: 'Remove user from team' do
         %i.icon-minus.icon-white
-    - if user == team.creator
-      %strong Owner
 
   .edit-member.hide.js-toggle-content
     = form_for member, url: team_member_path(team, user.username) do |f|

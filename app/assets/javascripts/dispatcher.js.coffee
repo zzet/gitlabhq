@@ -43,6 +43,8 @@ class Dispatcher
         new Wall(project_id)
       when 'projects:teams:members:index'
         new TeamMembers()
+      when 'projects:team_members:index'
+        new SidebarTabs('project_team_members')
       when 'groups:members'
         new GroupMembers()
       when 'projects:tree:show'

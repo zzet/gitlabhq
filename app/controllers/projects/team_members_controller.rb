@@ -10,6 +10,63 @@ class Projects::TeamMembersController < Projects::ApplicationController
     teams_ids = @project.teams.pluck(:id)
     teams_ids += @group.teams.pluck(:id) if @group.present?
     @teams = Team.where(id: teams_ids)
+
+    #NOTE This part of code has to combine members of project, group and teams and their access levels,
+    #     and then sort access levels. Next two variables used in views in all_members parts.
+    #TODO Need refactoring
+    @all_members = []
+    @accesses = {}
+
+    @users_projects.each do |member|
+      user = member.user
+      @all_members << user
+      @accesses[user.id] ||= []
+      @accesses[user.id] << {
+        from: @project,
+        human_access: member.human_access,
+        access: member.access_field
+      }
+    end
+
+    @group.users_groups.each do |member|
+      user = member.user
+      @all_members << user
+      @accesses[user.id] ||= []
+      @accesses[user.id] << {
+        from: @group,
+        human_access: member.human_access,
+        access: member.access_field
+      }
+    end
+
+    @teams.each do |team|
+      team.team_user_relationships.each do |member|
+        user = member.user
+        @all_members <<  user
+        @accesses[user.id] ||= []
+        @accesses[user.id] << {
+          from: team,
+          human_access: member.human_access,
+          access: member.access_field
+        }
+      end
+    end
+
+    ar = @accesses.map do |user_id, accesses|
+      [
+        user_id,
+        accesses.sort { |a, b| b[:access] <=> a[:access] }
+      ]
+    end
+    @accesses = Hash[ar]
+
+    @all_members.uniq!
+    @all_members.sort! do |a, b|
+      a_access = @accesses[a.id].first[:access]
+      b_access = @accesses[b.id].first[:access]
+
+      b_access <=> a_access
+    end
   end
 
   def new

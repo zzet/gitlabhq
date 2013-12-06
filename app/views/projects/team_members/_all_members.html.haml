@@ -1,0 +1,31 @@
+.ui-box
+  .title
+    %strong All members (#{@all_members.count})
+  %ul.well-list
+    - @all_members.each do |user|
+      %li
+        = link_to user_url(user) do
+          = image_tag avatar_icon(user.email, 16), class: "avatar s16"
+        %strong= user.name
+        %span.cgray #{user.username} (#{user.email})
+        - if user == current_user
+          %span.label.label-success It's you
+
+        %span.pull-right
+          - access = @accesses[user.id].first
+          - case access[:from]
+            - when Project
+              %span.cgray from project
+            - when Group
+              %span.cgray
+                from group
+                = link_to access[:from].name, group_members_path(access[:from].path)
+            - when Team
+              %span.cgray
+                from team
+                - if can? current_user, :manage_team, access[:from]
+                  = link_to access[:from].name, team_members_path(access[:from].path)
+                - else
+                  = link_to access[:from].name, team_path(access[:from].path)
+          %strong= access[:human_access]
+
