@@ -22,7 +22,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
       @all_members << user
       @accesses[user.id] ||= []
       @accesses[user.id] << {
-        from: "From project",
+        from: @project,
         human_access: member.human_access,
         access: member.access_field
       }
@@ -33,7 +33,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
       @all_members << user
       @accesses[user.id] ||= []
       @accesses[user.id] << {
-        from: "From group",
+        from: @group,
         human_access: member.human_access,
         access: member.access_field
       }
@@ -42,10 +42,10 @@ class Projects::TeamMembersController < Projects::ApplicationController
     @teams.each do |team|
       team.team_user_relationships.each do |member|
         user = member.user
-        @all_members << user
+        @all_members <<  user
         @accesses[user.id] ||= []
         @accesses[user.id] << {
-          from: "From team #{team.name}",
+          from: team,
           human_access: member.human_access,
           access: member.access_field
         }
@@ -59,6 +59,14 @@ class Projects::TeamMembersController < Projects::ApplicationController
       ]
     end
     @accesses = Hash[ar]
+
+    @all_members.uniq!
+    @all_members.sort! do |a, b|
+      a_access = @accesses[a.id].first[:access]
+      b_access = @accesses[b.id].first[:access]
+
+      b_access <=> a_access
+    end
   end
 
   def new

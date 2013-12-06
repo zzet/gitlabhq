@@ -10,3 +10,4 @@
     %ul.well-list
       - team.team_user_relationships.order('team_access DESC').each do |member|
         = render 'teams/members/member', team: team, member: member, show_controls: false
+  %br
