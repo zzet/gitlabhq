@@ -1,8 +1,13 @@
 - user = member.user
 %li{id: dom_id(user), class: "team_member_row access-#{member.human_access.downcase} js-toggle-container"}
+  .batch-action-column
+    - if user != current_user
+      = check_box_tag "ids[]", member.id, false, class: 'js-batch-action-item'
   = image_tag avatar_icon(user.email, 16), class: "avatar s16"
   %strong= user.name
   %span.cgray= user.username
+  - if user == current_user
+    %span.label.label-success It's you
 
   .pull-right
     %strong= member.human_access

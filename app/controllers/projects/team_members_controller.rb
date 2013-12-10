@@ -28,15 +28,17 @@ class Projects::TeamMembersController < Projects::ApplicationController
       }
     end
 
-    @group.users_groups.each do |member|
-      user = member.user
-      @all_members << user
-      @accesses[user.id] ||= []
-      @accesses[user.id] << {
-        from: @group,
-        human_access: member.human_access,
-        access: member.access_field
-      }
+    if @group.present?
+      @group.users_groups.each do |member|
+        user = member.user
+        @all_members << user
+        @accesses[user.id] ||= []
+        @accesses[user.id] << {
+          from: @group,
+          human_access: member.human_access,
+          access: member.access_field
+        }
+      end
     end
 
     @teams.each do |team|
@@ -114,6 +116,22 @@ class Projects::TeamMembersController < Projects::ApplicationController
     notice = status ? "Succesfully imported" : "Import failed"
 
     redirect_to project_team_index_path(project), notice: notice
+  end
+
+  def batch_update
+    Projects::Users::BatchUpdateRelationContext.new(@current_user, @project, params).execute
+
+    respond_to do |format|
+      format.js { render nothing: true }
+    end
+  end
+
+  def batch_delete
+    Projects::Users::BatchRemoveRelationContext.new(@current_user, @project, params).execute
+
+    respond_to do |format|
+      format.js { render nothing: true }
+    end
   end
 
   protected
