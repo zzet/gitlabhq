@@ -1,7 +1,8 @@
 - user = member.user
 %li{id: dom_id(user), class: "team_member_row access-#{member.human_access.downcase} js-toggle-container"}
-  = image_tag avatar_icon(user.email, 16), class: "avatar s16"
-  %strong= user.name
+  = link_to user_path(user) do
+    = image_tag avatar_icon(user.email, 16), class: "avatar s16"
+  %strong= link_to user.name, user_path(user)
   %span.cgray= user.username
 
   .pull-right

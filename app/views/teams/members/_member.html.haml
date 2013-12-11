@@ -1,8 +1,9 @@
 - user = member.user
 - return unless user
 %li{class: "#{dom_class(member)} js-toggle-container", id: dom_id(member)}
-  = image_tag gravatar_icon(user.email, 16), class: "avatar s16"
-  %strong= user.name
+  = link_to user_path(user) do
+    = image_tag gravatar_icon(user.email, 16), class: "avatar s16"
+  %strong= link_to user.name, user_path(user)
   %span.cgray= user.username
   - if user == current_user
     %span.label.label-success It's you
