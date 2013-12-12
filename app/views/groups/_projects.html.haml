@@ -13,9 +13,8 @@
     - projects.each do |project|
       %li.project-row
         = link_to project_path(project), class: dom_class(project) do
-          - if project.public
-            %small.access-icon
-              = public_icon
+          %small.access-icon
+            = privacy_icon(project)
           %span.project-name.filter-title
             = truncate(project.name, length: 25)
           %span.arrow
