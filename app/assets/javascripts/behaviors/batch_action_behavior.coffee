@@ -67,7 +67,7 @@ class BatchActionBehavior
       success: ->
         window.location.reload()
       error: ->
-        alert('Error!')
+        alert('Error! Refresh the page and try again.')
 
     return false
 
@@ -84,7 +84,7 @@ class BatchActionBehavior
       success: ->
         window.location.reload()
       error: ->
-        alert('Error!')
+        alert('Error! Refresh the page and try again.')
 
     return false
 
