@@ -13,14 +13,16 @@ Feature: Project Team management
 
   @javascript
   Scenario: Add user to project
-    Given I click link "New Team Member"
+    Given I click link "New project member"
     And I select "Mike" as "Reporter"
     Then I should see "Mike" in team list as "Reporter"
 
   @javascript
   Scenario: Update user access
     Given I should see "Sam" in team list as "Developer"
+    And I go to "Project members" tab
     And I change "Sam" role to "Reporter"
+    And I go to "All members" tab
     And I should see "Sam" in team list as "Reporter"
 
   Scenario: Cancel team member

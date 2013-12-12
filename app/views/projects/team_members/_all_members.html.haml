@@ -3,7 +3,7 @@
     %strong All members (#{@all_members.count})
   %ul.well-list
     - @all_members.each do |user|
-      %li.js-toggle-container
+      %li.js-toggle-container{id: dom_id(user, 'all_members_tab')}
         = link_to user_path(user) do
           = image_tag avatar_icon(user.email, 16), class: "avatar s16"
         %strong= link_to user.name, user_path(user)

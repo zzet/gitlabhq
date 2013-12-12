@@ -28,15 +28,17 @@ class Projects::TeamMembersController < Projects::ApplicationController
       }
     end
 
-    @group.users_groups.each do |member|
-      user = member.user
-      @all_members << user
-      @accesses[user.id] ||= []
-      @accesses[user.id] << {
-        from: @group,
-        human_access: member.human_access,
-        access: member.access_field
-      }
+    if @group.present?
+      @group.users_groups.each do |member|
+        user = member.user
+        @all_members << user
+        @accesses[user.id] ||= []
+        @accesses[user.id] << {
+          from: @group,
+          human_access: member.human_access,
+          access: member.access_field
+        }
+      end
     end
 
     @teams.each do |team|
