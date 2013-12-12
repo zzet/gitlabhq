@@ -504,3 +504,13 @@ li.commit {
     }
   }
 }
+
+.hide-line-numbers {
+  .linenumber-content {
+    display: none;
+    visibility: hidden;
+  }
+  .diff-line-num:before {
+    content: attr(data-linenumber);
+  }
+}
