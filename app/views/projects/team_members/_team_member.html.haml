@@ -3,8 +3,9 @@
   .batch-action-column
     - if user != current_user
       = check_box_tag "ids[]", member.id, false, class: 'js-batch-action-item'
-  = image_tag avatar_icon(user.email, 16), class: "avatar s16"
-  %strong= user.name
+  = link_to user_path(user) do
+    = image_tag avatar_icon(user.email, 16), class: "avatar s16"
+  %strong= link_to user.name, user_path(user)
   %span.cgray= user.username
   - if user == current_user
     %span.label.label-success It's you
@@ -13,7 +14,7 @@
     %strong= member.human_access
     - if current_user_can_admin_project
       - unless @project.personal? && user == current_user
-        = link_to '#', class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
+        = link_to '#', id: dom_id(user, "toggle_edit_form"), class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
           %i.icon-edit
         = link_to project_team_member_path(@project, user), confirm: remove_from_project_team_message(@project, user), method: :delete, class: "btn-tiny btn btn-remove", title: 'Remove user from team' do
           %i.icon-minus.icon-white

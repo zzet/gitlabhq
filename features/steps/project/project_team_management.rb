@@ -15,8 +15,12 @@ class ProjectTeamManagement < Spinach::FeatureSteps
     page.should have_content(user.username)
   end
 
-  Given 'I click link "New Team Member"' do
+  Given 'I click link "New project member"' do
     click_link "New project member"
+  end
+
+  Given 'I go to "Project members" tab' do
+    click_link "Project members"
   end
 
   And 'I select "Mike" as "Reporter"' do
@@ -30,27 +34,41 @@ class ProjectTeamManagement < Spinach::FeatureSteps
   end
 
   Then 'I should see "Mike" in team list as "Reporter"' do
-    within ".access-reporter" do
+    user = User.find_by_name("Mike")
+
+    click_link "All members"
+    within "#all_members_tab_user_#{user.id}" do
       page.should have_content('Mike')
+      page.should have_content('Reporter')
     end
   end
 
   Given 'I should see "Sam" in team list as "Developer"' do
-    within ".access-developer" do
+    user = User.find_by_name("Sam")
+
+    click_link "All members"
+    within "#all_members_tab_user_#{user.id}" do
       page.should have_content('Sam')
+      page.should have_content('Developer')
     end
   end
 
   And 'I change "Sam" role to "Reporter"' do
     user = User.find_by_name("Sam")
+
     within "#user_#{user.id}" do
+      click_on "#toggle_edit_form_user_#{user.id}"
       select "Reporter", from: "team_member_project_access"
+      click_button "Save"
     end
   end
 
   And 'I should see "Sam" in team list as "Reporter"' do
-    within ".access-reporter" do
+    user = User.find_by_name("Sam")
+    click_link "All members"
+    within "#all_members_tab_user_#{user.id}" do
       page.should have_content('Sam')
+      page.should have_content('Reporter')
     end
   end
 
