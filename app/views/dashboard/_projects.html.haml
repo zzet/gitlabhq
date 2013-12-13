@@ -6,6 +6,8 @@
         = link_to new_project_path, class: "btn btn-new" do
           %i.icon-plus
           New project
+    = render 'shared/projects/sort_pills'
+
   %ul.well-list.dash-list
     - projects.each do |project|
       %li.project-row

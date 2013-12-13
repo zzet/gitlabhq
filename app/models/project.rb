@@ -130,7 +130,7 @@ class Project < ActiveRecord::Base
   scope :in_namespace, ->(namespace) { where(namespace_id: namespace.id) }
   scope :in_group_namespace, -> { joins(:group) }
   scope :sorted_by_activity, -> { order("projects.last_activity_at DESC") }
-  scope :sorted_by_push_date, -> { reorder("projects.last_pushed_at DESC") }
+  scope :sorted_by_push_date, -> { reorder("projects.last_pushed_at DESC NULLS LAST") }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
   scope :public_via_http, -> { where(public: true) }

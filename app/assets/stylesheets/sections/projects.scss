@@ -233,3 +233,21 @@ ul.nav.nav-projects-tabs {
     }
   }
 }
+
+.ui-box .title .nav.nav-pills.project-sorting-tabs {
+  width: 100%;
+  float: left;
+
+  a {
+    padding: 1px 3px;
+    margin-bottom: -1px;
+    font-size: 11px;
+    line-height: 11px;
+    background: none;
+    border: none;
+  }
+
+  li.active a{
+    border-bottom: 2px solid #848785;
+  }
+}
