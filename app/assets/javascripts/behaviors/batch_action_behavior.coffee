@@ -1,44 +1,38 @@
 #
-# .CONTAINER_CLASS
-#   input(type=checkbox).CHECK_ALL_CHECKBOX_CLASS
+# .js-batch-action-container
+#   input(type=checkbox).js-batch-action-check-all
 #
 #   # n items
 #   - entities.each do |entity|
-#     input(type=checkbox value="entity.id").ITEMS_CHECKBOX_CLASS
-#     input(type=checkbox value="entity.id").ITEMS_CHECKBOX_CLASS
+#     input(type=checkbox value="entity.id").js-batch-action-item
+#     input(type=checkbox value="entity.id").js-batch-action-item
 #
-#   .CONTENT_CLASS
+#   .js-batch-action-content
 #     %form
 #       %input
 #       %input(type=submit)
 #
-#     %a.REMOVE_LINK_CLASS
+#     %a.js-batch-action-remove-link
 #
-# CONTAINER_CLASS is container with batch action elements
-# CHECK_ALL_CHECKBOX_CLASS is checkbox for choose all items
-# ITEMS_CHECKBOX_CLASS is checkbox where value is id of edited entity
-# CONTENT_CLASS is block which visible when somebody item checked
-#   this block should content form for edit enities
-# REMOVE_LINK_CLASS is link for remove checked entities
+# .js-batch-action-container - is container with batch action elements
+# .js-batch-action-check-all - is checkbox for choose all items
+# .js-batch-action-item - is checkbox where value is id of edited entity
+# .js-batch-action-content - is block which visible when somebody item checked,
+#                            this block should content form for edit enities
+# .js-batch-action-remove-link - is link for remove checked entities
 #   this link should be in content block
 #
 class BatchActionBehavior
-  CONTAINER_CLASS = '.js-batch-action-container'
-  CHECK_ALL_CHECKBOX_CLASS = '.js-batch-action-check-all'
-  ITEMS_CHECKBOX_CLASS = '.js-batch-action-item'
-  CONTENT_CLASS = '.js-batch-action-content'
-  REMOVE_LINK_CLASS = '.js-batch-remove-link'
-
   constructor: ->
-    @container = $(CONTAINER_CLASS)
-    @check_all_checkbox = @container.find(CHECK_ALL_CHECKBOX_CLASS)
-    @items = @container.find(ITEMS_CHECKBOX_CLASS)
-    @content = @container.find(CONTENT_CLASS)
+    @container = $('.js-batch-action-container')
+    @check_all_checkbox = @container.find('.js-batch-action-check-all')
+    @items = @container.find('.js-batch-action-item')
+    @content = @container.find('.js-batch-action-content')
 
-    @container.on('click', CHECK_ALL_CHECKBOX_CLASS, @checkallCheckboxHandler)
+    @check_all_checkbox.on('click', @checkallCheckboxHandler)
     @items.on('click', @itemCheckboxHandler)
 
-    @content.on('confirm:complete', REMOVE_LINK_CLASS, @removeLinkHandler)
+    @content.on('confirm:complete', '.js-batch-action-remove-link', @removeLinkHandler)
     @content.on('submit', 'form', @contentFormHandler)
 
   checkallCheckboxHandler: (event) =>
@@ -54,6 +48,9 @@ class BatchActionBehavior
     @_updateContent()
 
   contentFormHandler: (event) =>
+    event.preventDefault()
+    event.stopPropagation()
+
     form = $(event.target)
     url = form.attr('action')
     method = form.attr('method')
