@@ -462,6 +462,20 @@ li.commit {
       margin-right: 10px;
     }
 
+    .build_status_additional{
+      margin-right: 5px;
+    }
+
+    .popover{
+      form{
+        margin: 5px 0 5px 0
+      }
+    }
+
+    .build-info{
+      display: none;
+    }
+
     .notes_count {
       float: right;
       margin-right: 10px;

@@ -25,6 +25,8 @@ class Dispatcher
         new Activities()
       when 'projects:commit:show'
         new Commit()
+      when 'projects:commits:show'
+        new JenkinsBuild()
       when 'groups:show'
         new Activities()
         new SidebarFilter()

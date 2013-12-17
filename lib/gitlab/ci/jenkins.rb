@@ -39,6 +39,16 @@ module Gitlab
             end
     end
 
+    def build_time
+      time = build_result["timestamp"]
+      (time) ? Time.at(time/1000).to_datetime : nil
+    end
+
+    def duration
+      time = (build_result["duration"]) ? build_result["duration"] / 1000 : 0
+      Time.at(time)
+    end
+
     def coverage
       @build_result_data["coverage"]
     end
