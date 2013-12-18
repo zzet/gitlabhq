@@ -17,7 +17,7 @@ class Gitlab::Event::Notification::Creator::Default
       # TODO. Rewrite in future with check by Entity type
       if subscriber_can_get_notification?(subscription, event)
         opts = { event: event, subscriber: subscription.user }
-        opts[:notification_state] = :delayed if event.action == "deleted"
+        opts[:notification_state] = :delayed if event.system_action == "destroy"
 
         notifications << subscription.notifications.create(opts)
       end
@@ -37,7 +37,7 @@ class Gitlab::Event::Notification::Creator::Default
   end
 
   def check_event_for_brave(subscription, event)
-    return true if ["Note", "MergeRequest", "Push_summary"].include?(event.source_type)
+    return true if ["Note", "MergeRequest", "Push"].include?(event.source_type)
     return true if ["Project"].include?(event.source_type) && event.action == "transfer"
 
     subscriber = subscription.user

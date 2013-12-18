@@ -19,12 +19,12 @@ class ProtectedBranch < ActiveRecord::Base
   validates :name, presence: true
   validates :project, presence: true
 
-  has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
-
-  actions_to_watch [:created, :updated, :deleted]
+  watch do
+    source watchable_name do
+      from :create, to: :created
+      from :destroy, to: :deleted
+    end
+  end
 
   def commit
     project.repository.commit(self.name)

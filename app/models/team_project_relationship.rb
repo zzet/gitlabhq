@@ -25,9 +25,15 @@ class TeamProjectRelationship < ActiveRecord::Base
   validates :project,         presence: true
   validates :team,            presence: true
 
+  watch do
+    source watchable_name do
+      from :create,  to: :created
+      from :update,  to: :updated
+      from :destroy, to: :deleted
+    end
+  end
+
   scope :with_project, ->(project){ where(project_id: project) }
 
   delegate :name, to: :team, allow_nil: true, prefix: true
-
-  actions_to_watch [:created, :deleted, :updated]
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131125201752) do
+ActiveRecord::Schema.define(:version => 20131209080209) do
 
   create_table "broadcast_messages", :force => true do |t|
     t.text     "message",    :null => false
@@ -97,6 +97,7 @@ ActiveRecord::Schema.define(:version => 20131125201752) do
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
     t.integer  "parent_event_id"
+    t.string   "system_action"
   end
 
   create_table "file_tokens", :force => true do |t|
@@ -289,6 +290,18 @@ ActiveRecord::Schema.define(:version => 20131125201752) do
   end
 
   add_index "protected_branches", ["project_id"], :name => "index_protected_branches_on_project_id"
+
+  create_table "pushes", :force => true do |t|
+    t.string   "ref"
+    t.string   "before"
+    t.string   "after"
+    t.text     "data"
+    t.integer  "project_id"
+    t.integer  "user_id"
+    t.integer  "commits_count"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
 
   create_table "service_configuration_assemblas", :force => true do |t|
     t.string   "token"

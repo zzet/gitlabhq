@@ -6,12 +6,14 @@ class Emails::Project::Issue < Emails::Project::Base
     @issue        = @event.source
     @project      = @issue.project
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'opened',
-            'X-Gitlab-Source' => 'issue',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-issue-#{@issue.iid}"
+    if @user && @project && @issue
+      headers 'X-Gitlab-Entity' => 'project',
+        'X-Gitlab-Action' => 'opened',
+        'X-Gitlab-Source' => 'issue',
+        'In-Reply-To'     => "project-#{@project.path_with_namespace}-issue-#{@issue.iid}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@issue.title}' (##{@issue.iid})")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@issue.title}' (##{@issue.iid})")
+    end
   end
 
   def closed_email(notification)
@@ -45,6 +47,10 @@ class Emails::Project::Issue < Emails::Project::Base
   end
 
   def deleted_email(notification)
+
+  end
+
+  def updated_email(notification)
 
   end
 end

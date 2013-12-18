@@ -16,5 +16,11 @@ class ProjectHook < WebHook
 
   belongs_to :project
 
-  actions_to_watch [:created, :updated, :deleted]
+  attr_accessible :project, :project_id
+
+  source watchable_name do
+    from :create, to: :created
+    from :update, to: :updated
+    from :destroy, to: :deleted
+  end
 end

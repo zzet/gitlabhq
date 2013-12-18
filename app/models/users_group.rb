@@ -23,6 +23,18 @@ class UsersGroup < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :group
+  validates :group_access, inclusion: { in: UsersGroup.group_access_roles.values }, presence: true
+  validates :user_id, presence: true
+  validates :group_id, presence: true
+  validates :user_id, uniqueness: { scope: [:group_id], message: "already exists in group" }
+
+  watch do
+    source watchable_name do
+      from :create,  to: :created
+      from :update,  to: :updated
+      from :destroy, to: :deleted
+    end
+  end
 
   scope :guests, -> { where(group_access: GUEST) }
   scope :reporters, -> { where(group_access: REPORTER) }
@@ -33,14 +45,7 @@ class UsersGroup < ActiveRecord::Base
   scope :with_group, ->(group) { where(group_id: group.id) }
   scope :with_user, ->(user) { where(user_id: user.id) }
 
-  validates :group_access, inclusion: { in: UsersGroup.group_access_roles.values }, presence: true
-  validates :user_id, presence: true
-  validates :group_id, presence: true
-  validates :user_id, uniqueness: { scope: [:group_id], message: "already exists in group" }
-
   delegate :name, :username, :email, to: :user, prefix: true
-
-  actions_to_watch [:created, :updated, :deleted]
 
   def access_field
     group_access

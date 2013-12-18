@@ -205,6 +205,9 @@ group :development, :test do
   gem "capybara"
   gem "pry"
   gem 'pry-rails'
+  #gem 'pry-remote'
+  #gem 'pry-stack_explorer'
+  #gem 'pry-debugger'
   gem "awesome_print"
   gem "database_cleaner"
   gem "launchy"

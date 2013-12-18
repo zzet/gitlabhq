@@ -187,7 +187,7 @@ describe Note do
       its(:noteable) { should == issue }
       its(:project)  { should == issue.project }
       its(:author)   { should == author }
-      its(:note) { should == "_mentioned in merge request !#{mergereq.iid}_" }
+      its(:note) { should == "_This issue was mentioned in merge request !#{mergereq.iid}_" }
     end
 
     context 'issue from a commit' do
@@ -195,7 +195,7 @@ describe Note do
 
       it { should be_valid }
       its(:noteable) { should == issue }
-      its(:note) { should == "_mentioned in commit #{commit.sha[0..5]}_" }
+      its(:note) { should == "_This issue was mentioned in commit #{commit.sha[0..5]}_" }
     end
 
     context 'merge request from an issue' do
@@ -204,7 +204,7 @@ describe Note do
       it { should be_valid }
       its(:noteable) { should == mergereq }
       its(:project) { should == mergereq.project }
-      its(:note) { should == "_mentioned in issue ##{issue.iid}_" }
+      its(:note) { should == "_This merge request was mentioned in issue ##{issue.iid}_" }
     end
 
     context 'commit from a merge request' do
@@ -213,7 +213,7 @@ describe Note do
       it { should be_valid }
       its(:noteable) { should == commit }
       its(:project) { should == project }
-      its(:note) { should == "_mentioned in merge request !#{mergereq.iid}_" }
+      its(:note) { should == "_This commit was mentioned in merge request !#{mergereq.iid}_" }
     end
   end
 

@@ -76,16 +76,15 @@ describe GitPushService do
   describe "Web Hooks" do
     context "with web hooks" do
       before do
-        @project_hook = create(:project_hook)
-        @project_hook_2 = create(:project_hook)
-        project.hooks << [@project_hook, @project_hook_2]
+        @project_hook_1 = create(:project_hook, project: project)
+        @project_hook_2 = create(:project_hook, project: project)
 
-        stub_request(:post, @project_hook.url)
+        stub_request(:post, @project_hook_1.url)
         stub_request(:post, @project_hook_2.url)
       end
 
       it "executes multiple web hook" do
-        @project_hook.should_receive(:async_execute).once
+        @project_hook_1.should_receive(:async_execute).once
         @project_hook_2.should_receive(:async_execute).once
 
         service.execute(project, user, @oldrev, @newrev, @ref)
@@ -94,8 +93,7 @@ describe GitPushService do
 
     context "execute web hooks" do
       before do
-        @project_hook = create(:project_hook)
-        project.hooks << [@project_hook]
+        @project_hook = create(:project_hook, project: project)
         stub_request(:post, @project_hook.url)
       end
 

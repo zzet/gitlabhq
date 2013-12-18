@@ -18,17 +18,11 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
-  factory :event, class: Event do
-    author
-    action Event.action.values.first
-    data "MyText"
-    source { create :project }
-  end
-
-  factory :push_event, class: Event do
-    author
-    action :pushed
-    data { "{\"repository\": \"any\"}" }
-    source { create :push }
+  factory :push, class: Push do
+    user
+    project { create :project_with_code }
+    before  "b98a310def241a6fd9c9a9a3e7934c48e498fe81"
+    after   "b19a04f53caeebf4fe5ec2327cb83e9253dc91bb"
+    ref     "refs/heads/master"
   end
 end

@@ -18,33 +18,22 @@
 class Event < ActiveRecord::Base
   include Actionable
 
-  attr_accessible :action, :data,
+  attr_accessible :action,    :system_action, :data,
                   :source_id, :source_type, :source,
                   :target_id, :target_type, :target,
                   :author_id, :author
 
-
-  belongs_to :author, class_name: User
   belongs_to :target, polymorphic: true
   belongs_to :source, polymorphic: true
+  belongs_to :author,       class_name: User
   belongs_to :parent_event, class_name: Event
 
   has_many :notifications,  dependent: :destroy,     class_name: Event::Subscription::Notification
-  has_many :subscriptions,  dependent: :destroy, through: :notifications, class_name: Event::Subscription
+  has_many :subscriptions,  dependent: :destroy,     class_name: Event::Subscription, through: :notifications
   has_many :subscribers,    through: :subscriptions, class_name: User
 
   validates :author,  presence: true
-  validates :source,  presence: true, unless: -> { action && (deleted_event? || push_event?) }
-
-  # Custom validators
-  def push_event?
-    return false unless Event::Action.push_action?(action)
-    return true if data["repository"]
-  end
-
-  def deleted_event?
-     [:deleted, :resigned, :reassigned].include? action.to_sym
-  end
+  validates :source,  presence: true
 
   # For Hash only
   #serialize :data
@@ -53,14 +42,25 @@ class Event < ActiveRecord::Base
   scope :with_source, ->(source) { where(source_id: source, source_type: source.class.name) }
   scope :recent, -> { order("created_at DESC") }
   scope :with_target, ->(target) { where(target_id: target, target_type: target.class.name) }
-  scope :with_push, -> { where(source_type: "Push_summary") }
+  scope :with_push, -> { where(source_type: Push) }
+
+  def deleted_event?
+    if system_action.present?
+      system_action.to_sym == :destroy
+    end
+  end
+
+  def push_event?
+    return false unless Event::Action.push_action?(action)
+    return true if data["repository"]
+  end
 
   def deleted_related?
-    target && deleted_event? && source_type.blank?
+    deleted_event? && target && source_type.blank?
   end
 
   def deleted_self?
-    source.blank? && deleted_event? && target.blank?
+    deleted_event? && source.blank?  && target.blank?
   end
 
   def full?

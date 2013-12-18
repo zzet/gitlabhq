@@ -4,9 +4,13 @@ module Projects
       def execute
         giver = Project.find(params[:source_project_id])
 
-        Gitlab::Event::Action.trigger :imported, @project
+        RequestStore.store[:borders] ||= []
+        RequestStore.store[:borders].push("gitlab.import.project")
+        Gitlab::Event::Action.trigger :import, @project
 
         status = @project.team.import(giver)
+
+        RequestStore.store[:borders].pop
 
         receive_delayed_notifications
 

@@ -19,8 +19,10 @@ describe MergeRequestObserver do
   before { mr_mock.stub(:project) }
   before { mr_mock.stub(:create_cross_references!).and_return(true) }
   before { Repository.any_instance.stub(commit: nil) }
+  before { RequestStore.store[:current_user] = some_user }
+  before { Gitlab::Event::Action.any_instance.stub(:trigger).and_return(true) }
 
-  before(:each) { enable_observers; ActiveRecord::Base.observers.disable(:activity_observer) }
+  before(:each) { enable_observers; ActiveRecord::Base.observers.disable(:watchable_observer) }
   after(:each) { disable_observers }
 
   subject { MergeRequestObserver.instance }

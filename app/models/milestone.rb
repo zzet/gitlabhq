@@ -26,11 +26,6 @@ class Milestone < ActiveRecord::Base
   has_many :merge_requests
   has_many :participants, through: :issues, source: :assignee
 
-  has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
-
   validates :title, presence: true
   validates :project, presence: true
 
@@ -47,11 +42,17 @@ class Milestone < ActiveRecord::Base
     end
 
     state :closed
-
     state :active
   end
 
-  actions_to_watch [:created, :closed, :reopend, :deleted, :updated]
+  watch do
+    source watchable_name do
+      from :create,   to: :created
+      from :close,    to: :closed
+      from :active,   to: :reopened
+      from :destroy,  to: :deleted
+    end
+  end
 
   def expired?
     if due_date

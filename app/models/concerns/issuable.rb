@@ -6,6 +6,7 @@
 #
 module Issuable
   extend ActiveSupport::Concern
+  include Watchable
   include Mentionable
 
   included do

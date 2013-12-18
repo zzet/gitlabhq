@@ -9,6 +9,7 @@ describe EventNotificationMailer do
     Event::Subscription::Notification.destroy_all;
     ActionMailer::Base.deliveries.clear;
     EventHierarchyWorker.reset;
+    RequestStore.store[:borders] = []
   end
 
   def collect_mails_data
@@ -221,7 +222,7 @@ describe EventNotificationMailer do
         context "when create issue" do
           before do
             collect_mails_data do
-              @issue = create :issue, project: project
+              @issue = Projects::Issues::CreateContext.new(@another_user, project, attributes_for(:issue)).execute
             end
           end
 
@@ -443,7 +444,7 @@ describe EventNotificationMailer do
 
         context "in project MR" do
           before do
-            @merge_request = create :merge_request, source_project: project, target_project: project
+            @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
           end
 
           context "when create note on MR wall" do
@@ -502,7 +503,7 @@ describe EventNotificationMailer do
         context "when create MR" do
           before do
             collect_mails_data do
-              @merge_request = create :merge_request, source_project: project, target_project: project
+              @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
             end
           end
 
@@ -524,7 +525,7 @@ describe EventNotificationMailer do
         context "when create assigned MR" do
           before do
             collect_mails_data do
-              @merge_request = create :merge_request, source_project: project, target_project: project, assignee: @user
+              @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project, assignee: @user)).execute
             end
           end
 
@@ -545,7 +546,7 @@ describe EventNotificationMailer do
 
         context "when MR is present in project" do
           before do
-            @merge_request = create :merge_request, source_project: project, target_project: project
+            @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
           end
 
           context "when update MR" do
@@ -624,7 +625,7 @@ describe EventNotificationMailer do
 
           context "when merge MR" do
             before do
-              @merge_request = create :merge_request, source_project: project, target_project: project
+              @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
               params = { merge_request: { state_event: :merge } }
 
               collect_mails_data do
@@ -649,7 +650,7 @@ describe EventNotificationMailer do
 
           context "when close MR" do
             before do
-              @merge_request = create :merge_request, source_project: project, target_project: project
+              @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
               params = { merge_request: { state_event: :close } }
 
               collect_mails_data do
@@ -796,7 +797,7 @@ describe EventNotificationMailer do
         context "when protect branch" do
           before do
             collect_mails_data do
-              @pb = create :protected_branch, project: project, name: "master"
+              @pb = project.protected_branches.create(name: "master")
             end
           end
 
@@ -817,7 +818,7 @@ describe EventNotificationMailer do
 
         context "when unprotect branch" do
           before do
-            @pb = create :protected_branch, project: project, name: "master"
+            @pb = project.protected_branches.create(name: "master")
 
             collect_mails_data do
               Projects::ProtectedBranchs::RemoveContext.new(@another_user, project, @pb).execute
@@ -1269,7 +1270,8 @@ describe EventNotificationMailer do
             end
 
             it "only one message" do
-              @mails_count.should == 1
+              # Move mail into project creator
+              @mails_count.should == 2
             end
 
             it "correct email" do

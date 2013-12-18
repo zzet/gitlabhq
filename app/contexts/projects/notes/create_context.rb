@@ -5,6 +5,9 @@ module Projects
         note = project.notes.new(params[:note])
         note.author = current_user
         note.save
+
+        receive_delayed_notifications
+
         note
       end
     end

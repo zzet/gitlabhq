@@ -17,38 +17,33 @@ class GitPushService
   def execute(project, user, oldrev, newrev, ref)
     @project, @user = project, user
 
-    # Collect data for this git push
-    @push_commits = project.repository.commits_between(oldrev, newrev)
-    @push_data = post_receive_data(oldrev, newrev, ref)
-
     RequestStore.store[:current_user] = user
-    Gitlab::Event::Action.trigger :pushed, "Push_summary", user, { project_id: project.id, push_data: @push_data, source: :repository }
+
+    push = Push.new(project: project, user: user, before: oldrev, after: newrev, ref: ref)
+    push.fill_push_data
+    push.save
+
+    @push_data    = push.data.dup
+    @push_commits = push.commits.dup
 
     create_push_event
 
     project.ensure_satellite_exists
     project.repository.expire_cache
+    Rails.cache.delete(project.repository.cache_key(:branch_names)) if push.branch?
+    Rails.cache.delete(project.repository.cache_key(:tag_names)) if push.tag?
 
-    if push_to_existing_branch?(ref, oldrev)
+    if push.to_existing_branch?
       project.update_merge_requests(oldrev, newrev, ref, @user)
-      process_commit_messages(ref)
+      process_commit_messages(push)
     end
 
-    if push_to_branch?(ref)
-      project.execute_hooks(@push_data.dup)
-      project.execute_services(@push_data.dup)
-      Rails.cache.delete(project.repository.cache_key(:branch_names))
-    end
+    project.execute_hooks(@push_data.dup)
+    project.execute_services(@push_data.dup)
 
-    if push_tag?(ref, oldrev)
-      project.execute_hooks(@push_data.dup)
-      project.execute_services(@push_data.dup)
-      Rails.cache.delete(project.repository.cache_key(:tag_names))
-    end
-
-    if push_to_new_branch?(ref, oldrev)
+    if push.created_branch?
       # Re-find the pushed commits.
-      if is_default_branch?(ref)
+      if push.to_default_branch?
         # Initial push to the default branch. Take the full history of that branch as "newly pushed".
         @push_commits = project.repository.commits(newrev)
       else
@@ -58,7 +53,7 @@ class GitPushService
         @push_commits = project.repository.commits_between(project.default_branch, newrev)
       end
 
-      process_commit_messages(ref)
+      process_commit_messages(push)
     end
   end
 
@@ -69,7 +64,9 @@ class GitPushService
   def sample_data(project, user)
     @project, @user = project, user
     @push_commits = project.repository.commits(project.default_branch, nil, 3)
-    post_receive_data(@push_commits.last.id, @push_commits.first.id, "refs/heads/#{project.default_branch}")
+    push = Push.new(project: project, user: user, before: @push_commits.last.id, after: @push_commits.first.id, ref: "refs/heads/#{project.default_branch}")
+    push.fill_push_data
+    push.data
   end
 
   protected
@@ -78,16 +75,16 @@ class GitPushService
     OldEvent.create!(
       project: project,
       action: OldEvent::PUSHED,
-      data: push_data,
-      author_id: push_data[:user_id]
+      data: @push_data,
+      author_id: @push_data[:user_id]
     )
 
   end
 
   # Extract any GFM references from the pushed commit messages. If the configured issue-closing regex is matched,
   # close the referenced Issue. Create cross-reference Notes corresponding to any other referenced Mentionables.
-  def process_commit_messages ref
-    is_default_branch = is_default_branch?(ref)
+  def process_commit_messages(push)
+    is_default_branch = push.to_default_branch?
 
     @push_commits.each do |commit|
       # Close issues if these commits were pushed to the project's default branch and the commit message matches the
@@ -114,104 +111,9 @@ class GitPushService
     end
   end
 
-  # Produce a hash of post-receive data
-  #
-  # data = {
-  #   before: String,
-  #   after: String,
-  #   ref: String,
-  #   user_id: String,
-  #   user_name: String,
-  #   project_id: String,
-  #   repository: {
-  #     name: String,
-  #     url: String,
-  #     description: String,
-  #     homepage: String,
-  #   },
-  #   commits: Array,
-  #   total_commits_count: Fixnum
-  # }
-  #
-  def post_receive_data(oldrev, newrev, ref)
-    begin
-      # Total commits count
-      push_commits_count = push_commits.size
-
-      # Get latest 20 commits ASC
-      push_commits_limited = push_commits.last(20)
-
-      # Hash to be passed as post_receive_data
-      data = {
-        before: oldrev,
-        after: newrev,
-        ref: ref,
-        user_id: user.id,
-        user_name: user.name,
-        project_id: project.id,
-        repository: {
-          name: project.name,
-          url: project.url_to_repo,
-          description: project.description,
-          homepage: project.web_url,
-        },
-        commits: [],
-        total_commits_count: push_commits_count
-      }
-
-      # For performance purposes maximum 20 latest commits
-      # will be passed as post receive hook data.
-      #
-      push_commits_limited.each do |commit|
-        data[:commits] << {
-          id: commit.id,
-          message: commit.safe_message,
-          timestamp: commit.committed_date.xmlschema,
-          url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{commit.id}",
-          author: {
-            name: commit.author_name,
-            email: commit.author_email
-          }
-        }
-      end
-
-      data
-    rescue Exception => ex
-      raise RuntimeError, "Can't process push recive data. \r\n#{ex.message}\r\n#{ex.backtrace.join("\r\n")}"
-    end
-  end
-
-  def push_to_existing_branch? ref, oldrev
-    ref_parts = ref.split('/')
-
-    # Return if this is not a push to a branch (e.g. new commits)
-    ref_parts[1] =~ /heads/ && oldrev != "0000000000000000000000000000000000000000"
-  end
-
-  def push_to_new_branch? ref, oldrev
-    ref_parts = ref.split('/')
-
-    ref_parts[1] =~ /heads/ && oldrev == "0000000000000000000000000000000000000000"
-  end
-
-  def push_to_branch? ref
-    ref =~ /refs\/heads/
-  end
-
-  def is_default_branch? ref
-    ref == "refs/heads/#{project.default_branch}"
-  end
-
   def commit_user commit
     User.where(email: commit.author_email).first ||
       User.where(name: commit.author_name).first ||
       user
-  end
-
-  def push_tag? ref, oldrev
-    ref_parts = ref.split('/')
-
-    # Return if this is not a push to a branch (e.g. new commits)
-    !(ref_parts[1] !~ /tags/ || oldrev == "00000000000000000000000000000000")
   end
 end

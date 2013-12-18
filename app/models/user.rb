@@ -68,7 +68,6 @@ class User < ActiveRecord::Base
   # Add login to attr_accessible
   attr_accessible :login
 
-
   #
   # Relations
   #
@@ -118,7 +117,6 @@ class User < ActiveRecord::Base
   has_many :master_team_groups,              through: :master_team_group_relationships, source: :group
 
   # Events
-  has_many :events,                   as: :source
   has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
   has_many :recent_events,                                 class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
   has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
@@ -130,7 +128,6 @@ class User < ActiveRecord::Base
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
 
   has_many :file_tokens
-
 
   #
   # Validations
@@ -167,6 +164,44 @@ class User < ActiveRecord::Base
     end
   end
 
+  watch do
+    source watchable_name do
+      from :create,   to: :created
+      from :block,    to: :blocked do
+        @event_data[:teams]     = @source.teams.map { |t| t.attributes }
+        @event_data[:projects]  = @source.projects.map { |pr| pr.attributes }
+      end
+      from :activate, to: :activate
+      from :update,   to: :updated, conditions: -> { [:email, :name, :admin, :projects_limit, :skype, :linkedin, :twitter, :bio, :username, :can_create_group, :can_create_team, :avatar].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
+      from :destroy,  to: :deleted
+    end
+
+    source :users_group do
+      before do: -> { @target = @source.user }
+      from :create,   to: :joined
+      from :update,   to: :updated
+      from :destroy,  to: :left
+    end
+
+    source :users_project do
+      before do: -> { @target = @source.user }
+      from :create,   to: :joined
+      from :update,   to: :updated
+      from :destroy,  to: :left
+    end
+
+    source :team_user_relationship do
+      before do: -> { @target = @source.user }
+      from :create,   to: :joined
+      from :update,   to: :updated
+      from :destroy,  to: :left
+    end
+
+    # TODO.
+    # Add support with Issue, MergeRequest, Milestone, Note, Snippet
+    # All models, which contain User
+  end
+
   mount_uploader :avatar, AttachmentUploader
 
   # Scopes
@@ -182,8 +217,6 @@ class User < ActiveRecord::Base
   scope :ldap, -> { where(provider:  'ldap') }
 
   scope :potential_team_members, ->(team) { team.members.any? ? active.not_in_team(team) : active  }
-
-  actions_to_watch [:created, :deleted, :updated, :joined, :left, :transfer, :added, :blocked, :activate]
 
   #
   # Class methods

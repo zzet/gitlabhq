@@ -25,22 +25,23 @@ require Rails.root.join("app/models/commit")
 require Rails.root.join("lib/static_model")
 
 class MergeRequest < ActiveRecord::Base
+  include Watchable
   include Issuable
   include InternalId
-  include Watchable
 
   attr_accessible :title, :description, :assignee_id,
-                  :source_project_id, :source_branch,
-                  :target_project_id, :target_branch,
+                  :source_project_id, :source_project, :source_branch,
+                  :target_project_id, :target_project, :target_branch,
                   :milestone_id, :author_id_of_changes, :state_event
 
-  belongs_to :target_project, foreign_key: :target_project_id, class_name: Project
-  belongs_to :source_project, foreign_key: :source_project_id, class_name: Project
-  has_many :ci_builds
+  attr_accessor :should_remove_source_branch
 
   attr_mentionable :title
 
-  attr_accessor :should_remove_source_branch
+  belongs_to  :target_project, foreign_key: :target_project_id, class_name: Project
+  belongs_to  :source_project, foreign_key: :source_project_id, class_name: Project
+
+  has_many    :ci_builds
 
   state_machine :state, initial: :opened do
     event :close do
@@ -56,11 +57,8 @@ class MergeRequest < ActiveRecord::Base
     end
 
     state :opened
-
     state :reopened
-
     state :closed
-
     state :merged
   end
 
@@ -78,9 +76,7 @@ class MergeRequest < ActiveRecord::Base
     end
 
     state :unchecked
-
     state :can_be_merged
-
     state :cannot_be_merged
   end
 
@@ -92,6 +88,24 @@ class MergeRequest < ActiveRecord::Base
   validates :target_project, presence: true
   validates :target_branch, presence: true
   validate :validate_branches
+
+  watch do
+    source watchable_name do
+      from :create,   to: :created
+      from :update,   to: :assigned,   conditions: -> { @source.assignee_id_changed? && @changes['assignee_id'].first.nil? }
+      from :update,   to: :reassigned, conditions: -> { @source.assignee_id_changed? && @changes['assignee_id'].first.present? && @changes['assignee_id'].last.present? }
+      from :update,   to: :unassigned, conditions: -> { @source.assignee_id_changed? && @changes['assignee_id'].first.present? && @changes['assignee_id'].last.nil? }
+      from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
+      from :close,    to: :closed
+      from :reopen,   to: :reopened
+      from :destroy,  to: :deleted
+    end
+
+    source :note do
+      before do: -> { @target = @source.noteable }, conditions: -> { @source.noteable.is_a?(MergeRequest) }
+      from :create,   to: :commented, conditions: -> { @source.noteable.is_a?(MergeRequest) }
+    end
+  end
 
   scope :of_group, ->(group) { where("source_project_id in (:group_project_ids) OR target_project_id in (:group_project_ids)", group_project_ids: group.project_ids) }
   scope :of_team, ->(team) { where("(source_project_id in (:team_project_ids) OR target_project_id in (:team_project_ids) AND assignee_id in (:team_member_ids))", team_project_ids: team.project_ids, team_member_ids: team.member_ids) }
@@ -106,8 +120,6 @@ class MergeRequest < ActiveRecord::Base
   # Closed scope for merge request should return
   # both merged and closed mr's
   scope :closed, -> { with_states(:closed, :merged) }
-
-  actions_to_watch [:created, :closed, :reopened, :deleted, :updated, :assigned, :reassigned, :commented, :merged]
 
   def validate_branches
     if target_project==source_project && target_branch == source_branch

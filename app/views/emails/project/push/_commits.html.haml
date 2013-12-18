@@ -14,9 +14,9 @@
       = "(#{@commits.first.committed_date.strftime("%Z")})"
     %th
       Author
-  = render partial: "emails/project/push_summary/commit", collection: @commits
+  = render partial: "emails/project/push/commit", collection: @commits
 
 - unless @diffs.blank?
   %h4 Diff
-  = render "emails/project/push_summary/diffs", diffs: @diffs
+  = render "emails/project/push/diffs", diffs: @diffs
 

@@ -32,15 +32,11 @@ class Note < ActiveRecord::Base
   belongs_to :noteable, polymorphic: true
   belongs_to :author,   class_name: User
 
-  has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
-
   delegate :name, to: :project, prefix: true
   delegate :name, :email, to: :author, prefix: true
 
-  validates :note, :project, presence: true
+  validates :note,    presence: true
+  validates :project, presence: true
   validates :line_code, format: { with: /\A[a-z0-9]+_\d+_\d+\Z/ }, allow_blank: true
   validates :attachment, file_size: { maximum: 10.megabytes.to_i }
 
@@ -48,6 +44,14 @@ class Note < ActiveRecord::Base
   validates :commit_id, presence: true, if: ->(n) { n.noteable_type == 'Commit' }
 
   mount_uploader :attachment, AttachmentUploader
+
+  watch do
+    source watchable_name do
+      from :create, to: :created
+      from :update, to: :updated
+      from :destroy, to: :deleted
+    end
+  end
 
   # Scopes
   scope :for_commit_id, ->(commit_id) { where(noteable_type: "Commit", commit_id: commit_id) }
@@ -58,8 +62,6 @@ class Note < ActiveRecord::Base
   scope :fresh, ->{ order("created_at ASC, id ASC") }
   scope :inc_author_project, ->{ includes(:project, :author) }
   scope :inc_author, ->{ includes(:author) }
-
-  actions_to_watch [:created, :deleted, :updated]
 
   serialize :st_diff
   before_create :set_diff, if: ->(n) { n.line_code.present? }
@@ -91,7 +93,7 @@ class Note < ActiveRecord::Base
 
   # Determine whether or not a cross-reference note already exists.
   def self.cross_reference_exists?(noteable, mentioner)
-    where(noteable_id: noteable.id, system: true, note: "_mentioned in #{mentioner.gfm_reference}_").any?
+    where(noteable_id: noteable.id, system: true, note: "_This #{noteable.class.name.underscore.gsub("_", " ")} was mentioned in #{mentioner.gfm_reference}_").any?
   end
 
   def commit_author

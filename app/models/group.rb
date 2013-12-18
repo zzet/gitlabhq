@@ -27,13 +27,37 @@ class Group < Namespace
   has_many :developers, through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::DEVELOPER } }
   has_many :masters,    through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } }
 
-  has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
+  watch do
+    source watchable_name do
+      from :create,   to: :created
+      from :update,   to: :updated
+      from :destroy,  to: :deleted
+    end
 
+    source :project do
+      before do: -> { @target = @source.group }, conditions: -> { @source.group.present? }
+      from :create,   to: :added,   conditions: -> { @source.group.present? }
+      from :update,   to: :added,   conditions: -> { @source.group.present? && @source.namespace_id_changed? && @source.namespace_id != @changes["namespace_id"].first }
+      from :update,   to: :removed, conditions: -> { @source.namespace_id_changed? && @source.namespace_id != @changes["namespace_id"].first && Group.find_by_id(@changes["namespace_id"].first).present? } do
+        @target = Group.find_by_id(@changes["namespace_id"].first)
+        @event_data[:owner_changes] = @changes
+      end
+      from :destroy,  to: :deleted, conditions: -> { @source.group.present? }
+    end
 
-  actions_to_watch [:created, :deleted, :updated, :transfer]
+    source :users_group do
+      before do: -> { @target = @source.group }
+      from :create,   to: :joined
+      from :update,   to: :updated
+      from :destroy,  to: :left
+    end
+
+    source :team_group_relationship do
+      before do: -> { @target = @source.group }
+      from :create,   to: :assigned
+      from :destroy,  to: :resigned
+    end
+  end
 
   scope :without_team, ->(team) { team.groups.present? ? where("namespaces.id NOT IN (:ids)", ids: team.groups.pluck(:id)) : scoped }
 

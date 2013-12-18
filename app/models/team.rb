@@ -35,11 +35,6 @@ class Team < ActiveRecord::Base
   has_many :masters,          through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: [Team::MASTER, Team::OWNER] } }
   has_many :owners,           through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: Team::OWNER } }
 
-  has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
-
   validates :creator, presence: true
   validates :name,    presence: true, uniqueness: true,
                       length: { within: 0..255 },
@@ -50,6 +45,35 @@ class Team < ActiveRecord::Base
                                 message: "only letters, digits & '_' '-' '.' allowed. Letter should be first" }
   validates :description, length: { within: 0..255 }
 
+  watch do
+    source watchable_name do
+      from :create,  to: :created
+      from :update,  to: :updated
+      from :destroy, to: :deleted
+    end
+
+    source :team_user_relationship do
+      before do: -> { @target = @source.team }
+      from :create,  to: :joined
+      from :update,  to: :updated
+      from :destroy, to: :left
+    end
+
+    source :team_project_relationship do
+      before do: -> { @target = @source.team }
+      from :create,  to: :assigned
+      from :update,  to: :updated
+      from :destroy, to: :resigned
+    end
+
+    source :team_group_relationship do
+      before do: -> { @target = @source.team }
+      from :create,  to: :assigned
+      from :update,  to: :updated
+      from :destroy, to: :resigned
+    end
+  end
+
   scope :with_member,     ->(user)    { joins(:team_user_relationships).where(team_user_relationships: { user_id: user.id }) }
   scope :with_project,    ->(project) { joins(:team_project_relationships).where(team_project_relationships: { project_id: project })}
   scope :with_group,      ->(group)   { joins(:team_group_relationships).where(team_group_relationships: { group_id: group })}
@@ -57,8 +81,6 @@ class Team < ActiveRecord::Base
   scope :created_by,      ->(user)    { where(creator_id: user) }
 
   delegate :name, to: :creator, allow_nil: true, prefix: true
-
-  actions_to_watch [:created, :updated, :assigned, :reassigned, :deleted, :transfer]
 
   after_create :add_owner
 

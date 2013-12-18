@@ -49,18 +49,12 @@ class Project < ActiveRecord::Base
   belongs_to :group,        foreign_key: "namespace_id", conditions: "type = 'Group'"
   belongs_to :namespace
 
-  has_one :last_event, class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
 
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
-  has_many :old_events,         dependent: :destroy, class_name: OldEvent
-
-  has_many :events,         as: :source
-  has_many :related_events, as: :target, class_name: Event
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
+  has_many :old_events,         class_name: OldEvent, dependent: :destroy
+  has_one  :last_event,         class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
 
   has_many :services
 
@@ -121,6 +115,105 @@ class Project < ActiveRecord::Base
 
   validate :check_limit, on: :create
 
+  watch do
+    source watchable_name do
+      from :create,   to: :created
+      from :update,   to: :transfer,  conditions: -> { @source.namespace_id_changed? && @source.namespace_id != @changes[:namespace_id].first } do
+        @event_data[:owner_changes] = @changes
+      end
+      from :update,   to: :updated,   conditions: -> { [:name, :path, :description, :creator_id, :default_branch, :issues_enabled, :wall_enabled, :merge_requests_enabled, :public, :issues_tracker, :issues_tracker_id].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
+      from :import,   to: :imported
+      from :destroy,  to: :deleted
+    end
+
+    source :push do
+      before do: -> { @target = @source.project }
+      from :create,   to: :created_branch,  conditions: -> { @source.created_branch? }
+      from :create,   to: :created_tag,     conditions: -> { @source.created_tag? }
+      from :create,   to: :deleted_branch,  conditions: -> { @source.deleted_branch? }
+      from :create,   to: :deleted_tag,     conditions: -> { @source.deleted_tag? }
+      from :create,   to: :pushed,          conditions: -> { @actions.blank? }
+    end
+
+    source :issue do
+      before do: -> { @target = @source.project }
+      from :create,   to: :opened
+      from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
+      from :close,    to: :closed
+      from :reopen,   to: :reopened
+      from :destroy,  to: :deleted
+    end
+
+    source :milestone do
+      before do: -> { @target = @source.project }
+      from :create,   to: :created
+      from :close,    to: :closed
+      from :active,   to: :reopened
+      from :destroy,  to: :deleted
+    end
+
+    source :merge_request do
+      before do: -> { @target = @source.target_project }
+      from :create,   to: :opened
+      from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
+      from :close,    to: :closed
+      from :reopen,   to: :reopened
+      from :merge,    to: :merged
+    end
+
+    source :project_snippet do
+      before do: -> { @target = @source.project }
+      from :create,   to: :created
+      from :update,   to: :updated
+      from :destroy,  to: :deleted
+    end
+
+    source :note do
+      before do: -> { @target = @source.project }
+      from :create,   to: :commented_commit,          conditions: -> { @source.commit_id.present? }
+      from :create,   to: :commented_merge_request,   conditions: [ unless: -> { @source.commit_id.present? }, if: -> { @source.noteable.present? && @source.noteable.is_a?(MergeRequest) }]
+      from :create,   to: :commented_issue,           conditions: [ unless: -> { @source.commit_id.present? }, if: -> { @source.noteable.present? && @source.noteable.is_a?(Issue) }]
+      from :create,   to: :commented,                 conditions: [ unless: -> { @source.commit_id.present? }, if: -> { @source.noteable.blank? } ]
+    end
+
+    source :project_hook do
+      before do: -> { @target = @source.project }
+      from :create,   to: :added
+      from :update,   to: :updated
+      from :destroy,  to: :deleted
+    end
+
+    source :web_hook do
+      before do: -> { @target = @source.project }
+      from :create,   to: :created
+      from :update,   to: :updated
+      from :destroy,  to: :deleted
+    end
+
+    source :protected_branch do
+      before do: -> { @target = @source.project }
+      from :create,   to: :protected
+      from :destroy,  to: :unprotected
+    end
+
+    # TODO. Add services
+
+    source :team_project_relationship do
+      before do: -> { @target = @source.project }
+      from :create,   to: :assigned
+      from :destroy,  to: :resigned
+    end
+
+    source :users_project do
+      before do: -> { @target = @source.project }
+      from :create,   to: :joined
+      from :update,   to: :updated
+      from :destroy,  to: :left
+    end
+  end
+
+  adjacent_targets [:group]
+
   # Scopes
   scope :without_user, ->(user)  { where("projects.id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
   scope :with_user, ->(user)  { where(users_projects: { user_id: user } ) }
@@ -138,9 +231,6 @@ class Project < ActiveRecord::Base
   scope :public_only, -> { public_via_http }
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
-
-  actions_to_watch [:created, :updated, :deleted, :transfer, :closed, :reopened, :merged, :imported]
-  adjacent_targets [:group]
 
   class << self
     def abandoned

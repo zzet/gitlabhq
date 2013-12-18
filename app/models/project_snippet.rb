@@ -16,10 +16,18 @@
 #
 
 class ProjectSnippet < Snippet
+  include Watchable
+
   belongs_to :project
   belongs_to :author, class_name: "User"
 
   validates :project, presence: true
+
+  source watchable_name do
+    from :create, to: :created
+    from :update, to: :updated
+    from :destroy, to: :deleted
+  end
 
   # Scopes
   scope :fresh, -> { order("created_at DESC") }

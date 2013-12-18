@@ -6,6 +6,7 @@ module Projects
       def execute
         @issue = Issue.new(params)
         @issue.author = @current_user
+        @issue.project = project if params[:project_id].blank?
 
         if @issue.save
           receive_delayed_notifications

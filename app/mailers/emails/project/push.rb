@@ -1,4 +1,4 @@
-class Emails::Project::PushSummary < Emails::Project::Base
+class Emails::Project::Push < Emails::Project::Base
   def created_branch_email(notification)
     @notification = notification
     @event        = @notification.event
