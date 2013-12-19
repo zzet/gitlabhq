@@ -18,6 +18,17 @@ class Projects::EditTreeController < Projects::BaseTreeController
     end
   end
 
+  def preview
+    @content = params[:content]
+    #TODO FIXME hack workaround https://github.com/gitlabhq/gitlabhq/issues/5939
+    @content += "\n" if @blob.data.end_with?("\n")
+
+    diffy = Diffy::Diff.new(@blob.data, @content, diff: '-U 3', include_diff_info: true)
+    @diff = Gitlab::Diff::DiffyParser.new(diffy)
+
+    render layout: false
+  end
+
   private
 
   def blob

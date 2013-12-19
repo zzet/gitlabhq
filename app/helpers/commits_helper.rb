@@ -16,7 +16,7 @@ module CommitsHelper
   end
 
   def each_diff_line(diff, index)
-    Gitlab::DiffParser.new(diff).each do |full_line, type, line_code, line_new, line_old|
+    Gitlab::Diff::GritParser.new(diff).each do |full_line, type, line_code, line_new, line_old|
       yield(full_line, type, line_code, line_new, line_old)
     end
   end
