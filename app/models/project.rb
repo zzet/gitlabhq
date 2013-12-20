@@ -63,7 +63,6 @@ class Project < ActiveRecord::Base
   has_many :subscribers,    through: :subscriptions
 
   has_many :services
-  has_many :ci_builds, foreign_key: 'source_project_id'
 
   has_many :merge_requests,     dependent: :destroy, foreign_key: "target_project_id"
   has_many :fork_merge_requests,dependent: :destroy, foreign_key: "source_project_id", class_name: MergeRequest

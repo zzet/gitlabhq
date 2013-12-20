@@ -47,6 +47,18 @@ class CiBuild < ActiveRecord::Base
       transition [:build] => :unstable
     end
 
+    state :build, :fail, :aborted, :unstable do
+      def can_rebuild?
+        true
+      end
+    end
+
+    state :skipped, :success do
+      def can_rebuild?
+        false
+      end
+    end
+
     state :build
     state :fail
     state :skipped

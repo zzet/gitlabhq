@@ -14,7 +14,7 @@ class ProjectCiBuild < Spinach::FeatureSteps
   end
 
   Given 'I click on more info' do
-    click_link 'More info'
+    page.find('.icon-info-sign').click
   end
 
   Then 'I see additional parameters' do
@@ -22,6 +22,6 @@ class ProjectCiBuild < Spinach::FeatureSteps
   end
 
   Then 'I rebuild' do
-    page.find('.popover').click_button 'Build again'
+    page.find('.popover .icon-repeat', visible: false).click
   end
 end

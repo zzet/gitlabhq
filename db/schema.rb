@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131218074508) do
+ActiveRecord::Schema.define(:version => 20131220140528) do
 
   create_table "broadcast_messages", :force => true do |t|
     t.text     "message",    :null => false
@@ -37,10 +37,13 @@ ActiveRecord::Schema.define(:version => 20131218074508) do
     t.text     "trace"
     t.text     "coverage"
     t.text     "data"
-    t.datetime "created_at",        :null => false
-    t.datetime "updated_at",        :null => false
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
     t.datetime "build_time"
     t.time     "duration"
+    t.integer  "skipped_count",     :default => 0
+    t.integer  "failed_count",      :default => 0
+    t.integer  "total_count",       :default => 0
   end
 
   create_table "deploy_keys_projects", :force => true do |t|

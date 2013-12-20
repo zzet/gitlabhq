@@ -464,11 +464,19 @@ li.commit {
 
     .build_status_additional{
       margin-right: 5px;
+      .badge{
+        cursor: pointer;
+      }
     }
 
     .popover{
       form{
-        margin: 5px 0 5px 0
+        margin: 5px 0 5px 0;
+        .icon-repeat input{
+          margin-left: -15px;
+          width: 23px;
+          opacity: 0;
+        }
       }
     }
 

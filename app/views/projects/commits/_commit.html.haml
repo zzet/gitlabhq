@@ -16,7 +16,8 @@
         .badge{class: "badge-#{ci_build_status_class(build_status.state)}"}
           %i{class: ci_build_status_image(build_status.state)}
       .build_status_additional.pull-right{"data-no-turbolink" => "true"}
-        = link_to('More info', '#')
+        .badge
+          %i.icon-info-sign
         .build-info
           - if build_status.duration
             %p
@@ -26,10 +27,18 @@
             %p
               Build time:
               = build_status.build_time.strftime('%Y-%m-%d %H:%M:%S')
+          - if build_status.failed_count > 0
+            %p
+              Failed:
+              = build_status.failed_count
           %p
-            = link_to 'log', [project, build_status], target: 'blank'
-          = form_tag rebuild_project_ci_build_path(project, build_status), method: :post, remote: true do |f|
-            = submit_tag 'Build again', class: 'btn btn-small'
+            = link_to 'Build log', [project, build_status], target: 'blank'
+
+          - if build_status.can_rebuild?
+            = form_tag rebuild_project_ci_build_path(project, build_status), method: :post, remote: true do |f|
+              %i.icon-repeat
+                = submit_tag 'rebuild'
+
 
   .commit-row-info
     = commit_author_link(commit, avatar: true, size: 16)
