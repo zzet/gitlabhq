@@ -25,6 +25,8 @@ class Dispatcher
         new Activities()
       when 'projects:commit:show'
         new Commit()
+      when 'projects:compare:show', 'projects:compare:index'
+        new Compare()
       when 'groups:show'
         new Activities()
         new SidebarFilter()

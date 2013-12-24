@@ -1,0 +1,21 @@
+.path-compare {
+  margin-top: 10px;
+  #comparePathContainer {
+    input {
+      border: none;
+      outline: none;
+      width: 100%;
+      box-shadow: none;
+    }
+
+    .compare_path {
+      position: relative;
+      .icon-remove {
+        position: absolute;
+        top: 7px;
+        right: -20px;
+        cursor: pointer;
+      }
+    }
+  }
+}
