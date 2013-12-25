@@ -47,7 +47,7 @@ module Gitlab
       end
 
       def diffs(paths = nil)
-        return [] if @commits.size > @limit
+        return [] if @commits.size > @limit && paths.blank?
         Gitlab::Git::Diff.between(@repository, @head.id, @base.id, *paths) rescue []
       end
     end
