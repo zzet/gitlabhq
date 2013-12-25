@@ -12,7 +12,7 @@ class SidebarSort
       switch $(@).attr('href')
         when '#alphabetically'
           projectList = _.sortBy(projectList, (project) ->
-            $(project).find('.project-name').text()
+            $(project).find('.project-name').text().trim().toLowerCase()
           )
         when '#by_last_push'
           projectList = _.sortBy(projectList, (project) ->
