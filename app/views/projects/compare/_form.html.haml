@@ -18,7 +18,7 @@
           %strong Make a merge request
     .clearfix
     .pull-left.path-compare
-      #comparePathContainer
+      %ul.bordered-list#comparePathContainer
         - if params[:compare].present?
           = render partial: 'path_fields', collection: params[:compare][:paths], as: :path
       .input-prepend

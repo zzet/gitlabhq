@@ -1,20 +1,22 @@
 .path-compare {
   margin-top: 10px;
-  #comparePathContainer {
-    input {
-      border: none;
-      outline: none;
-      width: 100%;
-      box-shadow: none;
+  .bordered-list {
+    li {
+      overflow: visible;
+      input {
+        border: none;
+        outline: none;
+        width: 400px;
+        box-shadow: none;
+        margin-bottom: 0;
+      }
     }
-
     .compare_path {
       position: relative;
       .icon-remove {
-        position: absolute;
-        top: 7px;
-        right: -20px;
+        float: left;
         cursor: pointer;
+        line-height: 26px;
       }
     }
   }

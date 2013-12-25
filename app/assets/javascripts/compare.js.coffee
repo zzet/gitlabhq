@@ -12,8 +12,8 @@ class Compare
       source: gon.available_paths,
       minLength: 1,
       select: (event, ui) =>
-        @addPath(ui.item.value)
         event.preventDefault()
+        @addPath(ui.item.value)
     })
     .keypress((event) =>
       if event.which == 13 and @pathSelectInput.val()
@@ -31,9 +31,16 @@ class Compare
 
   addPath: (pathValue)->
     pathValue ||= @pathSelectInput.val()
-    input = $(gon.path_template)
-    input.find('input').val(pathValue)
-    @comparePathContainer.append(input)
+
+    if @newPath(pathValue)
+      input = $(gon.path_template)
+      input.find('input').val(pathValue)
+      @comparePathContainer.append(input)
+
     @pathSelectInput.val('')
+
+  newPath: (value)->
+    @comparePathContainer.find("input[value='#{value}']").length == 0
+
 
 @Compare = Compare
