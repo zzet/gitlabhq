@@ -13,13 +13,15 @@
     - projects.each do |project|
       %li.project-row
         = link_to project_path(project), class: dom_class(project) do
+          %small.access-icon
+            = privacy_icon(project)
           %span.project-name.filter-title
             = truncate(project.name, length: 25)
           %span.arrow
             %i.icon-angle-right
-          %div.last_activity
+          %span.last-activity
             %strong Last activity:
             %span.date= project_last_activity(project)
-          %div.last_activity
+          %span.last-activity
             %strong Last push:
             %span.date= project_last_push(project)

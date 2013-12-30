@@ -14,4 +14,8 @@ module IconsHelper
   def private_icon
     content_tag :i, nil, class: 'icon-lock cgreen'
   end
+
+  def privacy_icon(object)
+    (object.public) ? public_icon : private_icon
+  end
 end
