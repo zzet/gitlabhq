@@ -41,6 +41,18 @@ class ProjectBrowseFiles < Spinach::FeatureSteps
     page.evaluate_script('editor.getValue()').should == "GitlabFileEditor"
   end
 
+  step 'I edit code' do
+    page.execute_script('editor.setValue("GitlabFileEditor")')
+  end
+
+  step 'I click link "Preview"' do
+    click_link 'Preview'
+  end
+
+  step 'I see preview' do
+    page.should have_css '.line_holder.new'
+  end
+
   step 'I click on "new file" link in repo' do
     click_link 'new-file-link'
   end
