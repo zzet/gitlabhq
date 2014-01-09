@@ -3,7 +3,7 @@ class SidebarSort
     container = $('#projects')
     tabs = container.find('.project-sorting-tabs li')
     projectListContainer = container.find('.well-list')
-    projectList = projectListContainer.find('li')
+    projectList = projectListContainer.find('li.project-row')
 
     tabs.find('a').click(() ->
       tabs.removeClass('active')
@@ -20,7 +20,8 @@ class SidebarSort
             new Date(last_push_at || 0)
           ).reverse()
 
-      projectListContainer.empty().append(projectList)
+      projectListContainer.remove('li.project-row')
+      projectListContainer.prepend(projectList)
     )
 
 @SidebarSort = SidebarSort
