@@ -5,7 +5,7 @@
 
 = render "form"
 
-- if @commits.size > 100
+- if @commits.size > 100 && @diffs.empty?
   .alert.alert-block
     %p
       %strong Warning! This comparison includes more than 100 commits.

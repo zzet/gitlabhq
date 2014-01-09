@@ -7,7 +7,7 @@
 %p{style: "color:gray"}
   Showing #{pluralize(diffs.count, "changed file")}
 
-%table
+%table{width: "100%", style: "width: 100%;"}
   - diffs.each_with_index do |diff, i|
     %tr
       - if diff.deleted_file
@@ -40,7 +40,7 @@
     - file = @repository.blob_at(@commit.parent_id, diff.old_path) unless file
     - next unless file
     %br
-    %table{id: "diff-#{i}", cellspacing: '0', cellpadding: '0', style: "border:1px solid #ccc; color: #444; width:100%"}
+    %table{id: "diff-#{i}", cellspacing: '0', cellpadding: '0', width: "100%", style: "border:1px solid #ccc; color: #444; width:100%"}
       %tr
         %td{colspan: 3, style: "padding:5px 5px 5px 10px;color:#555;border-bottom:1px solid #ccc;background:#eee;"}
           - if diff.deleted_file

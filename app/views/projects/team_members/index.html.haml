@@ -8,11 +8,29 @@
       = link_to import_project_team_members_path(@project), class: "btn grouped", title: "Import members from another project" do
         Import members
 
+%ul.nav.nav-tabs.js-sidebar-tabs
+  %li.active= link_to("All members", "#all_members", "data-toggle" => "tab", "id" => "project-all-members-tab")
+  %li= link_to("Project members", "#project_members", "data-toggle" => "tab", "id" => "project-project-members-tab")
+  - if @group
+    %li= link_to("Group members", "#group_members", "data-toggle" => "tab", "id" => "project-group-members-tab")
+  - if @teams.any?
+    %li= link_to("Team members", "#team_members", "data-toggle" => "tab", "id" => "project-team-members-tab")
+
+.tab-content
+  .tab-pane.active#all_members
+    = render "all_members"
+
+  .tab-pane#project_members
+    = render "team", members: @users_projects
+
+  - if @group
+    .tab-pane#group_members
+      = render "group_members"
+
+  - if @teams.any?
+    .tab-pane#team_members
+      = render "teams_members"
+
 %p.light
   Read more about project permissions
   %strong= link_to "here", help_permissions_path, class: "vlink"
-= render "team", members: @users_projects
-- if @group
-  = render "group_members"
-- if @teams.any?
-  = render "teams_members"
