@@ -3,9 +3,11 @@
   %td
     = link_to commit.short_id(8), project_commit_url(@project.path_with_namespace, commit.id)
   %td
-    = raw @project.repository.branch_names_contains(commit.id).each {|br| "#{ link_to br, project_commits_url(@project.path_with_namespace, br) }" }.join(", ")
+    %div{style: "word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;"}
+      = raw @project.repository.branch_names_contains(commit.id).each {|br| "#{ link_to br, project_commits_url(@project.path_with_namespace, br) }" }.join(", ")
   %td{title: commit.message.truncate(100)}
-    = simple_format(commit.message)
+    %div{style: "word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;"}
+      = simple_format(commit.message)
   %td
     = commit.committed_date.strftime("%Y-%d-%m %H:%M:%S")
   %td

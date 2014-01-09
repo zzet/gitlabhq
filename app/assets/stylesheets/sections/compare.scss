@@ -1,0 +1,23 @@
+.path-compare {
+  margin-top: 10px;
+  .bordered-list {
+    li {
+      overflow: visible;
+      input {
+        border: none;
+        outline: none;
+        width: 400px;
+        box-shadow: none;
+        margin-bottom: 0;
+      }
+    }
+    .compare_path {
+      position: relative;
+      .icon-remove {
+        float: left;
+        cursor: pointer;
+        line-height: 26px;
+      }
+    }
+  }
+}

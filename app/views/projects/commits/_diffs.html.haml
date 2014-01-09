@@ -40,7 +40,7 @@
       - file = project.repository.blob_at(@commit.id, diff.new_path)
       - file = project.repository.blob_at(@commit.parent_id, diff.old_path) unless file
       - next unless file
-      .file{id: "diff-#{i}"}
+      .file{id: "diff-#{i}", class: ("line-wrapping" if file.language && file.language.wrap)}
         .header
           - if diff.deleted_file
             %span= diff.old_path

@@ -1,0 +1,38 @@
+.ui-box
+  .title
+    %strong All members (#{@all_members.count})
+  %ul.well-list
+    - @all_members.each do |user|
+      %li.js-toggle-container{id: dom_id(user, 'all_members_tab')}
+        = link_to user_path(user) do
+          = image_tag avatar_icon(user.email, 16), class: "avatar s16"
+        %strong= link_to user.name, user_path(user)
+        %span.cgray #{user.username} (#{user.email})
+        - if user == current_user
+          %span.label.label-success It's you
+
+        %span.pull-right
+          - access = @accesses[user.id].first
+          %strong= access[:human_access]
+          = link_to '#', class: 'btn btn-tiny js-toggle-button', title: 'Show all permissions' do
+            %i.icon-group
+
+        .hide.js-toggle-content
+          .alert.prepend-top-20
+            - @accesses[user.id].each do |access|
+              %p
+                %strong= access[:human_access]
+                - case access[:from]
+                  - when Project
+                    %span.cgray from project
+                  - when Group
+                    %span.cgray
+                      from group
+                      = link_to access[:from].name, group_members_path(access[:from].path)
+                  - when Team
+                    %span.cgray
+                      from team
+                      - if can? current_user, :manage_team, access[:from]
+                        = link_to access[:from].name, team_members_path(access[:from].path)
+                      - else
+                        = link_to access[:from].name, team_path(access[:from].path)
