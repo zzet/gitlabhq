@@ -25,7 +25,7 @@ class Dispatcher
         new Activities()
       when 'projects:commit:show'
         new Commit()
-      when 'projects:commits:show'
+      when 'projects:commits:show', 'projects:merge_requests:index', 'projects:merge_requests:show'
         new JenkinsBuild()
       when 'groups:show'
         new Activities()

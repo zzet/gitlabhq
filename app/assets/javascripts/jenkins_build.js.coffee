@@ -10,7 +10,7 @@ class JenkinsBuild
     })
     .click((e)-> e.preventDefault())
 
-    $(".commit").on "ajax:success", '.popover form', (e, data, status, xhr) ->
+    $(".build").on "ajax:success", '.popover form', (e, data, status, xhr) ->
       $(e.target).parents('.commit').find('.build_status').empty().append(data)
       build_status_additional.popover('hide')
 

@@ -12,33 +12,8 @@
           = notes.count
 
     - if defined?(build_status) && build_status.present?
-      .build_status.pull-right
-        .badge{class: "badge-#{ci_build_status_class(build_status.state)}"}
-          %i{class: ci_build_status_image(build_status.state)}
-      .build_status_additional.pull-right{"data-no-turbolink" => "true"}
-        .badge
-          %i.icon-info-sign
-        .build-info
-          - if build_status.duration
-            %p
-              Duration:
-              = build_status.duration.strftime('%H:%M:%S')
-          - if build_status.build_time
-            %p
-              Build time:
-              = build_status.build_time.strftime('%Y-%m-%d %H:%M:%S')
-          - if build_status.failed_count > 0
-            %p
-              Failed:
-              = build_status.failed_count
-          %p
-            = link_to 'Build log', [project, build_status], target: 'blank'
-
-          - if build_status.can_rebuild?
-            = form_tag rebuild_project_ci_build_path(project, build_status), method: :post, remote: true do |f|
-              %i.icon-repeat
-                = submit_tag 'rebuild'
-
+      .pull-right
+        = render 'shared/projects/build_status', build: build_status, project: project
 
   .commit-row-info
     = commit_author_link(commit, avatar: true, size: 16)

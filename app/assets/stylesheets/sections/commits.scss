@@ -457,33 +457,6 @@ li.commit {
     font-size: 14px;
     margin-bottom: 2px;
 
-    .build_status {
-      float: right;
-      margin-right: 10px;
-    }
-
-    .build_status_additional{
-      margin-right: 5px;
-      .badge{
-        cursor: pointer;
-      }
-    }
-
-    .popover{
-      form{
-        margin: 5px 0 5px 0;
-        .icon-repeat input{
-          margin-left: -15px;
-          width: 23px;
-          opacity: 0;
-        }
-      }
-    }
-
-    .build-info{
-      display: none;
-    }
-
     .notes_count {
       float: right;
       margin-right: 10px;
