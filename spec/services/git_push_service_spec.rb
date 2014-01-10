@@ -84,9 +84,7 @@ describe GitPushService do
       end
 
       it "executes multiple web hook" do
-        @project_hook_1.should_receive(:async_execute).once
-        @project_hook_2.should_receive(:async_execute).once
-
+        Project.any_instance.should_receive(:execute_hooks).once
         service.execute(project, user, @oldrev, @newrev, @ref)
       end
     end
@@ -98,12 +96,12 @@ describe GitPushService do
       end
 
       it "when pushing a branch for the first time" do
-        @project_hook.should_receive(:async_execute)
+        ProjectHook.any_instance.should_receive(:async_execute)
         service.execute(project, user, @blankrev, 'newrev', 'refs/heads/master')
       end
 
       it "when pushing tags" do
-        @project_hook.should_receive(:async_execute)
+        ProjectHook.any_instance.should_receive(:async_execute)
         service.execute(project, user, 'newrev', 'newrev', 'refs/tags/v1.0.0')
       end
     end
