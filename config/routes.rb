@@ -352,10 +352,13 @@ Gitlab::Application.routes.draw do
         collection do
           delete :leave
 
-        # Used for import team
-        # from another project
-        get :import
-        post :apply_import
+          post :batch_update
+          delete :batch_delete
+
+          # Used for import team
+          # from another project
+          get :import
+          post :apply_import
         end
       end
 

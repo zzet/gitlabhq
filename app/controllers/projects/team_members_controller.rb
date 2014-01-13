@@ -118,6 +118,22 @@ class Projects::TeamMembersController < Projects::ApplicationController
     redirect_to project_team_index_path(project), notice: notice
   end
 
+  def batch_update
+    Projects::Users::BatchUpdateRelationContext.new(@current_user, @project, params).execute
+
+    respond_to do |format|
+      format.js { render nothing: true }
+    end
+  end
+
+  def batch_delete
+    Projects::Users::BatchRemoveRelationContext.new(@current_user, @project, params).execute
+
+    respond_to do |format|
+      format.js { render nothing: true }
+    end
+  end
+
   protected
 
   def member
