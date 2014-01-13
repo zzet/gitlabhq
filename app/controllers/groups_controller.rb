@@ -39,7 +39,7 @@ class GroupsController < ApplicationController
     @last_push = current_user.recent_push
 
     @teams = @group.teams
-    @projects = @group.projects
+    @projects = @group.projects.sorted_by_push_date
 
     @owners = @group.owners
     @masters = @group.masters

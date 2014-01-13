@@ -6,6 +6,7 @@
         = link_to team_projects_path(@team), class: "btn btn-new" do
           %i.icon-plus
           New project
+    = render 'shared/projects/sort_pills'
 
   %ul.well-list.js-sidebar-list
     - projects.each do |project|
@@ -26,7 +27,7 @@
             %span.date= project_last_activity(project)
           %span.last-activity
             %strong Last push:
-            %span.date= project_last_push(project)
+            %span.date.js-last-push{'data-sort-by-last-push' => project.last_pushed_at}= project_last_push(project)
     - if projects.blank?
       %li
         %h3.nothing_here_message There are no projects here.
