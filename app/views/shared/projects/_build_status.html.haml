@@ -1,0 +1,27 @@
+%span.build
+  %span.build_status_additional{"data-no-turbolink" => "true"}
+    %span.badge
+      %i.icon-info-sign
+    .build-info.hide
+      - if build.duration
+        %p
+          Duration:
+          = build.duration.strftime('%H:%M:%S')
+      - if build.build_time
+        %p
+          Build time:
+          = build.build_time.strftime('%Y-%m-%d %H:%M:%S')
+      - if build.failed_count > 0
+        %p
+          Failed:
+          = build.failed_count
+      %p
+        = link_to 'Build log', [project, build], target: 'blank'
+
+      - if build.can_rebuild?
+        = form_tag rebuild_project_ci_build_path(project, build), method: :post, remote: true do |f|
+          %i.icon-repeat
+            = submit_tag 'Rebuild'
+  %span.build_status
+    %span.badge{class: "badge-#{ci_build_status_class(build.state)}"}
+      %i{class: ci_build_status_image(build.state)}

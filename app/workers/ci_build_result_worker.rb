@@ -32,6 +32,13 @@ class CiBuildResultWorker
         build.data     = data
         build.trace    = parser.build_log
         build.coverage = parser.coverage if parser.coverage.present?
+        build.build_time = parser.build_time
+        build.duration = parser.duration
+
+        build.skipped_count = parser.test_result['skipped']
+        build.failed_count = parser.test_result['failed']
+        build.total_count = parser.test_result['total']
+
         build.save
       end
     end

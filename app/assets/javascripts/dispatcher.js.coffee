@@ -28,6 +28,8 @@ class Dispatcher
         new Commit()
       when 'projects:compare:show', 'projects:compare:index'
         new Compare()
+      when 'projects:commits:show', 'projects:merge_requests:index', 'projects:merge_requests:show'
+        new JenkinsBuild()
       when 'groups:show'
         new Activities()
         new SidebarFilter()

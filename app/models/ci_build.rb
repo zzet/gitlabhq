@@ -6,7 +6,8 @@ class CiBuild < ActiveRecord::Base
                   :target_sha, :target_branch,
                   :user_id, :user,
                   :service_id, :service_type,
-                  :state, :coverage, :trace, :data
+                  :state, :coverage, :trace, :data,
+                  :build_time, :duration
 
   belongs_to :service, polymorphic: true
 
@@ -22,6 +23,10 @@ class CiBuild < ActiveRecord::Base
   validates :user,           presence: true
 
   state_machine :state, initial: :build do
+    event :to_build do
+      transition [:build, :fail, :skipped, :aborted, :success, :unstable] => :build
+    end
+
     event :to_success do
       transition [:build, :skipped, :aborted, :unstable] => :success
     end
@@ -40,6 +45,18 @@ class CiBuild < ActiveRecord::Base
 
     event :to_unstable do
       transition [:build] => :unstable
+    end
+
+    state :build, :fail, :aborted, :unstable do
+      def can_rebuild?
+        true
+      end
+    end
+
+    state :skipped, :success do
+      def can_rebuild?
+        false
+      end
     end
 
     state :build

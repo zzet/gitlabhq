@@ -37,8 +37,13 @@ ActiveRecord::Schema.define(:version => 20131209080209) do
     t.text     "trace"
     t.text     "coverage"
     t.text     "data"
-    t.datetime "created_at",        :null => false
-    t.datetime "updated_at",        :null => false
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+    t.datetime "build_time"
+    t.time     "duration"
+    t.integer  "skipped_count",     :default => 0
+    t.integer  "failed_count",      :default => 0
+    t.integer  "total_count",       :default => 0
   end
 
   create_table "deploy_keys_projects", :force => true do |t|
@@ -84,6 +89,23 @@ ActiveRecord::Schema.define(:version => 20131209080209) do
     t.datetime "created_at",            :null => false
     t.datetime "updated_at",            :null => false
     t.string   "target_category"
+  end
+
+  create_table "event_summaries", :force => true do |t|
+    t.string   "title"
+    t.string   "user_id"
+    t.string   "state"
+    t.string   "period"
+    t.datetime "last_send_date"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
+
+  create_table "event_summary_subscription_relationships", :force => true do |t|
+    t.integer  "summary_id"
+    t.integer  "subscription_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "events", :force => true do |t|
