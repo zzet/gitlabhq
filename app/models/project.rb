@@ -14,7 +14,6 @@
 #  merge_requests_enabled :boolean          default(TRUE), not null
 #  wiki_enabled           :boolean          default(TRUE), not null
 #  namespace_id           :integer
-#  public                 :boolean          default(FALSE), not null
 #  issues_tracker         :string(255)      default("gitlab"), not null
 #  issues_tracker_id      :string(255)
 #  snippets_enabled       :boolean          default(TRUE), not null
@@ -23,20 +22,20 @@
 #  imported               :boolean          default(FALSE), not null
 #  last_pushed_at         :datetime
 #  import_url             :string(255)
+#  visibility_level       :integer          default(0), not null
 #
 
 class Project < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
-  include Gitlab::Access
-
+  include Gitlab::VisibilityLevel
   extend Enumerize
 
   ActsAsTaggableOn.strict_case_match = true
 
   attr_accessible :name, :path, :description, :issues_tracker, :label_list,
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
-    :wiki_enabled, :git_protocol_enabled, :public, :import_url, :last_activity_at, :last_pushed_at, as: [:default, :admin]
+    :wiki_enabled, :visibility_level, :import_url, :last_activity_at, :last_pushed_at, :git_protocol_enabled, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
 
@@ -46,21 +45,23 @@ class Project < ActiveRecord::Base
 
   # Relations
   belongs_to :creator,      foreign_key: "creator_id", class_name: "User"
-  belongs_to :group,        foreign_key: "namespace_id", conditions: "type = 'Group'"
+  belongs_to :group, -> { where(type: Group) }, foreign_key: "namespace_id"
   belongs_to :namespace
-
 
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
+  has_one :last_event, -> {order 'old_events.created_at DESC'}, class_name: Event, foreign_key: 'project_id'
   has_many :old_events,         class_name: OldEvent, dependent: :destroy
-  has_one  :last_event,         class_name: OldEvent, order: 'old_events.created_at DESC', foreign_key: 'project_id'
 
   has_many :services
 
+  # Merge Requests for target project should be removed with it
   has_many :merge_requests,     dependent: :destroy, foreign_key: "target_project_id"
+  # Merge requests from source project should be kept when source project was removed
   has_many :fork_merge_requests,dependent: :destroy, foreign_key: "source_project_id", class_name: MergeRequest
-  has_many :issues,             dependent: :destroy, order: "state DESC, created_at DESC"
+
+  has_many :issues,   -> { order "state DESC, created_at DESC" }, dependent: :destroy
   has_many :milestones,         dependent: :destroy
   has_many :notes,              dependent: :destroy
   has_many :snippets,           dependent: :destroy, class_name: ProjectSnippet
@@ -92,8 +93,8 @@ class Project < ActiveRecord::Base
   delegate :members, to: :team, prefix: true
 
   # Validations
-  validates :creator, presence: true
-  validates :description, length: { within: 0..2000 }
+  validates :creator, presence: true, on: :create
+  validates :description, length: { maximum: 2000 }, allow_blank: true
   validates :name, presence: true, length: { within: 0..255 },
             format: { with: Gitlab::Regex.project_name_regex,
                       message: "only letters, digits, spaces & '_' '-' '.' allowed. Letter or digit should be first" }
@@ -103,7 +104,7 @@ class Project < ActiveRecord::Base
                       message: "only letters, digits & '_' '-' '.' allowed. Letter or digit should be first" }
   validates :issues_enabled, :wall_enabled, :merge_requests_enabled,
             :wiki_enabled, inclusion: { in: [true, false] }
-  validates :issues_tracker_id, length: { within: 0..255 }
+  validates :issues_tracker_id, length: { maximum: 255 }, allow_blank: true
 
   validates :namespace, presence: true
   validates_uniqueness_of :name, scope: :namespace_id
@@ -226,9 +227,10 @@ class Project < ActiveRecord::Base
   scope :sorted_by_push_date, -> { reorder("projects.last_pushed_at DESC NULLS LAST") }
   scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
   scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
-  scope :public_via_http, -> { where(public: true) }
   scope :public_via_git, -> { where(git_protocol_enabled: true) }
-  scope :public_only, -> { public_via_http }
+  scope :public_only, -> { where(visibility_level: PUBLIC) }
+  scope :public_or_internal_only, ->(user) { where("visibility_level IN (:levels)", levels: user ? [ INTERNAL, PUBLIC ] : [ PUBLIC ]) }
+  scope :non_archived, -> { where(archived: false) }
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
 
@@ -246,7 +248,7 @@ class Project < ActiveRecord::Base
     end
 
     def search query
-      joins(:namespace).where("projects.name LIKE :query OR projects.path LIKE :query OR namespaces.name LIKE :query OR projects.description LIKE :query", query: "%#{query}%")
+      joins(:namespace).where("projects.archived = ?", false).where("projects.name LIKE :query OR projects.path LIKE :query OR namespaces.name LIKE :query OR projects.description LIKE :query", query: "%#{query}%")
     end
 
     def find_with_namespace(id)
@@ -258,6 +260,20 @@ class Project < ActiveRecord::Base
         where(namespace_id: namespace.id).find_by_path(id.second)
       else
         where(path: id, namespace_id: nil).last
+      end
+    end
+
+    def visibility_levels
+      Gitlab::VisibilityLevel.options
+    end
+
+    def sort(method)
+      case method.to_s
+      when 'newest' then reorder('projects.created_at DESC')
+      when 'oldest' then reorder('projects.created_at ASC')
+      when 'recently_updated' then reorder('projects.updated_at DESC')
+      when 'last_updated' then reorder('projects.updated_at ASC')
+      else reorder("namespaces.path, projects.name ASC")
       end
     end
   end
@@ -412,8 +428,14 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def execute_hooks(data)
-    hooks.each { |hook| hook.async_execute(data) }
+  def transfer(new_namespace)
+    ProjectTransferService.new.transfer(self, new_namespace)
+  end
+
+  def execute_hooks(data, hooks_scope = :push_hooks)
+    hooks.send(hooks_scope).each do |hook|
+      hook.async_execute(data)
+    end
   end
 
   def execute_services(data)
@@ -430,14 +452,14 @@ class Project < ActiveRecord::Base
     c_ids = self.repository.commits_between(oldrev, newrev).map(&:id)
 
     # Update code for merge requests into project between project branches
-    mrs = self.merge_requests.opened.by_branch(branch_name).all
+    mrs = self.merge_requests.opened.by_branch(branch_name).to_a
     # Update code for merge requests between project and project fork
-    mrs += self.fork_merge_requests.opened.by_branch(branch_name).all
+    mrs += self.fork_merge_requests.opened.by_branch(branch_name).to_a
 
     mrs.each { |merge_request| merge_request.reload_code; merge_request.mark_as_unchecked }
 
     # Close merge requests
-    mrs = self.merge_requests.opened.where(target_branch: branch_name).all
+    mrs = self.merge_requests.opened.where(target_branch: branch_name).to_a
     mrs = mrs.select(&:last_commit).select { |mr| c_ids.include?(mr.last_commit.id) }
     mrs.each { |merge_request| merge_request.merge!(user.id) }
 
@@ -573,5 +595,27 @@ class Project < ActiveRecord::Base
 
   def default_branch
     @default_branch ||= repository.root_ref if repository.exists?
+  end
+
+  def reload_default_branch
+    @default_branch = nil
+    default_branch
+  end
+
+  def visibility_level_field
+    visibility_level
+  end
+
+  def archive!
+    update_attribute(:archived, true)
+  end
+
+  def unarchive!
+    update_attribute(:archived, false)
+  end
+
+  def change_head(branch)
+    gitlab_shell.update_repository_head(self.path_with_namespace, branch)
+    reload_default_branch
   end
 end

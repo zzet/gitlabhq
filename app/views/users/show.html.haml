@@ -1,5 +1,5 @@
 .row
-  .span8
+  .col-md-8
     %h3.page-title
       = image_tag avatar_icon(@user.email, 90), class: "avatar s90", alt: ''
       = @user.name
@@ -9,15 +9,16 @@
             %i.icon-edit
             Edit Profile settings
       %br
-      %small #{@user.username}
+      %span.user-show-username #{@user.username}
       %br
       %small member since #{@user.created_at.stamp("Nov 12, 2031")}
     .clearfix
     %hr
     %h4 User Activity:
-    .activities
-      = render 'activities'
-  .span4
+    -#.activities
+      -#= render 'activities'
+    = render @events
+  .col-md-4
     = render 'profile', user: @user
 
     %ul.nav.nav-tabs.js-sidebar-tabs

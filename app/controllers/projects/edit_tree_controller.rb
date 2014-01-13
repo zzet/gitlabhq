@@ -10,7 +10,7 @@ class Projects::EditTreeController < Projects::BaseTreeController
     result = Projects::Files::UpdateContext.new(current_user, @project, params, @ref, @path).execute
 
     if result[:status] == :success
-      flash[:notice] = "Your changes have been successfully commited"
+      flash[:notice] = "Your changes have been successfully committed"
       redirect_to project_blob_path(@project, @id)
     else
       flash[:alert] = result[:error]

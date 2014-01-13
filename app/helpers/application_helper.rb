@@ -62,7 +62,7 @@ module ApplicationHelper
     size = 40 if size.nil? || size <= 0
 
     if !Gitlab.config.gravatar.enabled || user_email.blank?
-      'no_avatar.png'
+      '/assets/no_avatar.png'
     else
       gravatar_url = request.ssl? || gitlab_config.https ? Gitlab.config.gravatar.ssl_url : Gitlab.config.gravatar.plain_url
       user_email.strip!
@@ -72,7 +72,7 @@ module ApplicationHelper
 
   def last_commit(project)
     if project.repo_exists?
-      time_ago_in_words(project.repository.commit.committed_date) + " ago"
+      time_ago_with_tooltip(project.repository.commit.committed_date)
     else
       "Never"
     end
@@ -232,5 +232,27 @@ module ApplicationHelper
 
   def broadcast_message
     BroadcastMessage.current
+  end
+
+  def highlight_js(&block)
+    string = capture(&block)
+
+    content_tag :div, class: user_color_scheme_class do
+      Pygments::Lexer[:js].highlight(string).html_safe
+    end
+  end
+
+  def time_ago_with_tooltip(date, placement = 'top', html_class = 'time_ago')
+    capture_haml do
+      haml_tag :time, date.to_s,
+        class: html_class, datetime: date.getutc.iso8601, title: date.stamp("Aug 21, 2011 9:23pm"),
+        data: { toggle: 'tooltip', placement: placement }
+
+      haml_tag :script, "$('." + html_class + "').timeago().tooltip()"
+    end.html_safe
+  end
+
+  def render_markup(file_name, file_content)
+    GitHub::Markup.render(file_name, file_content).html_safe
   end
 end

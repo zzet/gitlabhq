@@ -41,6 +41,7 @@
 #  confirmed_at           :datetime
 #  confirmation_sent_at   :datetime
 #  unconfirmed_email      :string(255)
+#  hide_no_ssh_key        :boolean          default(FALSE), not null
 #
 
 require 'carrierwave/orm/activerecord'
@@ -54,7 +55,7 @@ class User < ActiveRecord::Base
 
   attr_accessible :email, :password, :password_confirmation, :remember_me, :bio, :name, :username,
                   :skype, :linkedin, :twitter, :color_scheme_id, :theme_id, :force_random_password,
-                  :extern_uid, :provider, :password_expires_at, :avatar,
+                  :extern_uid, :provider, :password_expires_at, :avatar, :hide_no_ssh_key,
                   as: [:default, :admin]
 
   attr_accessible :projects_limit, :can_create_group,
@@ -73,7 +74,7 @@ class User < ActiveRecord::Base
   #
 
   # Namespace for personal projects
-  has_one :namespace, dependent: :destroy, foreign_key: :owner_id, class_name: "Namespace", conditions: 'type IS NULL'
+  has_one :namespace, -> { where type: nil }, dependent: :destroy, foreign_key: :owner_id, class_name: "Namespace"
 
   # Profile
   has_many :keys, dependent: :destroy
@@ -81,7 +82,7 @@ class User < ActiveRecord::Base
   # Groups
   has_many :users_groups,             dependent: :destroy
   has_many :groups,                   through: :users_groups
-  has_many :owned_groups,             through: :users_groups, source: :group, conditions: { users_groups: { group_access: UsersGroup::OWNER } }
+  has_many :owned_groups,             -> { where(users_groups: { group_access: UsersGroup::OWNER } )}, through: :users_groups, source: :group
   has_many :created_groups,           class_name: Group, foreign_key: :owner_id
 
   # Projects
@@ -90,11 +91,16 @@ class User < ActiveRecord::Base
   has_many :projects,                 through: :users_projects
   has_many :personal_projects,        through: :namespace, source: :projects
   has_many :created_projects,         foreign_key: :creator_id, class_name: Project
-  has_many :master_projects,          through: :users_projects, source: :project,
-                                      conditions: { users_projects: { project_access: UsersProject::MASTER } }
+  has_many :master_projects,          -> { where({ users_projects: { project_access: UsersProject::MASTER } })},
+                                      through: :users_projects, source: :project
 
   has_many :snippets,                 dependent: :destroy, foreign_key: :author_id, class_name: Snippet
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
+  has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
+  has_many :events,                   dependent: :destroy, foreign_key: :author_id,   class_name: "Event"
+  has_many :recent_events, -> { order "id DESC" }, foreign_key: :author_id,   class_name: "Event"
+  has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: "Issue"
+  has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
 
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: Issue
@@ -106,14 +112,17 @@ class User < ActiveRecord::Base
   has_many :team_user_relationships,         dependent: :destroy
   has_many :teams,                           through: :team_user_relationships
   has_many :personal_teams,                  through: :team_user_relationships, foreign_key: :creator_id, source: :team
-  has_many :owned_teams,                     through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
-  has_many :master_teams,                    through: :team_user_relationships, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team
+  has_many :owned_teams,                     -> { where( { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }) },
+                                             through: :team_user_relationships, source: :team
+  has_many :master_teams,                    -> { where( { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }) },
+                                             through: :team_user_relationships, source: :team
   has_many :team_project_relationships,      through: :teams
   has_many :team_group_relationships,        through: :teams
   has_many :team_projects,                   through: :team_project_relationships,      source: :project
   has_many :team_groups,                     through: :team_group_relationships,        source: :group
   has_many :team_group_grojects,             through: :team_groups,                     source: :projects
-  has_many :master_team_group_relationships, through: :teams, conditions: { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }, source: :team_group_relationships
+  has_many :master_team_group_relationships, -> { where( { team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } })},
+                                             through: :teams, source: :team_group_relationships
   has_many :master_team_groups,              through: :master_team_group_relationships, source: :group
 
   # Events
@@ -133,16 +142,17 @@ class User < ActiveRecord::Base
   # Validations
   #
   validates :name, presence: true
-  validates :email, presence: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/ }
-  validates :bio, length: { within: 0..255 }
+  validates :email, presence: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/ }, uniqueness: true
+  validates :bio, length: { maximum: 255 }, allow_blank: true
   validates :extern_uid, allow_blank: true, uniqueness: {scope: :provider}
   validates :projects_limit, presence: true, numericality: {greater_than_or_equal_to: 0}
   validates :username, presence: true, uniqueness: true,
             exclusion: { in: Gitlab::Blacklist.path },
             format: { with: Gitlab::Regex.username_regex,
                       message: "only letters, digits & '_' '-' '.' allowed. Letter should be first" }
-  validate :namespace_uniq, if: ->(user) { user.username_changed? }
 
+  validate :namespace_uniq, if: ->(user) { user.username_changed? }
+  validate :avatar_type, if: ->(user) { user.avatar_changed? }
   validates :avatar, file_size: { maximum: 100.kilobytes.to_i }
 
   before_validation :generate_password, on: :create
@@ -211,8 +221,8 @@ class User < ActiveRecord::Base
   scope :alphabetically, -> { order('name ASC') }
   scope :in_team, ->(team){ where(id: team.member_ids) }
   scope :not_in_team, ->(team){ where('users.id NOT IN (:ids)', ids: team.member_ids) }
-  scope :not_in_project, ->(project) { project.users.present? ? where("id not in (:ids)", ids: project.users.map(&:id) ) : scoped }
-  scope :not_in_group, ->(group) { group.users.present? ? where("id not in (:ids)", ids: group.users.pluck(:id)) : scoped }
+  scope :not_in_project, ->(project) { project.users.present? ? where.not(id: project.users.map(&:id)) : all }
+  scope :not_in_group, ->(group) { group.users.present? ? where(id: group.users.pluck(:id)) : all }
   scope :without_projects, -> { where('id NOT IN (SELECT DISTINCT(user_id) FROM users_projects)') }
   scope :ldap, -> { where(provider:  'ldap') }
 
@@ -247,8 +257,7 @@ class User < ActiveRecord::Base
     end
 
     def by_username_or_id(name_or_id)
-      field = (name_or_id.to_s == name_or_id.to_i.to_s ? "id" : "username")
-      where(:"#{field}" => name_or_id).first
+      where('users.username = ? OR users.id = ?', name_or_id.to_s, name_or_id.to_i).first
     end
 
     def build_user(attrs = {}, options= {})
@@ -302,6 +311,12 @@ class User < ActiveRecord::Base
   def owned_projects
     @project_ids ||= (Project.where(namespace_id: ([owned_groups.pluck(:id)] + [namespace.try(:id)])).pluck(:id) + master_projects.pluck(:id)).uniq
     Project.where(id: @project_ids).joins(:namespace)
+  end
+
+  def avatar_type
+    unless self.avatar.image?
+      self.errors.add :avatar, "only images allowed"
+    end
   end
 
   # Groups user has access to
@@ -489,5 +504,19 @@ class User < ActiveRecord::Base
   def can_leave_project?(project)
     project.namespace != namespace &&
       project.project_member(self)
+  end
+
+  # Reset project events cache related to this user
+  #
+  # Since we do cache @event we need to reset cache in special cases:
+  # * when the user changes their avatar
+  # Events cache stored like  events/23-20130109142513.
+  # The cache key includes updated_at timestamp.
+  # Thus it will automatically generate a new fragment
+  # when the event is updated because the key changes.
+  def reset_events_cache
+    Event.where(author_id: self.id).
+      order('id DESC').limit(1000).
+      update_all(updated_at: Time.now)
   end
 end

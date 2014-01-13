@@ -1,5 +1,7 @@
+= render "home_panel"
+
 .row
-  .span8
+  .col-md-8
     = render "events/event_last_push", event: @last_push
     = link_to dashboard_path, class: 'btn btn-tiny' do
       &larr; To dashboard
@@ -9,13 +11,21 @@
     = render 'shared/event_filter'
     .content_list
     .loading.hide
-  .span4
-    -#.light-well
-    .project-side
+  .col-md-4.project-side.hidden-sm
+    .clearfix
+      - if @project.archived?
+        .alert
+          %h5
+            %i.icon-warning-sign
+            Archived project!
+          %p Repository is read-only
+
       - if can? current_user, :download_code, @project
         .project-home-dropdown
           = render "dropdown"
+
       = render "shared/watch_button", current_entity: @project
+
       %h3.page-title
         %span.public-label
         - if @project.public
@@ -26,6 +36,10 @@
       - if @project.description.present?
         .clearfix
           %p.light= @project.description
+
+      .clearfix
+        .form-horizontal
+          = render "shared/clone_panel"
 
       .clearfix
         - if @project.forked_from_project
@@ -46,15 +60,26 @@
                 Fork repository
 
           - if can? current_user, :download_code, @project
-            = link_to archive_project_repository_path(@project), class: "btn btn-block" do
-              %i.icon-download-alt
-              %span Download
-            = link_to project_compare_index_path(@project, from: @repository.root_ref, to: @ref || @repository.root_ref), class: 'btn btn-block' do
-              Compare code
+            = render 'projects/repositories/download_archive', btn_class: 'btn-block btn-group-justified', split_button: true
 
-      .clearfix
-        .form-horizontal
-          = render "shared/clone_panel"
+          = link_to project_compare_index_path(@project, from: @repository.root_ref, to: @ref || @repository.root_ref), class: 'btn btn-block' do
+            Compare code
+
+          - if @repository.readme
+            - readme = @repository.readme
+            = link_to project_blob_path(@project, tree_join(@repository.root_ref, readme.name)), class: 'btn btn-block' do
+              = readme.name
+
+      .prepend-top-10
+        %p
+          %span.light Created on
+          #{@project.created_at.stamp('Aug 22, 2013')}
+        %p
+          %span.light Owned by
+          - if @project.group
+            #{link_to @project.group.name, @project.group} Group
+          - else
+            #{link_to @project.owner_name, @project.owner}
 
       .clearfix.prepend-top-10
         .project-home-links

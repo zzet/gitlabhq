@@ -9,7 +9,7 @@ describe IssueObserver do
 
   before { subject.stub(:current_user).and_return(some_user) }
   before { subject.stub(:current_commit).and_return(nil) }
-  before { subject.stub(notification: mock('NotificationService').as_null_object) }
+  before { subject.stub(notification: double('NotificationService').as_null_object) }
   before { mock_issue.project.stub_chain(:repository, :commit).and_return(nil) }
   before { RequestStore.store[:current_user] = some_user }
   before { Gitlab::Event::Action.any_instance.stub(:trigger).and_return(true) }

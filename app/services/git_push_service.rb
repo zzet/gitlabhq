@@ -38,7 +38,7 @@ class GitPushService
       process_commit_messages(push)
     end
 
-    project.execute_hooks(@push_data.dup)
+    project.execute_hooks(@push_data.dup, :push_hooks)
     project.execute_services(@push_data.dup)
 
     if push.created_branch?

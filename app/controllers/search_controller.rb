@@ -1,16 +1,13 @@
 class SearchController < ApplicationController
   def show
-    result = SearchContext.new(@current_user, params).execute
+    @project = Project.find_by(id: params[:project_id]) if params[:project_id].present?
+    @group = Group.find_by(id: params[:group_id])       if params[:group_id].present?
 
-    @project        = result[:project]                  if result[:blobs].any?
-    @project        = Project.find(params[:project_id]) if params[:project_id].present?
-    @group          = Group.find(params[:group_id])     if params[:group_id].present?
-
-    @projects       = result[:projects]
-    @merge_requests = result[:merge_requests]
-    @issues         = result[:issues]
-    @wiki_pages     = result[:wiki_pages]
-    @blobs          = Kaminari.paginate_array(result[:blobs]).page(params[:page]).per(20)
-    @total_results = @projects.count + @merge_requests.count + @issues.count + @wiki_pages.count + @blobs.total_count
+    if @project
+      return access_denied! unless can?(current_user, :download_code, @project)
+      @search_results = Search::ProjectContext.new(@project, current_user, params).execute
+    else
+      @search_results = Search::GlobalContext.new(current_user, params).execute
+    end
   end
 end

@@ -2,8 +2,8 @@ require 'gitlab/satellite/satellite'
 
 class Projects::MergeRequestsController < Projects::ApplicationController
   before_filter :module_enabled
-  before_filter :merge_request, only: [:edit, :update, :show, :commits, :diffs, :automerge, :automerge_check, :ci_status]
-  before_filter :closes_issues, only: [:edit, :update, :show, :commits, :diffs]
+  before_filter :merge_request, only: [:edit, :update, :show, :diffs, :automerge, :automerge_check, :ci_status]
+  before_filter :closes_issues, only: [:edit, :update, :show, :diffs]
   before_filter :validates_merge_request, only: [:show, :diffs]
   before_filter :define_show_vars, only: [:show, :diffs]
 
@@ -29,8 +29,6 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
     respond_to do |format|
       format.html
-      format.js
-
       format.diff { render text: @merge_request.to_diff(current_user) }
       format.patch { render text: @merge_request.to_patch(current_user) }
     end
@@ -49,6 +47,11 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     diff_line_count = Commit::diff_line_count(@merge_request.diffs)
     @suppress_diff = Commit::diff_suppress?(@merge_request.diffs, diff_line_count) && !params[:force_show_diff]
     @force_suppress_diff = Commit::diff_force_suppress?(@merge_request.diffs, diff_line_count)
+
+    respond_to do |format|
+      format.html
+      format.json { render json: { html: view_to_html_string("projects/merge_requests/show/_diffs") } }
+    end
   end
 
   def new
@@ -79,8 +82,23 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def update
+    # If we close MergeRequest we want to ignore validation
+    # so we can close broken one (Ex. fork project removed)
+    if params[:merge_request] == {"state_event"=>"close"}
+      @merge_request.allow_broken = true
+
+      if @merge_request.close
+        opts = { notice: 'Merge request was successfully closed.' }
+      else
+        opts = { alert: 'Failed to close merge request.' }
+      end
+
+      redirect_to [@merge_request.target_project, @merge_request], opts
+      return
+    end
+
     if Projects::MergeRequests::UpdateContext.new(current_user, @project, @merge_request, params).execute
-      redirect_to [@project, @merge_request], notice: 'Merge request was successfully updated.'
+      redirect_to [@merge_request.target_project, @merge_request], notice: 'Merge request was successfully updated.'
     else
       render "edit"
     end
@@ -159,20 +177,26 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def validates_merge_request
+    # If source project was removed (Ex. mr from fork to origin)
+    return invalid_mr unless @merge_request.source_project
+
     # Show git not found page
     # if there is no saved commits between source & target branch
     if @merge_request.commits.blank?
-       # and if source target doesn't exist
-       return invalid_mr unless @merge_request.target_project.repository.branch_names.include?(@merge_request.target_branch)
+      # and if target branch doesn't exist
+      return invalid_mr unless @merge_request.target_branch_exists?
 
-       # or if source branch doesn't exist
-       return invalid_mr unless @merge_request.source_project.repository.branch_names.include?(@merge_request.source_branch)
+      # or if source branch doesn't exist
+      return invalid_mr unless @merge_request.source_branch_exists?
     end
   end
 
   def define_show_vars
     # Build a note object for comment form
     @note = @project.notes.new(noteable: @merge_request)
+    @notes = @merge_request.mr_and_commit_notes.inc_author.fresh
+    @discussions = Note.discussions_from_notes(@notes)
+    @noteable = @merge_request
 
     # Get commits from repository
     # or from cache if already merged
@@ -180,9 +204,6 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
     @allowed_to_merge = allowed_to_merge?
     @show_merge_controls = @merge_request.opened? && @commits.any? && @allowed_to_merge
-
-    @target_type = :merge_request
-    @target_id = @merge_request.id
   end
 
   def allowed_to_merge?

@@ -1,3 +1,26 @@
+# Be sure to restart your server when you modify this file.
+
+require 'securerandom'
+
+# Your secret key for verifying the integrity of signed cookies.
+# If you change this key, all old signed cookies will become invalid!
+# Make sure the secret is at least 30 characters and all random,
+# no regular words or you'll be exposed to dictionary attacks.
+
+def find_secure_token
+  token_file = Rails.root.join('../../shared/.devise_secret')
+  token_file = Rails.root.join('./.devise_secret') if Rails.env == 'test'
+  if File.exist? token_file
+    # Use the existing token.
+    File.read(token_file).chomp
+  else
+    # Generate a new token of 64 random hexadecimal characters and store it in token_file.
+    token = SecureRandom.hex(64)
+    File.write(token_file, token)
+    token
+  end
+end
+
 # Use this hook to configure devise mailer, warden hooks and so forth. The first
 # four configuration values can also be set straight in your models.
 Devise.setup do |config|
@@ -5,6 +28,9 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class with default "from" parameter.
   config.mailer_sender = Gitlab.config.gitlab.email_from
+
+
+  config.secret_key = find_secure_token
 
   # Configure the class responsible to send e-mails.
   # config.mailer = "Devise::Mailer"
@@ -74,8 +100,8 @@ Devise.setup do |config|
   # config.pepper = "2ef62d549c4ff98a5d3e0ba211e72cff592060247e3bbbb9f499af1222f876f53d39b39b823132affb32858168c79c1d7741d26499901b63c6030a42129924ef"
 
   # ==> Configuration for :confirmable
-  # The time you want to give your user to confirm his account. During this time
-  # he will be able to access your application without confirming. Default is 0.days
+  # The time you want to give a user to confirm their account. During this time
+  # they will be able to access your application without confirming. Default is 0.days
   # When confirm_within is zero, the user won't be able to sign in without confirming.
   # You can use this to let your user access some features of your application
   # without confirming the account, but blocking it after a certain period

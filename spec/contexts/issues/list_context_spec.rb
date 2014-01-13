@@ -11,23 +11,22 @@ describe Projects::Issues::ListContext do
   end
 
   describe 'sorting' do
-
     it 'sorts by newest' do
-      params = {:sort => 'newest'}
+      params = {sort: 'newest'}
 
       issues = Projects::Issues::ListContext.new(user, project, params).execute
       issues.first.should eq foo
     end
 
     it 'sorts by oldest' do
-      params = {:sort => 'oldest'}
+      params = {sort: 'oldest'}
 
       issues = Projects::Issues::ListContext.new(user, project, params).execute
       issues.first.should eq baz
     end
 
     it 'sorts by recently updated' do
-      params = {:sort => 'recently_updated'}
+      params = {sort: 'recently_updated'}
       baz.updated_at = Time.now + 10
       baz.save
 
@@ -36,7 +35,7 @@ describe Projects::Issues::ListContext do
     end
 
     it 'sorts by least recently updated' do
-      params = {:sort => 'last_updated'}
+      params = {sort: 'last_updated'}
       bar.updated_at = Time.now - 10
       bar.save
 
@@ -45,9 +44,8 @@ describe Projects::Issues::ListContext do
     end
 
     describe 'sorting by milestone' do
-
-      let(:newer_due_milestone) { create(:milestone, :due_date => '2013-12-11') }
-      let(:later_due_milestone) { create(:milestone, :due_date => '2013-12-12') }
+      let(:newer_due_milestone) { create(:milestone, due_date: '2013-12-11') }
+      let(:later_due_milestone) { create(:milestone, due_date: '2013-12-12') }
 
       before :each do
         foo.milestone = newer_due_milestone
@@ -57,7 +55,7 @@ describe Projects::Issues::ListContext do
       end
 
       it 'sorts by most recently due milestone' do
-        params = {:sort => 'milestone_due_soon'}
+        params = {sort: 'milestone_due_soon'}
 
         issues = Projects::Issues::ListContext.new(user, project, params).execute
         issues.first.should eq foo
@@ -65,13 +63,11 @@ describe Projects::Issues::ListContext do
       end
 
       it 'sorts by least recently due milestone' do
-        params = {:sort => 'milestone_due_later'}
+        params = {sort: 'milestone_due_later'}
 
         issues = Projects::Issues::ListContext.new(user, project, params).execute
         issues.first.should eq bar
       end
-
     end
   end
-
 end
