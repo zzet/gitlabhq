@@ -151,7 +151,7 @@ class Note < ActiveRecord::Base
     return @diff_line if @diff_line
 
     if diff
-      Gitlab::DiffParser.new(diff).each do |full_line, type, line_code, line_new, line_old|
+      Gitlab::Diff::GritParser.new(diff).each do |full_line, type, line_code, line_new, line_old|
         @diff_line = full_line if line_code == self.line_code
       end
     end
