@@ -12,7 +12,7 @@ end
 gem "rails", "3.2.15"
 
 # Supported DBs
-gem "pg", group: :postgres
+gem "pg"
 
 # Auth
 gem "devise", '~> 2.2'
