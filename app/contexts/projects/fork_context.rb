@@ -18,13 +18,14 @@ module Projects
             #First save the DB entries as they can be rolled back if the repo fork fails
             from_project.build_forked_project_link(forked_to_project_id: from_project.id, forked_from_project_id: @project.id)
             if from_project.save
-              from_project.users_projects.create(from_project_access: UsersProject::MASTER, user: current_user)
+              from_project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
             end
             #Now fork the repo
             unless gitlab_shell.fork_repository(@project.path_with_namespace, from_project.namespace.path)
               raise "forking failed in gitlab-shell"
             end
             from_project.ensure_satellite_exists
+            enable_git_protocol(from_project) if from_project.git_protocol_enabled
           end
         rescue => ex
           from_project.errors.add(:base, "Fork transaction failed.")

@@ -29,22 +29,6 @@ class ProjectObserver < BaseObserver
 
   def after_update(project)
     project.rename_repo if project.path_changed?
-
-    if project.git_protocol_enabled_changed?
-      if project.git_protocol_enabled
-        log_info("#{project.owner.name} granted public access via git protocol for project \"#{project.name_with_namespace}\"")
-        GitlabShellWorker.perform_async(
-          :enable_git_protocol,
-          project.path_with_namespace
-        )
-      else
-        log_info("#{project.owner.name} removed public access via git protocol for project \"#{project.name_with_namespace}\"")
-        GitlabShellWorker.perform_async(
-          :disable_git_protocol,
-          project.path_with_namespace
-        )
-      end
-    end
   end
 
   def before_destroy(project)

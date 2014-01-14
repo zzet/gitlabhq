@@ -21,6 +21,12 @@ module Projects
           build_face_service.notify_build_face("updated")
         end
       end
+
+      if project.git_protocol_enabled
+        enable_git_protocol(project)
+      else
+        disable_git_protocol(project)
+      end
     end
   end
 end
