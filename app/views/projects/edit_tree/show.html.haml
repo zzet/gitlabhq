@@ -3,9 +3,9 @@
   = form_tag(project_edit_tree_path(@project, @id), method: :put, class: "form-horizontal") do
     .file-holder.file
       .file-title
-        .btn-group.js-edit-mode
-          = link_to 'Edit', '#editor', class: 'active btn btn-tiny'
-          = link_to 'Preview', '#preview', class: 'btn btn-tiny', 'data-preview-url' => preview_project_edit_tree_path(@project, @id)
+        .btn-group.js-edit-mode.left-options
+          = link_to 'Edit', '#editor', class: 'active hover btn btn-tiny'
+          = link_to editing_preview_title(@blob.name), '#preview', class: 'btn btn-tiny', 'data-preview-url' => preview_project_edit_tree_path(@project, @id)
         %i.icon-file
         %span.file_name
           = @path
@@ -60,8 +60,8 @@
         paneId = currentLink.attr('href'),
         currentPane = editModePanes.filter(paneId).show();
 
-    editModeLinks.removeClass('active');
-    currentLink.addClass('active');
+    editModeLinks.removeClass('active hover');
+    currentLink.addClass('active hover');
 
     if (paneId == '#preview') {
       $.post(currentLink.data('preview-url'), { content: editor.getValue() }, function(response) {
@@ -72,5 +72,6 @@
     } else {
       editModePanes.hide();
       currentPane.show();
+      editor.focus()
     }
   })
