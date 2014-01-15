@@ -4,9 +4,7 @@ class UsersController < ApplicationController
   def show
     @user           = User.find_by_username!(params[:username])
 
-    @projects       = @current_user.known_projects.where(id: @user.authorized_projects).includes(:namespace).sort_by do |p|
-      p.namespace.human_name
-    end
+    @projects       = @current_user.known_projects.where(id: @user.authorized_projects).includes(:namespace)
     @groups         = @current_user.authorized_groups.where(id: @user.personal_groups)
     @teams          = @current_user.authorized_teams.where(id: @user.personal_teams)
 
