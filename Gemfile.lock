@@ -52,6 +52,9 @@ GEM
     bootstrap-sass (2.3.2.2)
       sass (~> 3.2)
     builder (3.0.4)
+    bullet (4.7.1)
+      activesupport
+      uniform_notifier (>= 1.4.0)
     capi (0.1.1)
       capistrano
     capistrano (2.15.4)
@@ -358,9 +361,6 @@ GEM
       pry (>= 0.9.10)
     puma (2.3.2)
       rack (>= 1.1, < 2.0)
-    pygments.rb (0.4.2)
-      posix-spawn (~> 0.3.6)
-      yajl-ruby (~> 1.1.0)
     pyu-ruby-sasl (0.0.3.3)
     quiet_assets (1.0.2)
       railties (>= 3.1, < 5.0)
@@ -571,6 +571,7 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
+    uniform_notifier (1.4.0)
     virtus (0.5.5)
       backports (~> 3.3)
       descendants_tracker (~> 0.0.1)
@@ -599,6 +600,7 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   bootstrap-sass
+  bullet
   capi
   capistrano
   capistrano-ext

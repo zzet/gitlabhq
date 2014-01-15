@@ -173,7 +173,7 @@ group :development do
 
   # thin instead webrick
   gem 'thin'
-
+  gem 'bullet'
 end
 
 group :undev do
