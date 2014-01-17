@@ -29,6 +29,7 @@ class Issue < ActiveRecord::Base
   scope :of_group, ->(group) { where(project_id: group.project_ids) }
   scope :of_team, ->(team) { where(project_id: team.project_ids, assignee_id: team.member_ids) }
   scope :opened, -> { with_state(:opened, :reopened) }
+  scope :closed, -> { with_state(:closed) }
   scope :cared, ->(user) { where(assignee_id: user) }
   scope :open_for, ->(user) { opened.assigned_to(user) }
 

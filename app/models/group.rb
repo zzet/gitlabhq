@@ -18,14 +18,28 @@ class Group < Namespace
   has_many :team_group_relationships, dependent: :destroy
   has_many :teams,                    through: :team_group_relationships
   has_many :team_user_relationships,  through: :teams
-  has_many :admins,                   through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }
+  has_many :admins,                   -> { where({ users: { state: :active },
+                                                   team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } })},
+                                      through: :team_user_relationships, source: :user
 
   has_many :users_groups, dependent: :destroy
-  has_many :users,      through: :users_groups, conditions: { users: { state: :active } }
-  has_many :guests,     through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::GUEST } }
-  has_many :reporters,  through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::REPORTER } }
-  has_many :developers, through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::DEVELOPER } }
-  has_many :masters,    through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } }
+  has_many :users,      -> { where({ users: { state: :active } }) }, through: :users_groups
+
+  has_many :guests,     -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::GUEST } })},
+                        through: :users_groups, source: :user
+
+  has_many :reporters,  -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::REPORTER } })},
+                        through: :users_groups, source: :user
+
+  has_many :developers, -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::DEVELOPER } })},
+                        through: :users_groups, source: :user
+
+  has_many :masters,    -> { where({ users: { state: :active },
+                                     users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } })},
+                        through: :users_groups, source: :user
 
   watch do
     source watchable_name do
@@ -59,7 +73,7 @@ class Group < Namespace
     end
   end
 
-  scope :without_team, ->(team) { team.groups.present? ? where("namespaces.id NOT IN (:ids)", ids: team.groups.pluck(:id)) : scoped }
+  scope :without_team, ->(team) { team.groups.present? ? where.not(id: team.groups) : all }
 
   def human_name
     name

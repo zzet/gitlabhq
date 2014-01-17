@@ -1,43 +1,36 @@
 .row
-  .span3
-    %ul.nav.nav-pills.nav-stacked
-      = nav_tab :scope, nil do
-        = link_to admin_teams_path do
-          All
-          %span.pull-right
-            = @teams_count
-      %hr
+  .col-md-3
+    .admin-filter
+      = form_tag admin_teams_path, method: :get, class: '' do
+        .form-group
+          = label_tag :name, 'Name:'
+          = text_field_tag :name, params[:name], class: "form-control"
 
-      = nav_tab :scope, nil do
-        Search by name
-        = form_tag admin_teams_path, method: :get, class: 'form-inline' do
-          = text_field_tag :name, params[:name], class: "span3"
+        .form-group
+          = label_tag :owner_id, 'Owner:'
+          %div
+            = users_select_tag :owner_id, selected: params[:owner_id], class: 'input-large input-clamp'
+        .form-group
+          = label_tag :member_id, 'With user:'
+          %div
+            = users_select_tag :member_id, selected: params[:member_id], class: 'input-large input-clamp'
 
-      = nav_tab :scope, 'joined' do
-        With user
-        = form_tag(admin_teams_path, method: :get) do
-          = select_tag :member, options_from_collection_for_select(@users, :username, :name),
-                                class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
+        .form-group
+          = label_tag :group_id, 'Assigned on group:'
+          %div
+            = groups_select_tag :group_id, selected: params[:group_id], class: 'input-large input-clamp'
 
-      = nav_tab :scope, 'owned' do
-        Owned by
-        = form_tag(admin_teams_path, method: :get) do
-          = select_tag :owner, options_from_collection_for_select(@users, :username, :name, params[:owner]),
-                               class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
+        .form-group
+          = label_tag :project_id, 'Assigned on project:'
+          %div
+            = projects_select_tag :project_id, selected: params[:project_id], class: 'input-large input-clamp'
 
-      = nav_tab :scope, 'group' do
-        Assigned on group
-        = form_tag(admin_teams_path, method: :get) do
-          = select_tag :group, options_from_collection_for_select(@groups, :path, :name, params[:group]),
-                               class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
+        .form-actions
+          = submit_tag "Search", class: "btn submit btn-primary"
+          = link_to "Reset", admin_projects_path, class: "btn"
 
-      = nav_tab :scope, 'project' do
-        Assigned on project
-        = form_tag(admin_teams_path, method: :get) do
-          = select_tag :project, options_from_collection_for_select(@projects, :path_with_namespace, :name_with_namespace, params[:project]),
-                                 class: "span3 chosen trigger-submit", allow_blank: true, include_blank: true
 
-  .span9
+  .col-md-9
     .ui-box
       .title
         Teams (#{@teams.count})

@@ -21,7 +21,7 @@ module Projects
           end
         end
 
-        issues = Issue.where(id: issues_ids).all
+        issues = Issue.where(id: issues_ids)
         issues = issues.select { |issue| can?(current_user, :modify_issue, issue) }
 
         issues.each do |issue|

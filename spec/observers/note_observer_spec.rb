@@ -17,12 +17,6 @@ describe NoteObserver do
       end
     end
 
-    it 'sends out notifications' do
-      subject.should_receive(:notification)
-
-      subject.after_create(note)
-    end
-
     it 'creates cross-reference notes as appropriate' do
       @p = create(:project)
       @referenced = create(:issue, project: @p)

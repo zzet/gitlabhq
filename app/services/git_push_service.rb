@@ -19,7 +19,7 @@ class GitPushService
 
     RequestStore.store[:current_user] = user
 
-    push = Push.new(project: project, user: user, before: oldrev, after: newrev, ref: ref)
+    push = Push.new(project: project, user: user, revbefore: oldrev, revafter: newrev, ref: ref)
     push.fill_push_data
     push.save
 
@@ -64,7 +64,7 @@ class GitPushService
   def sample_data(project, user)
     @project, @user = project, user
     @push_commits = project.repository.commits(project.default_branch, nil, 3)
-    push = Push.new(project: project, user: user, before: @push_commits.last.id, after: @push_commits.first.id, ref: "refs/heads/#{project.default_branch}")
+    push = Push.new(project: project, user: user, revbefore: @push_commits.last.id, revafter: @push_commits.first.id, ref: "refs/heads/#{project.default_branch}")
     push.fill_push_data
     push.data
   end

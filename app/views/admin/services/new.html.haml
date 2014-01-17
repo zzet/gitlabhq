@@ -1,5 +1,6 @@
 = render "service_head"
 
-= form_for(@service, as: :service, url: admin_services_path, method: :post) do |f|
-  = f.hidden_field(:service_type, value: @service.to_param)
-  = render "form", f: f
+.form-holder
+  = form_for(@service, as: :service, url: admin_services_path, method: :post, html: { class: "form-horizontal" }) do |f|
+    = f.hidden_field(:service_type, value: @service.to_param)
+    = render "form", f: f

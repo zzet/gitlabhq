@@ -9,27 +9,6 @@ describe UsersProjectObserver do
   subject { UsersProjectObserver.instance }
   before { subject.stub(notification: double('NotificationService').as_null_object) }
 
-  describe "#after_update" do
-    before do
-      @users_project = create :users_project
-    end
-
-    it "should called when UsersProject updated" do
-      subject.should_receive(:after_update)
-      @users_project.update_attribute(:project_access, UsersProject::MASTER)
-    end
-
-    it "should send email to user" do
-      subject.should_receive(:notification)
-      @users_project.update_attribute(:project_access, UsersProject::MASTER)
-    end
-
-    it "should not called after UsersProject destroyed" do
-      subject.should_not_receive(:after_update)
-      @users_project.destroy
-    end
-  end
-
   describe "#after_destroy" do
     before do
       @users_project = create :users_project
@@ -71,15 +50,8 @@ describe UsersProjectObserver do
       end
     end
 
-    it "should send email to user" do
-      subject.should_receive(:notification)
-      Event.stub(create: true)
-
-      create(:users_project)
-    end
-
     it "should create new event" do
-      Event.should_receive(:create)
+      OldEvent.should_receive(:create)
 
       create(:users_project)
     end

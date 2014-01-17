@@ -79,16 +79,25 @@
     margin: 0;
     font-size: 20px;
     color: #666;
+    margin-top: 15px;
   }
 
   .last-activity {
-    float: right;
+    /*float: right;*/
     font-size: 12px;
+    clear: left;
+    line-height: 18px;
     color: #AAA;
     display: block;
     .date {
       color: #777;
     }
+  }
+}
+
+.group-row {
+  .arrow {
+    margin-top: 0px;
   }
 }
 
@@ -113,6 +122,6 @@
   float: left;
   margin-right: 3px;
   color: #999;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
   width: 16px;
 }

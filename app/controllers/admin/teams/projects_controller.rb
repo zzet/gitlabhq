@@ -1,6 +1,6 @@
 class Admin::Teams::ProjectsController < Admin::Teams::ApplicationController
   def new
-    @projects = Project.scoped
+    @projects = Project.all
     @projects = @projects.without_team(team) if team.projects.any?
     #@projects.reject!(&:empty_repo?)
   end

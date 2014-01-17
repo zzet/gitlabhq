@@ -87,7 +87,6 @@ describe GitPushService do
 
       it "when pushing tags" do
         project.should_receive(:execute_hooks)
-        ProjectHook.any_instance.should_receive(:async_execute)
         service.execute(project, user, 'newrev', 'newrev', 'refs/tags/v1.0.0')
       end
     end

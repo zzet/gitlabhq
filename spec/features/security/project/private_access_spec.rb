@@ -13,6 +13,8 @@ describe "Private Project Access" do
 
     # readonly
     project.team << [reporter, :reporter]
+
+    Rails.cache.clear
   end
 
   describe "Project should be private" do

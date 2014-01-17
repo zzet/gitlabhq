@@ -1,6 +1,7 @@
-= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+= form_for(resource, as: resource_name, url: session_path(resource_name), authenticity_token: true) do |f|
   = f.text_field :login, class: "form-control top", placeholder: "Username or Email", autofocus: "autofocus"
   = f.password_field :password, class: "form-control bottom", placeholder: "Password"
+  = hidden_field_tag :authenticity_token, form_authenticity_token
   - if devise_mapping.rememberable?
     .clearfix.append-bottom-10
       %label.checkbox.remember_me{for: "user_remember_me"}

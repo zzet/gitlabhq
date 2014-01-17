@@ -52,6 +52,7 @@ describe Projects::UpdateContext do
       before(:each) do
         @restrictions = double("restrictions")
         @restrictions.stub(:restricted_visibility_levels) { [ Gitlab::VisibilityLevel::PUBLIC ] }
+        @restrictions.stub(:git_daemon_enabled) { true }
         Settings.stub_chain(:gitlab).and_return(@restrictions)
       end
 
@@ -106,6 +107,6 @@ describe Projects::UpdateContext do
   end
 
   def update_project(project, user, opts)
-    Projects::UpdateContext.new(project, user, opts).execute
+    Projects::UpdateContext.new(user, project, opts).execute
   end
 end

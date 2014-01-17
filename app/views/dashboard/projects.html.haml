@@ -21,6 +21,10 @@
           Recently updated
         = link_to projects_dashboard_filter_path(sort: 'last_updated') do
           Last updated
+        = link_to projects_dashboard_filter_path(sort: 'recently_pushed') do
+          Recently pushed
+        = link_to projects_dashboard_filter_path(sort: 'last_pushed') do
+          Last pushed
 %p.light
   All projects you have access to are listed here. Public projects are not included here unless you are a member
 %hr

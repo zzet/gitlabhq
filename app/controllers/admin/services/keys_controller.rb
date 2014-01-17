@@ -1,7 +1,7 @@
 class Admin::Services::KeysController < Admin::Services::ApplicationController
   def index
-    @enabled_keys = @service.service_keys.all
-    @available_keys = available_keys - @enabled_keys
+    @enabled_keys = @service.service_keys
+    @available_keys = available_keys.where.not(id: @enabled_keys)
   end
 
   def show
@@ -39,20 +39,20 @@ class Admin::Services::KeysController < Admin::Services::ApplicationController
       srv.service_keys << key
     end
 
-    redirect_to admin_service_keys_path(@service)
+    redirect_to admin_service_keys_path(service.id)
   end
 
   def disable
-    services = @service.children.pluck(:id)
-    services << @service.id
+    services = service.children.pluck(:id)
+    services << service.id
     ServiceKeyServiceRelationship.where(service_key_id: params[:id], service_id: services).destroy_all
 
-    redirect_to admin_service_keys_path(@service)
+    redirect_to admin_service_keys_path(service.id)
   end
 
   protected
 
   def available_keys
-    @available_keys ||= ServiceKey.scoped
+    @available_keys ||= ServiceKey.all
   end
 end

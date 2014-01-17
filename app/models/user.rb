@@ -127,7 +127,7 @@ class User < ActiveRecord::Base
 
   # Events
   has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
-  has_many :recent_events,                                 class_name: OldEvent, foreign_key: :author_id, order: "id DESC"
+  has_many :recent_events,        -> { order(id: :desc) }, class_name: OldEvent, foreign_key: :author_id
   has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
 
   # Notifications & Subscriptions
@@ -309,7 +309,7 @@ class User < ActiveRecord::Base
   end
 
   def owned_projects
-    @project_ids ||= (Project.where(namespace_id: ([owned_groups.pluck(:id)] + [namespace.try(:id)])).pluck(:id) + master_projects.pluck(:id)).uniq
+    @project_ids ||= (Project.where(namespace_id: ([owned_groups.pluck(:id)] << [namespace.try(:id)]).flatten).pluck(:id) + master_projects.pluck(:id)).uniq
     Project.where(id: @project_ids).joins(:namespace)
   end
 
@@ -321,7 +321,7 @@ class User < ActiveRecord::Base
 
   # Groups user has access to
   def authorized_groups
-    @authorized_groups ||= (self.admin? ? Group.scoped : personal_groups)
+    @authorized_groups ||= (self.admin? ? Group.all : personal_groups)
   end
 
   def personal_groups
@@ -350,7 +350,7 @@ class User < ActiveRecord::Base
   end
 
   def authorized_teams
-    ateams = Team.scoped
+    ateams = Team.all
     unless self.admin?
       ateams = known_teams
     end

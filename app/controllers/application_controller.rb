@@ -11,7 +11,8 @@ class ApplicationController < ActionController::Base
   before_filter :add_gon_variables
   before_filter :configure_permitted_parameters, if: :devise_controller?
 
-  protect_from_forgery
+  protect_from_forgery with: :exception
+  #protect_from_forgery
 
   helper_method :abilities, :can?
 

@@ -21,8 +21,8 @@ gem 'activerecord-deprecated_finders'
 gem "pg"
 
 # Auth
-gem "devise"
-gem "devise-async"
+gem "devise", '3.0.4'
+gem "devise-async", '0.8.0'
 gem 'omniauth', "~> 1.1.3"
 gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
@@ -89,6 +89,8 @@ gem 'diffy'
 
 # Asciidoc to HTML
 gem  "asciidoctor"
+
+#gem 'activerecord-msgpack_serializer', github: 'zzet/activerecord-msgpack_serializer'
 
 # Application server
 group :unicorn do
@@ -216,6 +218,7 @@ group :development, :test do
   gem "capybara"
   gem "pry"
   gem 'pry-rails'
+  #gem 'pry-rescue'
   #gem 'pry-remote'
   #gem 'pry-stack_explorer'
   #gem 'pry-debugger'

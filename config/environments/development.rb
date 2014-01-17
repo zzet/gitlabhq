@@ -34,4 +34,14 @@ Gitlab::Application.configure do
   config.action_mailer.delivery_method = :letter_opener
 
   config.eager_load = false
+
+  # Use a different cache store in production
+  config_file = Rails.root.join('config', 'resque.yml')
+
+  resque_url = if File.exists?(config_file)
+                 YAML.load_file(config_file)[Rails.env]
+               else
+                 "redis://localhost:6379"
+               end
+  config.cache_store = :redis_store, resque_url
 end

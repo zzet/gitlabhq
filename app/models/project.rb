@@ -76,15 +76,16 @@ class Project < ActiveRecord::Base
   has_many :team_group_relationships,   through: :group
   has_many :group_teams,                through: :team_group_relationships, source: :team
 
-  has_many :users, through: :users_projects, conditions: { users: { state: :active } }
+  has_many :users,                      -> { where({ users: { state: :active } }) },
+                                        through: :users_projects
 
   has_many :users_projects,           dependent: :destroy
   has_many :users_groups,             through: :group
   has_many :team_user_relationships,  through: :teams
 
-  has_many :core_members,             through: :users_projects,          source: :user, conditions: { users: { state: :active } }
-  has_many :groups_members,           through: :users_groups,            source: :user, conditions: { users: { state: :active } }
-  has_many :teams_members,            through: :team_user_relationships, source: :user, conditions: { users: { state: :active } }
+  has_many :core_members,             -> { where({ users: { state: :active } })}, through: :users_projects, source: :user
+  has_many :groups_members,           -> { where({ users: { state: :active } })}, through: :users_groups, source: :user
+  has_many :teams_members,            -> { where({ users: { state: :active } })}, through: :team_user_relationships, source: :user
 
   has_many :deploy_keys_projects, dependent: :destroy
   has_many :deploy_keys, through: :deploy_keys_projects
@@ -218,7 +219,7 @@ class Project < ActiveRecord::Base
   # Scopes
   scope :without_user, ->(user)  { where("projects.id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
   scope :with_user, ->(user)  { where(users_projects: { user_id: user } ) }
-  scope :without_team, ->(team) { team.projects.present? ? where("projects.id NOT IN (:ids)", ids: team.projects.map(&:id)) : scoped  }
+  scope :without_team, ->(team) { team.projects.present? ? where("projects.id NOT IN (:ids)", ids: team.projects.map(&:id)) : all  }
   scope :not_in_group, ->(group) { where("projects.id NOT IN (:ids)", ids: group.project_ids ) }
   scope :in_team, ->(team) { where("projects.id IN (:ids)", ids: team.projects.map(&:id)) }
   scope :in_namespace, ->(namespace) { where(namespace_id: namespace.id) }

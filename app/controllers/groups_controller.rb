@@ -121,7 +121,7 @@ class GroupsController < ApplicationController
   end
 
   def projects
-    @projects ||= (current_user.admin? ? Project.scoped : current_user.known_projects).where(namespace_id: group.id).sorted_by_push_date
+    @projects ||= (current_user.admin? ? Project.all : current_user.known_projects).where(namespace_id: group.id).sorted_by_push_date
   end
 
   def project_ids

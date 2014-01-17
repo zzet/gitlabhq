@@ -1,4 +1,4 @@
-= render "home_panel"
+-#= render "home_panel"
 
 .row
   .col-md-8
@@ -26,20 +26,9 @@
 
       = render "shared/watch_button", current_entity: @project
 
-      %h3.page-title
-        %span.public-label
-        - if @project.public
-          Public
-        - else
-          Private
-
       - if @project.description.present?
         .clearfix
           %p.light= @project.description
-
-      .clearfix
-        .form-horizontal
-          = render "shared/clone_panel"
 
       .clearfix
         - if @project.forked_from_project
@@ -48,6 +37,7 @@
             Forked from:
             %br
             = link_to @project.forked_from_project.name_with_namespace, project_path(@project.forked_from_project)
+
         - unless @project.empty_repo?
           - if current_user && can?(current_user, :fork_project, @project) && @project.namespace != current_user.namespace
             - if current_user.already_forked?(@project)
@@ -70,16 +60,9 @@
             = link_to project_blob_path(@project, tree_join(@repository.root_ref, readme.name)), class: 'btn btn-block' do
               = readme.name
 
-      .prepend-top-10
-        %p
-          %span.light Created on
-          #{@project.created_at.stamp('Aug 22, 2013')}
-        %p
-          %span.light Owned by
-          - if @project.group
-            #{link_to @project.group.name, @project.group} Group
-          - else
-            #{link_to @project.owner_name, @project.owner}
+          .clearfix
+            .form-horizontal
+              = render "shared/clone_panel"
 
       .clearfix.prepend-top-10
         .project-home-links
@@ -89,6 +72,15 @@
           %span.light.prepend-left-20= repository_size
 
       .prepend-top-10
+        %p
+          %span.light Last push at
+          - if @project.last_pushed_at
+            #{@project.last_pushed_at.stamp('Aug 22, 2013')}
+          - else
+            Never
+        %p
+          %span.light Last activity at
+          #{@project.last_activity_at.stamp('Aug 22, 2013')}
         %p
           %span.light Created on
           #{@project.created_at.stamp('Aug 22, 2013')}

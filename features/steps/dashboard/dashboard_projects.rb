@@ -4,7 +4,7 @@ class DashboardProjects < Spinach::FeatureSteps
   include SharedProject
 
   Then 'I should see projects list' do
-    @user.authorized_projects.all.each do |project|
+    @user.authorized_projects.find_each do |project|
       page.should have_link project.name_with_namespace
     end
   end
