@@ -1,4 +1,6 @@
 class SearchController < ApplicationController
+  include SearchHelper
+
   def show
     @project = Project.find_by(id: params[:project_id]) if params[:project_id].present?
     @group = Group.find_by(id: params[:group_id])       if params[:group_id].present?
@@ -9,5 +11,13 @@ class SearchController < ApplicationController
     else
       @search_results = SearchService.new(current_user, params).global_search
     end
+  end
+
+  def autocomplete
+    term = params[:term]
+    @project = Project.find(params[:project_id]) if params[:project_id].present?
+    @ref = params[:project_ref] if params[:project_ref].present?
+
+    render json: search_autocomplete_opts(term).to_json
   end
 end
