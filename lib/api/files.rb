@@ -18,10 +18,10 @@ module API
       #
       post ":id/repository/files" do
         required_attributes! [:file_path, :branch_name, :content, :commit_message]
-        attrs = attributes_for_keys [:file_path, :branch_name, :content, :commit_message]
+        attrs = attributes_for_keys [:file_path, :branch_name, :content, :commit_message, :encoding]
         branch_name = attrs.delete(:branch_name)
         file_path = attrs.delete(:file_path)
-        result = ::Projects::Files::CreateContext.new(current_user, user_project, attrs, branch_name, file_path).execute
+        result = ProjectsService.new(current_user, user_project, attrs).repository.create_file(branch_name, file_path)
 
         if result[:status] == :success
           status(201)
@@ -48,10 +48,10 @@ module API
       #
       put ":id/repository/files" do
         required_attributes! [:file_path, :branch_name, :content, :commit_message]
-        attrs = attributes_for_keys [:file_path, :branch_name, :content, :commit_message]
+        attrs = attributes_for_keys [:file_path, :branch_name, :content, :commit_message, :encoding]
         branch_name = attrs.delete(:branch_name)
         file_path = attrs.delete(:file_path)
-        result = ::Projects::Files::UpdateContext.new(current_user, user_project, attrs, branch_name, file_path).execute
+        result = ProjectsService.new(current_user, user_project, attrs).repository.update_file(branch_name, file_path)
 
         if result[:status] == :success
           status(200)
@@ -81,7 +81,7 @@ module API
         attrs = attributes_for_keys [:file_path, :branch_name, :commit_message]
         branch_name = attrs.delete(:branch_name)
         file_path = attrs.delete(:file_path)
-        result = ::Projects::Files::RemoveContext.new(current_user, user_project, attrs, branch_name, file_path).execute
+        result = ProjectsService.new(current_user, user_project, attrs).repository.delete_file(branch_name, file_path)
 
         if result[:status] == :success
           status(200)

@@ -89,7 +89,7 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def bulk_update
-    result = Projects::Issues::BulkUpdateContext.new(current_user, project, params).execute
+    result = ProjectsService.new(current_user, project, params).issue.bulk_update
     redirect_to :back, notice: "#{result[:count]} issues updated"
   end
 
@@ -116,7 +116,10 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def issues_filtered
-    @issues = Projects::Issues::ListContext.new(current_user, project, params).execute
+    params[:scope] = 'all' if params[:scope].blank?
+    params[:state] = 'opened' if params[:state].blank?
+    params[:project_id] = @project.id
+    @issues = FilteringService.new.execute(current_user, Issue, params)
   end
 
   # Since iids are implemented only in 6.1

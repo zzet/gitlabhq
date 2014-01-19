@@ -69,7 +69,7 @@ production: &base
     # If a commit message matches this regular expression, all issues referenced from the matched text will be closed.
     # This happens when the commit is pushed or merged into the default branch of a project.
     # When not specified the default issue_closing_pattern as specified below will be used.
-    # issue_closing_pattern: ([Cc]lose[sd]|[Ff]ixe[sd]) +#\d+
+    # issue_closing_pattern: "([Cc]lose[sd]|[Ff]ixe[sd]) +#\d+"
 
     ## Default project features settings
     default_projects_features:
@@ -158,7 +158,8 @@ production: &base
       # - { name: 'twitter', app_id: 'YOUR APP ID',
       #     app_secret: 'YOUR APP SECRET'}
       # - { name: 'github', app_id: 'YOUR APP ID',
-      #     app_secret: 'YOUR APP SECRET' }
+      #     app_secret: 'YOUR APP SECRET',
+      #     args: { scope: 'user:email' } }
 
 
 

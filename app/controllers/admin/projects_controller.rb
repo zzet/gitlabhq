@@ -23,12 +23,12 @@ class Admin::ProjectsController < Admin::ApplicationController
   end
 
   def destroy
-    ::Projects::RemoveContext.new(current_user, project).execute
+    ::ProjectsService.new(current_user, project).delete
     redirect_to admin_projects_path
   end
 
   def transfer
-    result = ::Projects::TransferContext.new(@project, current_user, project: params).execute(:admin)
+    result = ::ProjectsService.new(current_user, @project, project: params).transfer(:admin)
 
     if result
       redirect_to [:admin, @project]

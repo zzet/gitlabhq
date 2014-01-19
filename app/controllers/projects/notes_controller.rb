@@ -5,7 +5,7 @@ class Projects::NotesController < Projects::ApplicationController
   before_filter :authorize_admin_note!, only: [:update, :destroy]
 
   def index
-    @notes = Projects::Notes::LoadContext.new(current_user, project, params).execute
+    @notes = ProjectsService.new(current_user, project, params).notes.load
 
     notes_json = { notes: [] }
 
@@ -20,7 +20,7 @@ class Projects::NotesController < Projects::ApplicationController
   end
 
   def create
-    @note = Projects::Notes::CreateContext.new(current_user, project, params).execute
+    @note = ProjectsService.new(current_user, project, params).notes.create
 
     respond_to do |format|
       format.json { render_note_json(@note) }

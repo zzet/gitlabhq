@@ -8,7 +8,7 @@ class Admin::Teams::ProjectsController < Admin::Teams::ApplicationController
   def create
     redirect_to :back if params[:project_ids].blank?
 
-    ::Teams::Projects::CreateRelationContext.new(current_user, team, params).execute
+    team_service.assign_on_projects(param)
 
     redirect_to admin_team_path(team), notice: 'Team of users was successfully assigned to projects.'
   end
@@ -17,16 +17,8 @@ class Admin::Teams::ProjectsController < Admin::Teams::ApplicationController
     team_project
   end
 
-  def update
-    if ::Teams::Projects::UpdateRelationContext.new(current_user, team, team_project, params).execute
-      redirect_to admin_team_path(team), notice: 'Access was successfully updated.'
-    else
-      render :edit
-    end
-  end
-
   def destroy
-    ::Teams::Projects::RemoveRelationContext.new(current_user, team, team_project, params).execute
+    team_service.resign_from_projects(team_project)
 
     redirect_to admin_team_path(team), notice: 'Team of users was successfully reassigned from project.'
   end
@@ -36,5 +28,4 @@ class Admin::Teams::ProjectsController < Admin::Teams::ApplicationController
   def team_project
     @project ||= team.projects.find_with_namespace(params[:id])
   end
-
 end

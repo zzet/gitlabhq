@@ -8,4 +8,8 @@ class Admin::Teams::ApplicationController < Admin::ApplicationController
   def team
     @team = Team.find_by_path(params[:team_id])
   end
+
+  def team_service
+    ::TeamsService.new(@current_user, team, params)
+  end
 end

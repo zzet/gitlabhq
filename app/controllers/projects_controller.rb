@@ -21,7 +21,7 @@ class ProjectsController < ApplicationController
   end
 
   def create
-    @project = ::Projects::CreateContext.new(current_user, params[:project]).execute
+    @project = ::ProjectsService.new(current_user, params[:project]).create
 
     respond_to do |format|
       flash[:notice] = 'Project was successfully created.' if @project.saved?
@@ -37,7 +37,7 @@ class ProjectsController < ApplicationController
   end
 
   def update
-    status = ::Projects::UpdateContext.new(current_user, project, params).execute
+    status = ::ProjectsService.new(current_user, @project, params).update
 
     respond_to do |format|
       if status
@@ -52,8 +52,7 @@ class ProjectsController < ApplicationController
   end
 
   def transfer
-    new_namespace = Namespace.find_by_id(params[:project][:namespace_id])
-    ::Projects::TransferContext.new(current_user, project, new_namespace).execute
+    ::ProjectsService.new(current_user, project, params).transfer
   end
 
   def show
@@ -99,7 +98,7 @@ class ProjectsController < ApplicationController
     return access_denied! unless can?(current_user, :remove_project, project)
 
     group = project.group
-    ::Projects::RemoveContext.new(current_user, project, params).execute
+    ::ProjectsService.new(current_user, project, params).delete
 
     respond_to do |format|
       format.html { redirect_to group.present? ? group_path(group) : root_path }
@@ -107,7 +106,7 @@ class ProjectsController < ApplicationController
   end
 
   def fork
-    @forked_project = ::Projects::ForkContext.new(current_user, project).execute
+    @forked_project = ::ProjectsService.new(current_user, project).fork
 
     respond_to do |format|
       format.html do

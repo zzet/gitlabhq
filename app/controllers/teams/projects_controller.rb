@@ -9,13 +9,13 @@ class Teams::ProjectsController < Teams::ApplicationController
   def create
     redirect_to :back if params[:project_ids].blank?
 
-    ::Teams::Projects::CreateRelationContext.new(current_user, team, params).execute
+    ::TeamsService.new(current_user, team, params).assign_on_projects
 
     redirect_to team_projects_path(team), notice: 'Team of users was successfully assigned to projects.'
   end
 
   def destroy
-    ::Teams::Projects::RemoveRelationContext.new(current_user, team, team_project).execute
+    ::TeamsService.new(current_user, team).resign_from_projects(team_project)
 
     redirect_to team_projects_path(team), notice: 'Team of users was successfully removed from project.'
   end

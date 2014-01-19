@@ -11,7 +11,7 @@ module API
           end
           not_found!
         end
-        
+
         def map_public_to_visibility_level(attrs)
           publik = attrs.delete(:public)
           publik = [ true, 1, '1', 't', 'T', 'true', 'TRUE', 'on', 'ON' ].include?(publik)
@@ -102,7 +102,7 @@ module API
                                      :visibility_level,
                                      :import_url]
         attrs = map_public_to_visibility_level(attrs)
-        @project = ::Projects::CreateContext.new(current_user, attrs).execute
+        @project = ProjectsService.new(current_user, attrs).create
         if @project.saved?
           present @project, with: Entities::Project
         else
@@ -143,7 +143,7 @@ module API
                                      :public,
                                      :visibility_level]
         attrs = map_public_to_visibility_level(attrs)
-        @project = ::Projects::CreateContext.new(user, attrs).execute
+        @project = ProjectsService.new(user, attrs).create
         if @project.saved?
           present @project, with: Entities::Project
         else

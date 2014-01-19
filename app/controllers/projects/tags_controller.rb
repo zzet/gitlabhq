@@ -14,15 +14,13 @@ class Projects::TagsController < Projects::ApplicationController
   end
 
   def create
-    Projects::Tags::CreateContext.new(current_user, @project, params).execute
+    ProjectsService.new(current_user, @project, params).repository.create_tag(params[:tag_name])
 
     redirect_to project_tags_path(@project)
   end
 
   def destroy
-    tag = @repository.find_tag(params[:id])
-
-    Projects::Tags::RemoveContext.new(current_user, @project, tag).execute
+    ProjectsService.new(current_user, @project).repository.delete_tag(params[:id])
 
     respond_to do |format|
       format.html { redirect_to project_tags_path }

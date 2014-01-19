@@ -120,7 +120,7 @@ module API
         user = User.find_by_id(params[:id])
 
         if user
-          ::Users::RemoveContext.new(current_user, user).execute
+          UsersService.new(current_user, user).delete
         else
           not_found!
         end

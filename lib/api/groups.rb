@@ -89,7 +89,7 @@ module API
         authenticated_as_admin!
         @group = Group.find(params[:id])
         project = Project.find(params[:project_id])
-        transfer_result = Projects::TransferContext.new(current_user, project, @group).execute
+        transfer_result = Projects::TransferService.new(current_user, project, @group).execute
         if transfer_result
           present @group
         else

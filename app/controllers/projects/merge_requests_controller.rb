@@ -17,7 +17,16 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   before_filter :authorize_modify_merge_request!, only: [:close, :edit, :update, :sort]
 
   def index
-    @merge_requests = Projects::MergeRequests::LoadContext.new(current_user, project, params).execute
+    params[:sort] ||= 'newest'
+    params[:scope] = 'all' if params[:scope].blank?
+    params[:state] = 'opened' if params[:state].blank?
+    params[:project_id] = @project.id
+
+    @merge_requests = FilteringService.new.execute(current_user, MergeRequest, params)
+    @merge_requests = @merge_requests.page(params[:page]).per(20)
+
+    @sort = params[:sort].humanize
+
     assignee_id, milestone_id = params[:assignee_id], params[:milestone_id]
     @assignee = @project.team.find(assignee_id) if assignee_id.present? && !assignee_id.to_i.zero?
     @milestone = @project.milestones.find(milestone_id) if milestone_id.present? && !milestone_id.to_i.zero?
@@ -70,7 +79,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def create
-    @merge_request = Projects::MergeRequests::CreateContext.new(current_user, @project, params[:merge_request]).execute
+    @merge_request = ProjectsService.new(current_user, @project, params[:merge_request]).merge_request.create
     @target_branches ||= []
     if @merge_request.persisted?
       redirect_to [@merge_request.target_project, @merge_request], notice: 'Merge request was successfully created.'
@@ -82,25 +91,23 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def update
-    # If we close MergeRequest we want to ignore validation
-    # so we can close broken one (Ex. fork project removed)
-    if params[:merge_request] == {"state_event"=>"close"}
-      @merge_request.allow_broken = true
+    if ProjectsService.new(current_user, @project, params).merge_request(@merge_request).update
+      @merge_request.reload
 
-      if @merge_request.close
-        opts = { notice: 'Merge request was successfully closed.' }
+      if params[:merge_request].has_key?(:state_event)
+        opts = { notice: "Merge request was successfully #{@merge_request.state}." }
       else
-        opts = { alert: 'Failed to close merge request.' }
+        opts = { notice: 'Merge request was successfully updated.' }
       end
 
       redirect_to [@merge_request.target_project, @merge_request], opts
-      return
-    end
-
-    if Projects::MergeRequests::UpdateContext.new(current_user, @project, @merge_request, params).execute
-      redirect_to [@merge_request.target_project, @merge_request], notice: 'Merge request was successfully updated.'
     else
-      render "edit"
+      if params[:merge_request].has_key?(:state_event)
+        opts = { alert: "Failed to #{params[:merge_request][:state_event]} merge request." }
+        redirect_to [@merge_request.target_project, @merge_request], opts
+      else
+        render "edit"
+      end
     end
   end
 
@@ -118,7 +125,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
     if @merge_request.opened? && @merge_request.can_be_merged?
       @merge_request.should_remove_source_branch = params[:should_remove_source_branch]
-      @merge_request.automerge!(current_user)
+      @merge_request.automerge!(current_user, params[:merge_commit_message])
       @status = true
     else
       @status = false

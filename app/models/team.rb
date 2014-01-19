@@ -114,6 +114,7 @@ class Team < ActiveRecord::Base
 
   def add_users(user_ids, access)
     user_ids.compact.each do |user_id|
+      user_id = user_id.id if user_id.is_a? User
       team_user_relationships.create(user_id: user_id, team_access: access)
     end
   end
@@ -121,6 +122,7 @@ class Team < ActiveRecord::Base
   def remove_user(user)
     team_user_relationships.where(user_id: user).destroy_all
   end
+
   def access_for entity
     begin
       case entity

@@ -43,7 +43,7 @@ class TeamsController < ApplicationController
   end
 
   def destroy
-    ::Teams::RemoveContext.new(current_user, team).execute
+    ::TeamsService.new(current_user, team).delete
 
     redirect_to dashboard_path
   end
@@ -53,7 +53,7 @@ class TeamsController < ApplicationController
   end
 
   def create
-    @team = ::Teams::CreateContext.new(current_user, params[:team]).execute
+    @team = ::TeamsService.new(current_user, params[:team]).create
     if @team.persisted?
       redirect_to team_path(@team)
     else

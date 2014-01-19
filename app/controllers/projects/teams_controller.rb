@@ -12,13 +12,13 @@ class Projects::TeamsController < Projects::ApplicationController
   end
 
   def create
-    ::Projects::Teams::CreateRelationContext.new(@current_user, project, params).execute
+    ::ProjectsService.new(@current_user, project, params).assign_team
 
     redirect_to project_teams_path(@project)
   end
 
   def destroy
-    ::Projects::Teams::RemoveRelationContext.new(@current_user, project, team).execute
+    ::ProjectsService.new(@current_user, project).resign_team(team)
 
     redirect_to project_teams_path(@project)
   end

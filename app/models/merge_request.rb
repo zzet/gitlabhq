@@ -232,8 +232,8 @@ class MergeRequest < ActiveRecord::Base
     self.merge
   end
 
-  def automerge!(current_user)
-    if Gitlab::Satellite::MergeAction.new(current_user, self).merge! && self.unmerged_commits.empty?
+  def automerge!(current_user, commit_message = nil)
+    if Gitlab::Satellite::MergeAction.new(current_user, self).merge!(commit_message) && self.unmerged_commits.empty?
       self.merge!(current_user.id)
       true
     end
@@ -335,6 +335,15 @@ class MergeRequest < ActiveRecord::Base
     Event.where(target_id: self.id, target_type: 'MergeRequest').
         order('id DESC').limit(100).
         update_all(updated_at: Time.now)
+  end
+
+  def merge_commit_message
+    message = "Merge branch '#{source_branch}' into '#{target_branch}'"
+    message << "\n\n"
+    message << title.to_s
+    message << "\n\n"
+    message << description.to_s
+    message
   end
 
   private

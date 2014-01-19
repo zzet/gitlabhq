@@ -22,7 +22,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def block
-    if Users::BlockContext.new(@current_user, user).execute
+    if UsersService.new(@current_user, user).block
       redirect_to :back, alert: "Successfully blocked"
     else
       redirect_to :back, alert: "Error occurred. User was not blocked"
@@ -87,11 +87,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def destroy
-    # 1. Remove groups where user is the only owner
-    user.solo_owned_groups.map(&:destroy)
-
-    # 2. Remove user with all authored content including personal projects
-    user.destroy
+    UsersService.new(current_user, user).delete
 
     respond_to do |format|
       format.html { redirect_to admin_users_path }

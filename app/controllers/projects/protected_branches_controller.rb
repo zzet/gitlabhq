@@ -11,12 +11,14 @@ class Projects::ProtectedBranchesController < Projects::ApplicationController
   end
 
   def create
-    @project.protected_branches.create(params[:protected_branch])
+    branch = params[:protected_branch][:name]
+    ProjectsService.new(current_user, @project).repository.protect_branch(branch)
     redirect_to project_protected_branches_path(@project)
   end
 
   def destroy
-    @project.protected_branches.find(params[:id]).destroy
+    branch = @project.protected_branches.find(params[:id])
+    ProjectsService.new(current_user, @project).repository.unprotect_branch(branch.name)
 
     respond_to do |format|
       format.html { redirect_to project_protected_branches_path }

@@ -7,7 +7,7 @@ class Projects::EditTreeController < Projects::BaseTreeController
   end
 
   def update
-    result = Projects::Files::UpdateContext.new(current_user, @project, params, @ref, @path).execute
+    result = ProjectsService.new(current_user, @project, params).repository.update_file(@ref, @path)
 
     if result[:status] == :success
       flash[:notice] = "Your changes have been successfully committed"
