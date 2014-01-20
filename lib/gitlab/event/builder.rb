@@ -77,6 +77,13 @@ class Gitlab::Event::Builder
           candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                    target_id: source.try(:id), target_type: source.class.name,
                                    author_id: user.id, system_action: action_meta[:action])
+          if candidates.blank? && (action_meta[:details].count == 3)
+            candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
+                                     target_id: source.try(:id), target_type: source.class.name,
+                                     author_id: user.id, system_action: action_meta[:details].second)
+          end
+
+
 
           if candidates.blank? && (source.is_a?(::Project) && action_meta[:action] == :updated)
             candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
@@ -93,7 +100,7 @@ class Gitlab::Event::Builder
             if candidates.blank?
               # TODO
               # Make base_actions method to watchable classes
-              base_actions = [:created, :updated, :deleted, :opened, :closed, :reopened, :merged, :blocked, :activate]
+              base_actions = [:create, :update, :delete, :open, :close, :reopen, :merge, :block, :activate]
 
               candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
                                        target_id: source.try(:id), target_type: source.class.name,

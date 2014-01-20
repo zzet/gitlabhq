@@ -46,6 +46,7 @@ class Group < Namespace
       from :create,   to: :created
       from :update,   to: :updated
       from :destroy,  to: :deleted
+      from :memberships_add, to: :members_added
     end
 
     source :project do

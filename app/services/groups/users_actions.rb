@@ -7,7 +7,17 @@ module Groups::UsersActions
                else
                  params[:user_ids].split(',')
                end
+
+    if user_ids.many?
+      RequestStore.store[:borders] ||= []
+      RequestStore.store[:borders].push("gitlab.memberships_add.project")
+      Gitlab::Event::Action.trigger :memberships_add, group
+    end
+
     group.add_users(user_ids, params[:group_access])
+
+    RequestStore.store[:borders].pop if user_ids.many?
+
     receive_delayed_notifications
   end
 

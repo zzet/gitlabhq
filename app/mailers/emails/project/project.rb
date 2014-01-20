@@ -62,4 +62,20 @@ class Emails::Project::Project < Emails::Project::Base
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@old_owner.path}/#{@project.path}] Project was moved from '#{@old_owner.path}' to '#{@new_owner.path}' namespace [transfered]")
   end
+
+  def members_added_email(notification)
+    @notification = notification
+    @event        = @notification.event
+    @user         = @event.author
+    @project      = @event.source
+    @events       = Event.where(parent_event_id: @event.id, target_type: User)
+    @new_members  = @project.users_projects.where(user_id: @events.pluck(:target_id))
+
+    headers 'X-Gitlab-Entity' => 'project',
+            'X-Gitlab-Action' => 'members_added',
+            'X-Gitlab-Source' => 'project',
+            'In-Reply-To'     => "project-#{@project.path_with_namespace}-members"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] #{@events.count} were added to project team")
+  end
 end

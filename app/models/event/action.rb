@@ -39,7 +39,10 @@ class Event::Action
         :merged,
         :assigned,
         :reassigned,
-        :resigned
+        :resigned,
+
+        # mass actions
+        :members_added
       ]
     end
 

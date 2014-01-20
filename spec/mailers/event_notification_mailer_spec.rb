@@ -927,7 +927,7 @@ describe EventNotificationMailer do
 
         context "when add users to project" do
           before do
-            params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
+            params = { user_ids: [@user_1_to_project.id], project_access: Gitlab::Access::DEVELOPER }
             collect_mails_data do
               @rel = ProjectsService.new(@another_user, project, params).add_membership
             end
@@ -944,6 +944,29 @@ describe EventNotificationMailer do
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
             @email.in_reply_to.should == "project-#{project.path_with_namespace}-user-#{@user_1_to_project.username}"
+            @email.body.should_not be_empty
+          end
+        end
+
+        context "when add many users to project" do
+          before do
+            params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
+            collect_mails_data do
+              @rel = ProjectsService.new(@another_user, project, params).add_membership
+            end
+          end
+
+          it "only one message" do
+            @mails_count.should == 1
+          end
+
+          it "correct email" do
+            @email.from.first.should == @another_user.email
+            @email.to.should be_nil
+            @email.cc.should be_nil
+            @email.bcc.count.should == 1
+            @email.bcc.first.should == @user.email
+            @email.in_reply_to.should == "project-#{project.path_with_namespace}-members"
             @email.body.should_not be_empty
           end
         end
@@ -975,6 +998,21 @@ describe EventNotificationMailer do
               @email.bcc.first.should == @user.email
               @email.in_reply_to.should == "project-#{project.path_with_namespace}-user-#{@user_1_to_project.username}"
               @email.body.should_not be_empty
+            end
+          end
+
+          context "when update user access to project for every user, which was added scoupe" do
+            before do
+              collect_mails_data do
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::MASTER } }).update_membership(@user_1_to_project)
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::MASTER } }).update_membership(@user_2_to_project)
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::DEVELOPER } }).update_membership(@user_1_to_project)
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::DEVELOPER } }).update_membership(@user_2_to_project)
+              end
+            end
+
+            it "only one message" do
+              @mails_count.should == 4
             end
           end
 
@@ -1375,7 +1413,7 @@ describe EventNotificationMailer do
 
           context "when add users to group" do
             before do
-              params = { user_ids: [@user_1_to_group.id, @user_2_to_group.id], group_access: Gitlab::Access::DEVELOPER }
+              params = { user_ids: [@user_1_to_group.id], group_access: Gitlab::Access::DEVELOPER }
               collect_mails_data do
                 GroupsService.new(@another_user, @group, params).add_membership
               end
@@ -1392,6 +1430,29 @@ describe EventNotificationMailer do
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
               @email.in_reply_to.should == "group-#{@group.path}-user-#{@user_1_to_group.username}"
+              @email.body.should_not be_empty
+            end
+          end
+
+          context "when add users to group" do
+            before do
+              params = { user_ids: [@user_1_to_group.id, @user_2_to_group.id], group_access: Gitlab::Access::DEVELOPER }
+              collect_mails_data do
+                GroupsService.new(@another_user, @group, params).add_membership
+              end
+            end
+
+            it "only one message" do
+              @mails_count.should == 1
+            end
+
+            it "correct email" do
+              @email.from.first.should == @another_user.email
+              @email.to.should be_nil
+              @email.cc.should be_nil
+              @email.bcc.count.should == 1
+              @email.bcc.first.should == @user.email
+              @email.in_reply_to.should == "group-#{@group.path}-members"
               @email.body.should_not be_empty
             end
           end

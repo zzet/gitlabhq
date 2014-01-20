@@ -2,9 +2,20 @@ module Projects::UsersActions
   private
 
   def add_membership_action
+
+
     user_ids = params[:user_ids].respond_to?(:each) ? params[:user_ids] : params[:user_ids].split(',')
+
+    if user_ids.many?
+      RequestStore.store[:borders] ||= []
+      RequestStore.store[:borders].push("gitlab.memberships_add.project")
+      Gitlab::Event::Action.trigger :memberships_add, @project
+    end
+
     users = User.where(id: user_ids)
     @project.team << [users, params[:project_access]]
+
+    RequestStore.store[:borders].pop if user_ids.many?
 
     receive_delayed_notifications
   end

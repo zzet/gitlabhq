@@ -126,6 +126,7 @@ class Project < ActiveRecord::Base
       from :update,   to: :updated,   conditions: -> { [:name, :path, :description, :creator_id, :default_branch, :issues_enabled, :wall_enabled, :merge_requests_enabled, :public, :issues_tracker, :issues_tracker_id].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
       from :import,   to: :imported
       from :destroy,  to: :deleted
+      from :memberships_add, to: :members_added
     end
 
     source :push do
