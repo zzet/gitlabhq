@@ -135,6 +135,8 @@ GEM
     email_spec (1.5.0)
       launchy (~> 2.1)
       mail (~> 2.2)
+    email_validator (1.4.0)
+      activemodel
     enumerize (0.7.0)
       activesupport (>= 3.2)
     equalizer (0.0.8)
@@ -281,7 +283,7 @@ GEM
     json (1.8.1)
     jwt (0.1.8)
       multi_json (>= 1.5)
-    kaminari (0.14.1)
+    kaminari (0.15.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
     kgio (2.8.1)
@@ -616,6 +618,7 @@ DEPENDENCIES
   devise-async (= 0.8.0)
   diffy
   email_spec
+  email_validator (~> 1.4.0)
   enumerize
   factory_girl_rails
   ffaker
@@ -647,7 +650,7 @@ DEPENDENCIES
   jquery-turbolinks
   jquery-ui-rails (= 2.0.2)
   js-routes
-  kaminari (~> 0.14.1)
+  kaminari (~> 0.15.1)
   launchy
   letter_opener
   mail_view (~> 1.0.3)

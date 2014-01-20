@@ -55,7 +55,7 @@ class Note < ActiveRecord::Base
 
   # Scopes
   scope :for_commit_id, ->(commit_id) { where(noteable_type: "Commit", commit_id: commit_id) }
-  scope :inline, ->{ where("line_code IS NOT NULL") }
+  scope :inline, ->{ where.not(line_code: nil) }
   scope :not_inline, ->{ where(line_code: [nil, '']) }
 
   scope :common, ->{ where(noteable_type: ["", nil]) }

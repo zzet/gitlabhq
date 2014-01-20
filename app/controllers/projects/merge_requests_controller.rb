@@ -20,9 +20,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     params[:sort] ||= 'newest'
     params[:scope] = 'all' if params[:scope].blank?
     params[:state] = 'opened' if params[:state].blank?
-    params[:project_id] = @project.id
 
-    @merge_requests = FilteringService.new.execute(current_user, MergeRequest, params)
+    @merge_requests = FilteringService.new.execute(current_user, MergeRequest, params.merge(project_id: @project.id))
     @merge_requests = @merge_requests.page(params[:page]).per(20)
 
     @sort = params[:sort].humanize

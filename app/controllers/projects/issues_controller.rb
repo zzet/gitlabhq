@@ -118,8 +118,7 @@ class Projects::IssuesController < Projects::ApplicationController
   def issues_filtered
     params[:scope] = 'all' if params[:scope].blank?
     params[:state] = 'opened' if params[:state].blank?
-    params[:project_id] = @project.id
-    @issues = FilteringService.new.execute(current_user, Issue, params)
+    @issues = FilteringService.new.execute(current_user, Issue, params.merge(project_id: @project.id))
   end
 
   # Since iids are implemented only in 6.1

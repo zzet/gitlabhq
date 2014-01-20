@@ -52,6 +52,9 @@ gem "grape", "~> 0.6.1"
 gem "grape-entity", "~> 0.3.0"
 gem 'rack-cors', require: 'rack/cors'
 
+# Email validation
+gem "email_validator", "~> 1.4.0", :require => 'email_validator/strict'
+
 # Format dates and times
 # based on human-friendly examples
 gem "stamp"
@@ -63,7 +66,7 @@ gem 'enumerize'
 gem 'closure_tree'
 
 # Pagination
-gem "kaminari", "~> 0.14.1"
+gem "kaminari", "~> 0.15.1"
 
 # HAML
 gem "haml-rails"
