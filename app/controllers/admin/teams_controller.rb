@@ -53,11 +53,9 @@ class Admin::TeamsController < Admin::ApplicationController
   end
 
   def create
-    @team = Team.new(params[:team])
-    @team.path = @team.name.dup.parameterize if @team.name
-    @team.owner = current_user
+    @team = TeamsService.new(current_user, params[:team]).create
 
-    if @team.save
+    if @team.persisted?
       redirect_to admin_team_path(@team), notice: 'Team of users was successfully created.'
     else
       render action: "new"
@@ -72,7 +70,7 @@ class Admin::TeamsController < Admin::ApplicationController
       team.owner = User.find(owner_id)
     end
 
-    if team.update_attributes(team_params)
+    if team.update(team_params)
       redirect_to admin_team_path(team), notice: 'Team of users was successfully updated.'
     else
       render action: "edit"
@@ -80,7 +78,7 @@ class Admin::TeamsController < Admin::ApplicationController
   end
 
   def destroy
-    ::Teams::RemoveContext.new(current_user, team).execute
+    ::TeamsService.new(current_user, team).delete
 
     redirect_to admin_teams_path, notice: 'Team of users was successfully deleted.'
   end

@@ -15,7 +15,7 @@ class Admin::ServicesController < Admin::ApplicationController
   end
 
   def create
-    @service = ::Services::CreateContext.new(@current_user, params[:service]).execute(:admin)
+    @service = ::ServicesService.new(@current_user, params[:service]).create_service_pattern(:admin)
     if @service.persisted?
       redirect_to admin_services_path
     else
@@ -28,7 +28,7 @@ class Admin::ServicesController < Admin::ApplicationController
   end
 
   def update
-    @service = ::Services::UpdateContext.new(@current_user, service, params[:service]).execute(:admin)
+    @service = ::ServicesService.new(@current_user, service, params[:service]).update_service_pattern(:admin)
     if @service.errors.blank?
       redirect_to admin_service_path(@service.id)
     else
@@ -37,7 +37,7 @@ class Admin::ServicesController < Admin::ApplicationController
   end
 
   def destroy
-    if ::Services::RemoveContext.new(@current_user, service).execute(:admin)
+    if ::ServicesService.new(@current_user, service).remove_service_pattern(:admin)
       redirect_to admin_services_path
     else
       render :edit

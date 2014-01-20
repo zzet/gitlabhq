@@ -6,24 +6,24 @@ class Groups::TeamsController < Groups::ApplicationController
     @teams = group.teams
     @team_group_relation = group.team_group_relationships.build
     @avaliable_teams = current_user.authorized_teams
-    @avaliable_teams = @avaliable_teams.where("id not in (?)", @teams.pluck(:id)) if @teams.any?
+    @avaliable_teams = @avaliable_teams.where.not(id: @teams.pluck(:id)) if @teams.any?
     render :index, layout: 'group_settings'
   end
 
   def create
-    ::Groups::Teams::CreateRelationContext.new(@current_user, group, params).execute
+    ::GroupsService.new(@current_user, group, params).assign_team
 
     redirect_to group_teams_path(@group)
   end
 
   def destroy
-    ::Groups::Teams::RemoveRelationContext.new(@current_user, group, team).execute
+    ::GroupsService.new(@current_user, group).resign_team(team)
 
     redirect_to group_teams_path(@group)
   end
   protected
 
   def team
-    @team ||= (params[:id].present? ? Team.find_by_path(params[:id]) : Team.find(params[:team_id]))
+    @team ||= (params[:id].present? ? Team.find_by(path: params[:id]) : Team.find(params[:team_id]))
   end
 end

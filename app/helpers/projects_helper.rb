@@ -41,24 +41,26 @@ module ProjectsHelper
 
   def link_to_submodule(item)
     submodule_url = item.submodule_url
-    ssh_match     = submodule_url.match(/\A(\w*)@([\w\.]*):([\w\/-]*)\.git\z/)
+    if item.submodule_url
+      ssh_match     = submodule_url.match(/\A(\w*)@([\w\.]*):([\w\/-]*)\.git\z/)
 
-    url = if ssh_match
-            if ssh_match[2] == Gitlab.config.gitlab.host
-              "#{Gitlab.config.gitlab.url}/#{ssh_match[3]}/tree/#{item.id}"
+      url = if ssh_match
+              if ssh_match[2] == Gitlab.config.gitlab.host
+                "#{Gitlab.config.gitlab.url}/#{ssh_match[3]}/tree/#{item.id}"
+              else
+                "http://#{ssh_match[2]}/#{ssh_match[3]}"
+              end
             else
-              "http://#{ssh_match[2]}/#{ssh_match[3]}"
+              uri = URI.parse(submodule_url)
+              if uri.host == Gitlab.config.gitlab.host
+                "#{Gitlab.config.gitlab.url}/#{uri.path.gsub(".git", "")}/tree/#{item.id}"
+              else
+                "http://#{uri.host}/#{uri.path.gsub(".git", "")}"
+              end
             end
-          else
-            uri = URI.parse(submodule_url)
-            if uri.host == Gitlab.config.gitlab.host
-              "#{Gitlab.config.gitlab.url}/#{uri.path.gsub(".git", "")}/tree/#{item.id}"
-            else
-              "http://#{uri.host}/#{uri.path.gsub(".git", "")}"
-            end
-          end
 
-    link_to truncate(item.name, length: 40), url
+      link_to truncate(item.name, length: 40), url
+    end
   end
 
   def project_title project
@@ -104,7 +106,7 @@ module ProjectsHelper
   end
 
   def project_active_milestones
-    @project.milestones.active.order("due_date, title ASC").all
+    @project.milestones.active.order("due_date, title ASC")
   end
 
   def project_issues_trackers(current_tracker = nil)
@@ -163,8 +165,8 @@ module ProjectsHelper
     end
   end
 
-  def repository_size
-    "#{@project.repository.size} MB"
+  def repository_size(project = nil)
+    "#{(project || @project).repository.size} MB"
   rescue
     # In order to prevent 500 error
     # when application cannot allocate memory
@@ -179,7 +181,7 @@ module ProjectsHelper
               "#{@project.path}\/#{@path} at #{@ref} - " + title
             elsif current_controller?(:issues)
               if current_action?(:show)
-                "Issue ##{@issue.iid} - " + title
+                "Issue ##{@issue.iid} - #{@issue.title} - " + title
               else
                 "Issues - " + title
               end
@@ -204,5 +206,22 @@ module ProjectsHelper
             end
 
     title
+  end
+
+  def default_url_to_repo(project = nil)
+    project = project || @project
+    current_user ? project.url_to_repo : project.http_url_to_repo
+  end
+
+  def default_clone_protocol
+    current_user ? "ssh" : "http"
+  end
+
+  def project_last_activity(project)
+    if project.last_activity_at
+      time_ago_with_tooltip(project.last_activity_at, 'bottom', 'last_activity_time_ago')
+    else
+      "Never"
+    end
   end
 end

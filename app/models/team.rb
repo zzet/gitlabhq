@@ -27,13 +27,27 @@ class Team < ActiveRecord::Base
   has_many :projects,         through: :team_project_relationships
   has_many :groups,           through: :team_group_relationships
   has_many :accessed_projects,through: :groups, source: :projects
-  has_many :members,          through: :team_user_relationships, source: :user, conditions: { users: { state: :active } }
+  has_many :members,          -> { where({ users: { state: :active } })}, through: :team_user_relationships, source: :user
 
-  has_many :guests,           through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: Team::GUEST } }
-  has_many :reporters,        through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: Team::REPORTER } }
-  has_many :developers,       through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: Team::DEVELOPER } }
-  has_many :masters,          through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: [Team::MASTER, Team::OWNER] } }
-  has_many :owners,           through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: Team::OWNER } }
+  has_many :guests,           -> { where({ users: { state: :active },
+                                           team_user_relationships: { team_access: Team::GUEST } })},
+                              through: :team_user_relationships, source: :user
+
+  has_many :reporters,        -> { where({ users: { state: :active },
+                                           team_user_relationships: { team_access: Team::REPORTER } })},
+                              through: :team_user_relationships, source: :user
+
+  has_many :developers,       -> { where({ users: { state: :active },
+                                           team_user_relationships: { team_access: Team::DEVELOPER } })},
+                              through: :team_user_relationships, source: :user
+
+  has_many :masters,          -> { where({ users: { state: :active },
+                                           team_user_relationships: { team_access: [Team::MASTER, Team::OWNER] } })},
+                              through: :team_user_relationships, source: :user
+
+  has_many :owners,           -> { where({ users: { state: :active },
+                                           team_user_relationships: { team_access: Team::OWNER } })},
+                              through: :team_user_relationships, source: :user
 
   validates :creator, presence: true
   validates :name,    presence: true, uniqueness: true,
@@ -100,6 +114,7 @@ class Team < ActiveRecord::Base
 
   def add_users(user_ids, access)
     user_ids.compact.each do |user_id|
+      user_id = user_id.id if user_id.is_a? User
       team_user_relationships.create(user_id: user_id, team_access: access)
     end
   end
@@ -107,6 +122,7 @@ class Team < ActiveRecord::Base
   def remove_user(user)
     team_user_relationships.where(user_id: user).destroy_all
   end
+
   def access_for entity
     begin
       case entity

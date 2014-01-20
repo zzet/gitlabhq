@@ -4,52 +4,51 @@
   You can manage projects, users and other GitLab data from here.
 %hr
 .admin_dash.row
-  .span3
+  .col-sm-3
     .light-well
       %h4 Projects
       .data
         = link_to admin_projects_path do
           %h1= @projects_count
         %hr
-        = link_to 'New Project', new_project_path, class: "btn btn-small"
-  .span3
+        = link_to 'New Project', new_project_path, class: "btn btn-new"
+  .col-sm-3
     .light-well
       %h4 Users
       .data
         = link_to admin_users_path do
           %h1= @users_count
         %hr
-        = link_to 'New User', new_admin_user_path, class: "btn btn-small"
-  .span3
+        = link_to 'New User', new_admin_user_path, class: "btn btn-new"
+  .col-sm-3
     .light-well
       %h4 Groups
       .data
         = link_to admin_groups_path do
           %h1= @groups_count
         %hr
-        = link_to 'New Group', new_admin_group_path, class: "btn btn-small"
-  .span3
+        = link_to 'New Group', new_admin_group_path, class: "btn btn-new"
+  .col-sm-3
     .light-well
       %h4 Teams
       .data
         = link_to admin_teams_path do
           %h1= @teams_count
         %hr
-        = link_to 'New Team', new_team_path, class: "btn btn-small"
+        = link_to 'New Team', new_team_path, class: "btn btn-new"
 
 
 .row.prepend-top-10
-  .span4
+  .col-md-4
     %h4 Latest projects
     %hr
     - @projects.each do |project|
       %p
         = link_to project.name_with_namespace, [:admin, project]
         %span.light.pull-right
-          = time_ago_in_words project.created_at
-          ago
+          #{time_ago_with_tooltip(project.created_at)}
 
-  .span4
+  .col-md-4
     %h4 Latest users
     %hr
     - @users.each do |user|
@@ -57,10 +56,9 @@
         = link_to [:admin, user] do
           = user.name
         %span.light.pull-right
-          = time_ago_in_words user.created_at
-          ago
+          #{time_ago_with_tooltip(user.created_at)}
 
-  .span4
+  .col-md-4
     %h4 Latest groups
     %hr
     - @groups.each do |group|
@@ -68,12 +66,11 @@
         = link_to [:admin, group] do
           = group.name
         %span.light.pull-right
-          = time_ago_in_words group.created_at
-          ago
+          #{time_ago_with_tooltip(group.created_at)}
 
 %br
 .row
-  .span4
+  .col-md-4
     %h4 Stats
     %hr
     %p
@@ -108,7 +105,7 @@
       File tokens (public links)
       %span.light.pull-right
         = @file_tokens_count
-  .span4
+  .col-md-4
     %h4
       Features
     %hr
@@ -128,7 +125,7 @@
       OmniAuth
       %span.light.pull-right
         = boolean_to_icon Gitlab.config.omniauth.enabled
-  .span4
+  .col-md-4
     %h4 Components
     %hr
     %p
@@ -139,3 +136,16 @@
       GitLab Shell
       %span.pull-right
         = Gitlab::Shell.new.version
+    %p
+      GitLab API
+      %span.pull-right
+        = API::API::version
+    %p
+      Ruby
+      %span.pull-right
+        #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}
+
+    %p
+      Rails
+      %span.pull-right
+        #{Rails::VERSION::STRING}

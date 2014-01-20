@@ -10,18 +10,18 @@ class Groups::MembersController < Groups::ApplicationController
   end
 
   def create
-    ::Groups::Users::CreateRelationContext.new(@current_user, group, params).execute
+    ::GroupsService.new(@current_user, group, params).add_membership
 
     redirect_to group_members_path(@group), notice: 'Users were successfully added.'
   end
 
   def update
-    ::Groups::Users::UpdateRelationContext.new(@current_user, group, member, params[:group_member]).execute
+    ::GroupsService.new(@current_user, group, params[:group_member]).update_membership(member)
     redirect_to group_members_path(group), notice: "Member was successfully updated."
   end
 
   def destroy
-    ::Groups::Users::RemoveRelationContext.new(@current_user, group, member).execute
+    ::GroupsService.new(@current_user, group).remove_membership(member)
 
     respond_to do |format|
       format.html { redirect_to group_members_path(@group), notice: 'User was successfully removed from group.' }

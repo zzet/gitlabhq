@@ -7,8 +7,11 @@ class Projects::DeployKeysController < Projects::ApplicationController
   layout "project_settings"
 
   def index
-    @enabled_keys = @project.deploy_keys.all
-    @available_keys = available_keys - @enabled_keys
+    @enabled_keys = @project.deploy_keys
+    @available_keys = available_keys
+    if @available_keys.any?
+      @available_keys = @available_keys.where.not(@enabled_keys.pluck(:id)) if @enabled_keys.any?
+    end
   end
 
   def show

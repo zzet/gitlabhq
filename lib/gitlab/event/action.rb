@@ -11,7 +11,7 @@ class Gitlab::Event::Action
       if detailed_event.present?
         event << ".#{detailed_event}"
       else
-        if RequestStore.store[:borders].many?
+        if RequestStore.store[:borders] && RequestStore.store[:borders].many?
           event << ".#{RequestStore.store[:borders][RequestStore.store[:borders].count - 2]}"
         end
       end

@@ -54,7 +54,7 @@ describe EventNotificationMailer do
 
     context "when event source - project " do
       context "when create project" do
-        before { collect_mails_data { @project = Projects::CreateContext.new(@another_user, attributes_for(:project)).execute } }
+        before { collect_mails_data { @project = ProjectsService.new(@another_user, attributes_for(:project)).create } }
 
         it "only one message" do
           @mails_count.should == 1
@@ -75,10 +75,10 @@ describe EventNotificationMailer do
       context "when project is present" do
         context "when update project" do
           before do
-            @project_for_update = Projects::CreateContext.new(@another_user, attributes_for(:project)).execute
+            @project_for_update = ProjectsService.new(@another_user, attributes_for(:project)).create
 
             collect_mails_data do
-              Projects::UpdateContext.new(@another_user, @project_for_update, { project: attributes_for(:project) }).execute
+              ProjectsService.new(@another_user, @project_for_update, { project: attributes_for(:project) }).update
             end
 
             @old_path_with_namespace = @project_for_update.path_with_namespace
@@ -102,12 +102,13 @@ describe EventNotificationMailer do
 
         context "when transfer project from user to group" do
           before do
-            @project_for_transfer = Projects::CreateContext.new(@another_user, attributes_for(:project)).execute
+            @project_for_transfer = ProjectsService.new(@another_user, attributes_for(:project)).create
             @old_path_with_namespace = @project_for_transfer.path_with_namespace
             @group = create :group, owner: @another_user
+            params = { project: { namespace_id: @group.id }}
 
             collect_mails_data do
-              ::Projects::TransferContext.new(@another_user, @project_for_transfer, @group).execute
+              ProjectsService.new(@another_user, @project_for_transfer, params).transfer
             end
           end
 
@@ -132,11 +133,12 @@ describe EventNotificationMailer do
             @new_group = create :group, owner: @another_user
 
             params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @old_group.id) }
-            @project_in_group = Projects::CreateContext.new(@another_user, params[:project]).execute
+            @project_in_group = ProjectsService.new(@another_user, params[:project]).create
             @old_path_with_namespace = @project_in_group.path_with_namespace
+            params = { project: { namespace_id: @new_group.id }}
 
             collect_mails_data do
-              ::Projects::TransferContext.new(@another_user, @project_in_group, @new_group).execute
+              ProjectsService.new(@another_user, @project_in_group, params).transfer
             end
           end
 
@@ -160,11 +162,12 @@ describe EventNotificationMailer do
             @old_group = create :group, owner: @another_user
 
             params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @old_group.id) }
-            @project_in_group = Projects::CreateContext.new(@another_user, params[:project]).execute
+            @project_in_group = ProjectsService.new(@another_user, params[:project]).create
             @old_path_with_namespace = @project_in_group.path_with_namespace
+            params = { project: { namespace_id: @another_user.namespace.id }}
 
             collect_mails_data do
-              ::Projects::TransferContext.new(@another_user, @project_in_group, @another_user.namespace).execute
+              ProjectsService.new(@another_user, @project_in_group, params).transfer
             end
           end
 
@@ -189,11 +192,11 @@ describe EventNotificationMailer do
 
         context "when destroy project" do
           before do
-            @project_for_destroy = Projects::CreateContext.new(@another_user, attributes_for(:project)).execute
+            @project_for_destroy = ProjectsService.new(@another_user, attributes_for(:project)).create
             @old_path_with_namespace = @project_for_destroy.path_with_namespace
             collect_mails_data do
               clean_destroy do
-                ::Projects::RemoveContext.new(@another_user, @project_for_destroy).execute
+                ProjectsService.new(@another_user, @project_for_destroy).delete
               end
             end
           end
@@ -222,7 +225,7 @@ describe EventNotificationMailer do
         context "when create issue" do
           before do
             collect_mails_data do
-              @issue = Projects::Issues::CreateContext.new(@another_user, project, attributes_for(:issue)).execute
+              @issue = ProjectsService.new(@another_user, project, attributes_for(:issue)).issue.create
             end
           end
 
@@ -250,7 +253,7 @@ describe EventNotificationMailer do
             before do
               params = { state_event: :close }
               collect_mails_data do
-                Projects::Issues::UpdateContext.new(@another_user, project, @issue, params).execute
+                ProjectsService.new(@another_user, project, params).issue(@issue).update
               end
             end
 
@@ -275,7 +278,7 @@ describe EventNotificationMailer do
 
               params = { state_event: :reopen }
               collect_mails_data do
-                Projects::Issues::UpdateContext.new(@another_user, project, @issue, params).execute
+                ProjectsService.new(@another_user, project, params).issue(@issue).update
               end
             end
 
@@ -347,7 +350,7 @@ describe EventNotificationMailer do
         context "when create note on wall" do
           before do
             collect_mails_data do
-              @note = Projects::Notes::CreateContext.new(@another_user, project, { note: attributes_for(:note) }).execute
+              @note = ProjectsService.new(@another_user, project, { note: attributes_for(:note) }).notes.create
             end
           end
 
@@ -367,7 +370,7 @@ describe EventNotificationMailer do
 
         context "when update note" do
           before do
-            @note = Projects::Notes::CreateContext.new(@another_user, project, { note: attributes_for(:note) }).execute
+            @note = ProjectsService.new(@another_user, project, { note: attributes_for(:note) }).notes.create
 
             collect_mails_data do
               @note.update_attributes(note: "#{@note.note}_updated")
@@ -382,7 +385,7 @@ describe EventNotificationMailer do
             project.team << [@commiter_user, 40]
 
             collect_mails_data do
-              @note = Projects::Notes::CreateContext.new(@another_user, project, note: attributes_for(:note_on_commit)).execute
+              @note = ProjectsService.new(@another_user, project, note: attributes_for(:note_on_commit)).notes.create
             end
           end
 
@@ -405,7 +408,7 @@ describe EventNotificationMailer do
             @mails.last.cc.should be_nil
             @mails.last.bcc.count.should == 1
             @mails.last.bcc.first.should == @commiter_user.email
-            @mails.first.in_reply_to.should == "project-#{project.path_with_namespace}-commit-bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
+            @mails.last.in_reply_to.should == "project-#{project.path_with_namespace}-commit-bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
           end
         end
 
@@ -415,7 +418,7 @@ describe EventNotificationMailer do
             params = { note: attributes_for(:note_on_commit_diff) }
 
             collect_mails_data do
-              Projects::Notes::CreateContext.new(@another_user, project, params).execute
+              ProjectsService.new(@another_user, project, params).notes.create
             end
           end
 
@@ -444,14 +447,14 @@ describe EventNotificationMailer do
 
         context "in project MR" do
           before do
-            @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
+            @merge_request = ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
           end
 
           context "when create note on MR wall" do
             before do
               params = { note: attributes_for(:note_on_merge_request, noteable: @merge_request) }
               collect_mails_data do
-                Projects::Notes::CreateContext.new(@another_user, project, params).execute
+                ProjectsService.new(@another_user, project, params).notes.create
               end
             end
 
@@ -474,7 +477,7 @@ describe EventNotificationMailer do
             before do
               params = { note: attributes_for(:note_on_merge_request_diff, noteable: @merge_request) }
               collect_mails_data do
-                Projects::Notes::CreateContext.new(@another_user, project, params).execute
+                ProjectsService.new(@another_user, project, params).notes.create
               end
             end
 
@@ -503,7 +506,7 @@ describe EventNotificationMailer do
         context "when create MR" do
           before do
             collect_mails_data do
-              @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
+              @merge_request = ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
             end
           end
 
@@ -525,7 +528,7 @@ describe EventNotificationMailer do
         context "when create assigned MR" do
           before do
             collect_mails_data do
-              @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project, assignee: @user)).execute
+              @merge_request = ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project, assignee: @user)).merge_request.create
             end
           end
 
@@ -546,7 +549,7 @@ describe EventNotificationMailer do
 
         context "when MR is present in project" do
           before do
-            @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
+            @merge_request = ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
           end
 
           context "when update MR" do
@@ -568,7 +571,7 @@ describe EventNotificationMailer do
               }
 
               collect_mails_data do
-                ::Projects::MergeRequests::UpdateContext.new(@user, project, @merge_request, params).execute
+                ProjectsService.new(@user, project, params).merge_request(@merge_request).update
               end
             end
 
@@ -595,7 +598,7 @@ describe EventNotificationMailer do
                 }
               }
 
-              ::Projects::MergeRequests::UpdateContext.new(@user, project, @merge_request, params).execute
+              ProjectsService.new(@user, project, params).merge_request(@merge_request).update
 
               params = {
                 merge_request: {
@@ -604,7 +607,7 @@ describe EventNotificationMailer do
               }
 
               collect_mails_data do
-                ::Projects::MergeRequests::UpdateContext.new(@user, project, @merge_request, params).execute
+                ProjectsService.new(@user, project, params).merge_request(@merge_request).update
               end
             end
 
@@ -625,11 +628,11 @@ describe EventNotificationMailer do
 
           context "when merge MR" do
             before do
-              @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
+              @merge_request = ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
               params = { merge_request: { state_event: :merge } }
 
               collect_mails_data do
-                Projects::MergeRequests::UpdateContext.new(@another_user, project, @merge_request, params).execute
+                ProjectsService.new(@another_user, project, params).merge_request(@merge_request).update
               end
             end
 
@@ -650,11 +653,11 @@ describe EventNotificationMailer do
 
           context "when close MR" do
             before do
-              @merge_request = Projects::MergeRequests::CreateContext.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).execute
+              @merge_request = ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
               params = { merge_request: { state_event: :close } }
 
               collect_mails_data do
-                Projects::MergeRequests::UpdateContext.new(@another_user, project, @merge_request, params).execute
+                ProjectsService.new(@another_user, project, params).merge_request(@merge_request).update
               end
             end
 
@@ -679,7 +682,7 @@ describe EventNotificationMailer do
               params = { merge_request: { state_event: :reopen } }
 
               collect_mails_data do
-                Projects::MergeRequests::UpdateContext.new(@another_user, project, @merge_request, params).execute
+                ProjectsService.new(@another_user, project, params).merge_request(@merge_request).update
               end
             end
 
@@ -772,7 +775,7 @@ describe EventNotificationMailer do
           context "when remove project_hook" do
             before do
               collect_mails_data do
-                Projects::ProjectHooks::RemoveContext.new(@another_user, project, @project_hook).execute
+                ProjectsService.new(@another_user, project).delete_hook(@project_hook)
               end
             end
 
@@ -797,7 +800,7 @@ describe EventNotificationMailer do
         context "when protect branch" do
           before do
             collect_mails_data do
-              @pb = project.protected_branches.create(name: "master")
+              ProjectsService.new(@another_user, project).repository.protect_branch("master")
             end
           end
 
@@ -811,7 +814,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should == "project-#{project.path_with_namespace}-branch-#{@pb.name}"
+            @email.in_reply_to.should == "project-#{project.path_with_namespace}-branch-master"
             @email.body.should_not be_empty
           end
         end
@@ -821,7 +824,7 @@ describe EventNotificationMailer do
             @pb = project.protected_branches.create(name: "master")
 
             collect_mails_data do
-              Projects::ProtectedBranchs::RemoveContext.new(@another_user, project, @pb).execute
+              ProjectsService.new(@another_user, project).repository.unprotect_branch(@pb.name)
             end
           end
 
@@ -872,7 +875,7 @@ describe EventNotificationMailer do
         context "when assign team on project" do
           before do
             collect_mails_data do
-              @rel = Projects::Teams::CreateRelationContext.new(@another_user, project, { team_ids: [@team.id] }).execute
+              @rel = ProjectsService.new(@another_user, project, { team_ids: [@team.id] }).assign_team
             end
           end
 
@@ -893,10 +896,10 @@ describe EventNotificationMailer do
 
         context "when remove team from project" do
           before do
-            @rel = Projects::Teams::CreateRelationContext.new(@another_user, project, { team_ids: [@team.id] }).execute
+            @rel = ProjectsService.new(@another_user, project, { team_ids: [@team.id] }).assign_team
 
             collect_mails_data do
-              Projects::Teams::RemoveRelationContext.new(@another_user, project, @team).execute
+              ProjectsService.new(@another_user, project).resign_team(@team)
             end
           end
 
@@ -924,9 +927,9 @@ describe EventNotificationMailer do
 
         context "when add users to project" do
           before do
-            params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
+            params = { user_ids: [@user_1_to_project.id], project_access: Gitlab::Access::DEVELOPER }
             collect_mails_data do
-              @rel = Projects::Users::CreateRelationContext.new(@another_user, project, params).execute
+              @rel = ProjectsService.new(@another_user, project, params).add_membership
             end
           end
 
@@ -945,18 +948,41 @@ describe EventNotificationMailer do
           end
         end
 
+        context "when add many users to project" do
+          before do
+            params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
+            collect_mails_data do
+              @rel = ProjectsService.new(@another_user, project, params).add_membership
+            end
+          end
+
+          it "only one message" do
+            @mails_count.should == 1
+          end
+
+          it "correct email" do
+            @email.from.first.should == @another_user.email
+            @email.to.should be_nil
+            @email.cc.should be_nil
+            @email.bcc.count.should == 1
+            @email.bcc.first.should == @user.email
+            @email.in_reply_to.should == "project-#{project.path_with_namespace}-members"
+            @email.body.should_not be_empty
+          end
+        end
+
         context "when user in project" do
           before do
             params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
             collect_mails_data do
-              Projects::Users::CreateRelationContext.new(@another_user, project, params).execute
+              ProjectsService.new(@another_user, project, params).add_membership
             end
           end
 
           context "when update user access to project" do
             before do
               collect_mails_data do
-                Projects::Users::UpdateRelationContext.new(@another_user, project, @user_1_to_project, { team_member: { project_access: Gitlab::Access::MASTER } }).execute
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::MASTER } }).update_membership(@user_1_to_project)
               end
             end
 
@@ -975,10 +1001,25 @@ describe EventNotificationMailer do
             end
           end
 
+          context "when update user access to project for every user, which was added scoupe" do
+            before do
+              collect_mails_data do
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::MASTER } }).update_membership(@user_1_to_project)
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::MASTER } }).update_membership(@user_2_to_project)
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::DEVELOPER } }).update_membership(@user_1_to_project)
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::DEVELOPER } }).update_membership(@user_2_to_project)
+              end
+            end
+
+            it "only one message" do
+              @mails_count.should == 4
+            end
+          end
+
           context "when remove user from project" do
             before do
               collect_mails_data do
-                Projects::Users::RemoveRelationContext.new(@another_user, project, @user_2_to_project).execute
+                ProjectsService.new(@another_user, project).remove_membership(@user_2_to_project)
               end
             end
 
@@ -1185,7 +1226,7 @@ describe EventNotificationMailer do
             before do
               collect_mails_data do
                 clean_destroy do
-                  Groups::RemoveContext.new(@another_user, @group).execute
+                  GroupsService.new(@another_user, @group).delete
                 end
               end
             end
@@ -1217,7 +1258,7 @@ describe EventNotificationMailer do
             before do
               params = { project: attributes_for(:project, namespace_id: @group.id) }
               collect_mails_data do
-                @project = ::Projects::CreateContext.new(@another_user, params[:project]).execute
+                @project = ProjectsService.new(@another_user, params[:project]).create
               end
             end
 
@@ -1238,10 +1279,11 @@ describe EventNotificationMailer do
 
           context "when project moved to group" do
             before do
-              @project = Projects::CreateContext.new(@another_user, attributes_for(:project, namespace_id: nil)).execute
+              @project = ProjectsService.new(@another_user, attributes_for(:project, namespace_id: nil)).create
               @another_group = create :group, owner: @another_user
+              params = { project: { namespace_id: @another_group.id }}
               collect_mails_data do
-                Projects::TransferContext.new(@another_user, @project, @another_group).execute
+                ProjectsService.new(@another_user, @project, params).transfer
               end
             end
 
@@ -1264,8 +1306,9 @@ describe EventNotificationMailer do
             before do
               @another_group = create :group, owner: @another_user
               @project = create :project, namespace_id: @group.id
+              params = { project: { namespace_id: @another_group.id }}
               collect_mails_data do
-                Projects::TransferContext.new(@another_user, @project, @another_group).execute
+                ProjectsService.new(@another_user, @project, params).transfer
               end
             end
 
@@ -1289,7 +1332,7 @@ describe EventNotificationMailer do
             before do
               @project = create :project, namespace_id: @group.id
               collect_mails_data do
-                Projects::RemoveContext.new(@another_user, @project).execute
+                ProjectsService.new(@another_user, @project).delete
               end
             end
 
@@ -1318,7 +1361,7 @@ describe EventNotificationMailer do
             before do
               params = { team_ids: [@team.id] }
               collect_mails_data do
-                Groups::Teams::CreateRelationContext.new(@another_user, @group, params).execute
+                GroupsService.new(@another_user, @group, params).assign_team
               end
             end
 
@@ -1340,9 +1383,9 @@ describe EventNotificationMailer do
           context "when team removed from group" do
             before do
               params = { team_ids: [@team.id] }
-              Groups::Teams::CreateRelationContext.new(@another_user, @group, params).execute
+              GroupsService.new(@another_user, @group, params).assign_team
               collect_mails_data do
-                Groups::Teams::RemoveRelationContext.new(@another_user, @group, @team).execute
+                GroupsService.new(@another_user, @group).resign_team(@team)
               end
             end
 
@@ -1370,9 +1413,9 @@ describe EventNotificationMailer do
 
           context "when add users to group" do
             before do
-              params = { user_ids: [@user_1_to_group.id, @user_2_to_group.id], group_access: Gitlab::Access::DEVELOPER }
+              params = { user_ids: [@user_1_to_group.id], group_access: Gitlab::Access::DEVELOPER }
               collect_mails_data do
-                Groups::Users::CreateRelationContext.new(@another_user, @group, params).execute
+                GroupsService.new(@another_user, @group, params).add_membership
               end
             end
 
@@ -1391,16 +1434,39 @@ describe EventNotificationMailer do
             end
           end
 
+          context "when add users to group" do
+            before do
+              params = { user_ids: [@user_1_to_group.id, @user_2_to_group.id], group_access: Gitlab::Access::DEVELOPER }
+              collect_mails_data do
+                GroupsService.new(@another_user, @group, params).add_membership
+              end
+            end
+
+            it "only one message" do
+              @mails_count.should == 1
+            end
+
+            it "correct email" do
+              @email.from.first.should == @another_user.email
+              @email.to.should be_nil
+              @email.cc.should be_nil
+              @email.bcc.count.should == 1
+              @email.bcc.first.should == @user.email
+              @email.in_reply_to.should == "group-#{@group.path}-members"
+              @email.body.should_not be_empty
+            end
+          end
+
           context "when user in group" do
             before do
               params = { user_ids: [@user_1_to_group.id, @user_2_to_group.id], group_access: Gitlab::Access::DEVELOPER }
-              Groups::Users::CreateRelationContext.new(@another_user, @group, params).execute
+              GroupsService.new(@another_user, @group, params).add_membership
             end
 
             context "when update user access to group" do
               before do
                 collect_mails_data do
-                  Groups::Users::UpdateRelationContext.new(@another_user, @group, @user_1_to_group, {group_access: Gitlab::Access::MASTER }).execute
+                  GroupsService.new(@another_user, @group, {group_access: Gitlab::Access::MASTER }).update_membership(@user_1_to_group)
                 end
               end
 
@@ -1422,7 +1488,7 @@ describe EventNotificationMailer do
             context "when remove user from group" do
               before do
                 collect_mails_data do
-                  Groups::Users::RemoveRelationContext.new(@another_user, @group, @user_2_to_group).execute
+                  GroupsService.new(@another_user, @group).remove_membership(@user_2_to_group)
                 end
               end
 
@@ -1457,11 +1523,11 @@ describe EventNotificationMailer do
       context "when update project" do
         before do
           params = attributes_for(:project, namespace_id: @group.id)
-          @project = Projects::CreateContext.new(@another_user, params).execute
+          @project = ProjectsService.new(@another_user, params).create
           params = { project: attributes_for(:project) }
 
           collect_mails_data do
-            Projects::UpdateContext.new(@another_user, @project, params).execute
+            ProjectsService.new(@another_user, @project, params).update
           end
         end
 
@@ -1485,12 +1551,12 @@ describe EventNotificationMailer do
           SubscriptionService.subscribe(@user, :all, :project, :all)
 
           params = attributes_for(:project, namespace_id: @group.id)
-          @project = Projects::CreateContext.new(@another_user, params).execute
+          @project = ProjectsService.new(@another_user, params).create
 
           params = { project: attributes_for(:project) }
 
           collect_mails_data do
-            Projects::UpdateContext.new(@another_user, @project, params).execute
+            ProjectsService.new(@another_user, @project, params).update
           end
         end
 
@@ -1572,7 +1638,7 @@ describe EventNotificationMailer do
           before do
             collect_mails_data do
               clean_destroy do
-                Teams::RemoveContext.new(@another_user, @team).execute
+                TeamsService.new(@another_user, @team).delete
               end
             end
           end
@@ -1605,7 +1671,7 @@ describe EventNotificationMailer do
             @user_to_team = create :user
             params = { user_ids: [@user_to_team.id], team_access: Gitlab::Access::DEVELOPER }
             collect_mails_data do
-              Teams::Users::CreateRelationContext.new(@another_user, @team, params).execute
+              TeamsService.new(@another_user, @team, params).add_memberships
             end
           end
 
@@ -1628,14 +1694,14 @@ describe EventNotificationMailer do
           before do
             @user_in_team = create :user
             params = { user_ids: [@user_in_team.id], team_access: Gitlab::Access::DEVELOPER }
-            Teams::Users::CreateRelationContext.new(@another_user, @team, params).execute
+            TeamsService.new(@another_user, @team, params).add_memberships
           end
 
           context "we update access in team" do
             before do
               params = { team_access: Gitlab::Access::MASTER }
               collect_mails_data do
-                Teams::Users::UpdateRelationContext.new(@another_user, @team, @user_in_team, params).execute
+                TeamsService.new(@another_user, @team, params).update_memberships(@user_in_team)
               end
             end
 
@@ -1657,7 +1723,7 @@ describe EventNotificationMailer do
           context "we remove user from team" do
             before do
               collect_mails_data do
-                Teams::Users::RemoveRelationContext.new(@another_user, @team, @user_in_team).execute
+                TeamsService.new(@another_user, @team).delete_membership(@user_in_team)
               end
             end
 
@@ -1685,7 +1751,7 @@ describe EventNotificationMailer do
             params = { project_ids: [@project_to_team.id] }
 
             collect_mails_data do
-              Teams::Projects::CreateRelationContext.new(@another_user, @team, params).execute
+              TeamsService.new(@another_user, @team, params).assign_on_projects
             end
           end
 
@@ -1708,10 +1774,10 @@ describe EventNotificationMailer do
           before do
             @project_in_team = create :project, creator: @another_user
             params = { project_ids: [@project_in_team.id] }
-            Teams::Projects::CreateRelationContext.new(@another_user, @team, params).execute
+            TeamsService.new(@another_user, @team, params).assign_on_projects
 
             collect_mails_data do
-              Teams::Projects::RemoveRelationContext.new(@another_user, @team, @project_in_team).execute
+              TeamsService.new(@another_user, @team).resign_from_projects(@project_in_team)
             end
           end
 
@@ -1743,14 +1809,14 @@ describe EventNotificationMailer do
             user2 = create :user
 
             params = { user_ids: "#{user1.id}", team_access: Gitlab::Access::MASTER }
-            Teams::Users::CreateRelationContext.new(@another_user, @team, params)
+            TeamsService.new(@another_user, @team, params).add_memberships
 
             params = { user_ids: "#{user2.id}", team_access: Gitlab::Access::DEVELOPER }
-            Teams::Users::CreateRelationContext.new(@another_user, @team, params)
+            TeamsService.new(@another_user, @team, params).add_memberships
 
             params = { group_ids: [group.id] }
             collect_mails_data do
-              Teams::Groups::CreateRelationContext.new(@another_user, @team, params).execute
+              TeamsService.new(@another_user, @team, params).assign_on_groups
             end
           end
 
@@ -1779,15 +1845,15 @@ describe EventNotificationMailer do
 
             user1 = create :user
             params = { user_ids: "#{user1.id}", team_access: Gitlab::Access::MASTER }
-            Teams::Users::CreateRelationContext.new(@another_user, @team, params)
+            TeamsService.new(@another_user, @team, params).add_memberships
 
             user2 = create :user
             params = { user_ids: "#{user2.id}", team_access: Gitlab::Access::DEVELOPER }
-            Teams::Users::CreateRelationContext.new(@another_user, @team, params)
+            TeamsService.new(@another_user, @team, params).add_memberships
 
             params = { group_ids: "#{group.id}" }
             collect_mails_data do
-              Teams::Groups::CreateRelationContext.new(@another_user, @team, params).execute
+              TeamsService.new(@another_user, @team, params).assign_on_groups
             end
           end
 
@@ -1809,10 +1875,10 @@ describe EventNotificationMailer do
         context "resign team from group" do
           before do
             params = { group_ids: "#{group.id}" }
-            Teams::Groups::CreateRelationContext.new(@another_user, @team, params).execute
+            TeamsService.new(@another_user, @team, params).assign_on_groups
 
             collect_mails_data do
-              Teams::Groups::RemoveRelationContext.new(@another_user, @team, group).execute
+              TeamsService.new(@another_user, @team).resign_from_groups(group)
             end
           end
 
@@ -1918,7 +1984,7 @@ describe EventNotificationMailer do
           before do
             collect_mails_data do
               clean_destroy do
-                Users::RemoveContext.new(@another_user, @watched_user).execute
+                UsersService.new(@another_user, @watched_user).delete
               end
             end
           end
@@ -1942,7 +2008,7 @@ describe EventNotificationMailer do
           context "when user wasn't in group or project or team" do
             before do
               collect_mails_data do
-                Users::BlockContext.new(@another_user, @watched_user).execute
+                UsersService.new(@another_user, @watched_user).block
               end
             end
 
@@ -1969,11 +2035,11 @@ describe EventNotificationMailer do
               @group = create :group, owner: @another_user
               @group.add_users([@watched_user.id], Gitlab::Access::MASTER)
 
-              @project = Projects::CreateContext.new(@another_user, attributes_for(:project, namespace_id: @group)).execute
+              @project = ProjectsService.new(@another_user, attributes_for(:project, namespace_id: @group)).create
               @project.team << [@watched_user, Gitlab::Access::MASTER]
 
               collect_mails_data do
-                Users::BlockContext.new(@another_user, @watched_user).execute
+                UsersService.new(@another_user, @watched_user).block
               end
             end
 
@@ -2005,7 +2071,7 @@ describe EventNotificationMailer do
           before do
             params = { user_ids: [@watched_user.id], project_access: Gitlab::Access::DEVELOPER }
             collect_mails_data do
-              @rel = Projects::Users::CreateRelationContext.new(@another_user, project, params).execute
+              @rel = ProjectsService.new(@another_user, project, params).add_membership
             end
           end
 
@@ -2028,14 +2094,14 @@ describe EventNotificationMailer do
           before do
             params = { user_ids: [@watched_user.id], project_access: Gitlab::Access::DEVELOPER }
             collect_mails_data do
-              Projects::Users::CreateRelationContext.new(@another_user, project, params).execute
+              ProjectsService.new(@another_user, project, params).add_membership
             end
           end
 
           context "when update user access to project" do
             before do
               collect_mails_data do
-                Projects::Users::UpdateRelationContext.new(@another_user, project, @watched_user, { team_member: { project_access: Gitlab::Access::MASTER } }).execute
+                ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::MASTER } }).update_membership(@watched_user)
               end
             end
 
@@ -2057,7 +2123,7 @@ describe EventNotificationMailer do
           context "when remove user from project" do
             before do
               collect_mails_data do
-                Projects::Users::RemoveRelationContext.new(@another_user, project, @watched_user).execute
+                ProjectsService.new(@another_user, project).remove_membership(@watched_user)
               end
             end
 
@@ -2088,7 +2154,7 @@ describe EventNotificationMailer do
           before do
             params = { user_ids: [@watched_user.id], group_access: Gitlab::Access::DEVELOPER }
             collect_mails_data do
-              Groups::Users::CreateRelationContext.new(@another_user, @group, params).execute
+              GroupsService.new(@another_user, @group, params).add_membership
             end
           end
 
@@ -2110,13 +2176,13 @@ describe EventNotificationMailer do
         context "when user in group" do
           before do
             params = { user_ids: [@watched_user.id], group_access: Gitlab::Access::DEVELOPER }
-            Groups::Users::CreateRelationContext.new(@another_user, @group, params).execute
+            GroupsService.new(@another_user, @group, params).add_membership
           end
 
           context "when update user access to group" do
             before do
               collect_mails_data do
-                Groups::Users::UpdateRelationContext.new(@another_user, @group, @watched_user, {group_access: Gitlab::Access::MASTER }).execute
+                GroupsService.new(@another_user, @group, {group_access: Gitlab::Access::MASTER }).update_membership(@watched_user)
               end
             end
 
@@ -2138,7 +2204,7 @@ describe EventNotificationMailer do
           context "when remove user from group" do
             before do
               collect_mails_data do
-                Groups::Users::RemoveRelationContext.new(@another_user, @group, @watched_user).execute
+                GroupsService.new(@another_user, @group).remove_membership(@watched_user)
               end
             end
 
@@ -2168,7 +2234,7 @@ describe EventNotificationMailer do
           before do
             params = { user_ids: [@watched_user.id], team_access: Gitlab::Access::DEVELOPER }
             collect_mails_data do
-              Teams::Users::CreateRelationContext.new(@another_user, @team, params).execute
+              TeamsService.new(@another_user, @team, params).add_memberships
             end
           end
 
@@ -2191,14 +2257,14 @@ describe EventNotificationMailer do
           before do
             @user_in_team = create :user
             params = { user_ids: [@watched_user.id], team_access: Gitlab::Access::DEVELOPER }
-            Teams::Users::CreateRelationContext.new(@another_user, @team, params).execute
+            TeamsService.new(@another_user, @team, params).add_memberships
           end
 
           context "we update access in team" do
             before do
               params = { team_access: Gitlab::Access::MASTER }
               collect_mails_data do
-                Teams::Users::UpdateRelationContext.new(@another_user, @team, @watched_user, params).execute
+                TeamsService.new(@another_user, @team, params).update_memberships(@watched_user)
               end
             end
 
@@ -2220,7 +2286,7 @@ describe EventNotificationMailer do
           context "we remove user from team" do
             before do
               collect_mails_data do
-                Teams::Users::RemoveRelationContext.new(@another_user, @team, @watched_user).execute
+                TeamsService.new(@another_user, @team).delete_membership(@watched_user)
               end
             end
 

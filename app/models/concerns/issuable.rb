@@ -26,9 +26,9 @@ module Issuable
 
     scope :authored, ->(user) { where(author_id: user) }
     scope :assigned_to, ->(u) { where(assignee_id: u.id)}
-    scope :recent, -> { order("created_at DESC") }
-    scope :assigned, -> { where("assignee_id IS NOT NULL") }
-    scope :unassigned, -> { where("assignee_id IS NULL") }
+    scope :recent, -> { order(created_at: :desc) }
+    scope :assigned, -> { where.not(assignee_id: nil) }
+    scope :unassigned, -> { where.not(assignee_id: nil) }
     scope :of_projects, ->(ids) { where(project_id: ids) }
 
     delegate :name,
@@ -50,6 +50,20 @@ module Issuable
   module ClassMethods
     def search(query)
       where("title like :query", query: "%#{query}%")
+    end
+
+    def sort(method)
+      case method.to_s
+      when 'newest' then reorder(created_at: :desc)
+      when 'oldest' then reorder(created_at: :asc)
+      when 'recently_updated' then reorder(updated_at: :desc)
+      when 'last_updated' then reorder(updated_at: :asc)
+      when 'milestone_due_soon' then joins(:milestone).reorder("milestones.due_date ASC")
+      when 'milestone_due_later' then joins(:milestone).reorder("milestones.due_date DESC")
+      #when 'milestone_due_soon' then joins(:milestone).reorder(milestones: { due_date: :asc })
+      #when 'milestone_due_later' then joins(:milestone).reorder(milestones: { due_date: :desc })
+      else reorder(created_at: :desc)
+      end
     end
   end
 
@@ -116,5 +130,12 @@ module Issuable
       mentions << note.mentioned_users
     end
     users.concat(mentions.reduce([], :|)).uniq
+  end
+
+  def to_hook_data
+    {
+      object_kind: self.class.name.underscore,
+      object_attributes: self.attributes
+    }
   end
 end

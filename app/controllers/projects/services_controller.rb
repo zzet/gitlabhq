@@ -22,9 +22,9 @@ class Projects::ServicesController < Projects::ApplicationController
 
   def update
     @service = if service.pattern.present?
-                 Projects::Services::UpdateContext.new(current_user, @project, service, params[:service]).execute
+                 ProjectsService.new(current_user, @project, params[:service]).update_service(service)
                else
-                 Projects::Services::ImportContext.new(current_user, @project, service, params[:service]).execute
+                 ProjectsService.new(current_user, @project, params[:service]).import_service_pattern(service)
                end
 
     if @service.valid?

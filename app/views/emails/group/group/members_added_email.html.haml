@@ -1,0 +1,23 @@
+= raw "#{ link_to @user.name, user_url(@user.username) } added members to #{ link_to @group.name, group_url(@group.path) } group team:"
+%br
+%table
+  %caption Added members
+  %tr
+    %th Name
+    %td Group access
+  - @new_members.each do |pm|
+    %tr
+      %td= link_to pm.user.name, user_url(pm.user.username)
+      %td= pm.human_access
+%br
+
+%table
+  %caption group team members now
+  %tr
+    %th Name
+    %td Group access
+  - @group.users_groups.each do |pm|
+    %tr
+      %td= link_to pm.user.name, user_url(pm.user.username)
+      %td= pm.human_access
+%br

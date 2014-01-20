@@ -48,13 +48,6 @@ class Gitlab::Event::Hierarchy::Storage
     if lvl.any?
       lvl_meta = Gitlab::Event::Action.parse(lvl.first[:name])
       arg_meta = Gitlab::Event::Action.parse(arg[:name])
-
-      #p "." * 100
-      #p arg_meta
-      #p lvl_meta
-      #p RequestStore.store[:borders]
-      #p "," * 100
-
       return lvl_meta == arg_meta ? true : ((lvl_meta[:details] == arg_meta[:details]) && (!lvl_meta[:details].blank?))
     end
   end
@@ -62,7 +55,11 @@ class Gitlab::Event::Hierarchy::Storage
   def parent(action, data)
     return nil if events.blank?
 
-    parent_event = events.first[:name] == action ? events.first : find_event(events.last, action, data)
+    parent_event = if events.first[:name] == events.last[:name]
+                     events.last[:name].include?(action) ? events.last : find_event(events.last, action, data)
+                   else
+                     events.first[:name].include?(action) ? events.first : find_event(events.last, action, data)
+                   end
     parent_event
   end
 
@@ -70,7 +67,7 @@ class Gitlab::Event::Hierarchy::Storage
     parent_event = nil
 
     if event[:childrens].any?
-      parent_event = event[:childrens].last[:name] == action ? event : find_event(event[:childrens].last, action, data)
+      parent_event = event[:childrens].last[:name].include?(action) ? event : find_event(event[:childrens].last, action, data)
     end
 
     parent_event

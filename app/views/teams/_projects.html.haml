@@ -1,6 +1,6 @@
 .ui-box
   .title.clearfix
-    = search_field_tag :filter_projects, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter'
+    = search_field_tag :filter_projects, nil, placeholder: 'Filter by name', class: 'form-control js-sidebar-filter'
     - if current_user.can_create_project?
       %span.pull-right
         = link_to team_projects_path(@team), class: "btn btn-new" do
@@ -13,7 +13,7 @@
       %li.project-row
         = link_to project_path(project), class: dom_class(project) do
           %small.access-icon
-            = privacy_icon(project)
+            = visibility_level_icon(project.visibility_level)
           %span.namespace-name
             - if project.namespace
               = project.namespace.human_name

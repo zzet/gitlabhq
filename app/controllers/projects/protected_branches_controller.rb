@@ -6,17 +6,19 @@ class Projects::ProtectedBranchesController < Projects::ApplicationController
   before_filter :authorize_admin_project!, only: [:destroy, :create]
 
   def index
-    @branches = @project.protected_branches.all
+    @branches = @project.protected_branches.to_a
     @protected_branch = @project.protected_branches.new
   end
 
   def create
-    @project.protected_branches.create(params[:protected_branch])
+    branch = params[:protected_branch][:name]
+    ProjectsService.new(current_user, @project).repository.protect_branch(branch)
     redirect_to project_protected_branches_path(@project)
   end
 
   def destroy
-    @project.protected_branches.find(params[:id]).destroy
+    branch = @project.protected_branches.find(params[:id])
+    ProjectsService.new(current_user, @project).repository.unprotect_branch(branch.name)
 
     respond_to do |format|
       format.html { redirect_to project_protected_branches_path }

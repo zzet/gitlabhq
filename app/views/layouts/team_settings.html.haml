@@ -2,15 +2,17 @@
 %html{ lang: "en"}
   = render "layouts/head", title: "#{@team.name}"
   %body{class: "#{app_theme} application", :'data-page' => body_data_page}
+    = render "layouts/broadcast"
     = render "layouts/head_panel", title: "team: #{@team.name}"
     = render "layouts/flash"
+
     %nav.main-nav
       .container= render 'layouts/nav/team'
 
     .container
       .content
         .row
-          .span2
+          .col-md-2
             = render "teams/settings_nav"
-          .span10
+          .col-md-10
             = yield

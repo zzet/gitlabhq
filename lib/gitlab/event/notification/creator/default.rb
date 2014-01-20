@@ -2,7 +2,7 @@ class Gitlab::Event::Notification::Creator::Default
   def create(event)
     notifications = []
 
-    subscriptions = ::Event::Subscription.scoped
+    subscriptions = ::Event::Subscription.all
 
     subscriptions = if event.target.present?
                       subscriptions.by_target(event.target)

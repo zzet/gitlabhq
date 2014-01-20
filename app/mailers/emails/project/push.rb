@@ -10,7 +10,7 @@ class Emails::Project::Push < Emails::Project::Base
     @branch       = @push_data["ref"]
     @branch.slice!("refs/heads/")
 
-    diff_data = load_diff_data(@project.repository.commit(@project.default_branch).id, @push_data['after'], @branch, @project, @user)
+    diff_data = load_diff_data(@project.repository.commit(@project.default_branch).id, @push_data['revafter'], @branch, @project, @user)
 
     @before_commit = diff_data[:before_commit]
     @after_commit  = diff_data[:after_commit]
@@ -102,7 +102,7 @@ class Emails::Project::Push < Emails::Project::Base
     @branch = @push_data["ref"]
     @branch.slice!("refs/heads/")
 
-    diff_data = load_diff_data(@push_data['before'], @push_data['after'], @branch, @project, @user)
+    diff_data = load_diff_data(@push_data['revbefore'], @push_data['revafter'], @branch, @project, @user)
 
     @before_commit = diff_data[:before_commit]
     @after_commit  = diff_data[:after_commit]

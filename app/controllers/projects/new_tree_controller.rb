@@ -6,10 +6,10 @@ class Projects::NewTreeController < Projects::BaseTreeController
 
   def update
     file_path = File.join(@path, File.basename(params[:file_name]))
-    result = Projects::Files::CreateContext.new(current_user, @project, params, @ref, file_path).execute
+    result = ProjectsService.new(current_user, @project, params).repository.create_file(@ref, file_path)
 
     if result[:status] == :success
-      flash[:notice] = "Your changes have been successfully commited"
+      flash[:notice] = "Your changes have been successfully committed"
       redirect_to project_blob_path(@project, File.join(@ref, file_path))
     else
       flash[:alert] = result[:error]

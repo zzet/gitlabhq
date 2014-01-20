@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: events
+# Table name: old_events
 #
 #  id          :integer          not null, primary key
 #  target_type :string(255)
@@ -18,7 +18,7 @@ class OldEvent < ActiveRecord::Base
   attr_accessible :project, :action, :data, :author_id, :project_id,
                   :target_id, :target_type
 
-  default_scope where("author_id IS NOT NULL")
+  default_scope { where.not(author_id: nil) }
 
   CREATED   = 1
   UPDATED   = 2
@@ -30,11 +30,11 @@ class OldEvent < ActiveRecord::Base
   JOINED    = 8 # User joined project
   LEFT      = 9 # User left project
 
-  delegate :name, :email, to: :author,        prefix: true, allow_nil: true
-  delegate :title,        to: :issue,         prefix: true, allow_nil: true
-  delegate :title,        to: :merge_request, prefix: true, allow_nil: true
+  delegate :name, :email, to: :author, prefix: true, allow_nil: true
+  delegate :title, to: :issue, prefix: true, allow_nil: true
+  delegate :title, to: :merge_request, prefix: true, allow_nil: true
 
-  belongs_to :author, class_name: User
+  belongs_to :author, class_name: "User"
   belongs_to :project
   belongs_to :target, polymorphic: true
 
@@ -70,7 +70,7 @@ class OldEvent < ActiveRecord::Base
         data: {
           ref: "#{prefix}/#{ref.name}",
           before: before,
-            after: after
+          after: after
         },
         author_id: user.id
       )

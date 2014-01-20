@@ -3,7 +3,7 @@ class Push < ActiveRecord::Base
 
   DEFAULT_COMMITS_COUNT = 20
 
-  attr_accessible :after,   :before,
+  attr_accessible :revafter,:revbefore,
                   :ref,     :data,
                   :commits, :commits_count,
                   :project, :project_id,
@@ -14,8 +14,8 @@ class Push < ActiveRecord::Base
 
   validate :project,  presence: true
   validate :user,     presence: true
-  validate :before,   presence: true
-  validate :after,    presence: true
+  validate :revbefore,presence: true
+  validate :revafter, presence: true
   validate :ref,      presence: true
 
   watch do
@@ -24,19 +24,19 @@ class Push < ActiveRecord::Base
     end
   end
 
-  store :data
+  serialize :data #, ActiveRecord::Serializers::MessagePackSerializer
 
-  def refs_action?;         after =~ /^00000/ || before =~ /^00000/; end
+  def refs_action?;         revafter =~ /^00000/ || revbefore =~ /^00000/; end
 
   def branch?;              ref =~ /^refs\/heads/; end
-  def to_existing_branch?;  branch? && before != "0000000000000000000000000000000000000000"; end
+  def to_existing_branch?;  branch? && revbefore != "0000000000000000000000000000000000000000"; end
   def to_default_branch?;   branch? && branch_name == project.default_branch; end
-  def created_branch?;      branch? && before =~ /^00000/; end
-  def deleted_branch?;      branch? && after  =~ /^00000/; end
+  def created_branch?;      branch? && revbefore =~ /^00000/; end
+  def deleted_branch?;      branch? && revafter  =~ /^00000/; end
 
   def tag?;                 ref =~ /^refs\/tag/; end
-  def created_tag?;         tag?    && before =~ /^00000/; end
-  def deleted_tag?;         tag?    && after  =~ /^00000/; end
+  def created_tag?;         tag?    && revbefore =~ /^00000/; end
+  def deleted_tag?;         tag?    && revafter  =~ /^00000/; end
 
   def ref_name
     if tag?
@@ -55,15 +55,17 @@ class Push < ActiveRecord::Base
   end
 
   def data(limit = DEFAULT_COMMITS_COUNT)
-    @data ||= begin
-                limit = all_commits_count unless limit.is_a?(Fixnum)
-                load_push_data(limit)
-              end
+    @data = begin
+              limit = all_commits_count unless limit.is_a?(Fixnum)
+              #write_attribute(:data, load_push_data(limit))
+              load_push_data(limit)
+            end if @data.blank?
+    @data
   end
 
   def commits(limit = DEFAULT_COMMITS_COUNT)
     limit = all_commits_count unless limit.is_a?(Fixnum)
-    @commits ||= project.repository.commits_between(before, after).last(limit).reverse
+    @commits ||= project.repository.commits_between(revbefore, revafter).last(limit).reverse
   end
 
   def commits_count(limit = DEFAULT_COMMITS_COUNT)
@@ -72,7 +74,7 @@ class Push < ActiveRecord::Base
   end
 
   def all_commits_count
-    project.repository.commits_between(before, after).count
+    project.repository.commits_between(revbefore, revafter).count
   end
 
   def fill_push_data
@@ -110,8 +112,8 @@ class Push < ActiveRecord::Base
 
       # Hash to be passed as post_receive_data
       data = {
-        before: before,
-        after: after,
+        before: revbefore,
+        after: revafter,
         ref: ref,
         user_id: user.id,
         user_name: user.name,

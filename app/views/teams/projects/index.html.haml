@@ -1,18 +1,13 @@
 %h3.page-title
   Team projects
 %p.light
-  members of team have access to all team projects.
+  Members of team have access to all team projects.
 %hr
 - can_manage_team =  current_user.can? :manage_team, @team
-.ui-box.span5.no_margin
-  .title
-    %strong #{@team.name}
-    team projects
-    %small
-      (#{@projects.count})
+.col-md-6.no_margin
   %ul.well-list
     - @projects.each do |project|
       = render 'project', project: project, show_controls: can_manage_team
 - if can_manage_team
-  .span5.pull-right
+  .col-md-6.pull-right
     = render "new_project"
