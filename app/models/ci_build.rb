@@ -22,6 +22,9 @@ class CiBuild < ActiveRecord::Base
   validates :source_branch,  presence: true
   validates :user,           presence: true
 
+  serialize :data
+  serialize :coverage
+
   state_machine :state, initial: :build do
     event :to_build do
       transition [:build, :fail, :skipped, :aborted, :success, :unstable] => :build

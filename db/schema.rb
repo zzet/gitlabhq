@@ -42,13 +42,13 @@ ActiveRecord::Schema.define(version: 20140116231608) do
     t.text     "trace"
     t.text     "coverage"
     t.text     "data"
-    t.datetime "created_at",                       :null => false
-    t.datetime "updated_at",                       :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.datetime "build_time"
     t.time     "duration"
-    t.integer  "skipped_count",     :default => 0
-    t.integer  "failed_count",      :default => 0
-    t.integer  "total_count",       :default => 0
+    t.integer  "skipped_count",     default: 0
+    t.integer  "failed_count",      default: 0
+    t.integer  "total_count",       default: 0
   end
 
   create_table "deploy_keys_projects", force: true do |t|
