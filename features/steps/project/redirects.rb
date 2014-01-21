@@ -17,7 +17,7 @@ class Spinach::Features::ProjectRedirects < Spinach::FeatureSteps
   end
 
   step 'I should see project "Community" home page' do
-    within '.project-home-title' do
+    within '.project_name' do
       page.should have_content 'Community'
     end
   end

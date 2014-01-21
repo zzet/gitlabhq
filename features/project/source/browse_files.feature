@@ -35,7 +35,7 @@ Feature: Project Browse files
     Given I click on "Gemfile.lock" file in repo
     And I click button "edit"
     And I edit code
-    And I click link "Preview"
-    Then I see preview
+    And I click link "Diff"
+    Then I see diff
 
 

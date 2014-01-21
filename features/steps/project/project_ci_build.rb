@@ -4,6 +4,10 @@ class ProjectCiBuild < Spinach::FeatureSteps
   include SharedProject
   include Spinach::DSL
 
+  Given "Project has Jenkins Ci service" do
+    create(:active_public_enabled_jenkins_service, project: @project)
+  end
+
   Given 'Ci build' do
     last_commit = @project.repository.commits('master', '', 1).last
     create(:ci_build, target_project: @project,

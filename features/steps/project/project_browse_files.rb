@@ -45,11 +45,11 @@ class ProjectBrowseFiles < Spinach::FeatureSteps
     page.execute_script('editor.setValue("GitlabFileEditor")')
   end
 
-  step 'I click link "Preview"' do
-    click_link 'Preview'
+  step 'I click link "Diff"' do
+    click_link 'Diff'
   end
 
-  step 'I see preview' do
+  step 'I see diff' do
     page.should have_css '.line_holder.new'
   end
 

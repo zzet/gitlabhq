@@ -133,12 +133,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  protected
-
-  def check_git_protocol
-    @git_protocol_enabled ||= Gitlab.config.gitlab.git_daemon_enabled
-  end
-
   def archive
     return access_denied! unless can?(current_user, :archive_project, project)
     project.archive!
@@ -155,6 +149,12 @@ class ProjectsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to @project }
     end
+  end
+
+  protected
+
+  def check_git_protocol
+    @git_protocol_enabled ||= Gitlab.config.gitlab.git_daemon_enabled
   end
 
   private
