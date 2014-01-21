@@ -20,7 +20,7 @@ module Repositories::BranchesActions
       newrev = new_branch.commit.id
       ref = "refs/heads/" << new_branch.name
 
-      Projects::PushService.new(current_user, project, oldrev, newrev, ref).execute
+      GitPushService.new(current_user, project, oldrev, newrev, ref).execute
     end
   end
 
@@ -31,7 +31,7 @@ module Repositories::BranchesActions
       newrev = "0000000000000000000000000000000000000000"
       ref = "refs/heads/" << branch.name
 
-      Projects::PushService.new(current_user, project, oldrev, newrev, ref).execute
+      GitPushService.new(current_user, project, oldrev, newrev, ref).execute
 
       receive_delayed_notifications
     end

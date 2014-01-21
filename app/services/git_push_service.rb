@@ -1,5 +1,16 @@
 class GitPushService
-  attr_accessor :project, :user, :push_data, :push_commits
+  attr_accessor :user, :project, :params,
+                :oldrev, :newrev, :ref,
+                :push_data, :push_commits
+
+  def initialize(user, project, oldrev = nil, newrev = nil, ref = nil, params = {})
+    @current_user = user
+    @project = project
+    @oldrev = oldrev
+    @newrev = newrev
+    @ref = ref
+    @params = params.dup
+  end
 
   # This method will be called after each git update
   # and only if the provided user and project is present in GitLab.
@@ -14,10 +25,12 @@ class GitPushService
   #  5. Executes the project's web hooks
   #  6. Executes the project's services
   #
-  def execute(project, user, oldrev, newrev, ref)
-    @project, @user = project, user
+  def execute
+    if oldrev.nil? || newrev.nil? || ref.nil?
+      raise "Incorrect data"
+    end
 
-    RequestStore.store[:current_user] = user
+    RequestStore.store[:current_user] = current_user # unless current_user.present?
 
     push = Push.new(project: project, user: user, revbefore: oldrev, revafter: newrev, ref: ref)
     push.fill_push_data
@@ -61,7 +74,7 @@ class GitPushService
   # generated with post_receive_data method
   # for given project
   #
-  def sample_data(project, user)
+  def sample_data
     @project, @user = project, user
     @push_commits = project.repository.commits(project.default_branch, nil, 3)
     push = Push.new(project: project, user: user, revbefore: @push_commits.last.id, revafter: @push_commits.first.id, ref: "refs/heads/#{project.default_branch}")

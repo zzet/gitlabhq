@@ -9,7 +9,7 @@ module Repositories::TagsActions
       newrev = new_tag.commit.id
       ref = "refs/tags/" << new_tag.name
 
-      Projects::PushService.new(current_user, project, oldrev, newrev, ref).execute
+      GitPushService.new(current_user, project, oldrev, newrev, ref).execute
     end
   end
 
@@ -20,7 +20,7 @@ module Repositories::TagsActions
       newrev = "0000000000000000000000000000000000000000"
       ref = "refs/tags/" << tag.name
 
-      Projects::PushService.new(current_user, project, oldrev, newrev, ref).execute
+      GitPushService.new(current_user, project, oldrev, newrev, ref).execute
 
       receive_delayed_notifications
     end
