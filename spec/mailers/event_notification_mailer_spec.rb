@@ -186,10 +186,6 @@ describe EventNotificationMailer do
           end
         end
 
-        context "when import users from another project" do
-          it { pending "add (or delete) when import users from another project" }
-        end
-
         context "when destroy project" do
           before do
             @project_for_destroy = ProjectsService.new(@another_user, attributes_for(:project)).create
@@ -971,6 +967,37 @@ describe EventNotificationMailer do
           end
         end
 
+        context "when import users from another project" do
+          before do
+            @group = create :group, owner: @another_user
+            params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @group.id) }
+            @first_project = ProjectsService.new(@another_user, params[:project]).create
+            params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @group.id) }
+            @second_project = ProjectsService.new(@another_user, params[:project]).create
+            params = { source_project_id: @first_project.id }
+            params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
+            ProjectsService.new(@another_user, project, params).add_membership
+
+            collect_mails_data do
+              ProjectsService.new(@another_user, @second_project, params).import_memberships
+            end
+          end
+
+          it "only one message" do
+            @mails_count.should == 1
+          end
+
+          it "correct email" do
+            @email.from.first.should == @another_user.email
+            @email.to.should be_nil
+            @email.cc.should be_nil
+            @email.bcc.count.should == 1
+            @email.bcc.first.should == @user.email
+            @email.in_reply_to.should == "project-#{@old_path_with_namespace}"
+            @email.body.should_not be_empty
+          end
+        end
+
         context "when user in project" do
           before do
             params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
@@ -983,6 +1010,28 @@ describe EventNotificationMailer do
             before do
               collect_mails_data do
                 ProjectsService.new(@another_user, project, { team_member: { project_access: Gitlab::Access::MASTER } }).update_membership(@user_1_to_project)
+              end
+            end
+
+            it "only one message" do
+              @mails_count.should == 1
+            end
+
+            it "correct email" do
+              @email.from.first.should == @another_user.email
+              @email.to.should be_nil
+              @email.cc.should be_nil
+              @email.bcc.count.should == 1
+              @email.bcc.first.should == @user.email
+              @email.in_reply_to.should == "project-#{project.path_with_namespace}-user-#{@user_1_to_project.username}"
+              @email.body.should_not be_empty
+            end
+          end
+
+          context "when update user access to project for many users" do
+            before do
+              collect_mails_data do
+                ProjectsService.new(@another_user, project, { ids: [@user_1_to_project.id, @user_2_to_project.id], team_member: { project_access: Gitlab::Access::MASTER } }).batch_update_memberships
               end
             end
 
@@ -1037,12 +1086,33 @@ describe EventNotificationMailer do
               @email.body.should_not be_empty
             end
           end
+
+          context "when remove many users from project" do
+            before do
+              collect_mails_data do
+                ProjectsService.new(@another_user, project, { ids: [@user_1_to_project.id, @user_2_to_project.id]}).batch_remove_memberships
+              end
+            end
+
+            it "only one message" do
+              @mails_count.should == 1
+            end
+
+            it "correct email" do
+              @email.from.first.should == @another_user.email
+              @email.to.should be_nil
+              @email.cc.should be_nil
+              @email.bcc.count.should == 1
+              @email.bcc.first.should == @user.email
+              @email.in_reply_to.should == "project-#{project.path_with_namespace}-user-#{@user_2_to_project.username}"
+              @email.body.should_not be_empty
+            end
+          end
+
         end
       end
 
       context "when event source - push action" do
-        #include FreezingEmail::Rspec
-
         before do
           @service = GitPushService.new
           @oldrev = 'b98a310def241a6fd9c9a9a3e7934c48e498fe81'
@@ -1380,6 +1450,29 @@ describe EventNotificationMailer do
             end
           end
 
+          context "when many teams assigned to group" do
+            before do
+              @second_team = create :team, creator: @another_user
+              params = { team_ids: [@team.id, @second_team.id] }
+              collect_mails_data do
+                GroupsService.new(@another_user, @group, params).assign_team
+              end
+            end
+
+            it "only one message" do
+              @mails_count.should == 1
+            end
+
+            it "correct email" do
+              @email.from.first.should == @another_user.email
+              @email.to.should be_nil
+              @email.cc.should be_nil
+              @email.bcc.count.should == 1
+              @email.bcc.first.should == @user.email
+              @email.in_reply_to.should == "group-#{@group.path}-team-#{@team.path}"
+              @email.body.should_not be_empty
+            end
+          end
           context "when team removed from group" do
             before do
               params = { team_ids: [@team.id] }
@@ -1434,7 +1527,7 @@ describe EventNotificationMailer do
             end
           end
 
-          context "when add users to group" do
+          context "when add many users to group" do
             before do
               params = { user_ids: [@user_1_to_group.id, @user_2_to_group.id], group_access: Gitlab::Access::DEVELOPER }
               collect_mails_data do

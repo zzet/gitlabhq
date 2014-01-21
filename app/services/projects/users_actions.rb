@@ -2,20 +2,12 @@ module Projects::UsersActions
   private
 
   def add_membership_action
-
-
     user_ids = params[:user_ids].respond_to?(:each) ? params[:user_ids] : params[:user_ids].split(',')
 
-    if user_ids.many?
-      RequestStore.store[:borders] ||= []
-      RequestStore.store[:borders].push("gitlab.memberships_add.project")
-      Gitlab::Event::Action.trigger :memberships_add, @project
+    multiple_action("memberships_add", "project", project, user_ids) do
+      users = User.where(id: user_ids)
+      @project.team << [users, params[:project_access]]
     end
-
-    users = User.where(id: user_ids)
-    @project.team << [users, params[:project_access]]
-
-    RequestStore.store[:borders].pop if user_ids.many?
 
     receive_delayed_notifications
   end
@@ -41,14 +33,9 @@ module Projects::UsersActions
   end
 
   def import_memberships_action(giver)
-    RequestStore.store[:borders] ||= []
-    RequestStore.store[:borders].push("gitlab.import.project")
-
-    Gitlab::Event::Action.trigger :import, @project
-
-    status = @project.team.import(giver)
-
-    RequestStore.store[:borders].pop
+    status = multiple_action("import", "project", project) do
+      @project.team.import(giver)
+    end
 
     receive_delayed_notifications
 
@@ -59,14 +46,20 @@ module Projects::UsersActions
     user_project_ids = params[:ids].respond_to?(:each) ? params[:ids] : params[:ids].split(',')
     user_project_relations = UsersProject.where(id: user_project_ids)
 
-    user_project_relations.destroy_all
+    multiple_action("memberships_remove", "project", project, user_project_relations) do
+      user_project_relations.destroy_all
+    end
 
     receive_delayed_notifications
   end
 
   def batch_update_memberships_action
     user_project_ids = params[:ids].respond_to?(:each) ? params[:ids] : params[:ids].split(',')
-    UsersProject.where(id: user_project_ids).update_all(project_access: params[:team_member][:project_access])
+    user_project_relations = UsersProject.where(id: user_project_ids)
+
+    multiple_action("memberships_update", "project", project, user_project_relations) do
+      user_project_relations.update_all(project_access: params[:team_member][:project_access])
+    end
 
     receive_delayed_notifications
   end

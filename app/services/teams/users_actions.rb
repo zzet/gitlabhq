@@ -2,9 +2,9 @@ module Teams::UsersActions
   private
 
   def add_memberships_action(users, access)
-    team.add_users(users, access)
-
-    receive_delayed_notifications
+    multiple_action("memberships_add", "team", team, users) do
+      team.add_users(users, access)
+    end
   end
 
   def remove_membership_action(user)

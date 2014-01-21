@@ -172,7 +172,6 @@ module Projects::BaseActions
     current_user.can?(:manage_namespace, namespace)
   end
 
-
   def transfer_to(new_namespace)
     begin
       old_path = project.path_with_namespace

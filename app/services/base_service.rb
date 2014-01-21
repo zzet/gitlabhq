@@ -23,4 +23,18 @@ class BaseService
       Sidekiq::Client.enqueue_to(:mail_notifications, MailNotificationWorker, notification.id)
     end
   end
+
+  def multiple_action(action_name, action_source, source, items = nil, &block)
+    if tems.nil? || items.many?
+      RequestStore.store[:borders] ||= []
+      RequestStore.store[:borders].push("gitlab.#{action_name}.#{action_source}")
+      Gitlab::Event::Action.trigger :"#{action_name}", source
+    end
+
+    yield
+
+    RequestStore.store[:borders].pop
+
+    receive_delayed_notifications
+  end
 end

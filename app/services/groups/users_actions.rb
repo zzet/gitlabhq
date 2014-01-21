@@ -8,17 +8,9 @@ module Groups::UsersActions
                  params[:user_ids].split(',')
                end
 
-    if user_ids.many?
-      RequestStore.store[:borders] ||= []
-      RequestStore.store[:borders].push("gitlab.memberships_add.project")
-      Gitlab::Event::Action.trigger :memberships_add, group
+    multiple_action("memberships_add", "group", group, user_ids) do
+      group.add_users(user_ids, params[:group_access])
     end
-
-    group.add_users(user_ids, params[:group_access])
-
-    RequestStore.store[:borders].pop if user_ids.many?
-
-    receive_delayed_notifications
   end
 
   def remove_user_membership_action(member)

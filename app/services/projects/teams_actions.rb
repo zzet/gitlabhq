@@ -4,10 +4,10 @@ module Projects::TeamsActions
   def assign_team_action
     unless params[:team_ids].blank?
       team_ids = params[:team_ids].respond_to?(:each) ? params[:team_ids] : params[:team_ids].split(',')
-      team_ids.each do |team_id|
-        team = Team.find(team_id)
-        params[:project_ids] = [project.id]
-        TeamsService.new(current_user, team, params).assign_on_projects
+      multiple_action("teams_add", "project", project, team_ids) do
+        team_ids.each do |team_id|
+          project.team_project_relationships.create(team_id: team_id)
+        end
       end
     end
   end

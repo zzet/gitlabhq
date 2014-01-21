@@ -7,11 +7,11 @@ module Teams::GroupsActions
       groups = groups.where(id: allowed_group_ids)
     end
 
-    groups.each do |group|
-      team.team_group_relationships.create(group_id: group.id)
+    multiple_action("groups_add", "team", team, groups) do
+      groups.each do |group|
+        team.team_group_relationships.create(group_id: group.id)
+      end
     end
-
-    receive_delayed_notifications
   end
 
   def resign_from_groups_action(groups)

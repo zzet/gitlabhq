@@ -7,11 +7,11 @@ module Teams::ProjectsActions
       projects = projects.where(id: allowed_project_ids)
     end
 
-    projects.each do |project|
-      team.team_project_relationships.create(project_id: project.id)
+    multiple_action("projects_add", "team", team, projects) do
+      projects.each do |project|
+        team.team_project_relationships.create(project_id: project.id)
+      end
     end
-
-    receive_delayed_notifications
   end
 
   def resign_from_projects_action(projects)
