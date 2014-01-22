@@ -52,7 +52,7 @@ describe Gitlab::Event::Notification::Factory do
       @user = create :user
       @project = create :project_with_code, { path: 'gitlabhq' }
 
-      @data = GitPushService.new.sample_data(@project, @user).to_json
+      @data = GitPushService.new(@user, @project).sample_data.to_json
 
       @event = create :push_event, { author: @user, data: @data, target: @project }
       @subscription = create :push_subscription, { user: @user, target: @project }
@@ -83,7 +83,7 @@ describe Gitlab::Event::Notification::Factory do
     it "should create notifications for event" do
       @event.author.create_notification_setting(own_changes: true)
 
-      notifications = Gitlab::Event::Notification::Factory.create_notifications(@event)
+      Gitlab::Event::Notification::Factory.create_notifications(@event)
       @event.notifications.should have_at_least(1).items
     end
   end
