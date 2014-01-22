@@ -78,6 +78,20 @@ module API
       end
     end
 
+    class Team < Grape::Entity
+      expose :id, :name, :path, :creator_id
+    end
+
+    class TeamDetail < Team
+      expose :projects, using: Entities::Project
+    end
+
+    class TeamMember < UserBasic
+      expose :team_access, as: :access_level do |user, options|
+        options[:team].team_users_relationships.find_by(user_id: user.id).team_access
+      end
+    end
+
     class RepoObject < Grape::Entity
       expose :name, :commit
       expose :protected do |repo, options|

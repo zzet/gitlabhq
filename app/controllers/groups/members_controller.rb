@@ -5,7 +5,7 @@ class Groups::MembersController < Groups::ApplicationController
   def index
     @members = group.users_groups.order("group_access DESC")
     @member_group_relation = group.users_groups.build
-    @avaliable_members = User.not_in_group(@group)
+    #@avaliable_members = User.not_in_group(@group)
     render :index, layout: 'group_settings'
   end
 

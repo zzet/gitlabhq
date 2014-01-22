@@ -1,4 +1,4 @@
-= form_for @team_group_relation, url: group_teams_path(@group) do |f|
+= form_for @team_group_relation, url: group_teams_path(@group), html: { class: 'form-horizontal users-group-form' } do |f|
   %fieldset
     %legend
       Assign teams on
@@ -6,9 +6,10 @@
       group
 
     %p 1. Choose teams you want assigned to the group
-    .control-group
-      = f.label :team_ids, "Teams"
-      .controls= select_tag :team_ids, options_for_select(@avaliable_teams.map {|t| [t.name, t.id]}), multiple: true, class: 'input-large chosen'
+    .form-group
+      = f.label :team_ids, "Teams", class: 'control-label'
+      .col-sm-10= teams_select_tag(:team_ids, multiple: true, class: 'input-large')
+      -#= select_tag :team_ids, options_for_select(@avaliable_teams.map {|t| [t.name, t.id]}), multiple: true, class: 'input-large chosen'
 
     .form-actions
       = f.submit 'Assign group on selected teams', class: "btn btn-create"

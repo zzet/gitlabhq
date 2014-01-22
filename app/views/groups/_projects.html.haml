@@ -1,6 +1,6 @@
 .ui-box
   .title.clearfix
-    = search_field_tag :filter_project, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter'
+    = search_field_tag :filter_project, nil, placeholder: 'Filter by name', class: 'form-control js-sidebar-filter'
     - if can? current_user, :manage_group, @group
       %span.pull-right
         = link_to new_project_path(namespace_id: @group.id), class: "btn btn-new" do

@@ -3,6 +3,8 @@
   user_path: "/api/:version/users/:id.json"
   groups_path: "/api/:version/groups.json"
   group_path: "/api/:version/groups/:id.json"
+  teams_path: "/api/:version/teams.json"
+  team_path: "/api/:version/teams/:id.json"
   projects_path: "/api/:version/projects.json"
   project_path: "/api/:version/projects/:id.json"
   notes_path: "/api/:version/projects/:id/notes.json"
@@ -53,6 +55,35 @@
       dataType: "json"
     ).done (users) ->
       callback(users)
+
+  # Return teams list. Filtered by query
+  # Only known teams
+  teams: (query, callback) ->
+    url = Api.buildUrl(Api.teams_path)
+
+    $.ajax(
+      url: url
+      data:
+        private_token: gon.api_token
+        search: query
+        per_page: 20
+        active: true
+      dataType: "json"
+    ).done (teams) ->
+      callback(teams)
+
+  team: (team_id, callback) ->
+    url = Api.buildUrl(Api.team_path)
+    url = url.replace(':id', team_id)
+
+    $.ajax(
+      url: url
+      data:
+        private_token: gon.api_token
+      dataType: "json"
+    ).done (team) ->
+      callback(team)
+
 
   # Return groups list. Filtered by query
   # Only known groups
