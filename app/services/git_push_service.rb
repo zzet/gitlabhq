@@ -1,5 +1,5 @@
 class GitPushService
-  attr_accessor :user, :project, :params,
+  attr_accessor :current_user, :project, :params,
                 :oldrev, :newrev, :ref,
                 :push_data, :push_commits
 
@@ -32,7 +32,7 @@ class GitPushService
 
     RequestStore.store[:current_user] = current_user # unless current_user.present?
 
-    push = Push.new(project: project, user: user, revbefore: oldrev, revafter: newrev, ref: ref)
+    push = Push.new(project: project, user: current_user, revbefore: oldrev, revafter: newrev, ref: ref)
     push.fill_push_data
     push.save
 
@@ -47,7 +47,7 @@ class GitPushService
     Rails.cache.delete(project.repository.cache_key(:tag_names)) if push.tag?
 
     if push.to_existing_branch?
-      project.update_merge_requests(oldrev, newrev, ref, @user)
+      project.update_merge_requests(oldrev, newrev, ref, @current_user)
       process_commit_messages(push)
     end
 
@@ -75,9 +75,9 @@ class GitPushService
   # for given project
   #
   def sample_data
-    @project, @user = project, user
+    @project, @user = project, current_user
     @push_commits = project.repository.commits(project.default_branch, nil, 3)
-    push = Push.new(project: project, user: user, revbefore: @push_commits.last.id, revafter: @push_commits.first.id, ref: "refs/heads/#{project.default_branch}")
+    push = Push.new(project: project, user: @user, revbefore: @push_commits.last.id, revafter: @push_commits.first.id, ref: "refs/heads/#{project.default_branch}")
     push.fill_push_data
     push.data
   end
@@ -127,6 +127,6 @@ class GitPushService
   def commit_user commit
     User.where(email: commit.author_email).first ||
       User.where(name: commit.author_name).first ||
-      user
+      current_user
   end
 end

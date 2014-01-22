@@ -7,7 +7,7 @@ module Projects::HooksActions
   end
 
   def test_hook_action(hook)
-    data = Projects::PushService.new.sample_data(current_user, project)
+    data = GitPushService.new.sample_data(current_user, project)
     hook.execute(data)
   end
 end

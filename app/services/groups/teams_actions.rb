@@ -16,7 +16,7 @@ module Groups::TeamsActions
   end
 
   def resign_team_action(team)
-    multiple_action("teams_remove", "group", group, teams) do
+    multiple_action("teams_remove", "group", group, team) do
       gtr = group_team_relation(team)
       gtr.destroy
     end

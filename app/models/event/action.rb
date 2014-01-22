@@ -18,7 +18,6 @@ class Event::Action
         :commented_merge_request,
         :commented_issue,
         :commented_commit,
-        :imported,
 
         # Git specific
         :pushed,
@@ -42,7 +41,14 @@ class Event::Action
         :resigned,
 
         # mass actions
-        :members_added
+        :imported,
+        :members_added,
+        :members_updated,
+        :members_removed,
+        :teams_added,
+        :teams_removed,
+        :groups_added,
+        :projects_added
       ]
     end
 

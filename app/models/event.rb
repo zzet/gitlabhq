@@ -40,7 +40,7 @@ class Event < ActiveRecord::Base
 
   # Scopes
   scope :with_source, ->(source) { where(source_id: source, source_type: source.class.name) }
-  scope :recent, -> { order("created_at DESC") }
+  scope :recent, -> { order(created_at: :desc) }
   scope :with_target, ->(target) { where(target_id: target, target_type: target.class.name) }
   scope :with_push, -> { where(source_type: Push) }
 

@@ -46,7 +46,10 @@ class Group < Namespace
       from :create,   to: :created
       from :update,   to: :updated
       from :destroy,  to: :deleted
-      from :memberships_add, to: :members_added
+      # Mass actions
+      from :memberships_add,  to: :members_added
+      from :teams_add,        to: :teams_added
+      from :teams_remove,     to: :teams_removed
     end
 
     source :project do

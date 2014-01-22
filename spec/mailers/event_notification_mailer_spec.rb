@@ -970,14 +970,17 @@ describe EventNotificationMailer do
         context "when import users from another project" do
           before do
             @group = create :group, owner: @another_user
+
             params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @group.id) }
             @first_project = ProjectsService.new(@another_user, params[:project]).create
+
             params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @group.id) }
             @second_project = ProjectsService.new(@another_user, params[:project]).create
-            params = { source_project_id: @first_project.id }
-            params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
-            ProjectsService.new(@another_user, project, params).add_membership
 
+            params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
+            ProjectsService.new(@another_user, @first_project, params).add_membership
+
+            params = { source_project_id: @first_project.id }
             collect_mails_data do
               ProjectsService.new(@another_user, @second_project, params).import_memberships
             end
@@ -993,7 +996,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should == "project-#{@old_path_with_namespace}"
+            @email.in_reply_to.should == "project-#{@second_project.path_with_namespace}-members"
             @email.body.should_not be_empty
           end
         end
@@ -1045,7 +1048,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "project-#{project.path_with_namespace}-user-#{@user_1_to_project.username}"
+              @email.in_reply_to.should == "project-#{project.path_with_namespace}-members"
               @email.body.should_not be_empty
             end
           end
@@ -1104,7 +1107,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "project-#{project.path_with_namespace}-user-#{@user_2_to_project.username}"
+              @email.in_reply_to.should == "project-#{project.path_with_namespace}-members"
               @email.body.should_not be_empty
             end
           end
@@ -1114,17 +1117,16 @@ describe EventNotificationMailer do
 
       context "when event source - push action" do
         before do
-          @service = GitPushService.new
           @oldrev = 'b98a310def241a6fd9c9a9a3e7934c48e498fe81'
           @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
           @ref = 'refs/heads/master'
-          project.save
+          #project.save
         end
 
         context "when pushed code" do
           before do
             collect_mails_data do
-              @service.execute(project, @another_user, @oldrev, @newrev, @ref)
+              GitPushService.new(@another_user, project, @oldrev, @newrev, @ref).execute
             end
           end
 
@@ -1147,7 +1149,7 @@ describe EventNotificationMailer do
           before do
             @oldrev = '0000000000000000000000000000000000000000'
             collect_mails_data do
-              @service.execute(project, @another_user, @oldrev, @newrev, @ref)
+              GitPushService.new(@another_user, project, @oldrev, @newrev, @ref).execute
             end
           end
 
@@ -1170,7 +1172,7 @@ describe EventNotificationMailer do
             @oldrev = '0000000000000000000000000000000000000000'
             @ref = 'refs/tags/v2.2.0'
             collect_mails_data do
-              @service.execute(project, @another_user, @oldrev, @newrev, @ref)
+              GitPushService.new(@another_user, project, @oldrev, @newrev, @ref).execute
             end
           end
 
@@ -1192,7 +1194,7 @@ describe EventNotificationMailer do
           before do
             @newrev = '0000000000000000000000000000000000000000'
             collect_mails_data do
-              @service.execute(project, @another_user, @oldrev, @newrev, @ref)
+              GitPushService.new(@another_user, project, @oldrev, @newrev, @ref).execute
             end
           end
 
@@ -1215,7 +1217,7 @@ describe EventNotificationMailer do
             @newrev = '0000000000000000000000000000000000000000'
             @ref = 'refs/tags/v2.2.0'
             collect_mails_data do
-              @service.execute(project, @another_user, @oldrev, @newrev, @ref)
+              GitPushService.new(@another_user, project, @oldrev, @newrev, @ref).execute
             end
           end
 
@@ -1469,7 +1471,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "group-#{@group.path}-team-#{@team.path}"
+              @email.in_reply_to.should == "group-#{@group.path}-teams"
               @email.body.should_not be_empty
             end
           end

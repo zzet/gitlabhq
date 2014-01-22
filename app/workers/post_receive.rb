@@ -29,7 +29,7 @@ class PostReceive
       return false
     end
 
-    GitPushService.new.execute(project, user, oldrev, newrev, ref)
+    GitPushService.new.execute(user, project, oldrev, newrev, ref)
   end
 
   def log(message)

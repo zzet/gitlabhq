@@ -3,8 +3,8 @@ class Gitlab::Event::Notification::Creator::Group < Gitlab::Event::Notification:
     notifications = []
 
     case event.action.to_sym
-    when :members_added
-      notifications << create_project_mass_member_add_notifications(event)
+    when :members_added, :teams_added
+      notifications << create_project_mass_add_notifications(event)
     else
       notifications = super(event)
     end
@@ -14,7 +14,7 @@ class Gitlab::Event::Notification::Creator::Group < Gitlab::Event::Notification:
 
   private
 
-  def create_project_mass_member_add_notifications(event)
+  def create_project_mass_add_notifications(event)
     group = event.source
     notifications = []
 

@@ -124,9 +124,14 @@ class Project < ActiveRecord::Base
         @event_data[:owner_changes] = @changes
       end
       from :update,   to: :updated,   conditions: -> { [:name, :path, :description, :creator_id, :default_branch, :issues_enabled, :wall_enabled, :merge_requests_enabled, :public, :issues_tracker, :issues_tracker_id].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
-      from :import,   to: :imported
       from :destroy,  to: :deleted
-      from :memberships_add, to: :members_added
+
+      # Mass actions
+      from :import,             to: :imported
+      from :memberships_add,    to: :members_added
+      from :teams_add,          to: :teams_added
+      from :memberships_remove, to: :members_removed
+      from :memberships_update, to: :members_updated
     end
 
     source :push do

@@ -64,6 +64,10 @@ class Team < ActiveRecord::Base
       from :create,  to: :created
       from :update,  to: :updated
       from :destroy, to: :deleted
+      # Mass actions
+      from :groups_add,       to: :groups_added
+      from :projects_add,     to: :projects_added
+      from :memberships_add,  to: :members_added
     end
 
     source :team_user_relationship do
@@ -91,7 +95,7 @@ class Team < ActiveRecord::Base
   scope :with_member,     ->(user)    { joins(:team_user_relationships).where(team_user_relationships: { user_id: user.id }) }
   scope :with_project,    ->(project) { joins(:team_project_relationships).where(team_project_relationships: { project_id: project })}
   scope :with_group,      ->(group)   { joins(:team_group_relationships).where(team_group_relationships: { group_id: group })}
-  scope :without_project, ->(project) { where("teams.id NOT IN (:ids)", ids: (a = with_project(project); a.blank? ? 0 : a))}
+  scope :without_project, ->(project) { where.not(id: (a = with_project(project); a.blank? ? 0 : a))}
   scope :created_by,      ->(user)    { where(creator_id: user) }
 
   delegate :name, to: :creator, allow_nil: true, prefix: true
