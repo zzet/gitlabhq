@@ -220,6 +220,3 @@ end
 #       new_user_password GET    /users/password/new(.:format)          devise/passwords#new
 #      edit_user_password GET    /users/password/edit(.:format)         devise/passwords#edit
 #                         PUT    /users/password(.:format)              devise/passwords#update
-describe "Authentication", "routing" do
-  # pending
-end
