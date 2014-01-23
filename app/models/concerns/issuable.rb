@@ -28,7 +28,7 @@ module Issuable
     scope :assigned_to, ->(u) { where(assignee_id: u.id)}
     scope :recent, -> { order(created_at: :desc) }
     scope :assigned, -> { where.not(assignee_id: nil) }
-    scope :unassigned, -> { where.not(assignee_id: nil) }
+    scope :unassigned, -> { where(assignee_id: nil) }
     scope :of_projects, ->(ids) { where(project_id: ids) }
 
     delegate :name,

@@ -1,7 +1,7 @@
 - user = member.user
 %li{id: dom_id(user), class: "team_member_row access-#{member.human_access.downcase} js-toggle-container"}
   .batch-action-column
-    = check_box_tag "ids[]", member.id, false, class: 'js-batch-action-item'
+    = check_box_tag "ids[]", member.id, false, id: "user_batch_select_#{member.id}", class: 'js-batch-action-item'
   = link_to user_path(user) do
     = image_tag avatar_icon(user.email, 16), class: "avatar s16"
   %strong= link_to user.name, user_path(user)

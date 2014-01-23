@@ -19,8 +19,14 @@ class ProjectTeamManagement < Spinach::FeatureSteps
     click_link "New project member"
   end
 
-  Given 'I go to "Project members" tab' do
-    click_link "Project members"
+  step 'I go to "Project members" tab' do
+    #click_link "Project members"
+    find("#project-project-members-tab").click
+    sleep 2
+  end
+
+  step 'I go to "All members" tab' do
+    find("#project-all-members-tab").click
   end
 
   And 'I select "Mike" as "Reporter"' do
@@ -55,8 +61,10 @@ class ProjectTeamManagement < Spinach::FeatureSteps
 
   And 'I change "Sam" role to "Reporter"' do
     user = User.find_by(name: "Sam")
-    within "#user_#{user.id}" do
-      click_on "#toggle_edit_form_user_#{user.id}"
+
+    page.find("#user_#{user.id}").find(".js-batch-action-item").click
+
+    within ".js-batch-action-content" do
       select "Reporter", from: "team_member_project_access"
       click_button "Save"
     end
