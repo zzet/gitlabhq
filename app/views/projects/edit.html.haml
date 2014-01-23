@@ -32,6 +32,16 @@
 
           %fieldset.features
             %legend
+              Git protocol:
+            .from-group
+              = f.label :git_protocol_enabled, "State", class: 'control-label'
+              .col-sm-10
+                .checkbox
+                  = f.check_box :git_protocol_enabled
+                  %span.descr Enable access to the project through git protocol (If indeed there is a need)
+
+          %fieldset.features
+            %legend
               Labels:
             .form-group
               = f.label :label_list, "Labels", class: 'control-label'
