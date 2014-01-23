@@ -20,7 +20,6 @@ class ProjectTeamManagement < Spinach::FeatureSteps
   end
 
   step 'I go to "Project members" tab' do
-    #click_link "Project members"
     find("#project-project-members-tab").click
     sleep 2
   end
