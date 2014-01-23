@@ -92,11 +92,14 @@ class Team < ActiveRecord::Base
     end
   end
 
-  scope :with_member,     ->(user)    { joins(:team_user_relationships).where(team_user_relationships: { user_id: user.id }) }
-  scope :with_project,    ->(project) { joins(:team_project_relationships).where(team_project_relationships: { project_id: project })}
-  scope :with_group,      ->(group)   { joins(:team_group_relationships).where(team_group_relationships: { group_id: group })}
-  scope :without_project, ->(project) { where.not(id: (a = with_project(project); a.blank? ? 0 : a))}
   scope :created_by,      ->(user)    { where(creator_id: user) }
+  scope :with_member,     ->(user)    { joins(:team_user_relationships).where(team_user_relationships: { user_id: user.id }) }
+
+  scope :with_project,    ->(project) { joins(:team_project_relationships).where(team_project_relationships: { project_id: project })}
+  scope :without_project, ->(project) { where.not(id: (a = with_project(project); a.blank? ? 0 : a))}
+
+  scope :with_group,      ->(group)   { joins(:team_group_relationships).where(team_group_relationships: { group_id: group })}
+  scope :without_group,   ->(group)   { where.not(id: (a = with_group(group); a.blank? ? 0 : a))}
 
   delegate :name, to: :creator, allow_nil: true, prefix: true
 

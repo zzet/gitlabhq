@@ -28,7 +28,7 @@ module API
         if current_user.admin
           @teams = paginate Team
         else
-          @teams = paginate current_user.teams
+          @teams = paginate current_user.known_teams
         end
         present @teams, with: Entities::Team
       end

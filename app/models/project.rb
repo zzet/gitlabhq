@@ -223,21 +223,21 @@ class Project < ActiveRecord::Base
   adjacent_targets [:group]
 
   # Scopes
-  scope :without_user, ->(user)  { where("projects.id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
-  scope :with_user, ->(user)  { where(users_projects: { user_id: user } ) }
-  scope :without_team, ->(team) { team.projects.present? ? where("projects.id NOT IN (:ids)", ids: team.projects.map(&:id)) : all  }
-  scope :not_in_group, ->(group) { where("projects.id NOT IN (:ids)", ids: group.project_ids ) }
-  scope :in_team, ->(team) { where("projects.id IN (:ids)", ids: team.projects.map(&:id)) }
+  scope :without_user,  ->(user) { where.not(id: user.authorized_projects.pluck(:id) ) }
+  scope :with_user,     ->(user) { where(users_projects: { user_id: user } ) }
+  scope :without_team,  ->(team) { team.projects.present? ? where.not(id: team.projects.pluck(:id)) : all }
+  scope :not_in_group, ->(group) { where.not(id: group.project_ids ) }
+  scope :in_team,       ->(team) { where(id: team.projects.pluck(:id)) }
   scope :in_namespace, ->(namespace) { where(namespace_id: namespace.id) }
-  scope :in_group_namespace, -> { joins(:group) }
-  scope :sorted_by_activity, -> { order("projects.last_activity_at DESC") }
+  scope :in_group_namespace,  -> { joins(:group) }
+  scope :sorted_by_activity,  -> { order(last_activity_at: :desc) }
   scope :sorted_by_push_date, -> { reorder("projects.last_pushed_at DESC NULLS LAST") }
-  scope :personal, ->(user) { where(namespace_id: user.namespace_id) }
-  scope :joined, ->(user) { where("namespace_id != ?", user.namespace_id) }
-  scope :public_via_git, -> { where(git_protocol_enabled: true) }
-  scope :public_only, -> { where(visibility_level: PUBLIC) }
-  scope :public_or_internal_only, ->(user) { where("visibility_level IN (:levels)", levels: user ? [ INTERNAL, PUBLIC ] : [ PUBLIC ]) }
-  scope :non_archived, -> { where(archived: false) }
+  scope :personal,      ->(user) { where(namespace_id: user.namespace_id) }
+  scope :joined,        ->(user) { where.not(namespace_id: user.namespace_id) }
+  scope :public_via_git,      -> { where(git_protocol_enabled: true) }
+  scope :public_only,         -> { where(visibility_level: PUBLIC) }
+  scope :public_or_internal_only, ->(user) { where(visibility_level: (user ? [ INTERNAL, PUBLIC ] : [ PUBLIC ])) }
+  scope :non_archived,        -> { where(archived: false) }
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
 

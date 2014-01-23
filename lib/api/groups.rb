@@ -28,7 +28,7 @@ module API
         if current_user.admin
           @groups = paginate Group
         else
-          @groups = paginate current_user.groups
+          @groups = paginate current_user.authorized_groups
         end
         present @groups, with: Entities::Group
       end
