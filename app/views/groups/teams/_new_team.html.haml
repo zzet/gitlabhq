@@ -9,7 +9,6 @@
     .form-group
       = f.label :team_ids, "Teams", class: 'control-label'
       .col-sm-10= teams_select_tag(:team_ids, multiple: true, class: 'input-large')
-      -#= select_tag :team_ids, options_for_select(@avaliable_teams.map {|t| [t.name, t.id]}), multiple: true, class: 'input-large chosen'
 
     .form-actions
       = f.submit 'Assign group on selected teams', class: "btn btn-create"
