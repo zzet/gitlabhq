@@ -12,7 +12,6 @@
 //= require jquery.highlight
 //= require jquery.history
 //= require jquery.waitforimages
-//= require jquery.textselectevent
 //= require jquery.atwho
 //= require jquery.scrollto
 //= require jquery.blockUI
