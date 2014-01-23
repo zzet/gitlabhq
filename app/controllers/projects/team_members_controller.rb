@@ -103,7 +103,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
   end
 
   def leave
-    project.users_projects.find_by_user_id(current_user).destroy
+    project.users_projects.find_by(user_id: current_user).destroy
 
     respond_to do |format|
       format.html { redirect_to :back }
@@ -137,6 +137,6 @@ class Projects::TeamMembersController < Projects::ApplicationController
   protected
 
   def member
-    @member ||= User.find_by_username(params[:id])
+    @member ||= User.find_by(username: params[:id])
   end
 end

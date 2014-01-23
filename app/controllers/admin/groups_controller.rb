@@ -63,6 +63,6 @@ class Admin::GroupsController < Admin::ApplicationController
   private
 
   def group
-    @group = ::Group.find_by_path(params[:id])
+    @group = Group.find_by(path: params[:id])
   end
 end

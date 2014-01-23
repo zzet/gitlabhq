@@ -38,3 +38,4 @@ doc/code/*
 *.log
 public/uploads.*
 public/system/
+public/assets/

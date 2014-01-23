@@ -65,8 +65,8 @@ class DashboardController < ApplicationController
                   current_user.authorized_projects
                 end.sorted_by_push_date
 
-    @projects = @projects.where(namespace_id: Group.find_by_name(params[:group])) if params[:group].present?
-    @projects = @projects.where(id: Team.find_by_name(params[:team]).projects) if params[:team].present?
+    @projects = @projects.where(namespace_id: Group.find_by(name: params[:group])) if params[:group].present?
+    @projects = @projects.where(id: Team.find_by(name: params[:team]).projects) if params[:team].present?
     @projects = @projects.where(visibility_level: params[:visibility_level]) if params[:visibility_level].present?
     @projects = @projects.includes(:namespace)
     #@projects = @projects.includes(:namespace).sorted_by_activity

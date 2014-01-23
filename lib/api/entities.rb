@@ -48,19 +48,19 @@ module API
 
     class ProjectMember < UserBasic
       expose :project_access, as: :access_level do |user, options|
-        options[:project].users_projects.find_by_user_id(user.id).project_access
+        options[:project].users_projects.find_by(user_id: user.id).project_access
       end
     end
 
     class TeamMember < UserBasic
       expose :permission, as: :access_level do |user, options|
-        options[:team].team_user_relationships.find_by_user_id(user.id).permission
+        options[:team].team_user_relationships.find_by(user_id: user.id).permission
       end
     end
 
     class TeamProject < Project
       expose :greatest_access, as: :greatest_access_level do |project, options|
-        options[:team].team_project_relationships.find_by_project_id(project.id).greatest_access
+        options[:team].team_project_relationships.find_by(project_id: project.id).greatest_access
       end
     end
 
@@ -74,7 +74,7 @@ module API
 
     class GroupMember < UserBasic
       expose :group_access, as: :access_level do |user, options|
-        options[:group].users_groups.find_by_user_id(user.id).group_access
+        options[:group].users_groups.find_by(user_id: user.id).group_access
       end
     end
 

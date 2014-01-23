@@ -15,8 +15,8 @@ class SearchService < BaseService
     project_ids = projects.pluck(:id)
 
     global_search_result[:projects] = projects.limit(20)
-    global_search_result[:merge_requests] = MergeRequest.in_projects(project_ids).search(query).order('updated_at DESC').limit(20)
-    global_search_result[:issues] = Issue.where(project_id: project_ids).search(query).order('updated_at DESC').limit(20)
+    global_search_result[:merge_requests] = MergeRequest.in_projects(project_ids).search(query).order(updated_at: :desc).limit(20)
+    global_search_result[:issues] = Issue.where(project_id: project_ids).search(query).order(updated_at: :desc).limit(20)
     global_search_result[:total_results] = %w(projects issues merge_requests).sum { |items| global_search_result[items.to_sym].size }
 
     global_search_result
@@ -33,8 +33,8 @@ class SearchService < BaseService
       project_search_result[:blobs] = blobs
       project_search_result[:total_results] = blobs.total_count
     else
-      project_search_result[:merge_requests] = project.merge_requests.search(query).order('updated_at DESC').limit(20)
-      project_search_result[:issues] = project.issues.search(query).order('updated_at DESC').limit(20)
+      project_search_result[:merge_requests] = project.merge_requests.search(query).order(updated_at: :desc).limit(20)
+      project_search_result[:issues] = project.issues.search(query).order(updated_at: :desc).limit(20)
       project_search_result[:total_results] = %w(issues merge_requests).sum { |items| project_search_result[items.to_sym].size }
     end
 
