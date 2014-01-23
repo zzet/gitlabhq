@@ -14,7 +14,7 @@ class Projects::TagsController < Projects::ApplicationController
   end
 
   def create
-    ProjectsService.new(current_user, @project, params).repository.create_tag(params[:tag_name])
+    ProjectsService.new(current_user, @project, params).repository.create_tag(params[:tag_name], params[:ref])
 
     redirect_to project_tags_path(@project)
   end

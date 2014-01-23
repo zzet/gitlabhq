@@ -16,7 +16,7 @@ class Projects::BranchesController < Projects::ApplicationController
   end
 
   def create
-    ProjectsService.new(current_user, @project, params).repository.create_branch(params[:branch_name])
+    ProjectsService.new(current_user, @project, params).repository.create_branch(params[:branch_name], params[:ref])
 
     redirect_to project_branches_path(@project)
   end
