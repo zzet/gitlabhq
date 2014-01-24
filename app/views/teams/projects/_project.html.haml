@@ -1,6 +1,6 @@
-%li
+%li{id: "project_#{project.id}_team_relationship" }
   = visibility_level_icon(project.visibility_level)
   = link_to project.name_with_namespace, project
   .pull-right
     = link_to 'Members', project_team_index_path(project), id: "edit_#{dom_id(project)}", class: "btn btn-small"
-    = link_to 'Remove', team_project_path(@team, project), confirm: remove_project_from_team_message(@team, project), method: :delete, class: "btn btn-small btn-remove"
+    = link_to 'Remove', team_project_path(@team, project), data: { confirm: remove_project_from_team_message(@team, project) }, method: :delete, class: "btn btn-small btn-remove"

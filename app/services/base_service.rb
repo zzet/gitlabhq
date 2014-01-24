@@ -33,7 +33,9 @@ class BaseService
 
     yield
 
-    RequestStore.store[:borders].pop
+    if [items].flatten.many? || items.nil?
+      RequestStore.store[:borders].pop
+    end
 
     receive_delayed_notifications
   end

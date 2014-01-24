@@ -30,6 +30,34 @@ module SharedPaths
   end
 
   # ----------------------------------------
+  # Team
+  # ----------------------------------------
+
+  step 'I visit team index page' do
+    visit teams_path
+  end
+
+  step 'I visit team page' do
+    visit team_path(current_team)
+  end
+
+  step 'I visit team settings page' do
+    visit edit_team_path(current_team)
+  end
+
+  step 'I visit members team settings page' do
+    visit team_members_path(current_team)
+  end
+
+  step 'I visit groups team settings page' do
+    visit team_groups_path(current_team)
+  end
+
+  step 'I visit projects team settings page' do
+    visit team_projects_path(current_team)
+  end
+
+  # ----------------------------------------
   # Dashboard
   # ----------------------------------------
 
@@ -317,5 +345,9 @@ module SharedPaths
 
   def project
     project = Project.find_by!(name: "Shop")
+  end
+
+  def current_team
+    @team ||= Team.first
   end
 end
