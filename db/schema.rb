@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140116231608) do
+ActiveRecord::Schema.define(version: 20140217120557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,6 +60,15 @@ ActiveRecord::Schema.define(version: 20140116231608) do
 
   add_index "deploy_keys_projects", ["project_id"], name: "index_deploy_keys_projects_on_project_id", using: :btree
 
+  create_table "event_auto_subscriptions", force: true do |t|
+    t.integer  "user_id"
+    t.string   "target"
+    t.integer  "namespace_id"
+    t.string   "namespace_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "event_subscription_notification_settings", force: true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
@@ -69,6 +78,7 @@ ActiveRecord::Schema.define(version: 20140116231608) do
     t.boolean  "brave"
     t.boolean  "subscribe_if_owner",     default: true
     t.boolean  "subscribe_if_developer", default: true
+    t.boolean  "system_notifications"
   end
 
   create_table "event_subscription_notifications", force: true do |t|
@@ -79,6 +89,13 @@ ActiveRecord::Schema.define(version: 20140116231608) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "subscriber_id"
+  end
+
+  create_table "event_subscription_options", force: true do |t|
+    t.integer  "subscription_id"
+    t.string   "source"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "event_subscriptions", force: true do |t|
@@ -94,6 +111,8 @@ ActiveRecord::Schema.define(version: 20140116231608) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "target_category"
+    t.integer  "auto_subscription_id"
+    t.string   "options",               default: [], array: true
   end
 
   create_table "events", force: true do |t|

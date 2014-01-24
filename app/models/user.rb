@@ -133,6 +133,7 @@ class User < ActiveRecord::Base
 
   # Notifications & Subscriptions
   has_many :personal_subscriptions,   dependent: :destroy, class_name: Event::Subscription
+  has_many :auto_subscriptions,       dependent: :destroy, class_name: Event::AutoSubscription
   has_many :subscriptions,            dependent: :destroy, class_name: Event::Subscription, as: :target
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
@@ -177,9 +178,11 @@ class User < ActiveRecord::Base
 
   watch do
     source watchable_name do
+      title 'self'
       from :create,   to: :created
       from :block,    to: :blocked do
         @event_data[:teams]     = @source.teams.map { |t| t.attributes }
+        @event_data[:groups]    = @source.groups.map { |t| t.attributes }
         @event_data[:projects]  = @source.projects.map { |pr| pr.attributes }
       end
       from :activate, to: :activate
@@ -188,6 +191,7 @@ class User < ActiveRecord::Base
     end
 
     source :users_group do
+      title 'Group'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -195,6 +199,7 @@ class User < ActiveRecord::Base
     end
 
     source :users_project do
+      title 'Project'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -202,6 +207,7 @@ class User < ActiveRecord::Base
     end
 
     source :team_user_relationship do
+      title 'Team'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated

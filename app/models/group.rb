@@ -43,6 +43,7 @@ class Group < Namespace
 
   watch do
     source watchable_name do
+      title 'Group actions'
       from :create,   to: :created
       from :update,   to: :updated
       from :destroy,  to: :deleted
@@ -53,6 +54,7 @@ class Group < Namespace
     end
 
     source :project do
+      title 'Project add/delete'
       before do: -> { @target = @source.group }, conditions: -> { @source.group.present? }
       from :create,   to: :added,   conditions: -> { @source.group.present? }
       from :update,   to: :added,   conditions: -> { @source.group.present? && @source.namespace_id_changed? && @source.namespace_id != @changes["namespace_id"].first }
@@ -64,6 +66,7 @@ class Group < Namespace
     end
 
     source :users_group do
+      title "Membership's actions"
       before do: -> { @target = @source.group }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -71,6 +74,7 @@ class Group < Namespace
     end
 
     source :team_group_relationship do
+      title 'Team assignation/resignation'
       before do: -> { @target = @source.group }
       from :create,   to: :assigned
       from :destroy,  to: :resigned

@@ -119,6 +119,7 @@ class Project < ActiveRecord::Base
 
   watch do
     source watchable_name do
+      title 'self'
       from :create,   to: :created
       from :update,   to: :transfer,  conditions: -> { @source.namespace_id_changed? && @source.namespace_id != @changes[:namespace_id].first } do
         @event_data[:owner_changes] = @changes
@@ -135,6 +136,7 @@ class Project < ActiveRecord::Base
     end
 
     source :push do
+      title 'Pushes/branches/tags'
       before do: -> { @target = @source.project }
       from :create,   to: :created_branch,  conditions: -> { @source.created_branch? }
       from :create,   to: :created_tag,     conditions: -> { @source.created_tag? }
@@ -144,6 +146,7 @@ class Project < ActiveRecord::Base
     end
 
     source :issue do
+      title 'Issues'
       before do: -> { @target = @source.project }
       from :create,   to: :opened
       from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
@@ -153,6 +156,7 @@ class Project < ActiveRecord::Base
     end
 
     source :milestone do
+      title 'Milestones'
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :close,    to: :closed
@@ -161,6 +165,7 @@ class Project < ActiveRecord::Base
     end
 
     source :merge_request do
+      title 'Merge requests'
       before do: -> { @target = @source.target_project }
       from :create,   to: :opened
       from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
@@ -170,6 +175,7 @@ class Project < ActiveRecord::Base
     end
 
     source :project_snippet do
+      title 'Snippets'
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :update,   to: :updated
@@ -177,6 +183,7 @@ class Project < ActiveRecord::Base
     end
 
     source :note do
+      title 'Notes'
       before do: -> { @target = @source.project }
       from :create,   to: :commented_commit,          conditions: -> { @source.commit_id.present? }
       from :create,   to: :commented_merge_request,   conditions: [ unless: -> { @source.commit_id.present? }, if: -> { @source.noteable.present? && @source.noteable.is_a?(MergeRequest) }]
@@ -185,6 +192,7 @@ class Project < ActiveRecord::Base
     end
 
     source :project_hook do
+      title 'Project hook'
       before do: -> { @target = @source.project }
       from :create,   to: :added
       from :update,   to: :updated
@@ -192,6 +200,7 @@ class Project < ActiveRecord::Base
     end
 
     source :web_hook do
+      title 'Web hook'
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :update,   to: :updated
@@ -199,6 +208,7 @@ class Project < ActiveRecord::Base
     end
 
     source :protected_branch do
+      title 'Protected branches'
       before do: -> { @target = @source.project }
       from :create,   to: :protected
       from :destroy,  to: :unprotected
@@ -207,12 +217,14 @@ class Project < ActiveRecord::Base
     # TODO. Add services
 
     source :team_project_relationship do
+      title 'Team assignation/resignation'
       before do: -> { @target = @source.project }
       from :create,   to: :assigned
       from :destroy,  to: :resigned
     end
 
     source :users_project do
+      title "Membership's actions"
       before do: -> { @target = @source.project }
       from :create,   to: :joined
       from :update,   to: :updated

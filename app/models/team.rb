@@ -61,6 +61,7 @@ class Team < ActiveRecord::Base
 
   watch do
     source watchable_name do
+      title 'self'
       from :create,  to: :created
       from :update,  to: :updated
       from :destroy, to: :deleted
@@ -71,6 +72,7 @@ class Team < ActiveRecord::Base
     end
 
     source :team_user_relationship do
+      title 'User'
       before do: -> { @target = @source.team }
       from :create,  to: :joined
       from :update,  to: :updated
@@ -78,6 +80,7 @@ class Team < ActiveRecord::Base
     end
 
     source :team_project_relationship do
+      title 'Project'
       before do: -> { @target = @source.team }
       from :create,  to: :assigned
       from :update,  to: :updated
@@ -85,6 +88,7 @@ class Team < ActiveRecord::Base
     end
 
     source :team_group_relationship do
+      title 'Group'
       before do: -> { @target = @source.team }
       from :create,  to: :assigned
       from :update,  to: :updated

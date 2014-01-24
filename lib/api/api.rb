@@ -41,5 +41,6 @@ module API
     mount ProjectHooks
     mount Files
     mount Namespaces
+    mount Subscriptions
   end
 end

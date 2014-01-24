@@ -1,41 +1,68 @@
 class Gitlab::Event::Notification::Creator::Default
+  # Interface method
   def create(event)
-    notifications = []
-
     subscriptions = ::Event::Subscription.all
-
     subscriptions = if event.target.present?
                       subscriptions.by_target(event.target)
                     else
+                      # For deleted events
                       subscriptions.by_event_target(event)
                     end
-
     subscriptions = subscriptions.by_source_type(event.source_type)
 
-    subscriptions.each do |subscription|
-      # Not send notification about changes to changes author
-      # TODO. Rewrite in future with check by Entity type
-      if subscriber_can_get_notification?(subscription, event)
-        opts = { event: event, subscriber: subscription.user }
-        opts[:notification_state] = :delayed if event.system_action == "destroy"
+    create_by_subscriptions(event, subscriptions)
+  end
 
+  def create_by_subscriptions(event, subscriptions, state = :new)
+    notifications = []
+    subscriptions.each do |subscription|
+      if subscriber_can_get_notification?(subscription, event)
+        opts = { event: event, subscriber: subscription.user,
+                 notification_state: default_notification_state(event, state) }
         notifications << subscription.notifications.create(opts)
       end
     end
-
-    create_adjacent_notifications(event)
-
-    notifications
+    notifications.flatten
   end
 
+  # Sometime we mast send notification without subscription
+  # For example notification on create MR for assignee
+  def create_by_event(event, user, state = :new)
+    opts = { event: event, subscriber: user, notification_state: state }
+    ::Event::Subscription::Notification.create(opts) if no_notification_on_event?(event, user)
+  end
+
+  def no_notification_on_event?(event, user)
+    notifications = ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user)
+    return false if notifications.any?
+
+    parent_event = event.parent_event
+    return true if parent_event.blank?
+
+    notifications = ::Event::Subscription::Notification.where(event_id: parent_event, subscriber_id: user)
+    return true if notifications.blank? && no_notification_on_event?(parent_event, user)
+
+    false
+  end
+
+  # Subscriber can get notification if
+  # 1) User active
+  # 2) User not actor
+  # 3) User has access on entity (not implemented)
+  # 2) Filter brave subscriptions
+  # 3) No notifications on event created already
   def subscriber_can_get_notification?(subscription, event)
-    #has_access(event, subscription.user) &&
     subscription.user.active? &&
+      no_notification_on_event?(event, subscription.user) &&
       check_event_for_brave(subscription, event) &&
-      (user_not_actor?(subscription.user, event) || user_subscribed_on_own_changes?(event)) &&
-      no_notification_on_event?(event, subscription)
+      (user_not_actor?(subscription.user, event) || user_subscribed_on_own_changes?(event))
+    #has_access(event, subscription.user)
   end
 
+  # Brave mode for filter events on which may created notifications
+  # Allowed to create notification if
+  # 1) source type Note, MergeRequest, Push
+  # 2) Project was transfered
   def check_event_for_brave(subscription, event)
     return true if ["Note", "MergeRequest", "Push"].include?(event.source_type)
     return true if ["Project"].include?(event.source_type) && event.action == "transfer"
@@ -53,72 +80,6 @@ class Gitlab::Event::Notification::Creator::Default
     parent_event event.parent_event
   end
 
-  private
-
-  def create_adjacent_notifications(event)
-
-    subscription_target = nil
-    subscription_source = nil
-
-    case event.target
-    when Project
-      return if event.action.to_sym == :transfer
-
-      project = event.target
-      namespace = project.namespace
-
-      if namespace
-        subscription_target = namespace.type == "Group" ? namespace.becomes(Group) : namespace.becomes(User)
-        subscription_source = :project
-      end
-    end
-
-    if subscription_target && subscription_source
-      subscribe_users_to_adjacent_resources(subscription_target, subscription_source)
-
-      subscriptions = ::Event::Subscription.by_target(subscription_target).by_source_type_hard(subscription_source)
-
-      subscriptions.each do |subscription|
-        if subscriber_can_get_notification?(subscription, event)
-          air_subscriptions = ::Event::Subscription.by_user(subscription.user).by_target(event.target).by_source_type_hard(event.source)
-          if air_subscriptions.blank?
-            subscription.notifications.create(event: event, subscriber: subscription.user)
-          end
-        end
-      end
-
-    end
-  end
-
-  def subscribe_users_to_adjacent_resources(target, source)
-    ss = Event::Subscription::NotificationSetting.where(adjacent_changes: true)
-    ss.each do |settings|
-      user = settings.user
-      subscriptions = Event::Subscription.by_user(user).by_target(target).by_source_type(:all)
-      if subscriptions.any?
-        tageted_subscriptions = Event::Subscription.by_user(user).by_target(target).by_source_type_hard(source)
-        SubscriptionService.subscribe(user, :all, target, source) if tageted_subscriptions.blank?
-      end
-    end
-  end
-
-  def parent_event_for(event)
-    event.parent_event
-  end
-
-  def no_notification_on_event?(event, subscription)
-    notifications = ::Event::Subscription::Notification.where(event_id: event, subscriber_id: subscription.user)
-    return false if notifications.any?
-
-    parent_event = parent_event_for event
-    return true if parent_event.blank?
-
-    notifications = ::Event::Subscription::Notification.where(event_id: parent_event, subscriber_id: subscription.user)
-    return true if notifications.blank? && no_notification_on_event?(parent_event, subscription)
-
-    false
-  end
-
   def user_not_actor?(user, event)
     user != event.author
   end
@@ -127,9 +88,39 @@ class Gitlab::Event::Notification::Creator::Default
     event.author.notification_setting && event.author.notification_setting.own_changes
   end
 
+  private
+
+  def default_notification_state(event, current_state)
+    return current_state if current_state != :new
+    # On all destroy events notifications :delayed
+    # Becouse it action often generated spam with dependent: :destroy action
+    return :delayed if event.system_action.to_sym == :destroy
+
+    action = event.action.to_sym
+
+    case event.target_type
+    when "Group"
+      case action
+      when :created, :members_added, :teams_added
+        return :delayed
+      end
+    when "Team"
+      case action
+      when :created, :members_added, :projects_added, :groups_added
+        return :delayed
+      end
+    when "Issue", "MergeRequest", "Note"
+      case action
+      when :created
+        return :delayed
+      end
+    end
+    current_state
+  end
+
   def has_access(event, user)
     if event.source.present?
-      entity = event.source
+      entity = event.target
       has_access = user.admin?
 
       case entity

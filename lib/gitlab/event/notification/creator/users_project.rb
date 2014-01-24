@@ -9,29 +9,21 @@ class Gitlab::Event::Notification::Creator::UsersProject < Gitlab::Event::Notifi
   end
 
   def create_project_notification(event)
-    project = event.source.project
+    project = event.target.project
     notifications = []
 
     subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
-    subscriptions.each do |subscription|
-      if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-      end
-    end
+    notifications << create_by_subscriptions(event, subscriptions, :delayed)
 
     notifications
   end
 
   def create_user_notification(event)
-    user = event.source.user
+    user = event.target.user
     notifications = []
 
     subscriptions = ::Event::Subscription.by_target(user).by_source_type(event.source_type)
-    subscriptions.each do |subscription|
-      if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-      end
-    end
+    notifications << create_by_subscriptions(event, subscriptions, :delayed)
 
     notifications
   end

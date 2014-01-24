@@ -46,6 +46,64 @@ module API
       expose :forked_from_project, using: Entities::ForkedFromProject, :if => lambda{ | project, options | project.forked? }
     end
 
+    class TargetSubscription < Grape::Entity
+      expose :id do |subscription, options|
+        subscription.target_id
+      end
+
+      expose :namespace do |subscription, options|
+        if subscription.target.respond_to?(:namespace)
+          subscription.target.namespace.human_name
+        end
+      end
+
+      expose :name do |subscription, options|
+        subscription.target.try(:name)
+      end
+
+      expose :link do |subscription, options|
+        h = Rails.application.routes.url_helpers
+
+        case subscription.target.class.name
+          when 'Project'
+            h.project_path(subscription.target)
+          when 'Team'
+            h.team_path(subscription.target)
+          when 'Group'
+            h.group_path(subscription.target)
+          when 'User'
+            h.user_path(subscription.target)
+          else
+            ''
+        end
+      end
+
+      expose :options do |subscription, options|
+        available_sources = subscription.target.class.watched_sources.map(&:to_s)
+        sources = subscription.options
+
+        available_sources.reduce({}) do |response, source|
+          response[source] = sources.include?(source)
+          response
+        end
+      end
+
+      expose :adjacent do |subscription, options|
+        target = subscription.target
+        if target.class.watched_adjacent_sources.any?
+          adjacent = ::Event::AutoSubscription.adjacent(target.class.name, target.id)
+            .pluck(:target).map(&:to_sym)
+
+          target.class.watched_adjacent_sources.reduce({}) do |response, source|
+            response[source] = adjacent.include?(source)
+            response
+          end
+        else
+          {}
+        end
+      end
+    end
+
     class ProjectMember < UserBasic
       expose :project_access, as: :access_level do |user, options|
         options[:project].users_projects.find_by(user_id: user.id).project_access
@@ -163,6 +221,10 @@ module API
 
     class Namespace < Grape::Entity
       expose :id, :path, :kind
+    end
+
+    class Subscription < Grape::Entity
+      expose :id
     end
   end
 end

@@ -60,7 +60,7 @@ class Event < ActiveRecord::Base
   end
 
   def deleted_self?
-    deleted_event? && source.blank?  && target.blank?
+    deleted_event? && target.blank?
   end
 
   def full?
