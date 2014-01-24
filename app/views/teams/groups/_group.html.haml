@@ -1,5 +1,5 @@
-%li
+%li{id: "group_#{group.id}_team_relationship" }
   = link_to group.name, group
   .pull-right
     = link_to 'Members', group_members_path(group), id: "edit_#{dom_id(group)}", class: "btn btn-small"
-    = link_to 'Remove', team_group_path(@team, group.path), confirm: remove_group_from_team_message(@team, group), method: :delete, class: "btn btn-small btn-remove"
+    = link_to 'Remove', team_group_path(@team, group.path), data: { confirm: remove_group_from_team_message(@team, group) }, method: :delete, class: "btn btn-small btn-remove"

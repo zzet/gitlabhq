@@ -10,7 +10,7 @@
     team groups
     %small
       (#{@groups.count})
-  %ul.well-list
+  %ul.well-list.team_groups_list
     - @groups.each do |group|
       = render 'group', group: group, show_controls: can_manage_team
 - if can_manage_team

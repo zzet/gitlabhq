@@ -50,6 +50,6 @@
               %br
               %strong Removed team cannot be restored!
 
-            = link_to 'Remove team', @team, confirm: remove_team_message(@team), method: :delete, class: "btn btn-remove"
+            = link_to 'Remove team', @team, date: { confirm: remove_team_message(@team) }, method: :delete, class: "btn btn-remove"
       - else
         %p.nothing_here_message Only team owner can remove a team

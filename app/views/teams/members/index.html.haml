@@ -5,7 +5,7 @@
 %hr
 - can_manage_team =  current_user.can? :manage_team, @team
 .col-md-6.no_margin
-  %ul.well-list
+  %ul.well-list.team_members_list
     - @members.each do |member|
       = render 'member', team: @team, member: member, show_controls: can_manage_team
 - if can_manage_team
