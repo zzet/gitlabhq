@@ -492,6 +492,10 @@ describe EventNotificationMailer do
             end
           end
         end
+
+        context "in project issue" do
+          it { pending "add (or delete) tests for notes in project issue" }
+        end
       end
 
       context "when source - merge_request" do
@@ -695,6 +699,25 @@ describe EventNotificationMailer do
         end
       end
 
+      context "when event source - snippet" do
+        context "when create snippet" do
+          before do
+            collect_mails_data do
+              @snippet = create :project_snippet, project: project, author: @another_user
+            end
+          end
+
+          it { pending "add (or delete) tests for snippets in project" }
+          #it { @mails_count.should == 1 }
+          #it { @email.from.first.should == @another_user.email }
+          #it { @email.to.should be_nil }
+          #it { @email.cc.should be_nil }
+          #it { @email.bcc.count.should == 1 }
+          #it { @email.bcc.first.should == @user.email }
+          #it { @email.in_reply_to.should == "project-#{@old_path_with_namespace}" }
+        end
+      end
+
       context "when event source - project_hook" do
         context "create project_hook" do
           before do
@@ -813,6 +836,29 @@ describe EventNotificationMailer do
             @email.bcc.first.should == @user.email
             @email.in_reply_to.should == "project-#{project.path_with_namespace}-branch-#{@pb.name}"
             @email.body.should_not be_empty
+          end
+        end
+      end
+
+      context "when event source - service" do
+        Service.implement_services.map {|s| s.new }.each do |service|
+          context "and service is #{service.to_param}" do
+            context "when create service" do
+              before do
+                collect_mails_data do
+                  @service = create :"#{service.to_param}_service"
+                end
+              end
+
+              it { pending "Add tests for service in projects" }
+              #it { @mails_count.should == 1 }
+              #it { @email.from.first.should == @another_user.email }
+              #it { @email.to.should be_nil }
+              #it { @email.cc.should be_nil }
+              #it { @email.bcc.count.should == 1 }
+              #it { @email.bcc.first.should == @user.email }
+              #it { @email.in_reply_to.should == "project-#{@old_path_with_namespace}" }
+            end
           end
         end
       end
