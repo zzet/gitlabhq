@@ -3,7 +3,7 @@ module Gitlab
   REVISION = `git log --pretty=format:'%h' -n 1`
 
   def self.config
-    Settings
+    Persey.config
   end
 end
 
