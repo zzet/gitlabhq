@@ -147,15 +147,19 @@ module GitlabMarkdownHelper
 
   def file_exists?(path)
     return false if path.nil? || path.empty?
-    return @repository.blob_at(@commit.id, path).present? || Tree.new(@repository, @commit.id, path).entries.any?
+    return @repository.blob_at(current_ref, path).present? || Tree.new(@repository, current_ref, path).entries.any?
   end
 
   # Check if the path is pointing to a directory(tree) or a file(blob)
   # eg. doc/api is directory and doc/README.md is file
   def local_path(path)
-    return "tree" if Tree.new(@repository, @commit.id, path).entries.any?
-    return "raw" if @repository.blob_at(@commit.id, path).image?
+    return "tree" if Tree.new(@repository, current_ref, path).entries.any?
+    return "raw" if @repository.blob_at(current_ref, path).image?
     return "blob"
+  end
+
+  def current_ref
+    @commit.nil? ? "master" : @commit.id
   end
 
   # We will assume that if no ref exists we can point to master
