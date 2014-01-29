@@ -12841,7 +12841,6 @@ var Text = function(parentEl) {
             style.overflow = "visible";
             style.whiteSpace = "nowrap";
 
-            //measureNode.innerHTML = "X";
             measureNode.innerHTML = lang.stringRepeat("X", 100);
 
             var container = this.element.parentNode;
@@ -12858,7 +12857,6 @@ var Text = function(parentEl) {
 
         var size = {
             height: rect.height,
-            //width: rect.width
             width: rect.width / 100
         };
 
