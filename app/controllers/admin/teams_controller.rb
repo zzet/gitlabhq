@@ -1,28 +1,28 @@
 class Admin::TeamsController < Admin::ApplicationController
   def index
-    @teams = Team.order('name ASC')
+    @teams = Team.order(name: :asc)
     @teams_count = @teams.count
 
-    if params[:member].present?
-      user = User.find_by_username(params[:member])
+    if params[:member_id].present?
+      user = User.find_by(id: params[:member_id])
       team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
 
-    if params[:owner].present?
-      user = User.find_by_username(params[:owner])
+    if params[:owner_id].present?
+      user = User.find_by(id: params[:owner_id])
       team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
 
-    if params[:group].present?
-      group = Group.find_by_path(params[:group])
+    if params[:group_id].present?
+      group = Group.find_by(id: params[:group_id])
       team_ids = TeamGroupRelationship.where(group_id: group).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
 
-    if params[:project].present?
-      project = Project.find_with_namespace(params[:project])
+    if params[:project_id].present?
+      project = Project.find_by(id: params[:project])
       team_ids = TeamProjectRelationship.where(project_id: project).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
@@ -86,7 +86,7 @@ class Admin::TeamsController < Admin::ApplicationController
   protected
 
   def team
-    @team ||= Team.find_by_path(params[:id])
+    @team ||= Team.find_by(path: params[:id])
   end
 
 end
