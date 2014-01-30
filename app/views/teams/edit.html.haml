@@ -5,7 +5,7 @@
         Team settings:
       %hr
       .form-holder
-        = form_for @team, remote: true, html: { class: "edit_project form-horizontal" } do |f|
+        = form_for @team, html: { class: "edit_project form-horizontal" } do |f|
           - if @team.errors.any?
             .alert.alert-error
               %span= @team.errors.full_messages.first

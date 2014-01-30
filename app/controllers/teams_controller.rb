@@ -37,7 +37,7 @@ class TeamsController < ApplicationController
 
   def update
     if team.update_attributes(params[:team])
-      redirect_to team_path(team)
+      redirect_to edit_team_path(team)
     else
       render action: :edit
     end
