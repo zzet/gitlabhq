@@ -17,7 +17,7 @@ gem 'actionpack-page_caching'
 gem 'actionpack-action_caching'
 
 # Supported DBs
-gem "pg"
+#gem "pg"
 
 # Auth
 gem "devise", '3.0.4'
