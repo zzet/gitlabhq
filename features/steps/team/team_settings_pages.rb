@@ -10,7 +10,7 @@ class Spinach::Features::TeamSettingsPages < Spinach::FeatureSteps
   end
 
   step 'I should be redirected to team settings page' do
-    current_path.should == team_path(current_team)
+    current_path.should == edit_team_path(current_team)
   end
 
   step 'I should be redirected to team members settings page' do
