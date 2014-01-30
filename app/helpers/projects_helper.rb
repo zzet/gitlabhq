@@ -41,21 +41,27 @@ module ProjectsHelper
 
   def link_to_submodule(item)
     submodule_url = item.submodule_url
-    ssh_match     = submodule_url.match(/\A(\w*)@([\w\.]*):([\w\/-]*)\.git\z/)
 
-    url = if ssh_match
-            if ssh_match[2] == Gitlab.config.gitlab.host
-              "#{Gitlab.config.gitlab.url}/#{ssh_match[3]}/tree/#{item.id}"
+    url = if submodule_url.present?
+            ssh_match     = submodule_url.match(/\A(\w*)@([\w\.]*):([\w\/-]*)\.git\z/)
+
+            if ssh_match
+              if ssh_match[2] == Gitlab.config.gitlab.host
+                "#{Gitlab.config.gitlab.url}/#{ssh_match[3]}/tree/#{item.id}"
+              else
+                "http://#{ssh_match[2]}/#{ssh_match[3]}"
+              end
             else
-              "http://#{ssh_match[2]}/#{ssh_match[3]}"
+              uri = URI.parse(submodule_url)
+              if uri.host == Gitlab.config.gitlab.host
+                "#{Gitlab.config.gitlab.url}/#{uri.path.gsub(".git", "")}/tree/#{item.id}"
+              else
+                "http://#{uri.host}/#{uri.path.gsub(".git", "")}"
+              end
             end
+
           else
-            uri = URI.parse(submodule_url)
-            if uri.host == Gitlab.config.gitlab.host
-              "#{Gitlab.config.gitlab.url}/#{uri.path.gsub(".git", "")}/tree/#{item.id}"
-            else
-              "http://#{uri.host}/#{uri.path.gsub(".git", "")}"
-            end
+            "#"
           end
 
     link_to truncate(item.name, length: 40), url
