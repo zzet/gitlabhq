@@ -26,11 +26,12 @@ module API
       #  GET /teams
       get do
         if current_user.admin
-          @teams = paginate Team
+          @teams = Team
         else
-          @teams = paginate current_user.known_teams
+          @teams = current_user.known_teams
         end
         @teams = @teams.search(params[:search]) if params[:search].present?
+        @teams = paginate @teams
         present @teams, with: Entities::Team
       end
 

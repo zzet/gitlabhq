@@ -6,6 +6,7 @@
   teams_path: "/api/:version/teams.json"
   team_path: "/api/:version/teams/:id.json"
   projects_path: "/api/:version/projects.json"
+  assign_projects_path: "/api/:version/projects/to_assign.json"
   project_path: "/api/:version/projects/:id.json"
   notes_path: "/api/:version/projects/:id/notes.json"
   namespaces_path: "/api/:version/namespaces.json"
@@ -116,7 +117,7 @@
   # Return projects list. Filtered by query
   # Only known projects
   projects: (query, callback) ->
-    url = Api.buildUrl(Api.projects_path)
+    url = Api.buildUrl(Api.assign_projects_path)
 
     $.ajax(
       url: url

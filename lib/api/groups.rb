@@ -26,11 +26,12 @@ module API
       #  GET /groups
       get do
         if current_user.admin
-          @groups = paginate Group
+          @groups = Group
         else
-          @groups = paginate current_user.authorized_groups
+          @groups = current_user.authorized_groups
         end
         @groups = @groups.search(params[:search]) if params[:search].present?
+        @groups = paginate @groups
         present @groups, with: Entities::Group
       end
 

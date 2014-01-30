@@ -25,8 +25,26 @@ module API
       # Example Request:
       #   GET /projects
       get do
-        @projects = paginate current_user.known_projects
+        @projects = current_user.known_projects
         @projects = @projects.search(params[:search]) if params[:search].present?
+        @projects = paginate @projects
+        present @projects, with: Entities::Project
+      end
+
+      # Get a projects list for authenticated user
+      #
+      # Example Request:
+      #   GET /projects/to_assign
+      get '/to_assign' do
+        @projects = if current_user.admin?
+                      Project.all
+                    else
+                      Project.where(id: (current_user.master_projects.pluck(:id) +
+                                         current_user.created_projects.pluck(:id) +
+                                         current_user.owned_projects.pluck(:id)))
+                    end
+        @projects = @projects.search(params[:search]) if params[:search].present?
+        @projects = paginate @projects
         present @projects, with: Entities::Project
       end
 
