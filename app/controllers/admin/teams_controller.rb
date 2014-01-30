@@ -11,7 +11,7 @@ class Admin::TeamsController < Admin::ApplicationController
 
     if params[:owner_id].present?
       user = User.find_by(id: params[:owner_id])
-      team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
+      team_ids = TeamUserRelationship.where(user_id: user, team_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER]).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
 
