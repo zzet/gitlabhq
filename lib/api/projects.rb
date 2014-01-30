@@ -26,6 +26,7 @@ module API
       #   GET /projects
       get do
         @projects = paginate current_user.known_projects
+        @projects = @projects.search(params[:search]) if params[:search].present?
         present @projects, with: Entities::Project
       end
 

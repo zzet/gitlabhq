@@ -30,6 +30,7 @@ module API
         else
           @groups = paginate current_user.authorized_groups
         end
+        @groups = @groups.search(params[:search]) if params[:search].present?
         present @groups, with: Entities::Group
       end
 

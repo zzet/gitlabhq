@@ -30,6 +30,7 @@ module API
         else
           @teams = paginate current_user.known_teams
         end
+        @teams = @teams.search(params[:search]) if params[:search].present?
         present @teams, with: Entities::Team
       end
 
