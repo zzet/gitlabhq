@@ -22,8 +22,9 @@ class TeamProjectRelationship < ActiveRecord::Base
   has_many :notifications,  through: :subscriptions
   has_many :subscribers,    through: :subscriptions
 
-  validates :project,         presence: true
-  validates :team,            presence: true
+  validates :project,       presence: true
+  validates :team,          presence: true
+  validates :team_id,       uniqueness: { scope: :project_id }
 
   watch do
     source watchable_name do

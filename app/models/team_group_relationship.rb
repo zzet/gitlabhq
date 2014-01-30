@@ -19,6 +19,7 @@ class TeamGroupRelationship < ActiveRecord::Base
 
   validates :group,           presence: true
   validates :team,            presence: true
+  validates :team_id, uniqueness: { scope: :group_id }
 
   watch do
     source watchable_name do
