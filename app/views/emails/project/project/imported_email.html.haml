@@ -5,10 +5,8 @@
   %tr
     %th Name
     %td Project access
-    %td Repo access
   - @project.users_projects.each do |pm|
     %tr
       %td= link_to pm.user.name, user_url(pm.user.username)
-      %td= pm.project_access_human
-      %td= pm.repo_access_human
+      %td= pm.human_access
 %br

@@ -2,7 +2,7 @@
 %p.light Services allow you to integrate GitLab with other applications
 %hr
 
-.span6
+.col-md-6
   %h4 Configured Services
   %ul.bordered-list
     - @services.each do |service|
@@ -43,7 +43,7 @@
           = service.children.count
           projects
 
-.span5
+.col-md-5
   %h4 Avaliable Services
   %ul.bordered-list
     - @service_modules.each do |service|

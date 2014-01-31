@@ -39,15 +39,15 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
     @event        = @notification.event
     @up           = JSON.load(@event.data)
     @user         = @event.author
-    @team         = Team.find(@up["team_id"])
-    @member       = User.find(@up["user_id"])
-
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'left',
-            'X-Gitlab-Source' => 'team-user-relationship',
-            'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
+    @team         = Team.find_by_id(@up["team_id"])
+    @member       = User.find_by_id(@up["user_id"])
 
     if @team && @member
+      headers 'X-Gitlab-Entity' => 'team',
+              'X-Gitlab-Action' => 'left',
+              'X-Gitlab-Source' => 'team-user-relationship',
+              'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
+
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.name}' membership in '#{@team.name}' team")
     end
   end

@@ -44,15 +44,15 @@ class Emails::User::UsersProject < Emails::User::Base
     @user         = @event.author
     @up           = JSON.load(@event.data)
     @member       = @event.target
-    @project      = Project.find(@up["project_id"])
-    @member       = User.find(@up["user_id"]) if @member.nil? || @member.is_a?(UsersProject)
+    @project      = Project.find_by_id(@up["project_id"])
+    @member       = User.find_by_id(@up["user_id"]) if @member.nil? || @member.is_a?(UsersProject)
 
-    headers 'X-Gitlab-Entity' => 'user',
-            'X-Gitlab-Action' => 'left',
-            'X-Gitlab-Source' => 'project-user-relationship',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
+    if @project && @member
+      headers 'X-Gitlab-Entity' => 'user',
+              'X-Gitlab-Action' => 'left',
+              'X-Gitlab-Source' => 'project-user-relationship',
+              'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
 
-    if @project
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was removed from '#{@project.path_with_namespace}' project team")
     end
   end

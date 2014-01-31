@@ -8,9 +8,10 @@ class Gitlab::Event::Hierarchy::Storage
   end
 
   def clear
-    RequestStore.store[:events_hierarchy_store].clear
+    events.clear
   end
 
+  # Put current event in events tree
   def put args
     if events.blank?
       events << { name: args[:name], data: args[:data], childrens: [] }
@@ -19,6 +20,18 @@ class Gitlab::Event::Hierarchy::Storage
     end
   end
 
+  # Find level and parent to put event
+  #
+  #        1| A |
+  #           |
+  #         _ _ _
+  #        |     |
+  #      2|B|  5|B|
+  #        |     |
+  #      _ _ _ _ _ _
+  #      |   | |   |
+  #     3c  4c 6c  7c
+  #
   def find_place_and_put(event_list, arg)
     if lvl_to_put?(event_list, arg)
       event_list << { name: arg[:name], data: arg[:data], childrens: [] }
@@ -35,14 +48,18 @@ class Gitlab::Event::Hierarchy::Storage
     if lvl.any?
       lvl_meta = Gitlab::Event::Action.parse(lvl.first[:name])
       arg_meta = Gitlab::Event::Action.parse(arg[:name])
-      return lvl_meta == arg_meta ? true : lvl_meta[:details] == arg_meta[:details]
+      return lvl_meta == arg_meta ? true : ((lvl_meta[:details] == arg_meta[:details]) && (!lvl_meta[:details].blank?))
     end
   end
 
   def parent(action, data)
     return nil if events.blank?
 
-    parent_event = events.first[:name] == action ? events.first : find_event(events.last, action, data)
+    parent_event = if events.first[:name] == events.last[:name]
+                     events.last[:name].include?(action) ? events.last : find_event(events.last, action, data)
+                   else
+                     events.first[:name].include?(action) ? events.first : find_event(events.last, action, data)
+                   end
     parent_event
   end
 
@@ -50,7 +67,7 @@ class Gitlab::Event::Hierarchy::Storage
     parent_event = nil
 
     if event[:childrens].any?
-      parent_event = event[:childrens].last[:name] == action ? event : find_event(event[:childrens].last, action, data)
+      parent_event = event[:childrens].last[:name].include?(action) ? event : find_event(event[:childrens].last, action, data)
     end
 
     parent_event

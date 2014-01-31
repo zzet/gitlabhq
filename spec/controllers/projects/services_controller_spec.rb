@@ -7,7 +7,7 @@ describe Projects::ServicesController do
     user.create_namespace!(path: user.username, name: user.username) unless user.namespace
 
     params = { project: attributes_for(:project_with_code) }
-    @project = Projects::CreateContext.new(user, params[:project]).execute
+    @project = ProjectsService.new(user, params[:project]).create
     sign_in user
   end
 
@@ -33,7 +33,7 @@ describe Projects::ServicesController do
 
       describe "GET 'edit' project service" do
         before do
-          @project_service = Projects::Services::ImportContext.new(user, @project, @service, { service: { state_event: :enable }}).execute
+          @project_service = ProjectsService.new(user, @project, { service: { state_event: :enable }}).import_service_pattern(@service)
         end
 
         it "returns http success" do
@@ -67,7 +67,7 @@ describe Projects::ServicesController do
 
       describe "PUT 'update' with project service" do
         before do
-          @project_service = Projects::Services::ImportContext.new(user, @project, @service).execute
+          @project_service = ProjectsService.new(user, @project).import_service_pattern(@service)
         end
 
         it "returns http redirect" do

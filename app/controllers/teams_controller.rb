@@ -26,6 +26,7 @@ class TeamsController < ApplicationController
     respond_to do |format|
       format.html
       format.js
+      format.json { pager_json("events/_events", @events.count) }
       format.atom { render layout: false }
     end
   end
@@ -36,14 +37,14 @@ class TeamsController < ApplicationController
 
   def update
     if team.update_attributes(params[:team])
-      redirect_to team_path(team)
+      redirect_to edit_team_path(team)
     else
       render action: :edit
     end
   end
 
   def destroy
-    ::Teams::RemoveContext.new(current_user, team).execute
+    ::TeamsService.new(current_user, team).delete
 
     redirect_to dashboard_path
   end
@@ -53,7 +54,7 @@ class TeamsController < ApplicationController
   end
 
   def create
-    @team = ::Teams::CreateContext.new(current_user, params[:team]).execute
+    @team = ::TeamsService.new(current_user, params[:team]).create
     if @team.persisted?
       redirect_to team_path(@team)
     else

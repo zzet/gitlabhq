@@ -18,24 +18,66 @@ class Group < Namespace
   has_many :team_group_relationships, dependent: :destroy
   has_many :teams,                    through: :team_group_relationships
   has_many :team_user_relationships,  through: :teams
-  has_many :admins,                   through: :team_user_relationships, source: :user, conditions: { users: { state: :active }, team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } }
+  has_many :admins,                   -> { where({ users: { state: :active },
+                                                   team_user_relationships: { team_access: [Gitlab::Access::OWNER, Gitlab::Access::MASTER] } })},
+                                      through: :team_user_relationships, source: :user
 
   has_many :users_groups, dependent: :destroy
-  has_many :users,      through: :users_groups, conditions: { users: { state: :active } }
-  has_many :guests,     through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::GUEST } }
-  has_many :reporters,  through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::REPORTER } }
-  has_many :developers, through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: Gitlab::Access::DEVELOPER } }
-  has_many :masters,    through: :users_groups, source: :user, conditions: { users: { state: :active }, users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } }
+  has_many :users,      -> { where({ users: { state: :active } }) }, through: :users_groups
 
-  has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
+  has_many :guests,     -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::GUEST } })},
+                        through: :users_groups, source: :user
 
+  has_many :reporters,  -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::REPORTER } })},
+                        through: :users_groups, source: :user
 
-  actions_to_watch [:created, :deleted, :updated, :transfer]
+  has_many :developers, -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::DEVELOPER } })},
+                        through: :users_groups, source: :user
 
-  scope :without_team, ->(team) { team.groups.present? ? where("namespaces.id NOT IN (:ids)", ids: team.groups.pluck(:id)) : scoped }
+  has_many :masters,    -> { where({ users: { state: :active },
+                                     users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } })},
+                        through: :users_groups, source: :user
+
+  watch do
+    source watchable_name do
+      from :create,   to: :created
+      from :update,   to: :updated
+      from :destroy,  to: :deleted
+      # Mass actions
+      from :memberships_add,  to: :members_added
+      from :teams_add,        to: :teams_added
+      from :teams_remove,     to: :teams_removed
+    end
+
+    source :project do
+      before do: -> { @target = @source.group }, conditions: -> { @source.group.present? }
+      from :create,   to: :added,   conditions: -> { @source.group.present? }
+      from :update,   to: :added,   conditions: -> { @source.group.present? && @source.namespace_id_changed? && @source.namespace_id != @changes["namespace_id"].first }
+      from :update,   to: :removed, conditions: -> { @source.namespace_id_changed? && @source.namespace_id != @changes["namespace_id"].first && Group.find_by_id(@changes["namespace_id"].first).present? } do
+        @target = Group.find_by_id(@changes["namespace_id"].first)
+        @event_data[:owner_changes] = @changes
+      end
+      from :destroy,  to: :deleted, conditions: -> { @source.group.present? }
+    end
+
+    source :users_group do
+      before do: -> { @target = @source.group }
+      from :create,   to: :joined
+      from :update,   to: :updated
+      from :destroy,  to: :left
+    end
+
+    source :team_group_relationship do
+      before do: -> { @target = @source.group }
+      from :create,   to: :assigned
+      from :destroy,  to: :resigned
+    end
+  end
+
+  scope :without_team, ->(team) { team.groups.present? ? where.not(id: team.groups) : all }
 
   def human_name
     name
@@ -47,7 +89,7 @@ class Group < Namespace
 
   def add_users(user_ids, group_access)
     user_ids.compact.each do |user_id|
-      user = self.users_groups.find_or_initialize_by_user_id(user_id)
+      user = self.users_groups.find_or_initialize_by(user_id: user_id)
       user.update_attributes(group_access: group_access)
     end
   end

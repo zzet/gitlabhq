@@ -1,0 +1,24 @@
+= raw "#{ link_to @user.name, user_url(@user.username) } updated members in #{ link_to @project.path_with_namespace, project_url(@project.path_with_namespace) } project team:"
+-#%br
+-#%table
+  -#%caption Added members
+  -#%tr
+    -#%th Name
+    -#%td Project access
+  -#- @new_members.each do |pm|
+    -#%tr
+      -#%td= link_to pm.user.name, user_url(pm.user.username)
+      -#%td= pm.human_access
+-#%br
+
+-#%table
+  -#%caption Project team members now
+  -#%tr
+    -#%th Name
+    -#%td Project access
+    -#%td Repo access
+  -#- @project.users_projects.each do |pm|
+    -#%tr
+      -#%td= link_to pm.user.name, user_url(pm.user.username)
+      -#%td= pm.human_access
+-#%br

@@ -16,15 +16,13 @@ class Projects::BranchesController < Projects::ApplicationController
   end
 
   def create
-    Projects::Branches::CreateContext.new(current_user, @project, params).execute
+    ProjectsService.new(current_user, @project, params).repository.create_branch(params[:branch_name], params[:ref])
 
     redirect_to project_branches_path(@project)
   end
 
   def destroy
-    branch = @repository.find_branch(params[:id])
-
-    Projects::Branches::RemoveContext.new(current_user, @project, branch).execute
+    ProjectsService.new(current_user, @project, params).repository.delete_branch(params[:id])
 
     respond_to do |format|
       format.html { redirect_to project_branches_path(@project) }

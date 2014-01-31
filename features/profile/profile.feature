@@ -8,8 +8,8 @@ Feature: Profile
 
   Scenario: I edit profile
     Given I visit profile page
-    Then I change my contact info
-    And I should see new contact info
+    Then I change my profile info
+    And I should see new profile info
 
   Scenario: I change my password without old one
     Given I visit profile password page
@@ -26,6 +26,14 @@ Feature: Profile
     Given I visit profile page
     Then I change my avatar
     And I should see new avatar
+    And I should see the "Remove avatar" button
+
+  Scenario: I remove my avatar
+    Given I visit profile page
+    And I have an avatar
+    When I remove my avatar
+    Then I should see my gravatar
+    And I should not see the "Remove avatar" button
 
   Scenario: My password is expired
     Given my password is expired

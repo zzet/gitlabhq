@@ -6,7 +6,7 @@ class Admin::Projects::MembersController < Admin::Projects::ApplicationControlle
   end
 
   def update
-    if Projects::Users::UpdateRelationContext.new(@current_user, @project, team_member, params).execute
+    if ProjectsService.new(@current_user, @project, params).update_membership(team_member)
       redirect_to [:admin, project],  notice: 'Project Access was successfully updated.'
     else
       render action: "edit"
@@ -14,7 +14,7 @@ class Admin::Projects::MembersController < Admin::Projects::ApplicationControlle
   end
 
   def destroy
-    Projects::Users::RemoveRelationContext.new(@current_user, @project, member, params).execute
+    ProjectsService.new(@current_user, @project, params).remove_membership(team_member)
 
     redirect_to :back
   end

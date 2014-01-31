@@ -1,4 +1,4 @@
-= form_for @group_relation, url: team_groups_path(@team) do |f|
+= form_for @group_relation, url: team_groups_path(@team), html: { class: 'form-horizontal'} do |f|
   %fieldset
     %legend
       Assign
@@ -6,9 +6,9 @@
       team to Groups of projects
 
     %p 1. Choose groups you want assigned to the team
-    .control-group
-      = f.label :group_ids, "Groups"
-      .controls= select_tag :group_ids, options_for_select(@avaliable_groups.map {|g| [g.name, g.id]}), multiple: true, class: 'input-large chosen'
+    .form-group
+      = f.label :group_ids, "Groups", class: 'control-label'
+      .col-sm-10= groups_select_tag(:group_ids, multiple: true, class: 'input-large input-clamp')
 
     .form-actions
       = f.submit 'Assign team on selected groups', class: "btn btn-create"

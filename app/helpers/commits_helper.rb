@@ -16,7 +16,7 @@ module CommitsHelper
   end
 
   def each_diff_line(diff, index)
-    Gitlab::DiffParser.new(diff).each do |full_line, type, line_code, line_new, line_old|
+    Gitlab::Diff::GritParser.new(diff).each do |full_line, type, line_code, line_new, line_old|
       yield(full_line, type, line_code, line_new, line_old)
     end
   end
@@ -103,6 +103,10 @@ module CommitsHelper
   # Returns the sorted alphabetically links to branches, separated by a comma
   def commit_branches_links(project, branches)
     branches.sort.map { |branch| link_to(branch, project_tree_path(project, branch)) }.join(", ").html_safe
+  end
+
+  def get_old_file(project, commit, diff)
+    project.repository.blob_at(commit.parent_id, diff.old_path) if commit.parent_id
   end
 
   protected

@@ -1,6 +1,4 @@
-class Profiles::GroupsController < ApplicationController
-  layout "profile"
-
+class Profiles::GroupsController < Profiles::ApplicationController
   def index
     @user_groups = current_user.users_groups.page(params[:page]).per(20)
   end
@@ -19,6 +17,6 @@ class Profiles::GroupsController < ApplicationController
   private
 
   def group
-    @group ||= Group.find_by_path(params[:id])
+    @group ||= Group.find_by(path: params[:id])
   end
 end

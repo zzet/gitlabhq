@@ -43,14 +43,14 @@ class Service::Jenkins < Service
 
       if configuration.merge_request_enabled
         # Update code for merge requests in project
-        mrs = project.merge_requests.opened.by_branch(branch_name).scoped
+        mrs = project.merge_requests.opened.by_branch(branch_name).all
         mrs.each do |merge_request|
           build_merge_request(merge_request, user)
         end
       end
 
       # Update code for merge requests to project from forks
-      mrs = project.fork_merge_requests.opened.by_branch(branch_name).scoped
+      mrs = project.fork_merge_requests.opened.by_branch(branch_name).all
       mrs.each do |merge_request|
         if merge_request.source_project != merge_request.target_project
           project_service = merge_request.target_project.services.where(type: Service::Jenkins).first

@@ -17,14 +17,14 @@ class Gitlab::Event::Notification::Creator::Issue < Gitlab::Event::Notification:
 
     subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
     subscriptions.each do |subscription|
-      if subscriber_can_get_notification?(subscription, event)
+      if subscriber_can_get_notification?(subscription, event) && no_notification?(event, subscription.user)
         notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
       end
     end
   end
 
   def create_notification_for_assigned(event)
-    ::Event::Subscription::Notification.create(event: event, subscriber: event.source.assignee)
+    ::Event::Subscription::Notification.create(event: event, subscriber: event.source.assignee, notification_state: :delayed)
   end
 
   def correct_assigned?(event)

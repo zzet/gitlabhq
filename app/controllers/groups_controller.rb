@@ -15,6 +15,8 @@ class GroupsController < ApplicationController
     @groups = @groups.search(params[:name]) if params[:name].present?
   end
 
+  before_filter :default_filter, only: [:issues, :merge_requests]
+
   layout :determine_layout
 
   before_filter :set_title, only: [:new, :create]
@@ -24,7 +26,7 @@ class GroupsController < ApplicationController
   end
 
   def create
-    @group = Groups::CreateContext.new(current_user, params[:group]).execute
+    @group = GroupsService.new(current_user, params[:group]).create
     if @group.persisted?
       redirect_to @group, notice: 'Group was successfully created.'
     else
@@ -39,7 +41,7 @@ class GroupsController < ApplicationController
     @last_push = current_user.recent_push
 
     @teams = @group.teams
-    @projects = @group.projects
+    @projects = @group.projects.sorted_by_push_date
 
     @owners = @group.owners
     @masters = @group.masters
@@ -65,22 +67,20 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.js
+      format.json { pager_json("events/_events", @events.count) }
       format.atom { render layout: false }
     end
   end
 
-  # Get authored or assigned open merge requests
   def merge_requests
-    @merge_requests = current_user.cared_merge_requests.of_group(@group)
-    @merge_requests = FilterContext.new(@current_user, @merge_requests, params).execute
+    @merge_requests = FilteringService.new.execute(current_user, MergeRequest, params)
+    @merge_requests = @merge_requests.of_group(@group)
     @merge_requests = @merge_requests.recent.page(params[:page]).per(20)
   end
 
-  # Get only assigned issues
   def issues
-    @issues = current_user.assigned_issues.of_group(@group)
-    @issues = FilterContext.new(@current_user, @issues, params).execute
+    @issues = FilteringService.new.execute(current_user, Issue, params)
+    @issues = @issues.of_group(@group)
     @issues = @issues.recent.page(params[:page]).per(20)
     @issues = @issues.includes(:author, :project)
 
@@ -109,7 +109,7 @@ class GroupsController < ApplicationController
   end
 
   def destroy
-    ::Groups::RemoveContext.new(current_user, group).execute
+    ::GroupsService.new(current_user, group).delete
 
     redirect_to root_path, notice: 'Group was removed.'
   end
@@ -117,11 +117,11 @@ class GroupsController < ApplicationController
   protected
 
   def group
-    @group ||= Group.find_by_path(params[:id])
+    @group ||= Group.find_by(path: params[:id])
   end
 
   def projects
-    @projects ||= (current_user.admin? ? Project.scoped : current_user.known_projects).where(namespace_id: group.id).sorted_by_push_date
+    @projects ||= (current_user.admin? ? Project.all : current_user.known_projects).where(namespace_id: group.id).sorted_by_push_date
   end
 
   def project_ids
@@ -157,5 +157,11 @@ class GroupsController < ApplicationController
     else
       'group'
     end
+  end
+
+  def default_filter
+    params[:scope] = 'assigned-to-me' if params[:scope].blank?
+    params[:state] = 'opened' if params[:state].blank?
+    params[:group_id] = @group.id
   end
 end

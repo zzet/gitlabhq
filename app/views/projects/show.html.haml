@@ -1,5 +1,5 @@
 .row
-  .span8
+  .col-md-8
     = render "events/event_last_push", event: @last_push
     = link_to dashboard_path, class: 'btn btn-tiny' do
       &larr; To dashboard
@@ -9,19 +9,20 @@
     = render 'shared/event_filter'
     .content_list
     .loading.hide
-  .span4
-    -#.light-well
-    .project-side
+  .col-md-4.project-side.hidden-sm
+    .clearfix
+      - if @project.archived?
+        .alert
+          %h5
+            %i.icon-warning-sign
+            Archived project!
+          %p Repository is read-only
+
       - if can? current_user, :download_code, @project
         .project-home-dropdown
           = render "dropdown"
+
       = render "shared/watch_button", current_entity: @project
-      %h3.page-title
-        %span.public-label
-        - if @project.public
-          Public
-        - else
-          Private
 
       - if @project.description.present?
         .clearfix
@@ -34,6 +35,7 @@
             Forked from:
             %br
             = link_to @project.forked_from_project.name_with_namespace, project_path(@project.forked_from_project)
+
         - unless @project.empty_repo?
           - if current_user && can?(current_user, :fork_project, @project) && @project.namespace != current_user.namespace
             - if current_user.already_forked?(@project)
@@ -46,15 +48,19 @@
                 Fork repository
 
           - if can? current_user, :download_code, @project
-            = link_to archive_project_repository_path(@project), class: "btn btn-block" do
-              %i.icon-download-alt
-              %span Download
-            = link_to project_compare_index_path(@project, from: @repository.root_ref, to: @ref || @repository.root_ref), class: 'btn btn-block' do
-              Compare code
+            = render 'projects/repositories/download_archive', btn_class: 'btn-block btn-group-justified', split_button: true
 
-      .clearfix
-        .form-horizontal
-          = render "shared/clone_panel"
+          = link_to project_compare_index_path(@project, from: @repository.root_ref, to: @ref || @repository.root_ref), class: 'btn btn-block' do
+            Compare code
+
+          - if @repository.readme
+            - readme = @repository.readme
+            = link_to project_blob_path(@project, tree_join(@repository.root_ref, readme.name)), class: 'btn btn-block' do
+              = readme.name
+
+          .clearfix
+            .form-horizontal
+              = render "shared/clone_panel"
 
       .clearfix.prepend-top-10
         .project-home-links
@@ -64,6 +70,15 @@
           %span.light.prepend-left-20= repository_size
 
       .prepend-top-10
+        %p
+          %span.light Last push at
+          - if @project.last_pushed_at
+            #{@project.last_pushed_at.stamp('Aug 22, 2013')}
+          - else
+            Never
+        %p
+          %span.light Last activity at
+          #{@project.last_activity_date.stamp('Aug 22, 2013')}
         %p
           %span.light Created on
           #{@project.created_at.stamp('Aug 22, 2013')}

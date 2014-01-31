@@ -6,7 +6,7 @@ class Gitlab::Event::Notification::Creator::Note < Gitlab::Event::Notification::
 
     notifications << create_notification_for_commit_author(event) if can_create_for_commit_author?(event)
 
-    #notifications << create_notification_for_mentioned_users(event, notifications.flatten)
+    notifications << create_notification_for_mentioned_users(event, notifications.flatten)
   end
 
   def can_create_for_commit_author?(event)
@@ -14,7 +14,7 @@ class Gitlab::Event::Notification::Creator::Note < Gitlab::Event::Notification::
   end
 
   def create_notification_for_commit_author(event)
-    ::Event::Subscription::Notification.create(event: event, subscriber: event.source.commit_author)
+    ::Event::Subscription::Notification.create(event: event, subscriber: event.source.commit_author, notification_state: :delayed)
   end
 
   def correct_commit_author?(event)
@@ -22,15 +22,23 @@ class Gitlab::Event::Notification::Creator::Note < Gitlab::Event::Notification::
   end
 
   def no_notification?(event, user)
-    return false if user.blank?
-    ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user).blank?
+    notifications = ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user)
+    return false if notifications.any?
+
+    parent_event = parent_event_for event
+    return true if parent_event.blank?
+
+    notifications = ::Event::Subscription::Notification.where(event_id: parent_event, subscriber_id: user)
+    return true if notifications.blank? && no_notification?(parent_event, user)
+
+    false
   end
 
   def create_notification_for_mentioned_users(event, notifications)
     notified_user_ids = notifications.map { |n| n.subscriber_id }
     user_to_notify = event.source.mentioned_users.reject { |u| notified_user_ids.include?(u.id) }
     user_to_notify.each do |user|
-      ::Event::Subscription::Notification.create(event: event, subscriber: user)
+      ::Event::Subscription::Notification.create(event: event, subscriber: user, notification_state: :delayed) if no_notification?(event, user)
     end
   end
 end

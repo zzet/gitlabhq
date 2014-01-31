@@ -58,7 +58,7 @@ module Grack
         end
 
       else
-        return unauthorized unless project.public
+        return unauthorized unless project.public?
       end
 
       if authorized_git_request?
@@ -80,7 +80,7 @@ module Grack
     def authorize_request(service)
       case service
       when 'git-upload-pack'
-        project.public || can?(user, :download_code, project)
+        can?(user, :download_code, project)
       when'git-receive-pack'
         refs.each do |ref|
           action = if project.protected_branch?(ref)
@@ -92,6 +92,9 @@ module Grack
           return false unless can?(user, action, project)
         end
 
+        # Never let git-receive-pack trough unauthenticated; it's
+        # harmless but git < 1.8 doesn't like it
+        return false if user.nil?
         true
       else
         false

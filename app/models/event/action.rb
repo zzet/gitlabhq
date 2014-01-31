@@ -9,6 +9,7 @@ class Event::Action
         :commented,
         :deleted,
         :added,
+        :removed,
         :joined,
         :left,
         :transfer,
@@ -17,7 +18,6 @@ class Event::Action
         :commented_merge_request,
         :commented_issue,
         :commented_commit,
-        :imported,
 
         # Git specific
         :pushed,
@@ -25,6 +25,8 @@ class Event::Action
         :deleted_branch,
         :created_tag,
         :deleted_tag,
+        :protected,
+        :unprotected,
         :cloned,
         :blocked,
         :activate,
@@ -36,7 +38,17 @@ class Event::Action
         :merged,
         :assigned,
         :reassigned,
-        :resigned
+        :resigned,
+
+        # mass actions
+        :imported,
+        :members_added,
+        :members_updated,
+        :members_removed,
+        :teams_added,
+        :teams_removed,
+        :groups_added,
+        :projects_added
       ]
     end
 

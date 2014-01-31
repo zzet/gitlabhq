@@ -1,16 +1,23 @@
 class SearchController < ApplicationController
+  include SearchHelper
+
   def show
-    result = SearchContext.new(@current_user, params).execute
+    @project = Project.find_by(id: params[:project_id]) if params[:project_id].present?
+    @group = Group.find_by(id: params[:group_id])       if params[:group_id].present?
 
-    @project        = result[:project]                  if result[:blobs].any?
-    @project        = Project.find(params[:project_id]) if params[:project_id].present?
-    @group          = Group.find(params[:group_id])     if params[:group_id].present?
+    if @project
+      return access_denied! unless can?(current_user, :download_code, @project)
+      @search_results = SearchService.new(current_user, params).project_search(@project)
+    else
+      @search_results = SearchService.new(current_user, params).global_search
+    end
+  end
 
-    @projects       = result[:projects]
-    @merge_requests = result[:merge_requests]
-    @issues         = result[:issues]
-    @wiki_pages     = result[:wiki_pages]
-    @blobs          = Kaminari.paginate_array(result[:blobs]).page(params[:page]).per(20)
-    @total_results = @projects.count + @merge_requests.count + @issues.count + @wiki_pages.count + @blobs.total_count
+  def autocomplete
+    term = params[:term]
+    @project = Project.find(params[:project_id]) if params[:project_id].present?
+    @ref = params[:project_ref] if params[:project_ref].present?
+
+    render json: search_autocomplete_opts(term).to_json
   end
 end

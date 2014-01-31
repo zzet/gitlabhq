@@ -86,7 +86,7 @@
         font-size: 12px;
       }
     }
-    .old_line, .new_line {
+    .old_line, .new_line, .diff_line {
       margin: 0px;
       padding: 0px;
       border: none;
@@ -96,8 +96,9 @@
       border-right: 1px solid #ccc;
       text-align: right;
       min-width: 35px;
-      max-width: 35px;
+      max-width: 50px;
       width: 35px;
+      -ms-user-select: none;
       @include user-select(none);
       a {
         float: left;
@@ -108,6 +109,15 @@
           text-decoration: underline;
         }
       }
+      &.new {
+        background: #CFD;
+      }
+      &.old {
+        background: #FDD;
+      }
+    }
+    .diff_line {
+      padding: 0;
     }
     .line_holder {
       &.old .old_line,
@@ -137,6 +147,11 @@
       &.matched {
         color: #ccc;
         background: #fafafa;
+      }
+      &.parallel {
+        display: table-cell;
+        overflow: hidden;
+        width: 50%;
       }
     }
   }
@@ -401,8 +416,8 @@
 
 .commits-compare-switch{
   background: url("switch_icon.png") no-repeat center center;
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   text-indent: -9999px;
   float: left;
   margin-right: 9px;
@@ -473,11 +488,6 @@ li.commit {
     font-size: 14px;
     margin-bottom: 2px;
 
-    .build_status {
-      float: right;
-      margin-right: 10px;
-    }
-
     .notes_count {
       float: right;
       margin-right: 10px;
@@ -488,9 +498,13 @@ li.commit {
       font-family: $monospace_font;
     }
 
+    .str-truncated {
+      max-width: 70%;
+    }
+
     .commit-row-message {
-      color: #555;
-      font-weight: bolder;
+      color: #333;
+      font-weight: 500;
       &:hover {
         color: #444;
         text-decoration: underline;
@@ -499,13 +513,14 @@ li.commit {
   }
 
   .commit-row-info {
+    color: #777;
+
     a {
       color: #777;
     }
 
     .committed_ago {
       float: right;
-      @extend .cgray;
     }
   }
 
@@ -518,5 +533,15 @@ li.commit {
       float: right;
       @extend .cgray;
     }
+  }
+}
+
+.hide-line-numbers {
+  .linenumber-content {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  .diff-line-num:before {
+    content: attr(data-linenumber) !important;
   }
 }

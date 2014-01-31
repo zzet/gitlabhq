@@ -9,6 +9,8 @@ class Gitlab::Event::Notification::Creator::Project < Gitlab::Event::Notificatio
       notifications << create_project_move_notifications(event)
     when :imported
       notifications << create_project_import_notifications(event)
+    when :members_added
+      notifications << create_project_mass_member_add_notifications(event)
     else
       notifications = super(event)
     end
@@ -19,6 +21,30 @@ class Gitlab::Event::Notification::Creator::Project < Gitlab::Event::Notificatio
   private
 
   def create_project_import_notifications(event)
+    project = event.source
+    notifications = []
+
+    subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
+    subscriptions.each do |subscription|
+      if subscriber_can_get_notification?(subscription, event)
+        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+      end
+    end
+
+    namespace = project.namespace
+    if namespace.is_a? Group
+      subscriptions = ::Event::Subscription.by_target(namespace).by_source_type(event.source_type)
+      subscriptions.each do |subscription|
+        if subscriber_can_get_notification?(subscription, event)
+          notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        end
+      end
+    end
+
+    notifications
+  end
+
+  def create_project_mass_member_add_notifications(event)
     project = event.source
     notifications = []
 
