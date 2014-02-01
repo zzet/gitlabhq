@@ -1,0 +1,7 @@
+= raw "Team '#{ link_to @team.path, team_url(@team.path) }' was assigned on #{@projects.count} projects:"
+%br
+%br
+- @projects.each do |pr|
+  %p
+    = link_to project_url(pr.path_with_namespace) do
+      = "#{pr.name_with_namespace} (#{pr.path_with_namespace})"

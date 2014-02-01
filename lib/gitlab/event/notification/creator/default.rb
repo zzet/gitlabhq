@@ -48,6 +48,11 @@ class Gitlab::Event::Notification::Creator::Default
     false
   end
 
+  def parent_event event
+    return event if event.parent_event.nil?
+    parent_event event.parent_event
+  end
+
   private
 
   def create_adjacent_notifications(event)

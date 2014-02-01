@@ -1,0 +1,7 @@
+= raw "Team '#{ link_to @team.path, team_url(@team.path) }' was assigned on #{@groups.count} groups:"
+%br
+%br
+- @groups.each do |g|
+  %p
+    = link_to group_url(g.path) do
+      = "#{g.name} (#{g.path})"

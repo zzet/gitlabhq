@@ -16,7 +16,6 @@
   %tr
     %th Name
     %td Project access
-    %td Repo access
   - @project.users_projects.each do |pm|
     %tr
       %td= link_to pm.user.name, user_url(pm.user.username)

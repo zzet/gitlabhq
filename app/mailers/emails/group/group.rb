@@ -65,10 +65,10 @@ class Emails::Group::Group < Emails::Group::Base
     @user         = @event.author
     @group        = @event.source
     @events       = Event.where(parent_event_id: @event.id, target_type: Team)
-    @new_members  = @group.team_group_relationships.where(team_id: @events.pluck(:target_id))
+    @teams        = Team.where(id: @events.pluck(:target_id))
 
     headers 'X-Gitlab-Entity' => 'group',
-            'X-Gitlab-Action' => 'members_added',
+            'X-Gitlab-Action' => 'teams_added',
             'X-Gitlab-Source' => 'group',
             'In-Reply-To'     => "group-#{@group.path}-teams"
 

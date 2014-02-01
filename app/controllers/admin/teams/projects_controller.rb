@@ -20,7 +20,7 @@ class Admin::Teams::ProjectsController < Admin::Teams::ApplicationController
   def destroy
     team_service.resign_from_projects(team_project)
 
-    redirect_to admin_team_path(team), notice: 'Team of users was successfully reassigned from project.'
+    redirect_to admin_team_path(team), notice: 'Team of users was successfully resigned from project.'
   end
 
   protected

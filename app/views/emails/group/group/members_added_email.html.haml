@@ -1,4 +1,4 @@
-= raw "#{ link_to @user.name, user_url(@user.username) } added members to #{ link_to @group.name, group_url(@group.path) } group team:"
+= raw "#{ link_to @user.name, user_url(@user.username) } added #{@new_members.count} members to #{ link_to @group.name, group_url(@group.path) } group team:"
 %br
 %table
   %caption Added members
@@ -21,3 +21,5 @@
       %td= link_to pm.user.name, user_url(pm.user.username)
       %td= pm.human_access
 %br
+%br
+NOTE: all groups members has access to groups projects
