@@ -126,4 +126,20 @@ class Emails::Project::Project < Emails::Project::Base
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] #{@events.count} users were removed from project team")
   end
+
+  def teams_added_email(notification)
+    @notification = notification
+    @event        = @notification.event
+    @user         = @event.author
+    @project      = @event.source
+    @events       = Event.where(parent_event_id: @event.id, target_type: Team)
+    @new_teams    = @project.team_project_relationships.where(team_id: @events.pluck(:target_id))
+
+    headers 'X-Gitlab-Entity' => 'project',
+            'X-Gitlab-Action' => 'teams_added',
+            'X-Gitlab-Source' => 'project',
+            'In-Reply-To'     => "project-#{@project.path_with_namespace}-teams"
+
+    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] #{@events.count} teams were assigned to project team")
+  end
 end
