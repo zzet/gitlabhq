@@ -25,8 +25,9 @@ class BaseService
   end
 
   def multiple_action(action_name, action_source, source, items = nil, &block)
+    RequestStore.store[:borders] ||= []
+
     if [items].flatten.many? || items.nil?
-      RequestStore.store[:borders] ||= []
       RequestStore.store[:borders].push("gitlab.#{action_name}.#{action_source}")
       Gitlab::Event::Action.trigger :"#{action_name}", source
     end

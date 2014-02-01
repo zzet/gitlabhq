@@ -21,6 +21,7 @@ module Projects::ServicesActions
 
     service
   end
+
   def update_service_action(service)
     service_params = params
     service_configuration_params = service_params.delete(:configuration)

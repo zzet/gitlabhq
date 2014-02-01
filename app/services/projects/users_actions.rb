@@ -8,8 +8,6 @@ module Projects::UsersActions
       users = User.where(id: user_ids)
       @project.team << [users, params[:project_access]]
     end
-
-    receive_delayed_notifications
   end
 
   def update_membership_action(member)
@@ -37,8 +35,6 @@ module Projects::UsersActions
       @project.team.import(giver)
     end
 
-    receive_delayed_notifications
-
     status
   end
 
@@ -49,8 +45,6 @@ module Projects::UsersActions
     multiple_action("memberships_remove", "project", project, user_project_ids) do
       user_project_relations.destroy_all
     end
-
-    receive_delayed_notifications
   end
 
   def batch_update_memberships_action
@@ -60,8 +54,6 @@ module Projects::UsersActions
     multiple_action("memberships_update", "project", project, user_project_ids) do
       user_project_relations.find_each { |membership| membership.update(project_access: params[:team_member][:project_access]) }
     end
-
-    receive_delayed_notifications
   end
 
   private
