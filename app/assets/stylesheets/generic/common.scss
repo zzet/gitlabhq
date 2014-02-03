@@ -486,6 +486,7 @@ table {
 
 .navbar-spinner {
   width: 100%;
+  min-height: 0px;
 
   .turbolink-spinner {
     width: 100%;
@@ -497,6 +498,9 @@ table {
       width: 100px;
       padding-top: 14px;
       padding-bottom: 14px;
+      .icon-spin {
+        font-size: 19px;
+      }
     }
   }
 }

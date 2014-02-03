@@ -13,11 +13,6 @@
 
       .navbar-collapse.collapse
         %ul.nav.navbar-nav
-          %li
-            %a
-              %div.hide.turbolink-spinner
-                %i.icon-refresh.icon-spin
-                Loading...
           %li.hidden-sm
             = render "layouts/search"
           %li.visible-sm
@@ -49,3 +44,8 @@
           %li
             = link_to current_user, class: "profile-pic", id: 'profile-pic' do
               = image_tag avatar_icon(current_user.email, 26), alt: 'User activity'
+
+  .navbar.navbar-fixed-top.navbar-spinner
+    .turbolink-spinner.hide
+      .container
+        %i.icon-refresh.icon-spin
