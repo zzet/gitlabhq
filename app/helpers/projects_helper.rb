@@ -228,4 +228,12 @@ module ProjectsHelper
       "Never"
     end
   end
+
+  def project_last_push(project)
+    if project.last_pushed_at
+      time_ago_with_tooltip(project.last_pushed_at, 'bottom', 'last_push_time_ago')
+    else
+      "Never"
+    end
+  end
 end
