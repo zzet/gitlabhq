@@ -15,7 +15,8 @@
     = form_for(member, as: :team_member, url: batch_update_project_team_members_path(@project), method: :post, html: { class: 'form-horizontal users-group-form' }) do |f|
       .alert.prepend-top-20
         .form-group
-          = f.select :project_access, options_for_select(UsersProject.access_roles, member.project_access), {}, class: "input-large medium project-access-select "
+          .col-sm-2
+            = f.select :project_access, options_for_select(UsersProject.access_roles, member.project_access), {}, class: "input-large medium project-access-select form-control"
           = f.submit 'Save', class: 'btn btn-save'
           or
           = link_to 'Remove', batch_delete_project_team_members_path(@project), class: 'btn btn-danger js-batch-action-remove-link', data: { confirm: "remove from project team?" }
