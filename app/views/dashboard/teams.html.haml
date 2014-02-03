@@ -69,7 +69,7 @@
           - @projects.each do |project|
             - next unless project.teams.any?
             %li{ class: (project.path_with_namespace == params[:project]) ? 'active' : 'light' }
-              = link_to projects_dashboard_path(project: project.path_with_namespace) do
+              = link_to teams_dashboard_path(project: project.path_with_namespace) do
                 %i.icon-folder-close-alt
                 = project.name_with_namespace
                 %small.pull-right
