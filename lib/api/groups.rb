@@ -35,6 +35,18 @@ module API
         present @groups, with: Entities::Group
       end
 
+      get '/to_assign' do
+        @groups = if current_user.admin?
+                      Group.all
+                    else
+                      Group.where(id: (current_user.created_groups.pluck(:id) +
+                                         current_user.owned_groups.pluck(:id)))
+                    end
+        @groups = @groups.search(params[:search]) if params[:search].present?
+        @groups = paginate @groups
+        present @groups, with: Entities::Group
+      end
+
       # Create group. Available only for admin
       #
       # Parameters:

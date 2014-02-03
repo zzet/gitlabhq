@@ -2,6 +2,7 @@
   users_path: "/api/:version/users.json"
   user_path: "/api/:version/users/:id.json"
   groups_path: "/api/:version/groups.json"
+  assign_groups_path: "/api/:version/groups/to_assign.json"
   group_path: "/api/:version/groups/:id.json"
   teams_path: "/api/:version/teams.json"
   team_path: "/api/:version/teams/:id.json"
@@ -89,7 +90,7 @@
   # Return groups list. Filtered by query
   # Only known groups
   groups: (query, callback) ->
-    url = Api.buildUrl(Api.groups_path)
+    url = Api.buildUrl(Api.assign_groups_path)
 
     $.ajax(
       url: url
