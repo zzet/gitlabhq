@@ -11,6 +11,7 @@
     .loading.hide
   .col-md-4.project-side.hidden-sm
     .clearfix
+    .clearfix
       - if @project.archived?
         .alert
           %h5
@@ -24,8 +25,10 @@
 
       = render "shared/watch_button", current_entity: @project
 
-      - if @project.description.present?
-        .clearfix
+      .clearfix
+        .visibility_level
+          = visibility_level_icon(@project.visibility_level)
+        - if @project.description.present?
           %p.light= @project.description
 
       .clearfix
