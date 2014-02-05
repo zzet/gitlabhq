@@ -1,5 +1,5 @@
 .dashboard
-  .activities.span8
+  .activities.col-sm-8.hidden-sm
     = render "events/event_last_push", event: @last_push
     = link_to dashboard_path, class: 'btn btn-tiny' do
       &larr; To dashboard
@@ -12,7 +12,7 @@
     - else
       %p.nothing_here_message Projects activity will be displayed here
     .loading.hide
-  .side.span4
+  .side.col-sm-4
     %div
       -#- if can? current_user, :manage_team, @team
         -#.dropdown.pull-right

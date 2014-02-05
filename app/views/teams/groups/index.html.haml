@@ -3,16 +3,13 @@
 %p.light
   members of team have access to all team groups.
 %hr
+
 - can_manage_team =  current_user.can? :manage_team, @team
-.ui-box.span5.no_margin
-  .title
-    %strong #{@team.name}
-    team groups
-    %small
-      (#{@groups.count})
-  %ul.well-list
+.col-md-6
+  %ul.well-list.team_groups_list
     - @groups.each do |group|
       = render 'group', group: group, show_controls: can_manage_team
+
 - if can_manage_team
-  .span5.pull-right
+  .col-md-6.pull-right
     = render "new_group"

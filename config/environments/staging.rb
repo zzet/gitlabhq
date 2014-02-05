@@ -81,7 +81,7 @@ Gitlab::Application.configure do
 
   #config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    :address => 'mail-sandbox-web.st2.ul.home',
+    :address => 'mail-sandbox-web-1.production.ul.home',
     :port => 2525,
     :user_name => 'Gitlab',
     :password => '5b4bbf451aa13c7c284024796b131445'

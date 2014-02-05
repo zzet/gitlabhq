@@ -67,7 +67,7 @@ describe OldEvent do
   end
 
   describe 'Team events' do
-    let(:user_project) { stub.as_null_object }
+    let(:user_project) { double.as_null_object }
     let(:observer) { UsersProjectObserver.instance }
 
     before {

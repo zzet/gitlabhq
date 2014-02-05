@@ -1,17 +1,17 @@
-= form_for @team do |f|
+= form_for @team, html: { class: 'group-form form-horizontal' } do |f|
   - if @team.errors.any?
     .alert.alert-error
       %span= @team.errors.full_messages.first
-  .control-group
-    = f.label :name do
-      Team name is
-    .controls
-      = f.text_field :name, placeholder: "Ex. OpenSource", class: "input-xxlarge left"
+  .form-group
+    = f.label :name, class: 'control-label' do
+      Team name
+    .col-sm-10
+      = f.text_field :name, placeholder: "Ex. OpenSource", class: "form-control"
 
-  .control-group.group-description-holder
-    = f.label :description, "Details"
-    .controls
-      = f.text_area :description, maxlength: 250, class: "input-xxlarge js-gfm-input", rows: 4
+  .form-group.group-description-holder
+    = f.label :description, "Details", class: 'control-label'
+    .col-sm-10
+      = f.text_area :description, maxlength: 250, class: "form-control js-gfm-input", rows: 4
 
   .form-actions
     = f.submit 'Create team', class: "btn btn-create"

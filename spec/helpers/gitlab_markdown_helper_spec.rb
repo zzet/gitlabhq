@@ -16,6 +16,7 @@ describe GitlabMarkdownHelper do
   before do
     # Helper expects a @project instance variable
     @project = project
+    @repository = project.repository
   end
 
   describe "#gfm" do
@@ -393,7 +394,7 @@ describe GitlabMarkdownHelper do
     end
 
     it "should leave ref-like href of 'manual' links untouched" do
-      markdown("why not [inspect !#{merge_request.iid}](http://example.tld/#!#{merge_request.iid})").should == "<p>why not <a href=\"http://example.tld/#!#{merge_request.iid}\">inspect </a><a href=\"#{project_merge_request_url(project, merge_request)}\" class=\"gfm gfm-merge_request \" title=\"Merge Request: #{merge_request.title}\">!#{merge_request.iid}</a><a href=\"http://example.tld/#!#{merge_request.iid}\"></a></p>\n"
+      markdown("why not [inspect !#{merge_request.iid}](http://example.tld/#!#{merge_request.iid})").should == "<p>why not <a href=\"http://example.tld/#!#{merge_request.iid}\">inspect </a><a class=\"gfm gfm-merge_request \" href=\"#{project_merge_request_url(project, merge_request)}\" title=\"Merge Request: #{merge_request.title}\">!#{merge_request.iid}</a><a href=\"http://example.tld/#!#{merge_request.iid}\"></a></p>\n"
     end
 
     it "should leave ref-like src of images untouched" do
@@ -435,7 +436,7 @@ describe GitlabMarkdownHelper do
 
   describe "#render_wiki_content" do
     before do
-      @wiki = stub('WikiPage')
+      @wiki = double('WikiPage')
       @wiki.stub(:content).and_return('wiki content')
     end
 
@@ -449,7 +450,7 @@ describe GitlabMarkdownHelper do
 
     it "should use the Gollum renderer for all other file types" do
       @wiki.stub(:format).and_return(:rdoc)
-      formatted_content_stub = stub('formatted_content')
+      formatted_content_stub = double('formatted_content')
       formatted_content_stub.should_receive(:html_safe)
       @wiki.stub(:formatted_content).and_return(formatted_content_stub)
 

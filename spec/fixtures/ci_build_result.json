@@ -1,43 +1,43 @@
 
 {
-  "buildId"=>10,
-  "md5"=>"34d8739acaa426524180504654977401",
-  "buildResult"=>
+  "buildId":10,
+  "md5":"34d8739acaa426524180504654977401",
+  "buildResult":
   {
-    "actions"=>[
+    "actions":[
       {
-      "buildsByBranchName"=>
+      "buildsByBranchName":
       {
-        "sourceRepo/test_mr"=>
+        "sourceRepo/test_mr":
         {
-          "buildNumber"=>1,
-          "buildResult"=>nil,
-          "revision"=>
+          "buildNumber":1,
+          "buildResult":null,
+          "revision":
           {
-            "SHA1"=>"83029b76cc49c8c3a7d8910dc30931500fa429f0",
-            "branch"=>[
+            "SHA1":"83029b76cc49c8c3a7d8910dc30931500fa429f0",
+            "branch":[
               {
-              "SHA1"=>"83029b76cc49c8c3a7d8910dc30931500fa429f0",
-              "name"=>"sourceRepo/test_mr"
+              "SHA1":"83029b76cc49c8c3a7d8910dc30931500fa429f0",
+              "name":"sourceRepo/test_mr"
             }]
           }
         }
       },
-      "lastBuiltRevision"=>
+      "lastBuiltRevision":
       {
-        "SHA1"=>"83029b76cc49c8c3a7d8910dc30931500fa429f0",
-        "branch"=>[
+        "SHA1":"83029b76cc49c8c3a7d8910dc30931500fa429f0",
+        "branch":[
           {
-          "SHA1"=>"83029b76cc49c8c3a7d8910dc30931500fa429f0",
-          "name"=>"sourceRepo/test_mr"
+          "SHA1":"83029b76cc49c8c3a7d8910dc30931500fa429f0",
+          "name":"sourceRepo/test_mr"
         }]
       },
-      "remoteUrls"=>["git@gitlab-staging-01.undev.cc:admon-ror/audiotag.git"],
-      "scmName"=>""
+      "remoteUrls":["git@gitlab-staging-01.undev.cc:admon-ror/audiotag.git"],
+      "scmName":""
     },
 
     {
-      "tags"=>[]
+      "tags":[]
     },
 
     {
@@ -45,296 +45,296 @@
     },
 
     {
-      "failCount"=>0,
-      "skipCount"=>0,
-      "totalCount"=>27,
-      "urlName"=>"testReport"
+      "failCount":0,
+      "skipCount":0,
+      "totalCount":27,
+      "urlName":"testReport"
     }
     ],
-    "artifacts"=>[],
-    "building"=>true,
-    "description"=>nil,
-    "duration"=>0,
-    "estimatedDuration"=>-1,
-    "executor"=>
+    "artifacts":[],
+    "building":true,
+    "description":null,
+    "duration":0,
+    "estimatedDuration":-1,
+    "executor":
     {
-      "currentExecutable"=>
+      "currentExecutable":
       {
-        "number"=>1
+        "number":1
       },
-      "currentWorkUnit"=>
+      "currentWorkUnit":
       {
 
       },
-      "idle"=>false,
-      "likelyStuck"=>false,
-      "number"=>0,
-      "progress"=>-1
+      "idle":false,
+      "likelyStuck":false,
+      "number":0,
+      "progress":-1
     },
-    "fullDisplayName"=>"Build Merge Request #10 #1",
-    "id"=>"2013-11-06_16-36-33",
-    "keepLog"=>false,
-    "number"=>1,
-    "result"=>"SUCCESS",
-    "timestamp"=>1383741393747,
-    "builtOn"=>"ci03.undev.cc-deb6",
-    "changeSet"=>
+    "fullDisplayName":"Build Merge Request #10 #1",
+    "id":"2013-11-06_16-36-33",
+    "keepLog":false,
+    "number":1,
+    "result":"SUCCESS",
+    "timestamp":1383741393747,
+    "builtOn":"ci03.undev.cc-deb6",
+    "changeSet":
     {
-      "items"=>[
+      "items":[
         {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"c5ec7c8570f961e79e7e01d30910456028821dd8",
-        "timestamp"=>1383664378000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"c5ec7c8570f961e79e7e01d30910456028821dd8",
+        "timestamp":1383664378000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 19:12:58 +0400",
-        "id"=>"c5ec7c8570f961e79e7e01d30910456028821dd8",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 19:12:58 +0400",
+        "id":"c5ec7c8570f961e79e7e01d30910456028821dd8",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"eea5c58800d39cc27e006aa9240f683da2b23491",
-        "timestamp"=>1383664455000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"eea5c58800d39cc27e006aa9240f683da2b23491",
+        "timestamp":1383664455000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 19:14:15 +0400",
-        "id"=>"eea5c58800d39cc27e006aa9240f683da2b23491",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 19:14:15 +0400",
+        "id":"eea5c58800d39cc27e006aa9240f683da2b23491",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"5805f7e50d246446f86b2601ac0adf3dfa784c16",
-        "timestamp"=>1383664784000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"5805f7e50d246446f86b2601ac0adf3dfa784c16",
+        "timestamp":1383664784000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 19:19:44 +0400",
-        "id"=>"5805f7e50d246446f86b2601ac0adf3dfa784c16",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 19:19:44 +0400",
+        "id":"5805f7e50d246446f86b2601ac0adf3dfa784c16",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"dd47cd052f36af19f4d00c72709ef13aa86712d1",
-        "timestamp"=>1383665068000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"dd47cd052f36af19f4d00c72709ef13aa86712d1",
+        "timestamp":1383665068000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 19:24:28 +0400",
-        "id"=>"dd47cd052f36af19f4d00c72709ef13aa86712d1",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 19:24:28 +0400",
+        "id":"dd47cd052f36af19f4d00c72709ef13aa86712d1",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"608f1f86ab6589ac70357beadfbbe3e720aa1532",
-        "timestamp"=>1383665594000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"608f1f86ab6589ac70357beadfbbe3e720aa1532",
+        "timestamp":1383665594000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 19:33:14 +0400",
-        "id"=>"608f1f86ab6589ac70357beadfbbe3e720aa1532",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 19:33:14 +0400",
+        "id":"608f1f86ab6589ac70357beadfbbe3e720aa1532",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"d85d67eaaba70de0edd3505042dd66e959f5b556",
-        "timestamp"=>1383671907000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"d85d67eaaba70de0edd3505042dd66e959f5b556",
+        "timestamp":1383671907000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 21:18:27 +0400",
-        "id"=>"d85d67eaaba70de0edd3505042dd66e959f5b556",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 21:18:27 +0400",
+        "id":"d85d67eaaba70de0edd3505042dd66e959f5b556",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"7fcdffa9e24963b6432da3ad19c3ccbaa54617ac",
-        "timestamp"=>1383671993000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"7fcdffa9e24963b6432da3ad19c3ccbaa54617ac",
+        "timestamp":1383671993000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 21:19:53 +0400",
-        "id"=>"7fcdffa9e24963b6432da3ad19c3ccbaa54617ac",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 21:19:53 +0400",
+        "id":"7fcdffa9e24963b6432da3ad19c3ccbaa54617ac",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"5119f64d69289b0dd48d5fe109bfff72213395f0",
-        "timestamp"=>1383672025000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"5119f64d69289b0dd48d5fe109bfff72213395f0",
+        "timestamp":1383672025000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 21:20:25 +0400",
-        "id"=>"5119f64d69289b0dd48d5fe109bfff72213395f0",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 21:20:25 +0400",
+        "id":"5119f64d69289b0dd48d5fe109bfff72213395f0",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"6fc4b970ffa54130185f0d592ddde918be639f25",
-        "timestamp"=>1383672204000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"6fc4b970ffa54130185f0d592ddde918be639f25",
+        "timestamp":1383672204000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 21:23:24 +0400",
-        "id"=>"6fc4b970ffa54130185f0d592ddde918be639f25",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 21:23:24 +0400",
+        "id":"6fc4b970ffa54130185f0d592ddde918be639f25",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"c1e4b5286f920e5042631c7e7e043f6a5ec0faf7",
-        "timestamp"=>1383672217000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"c1e4b5286f920e5042631c7e7e043f6a5ec0faf7",
+        "timestamp":1383672217000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"test\n",
-        "date"=>"2013-11-05 21:23:37 +0400",
-        "id"=>"c1e4b5286f920e5042631c7e7e043f6a5ec0faf7",
-        "msg"=>"test",
-        "paths"=>[
+        "comment":"test\n",
+        "date":"2013-11-05 21:23:37 +0400",
+        "id":"c1e4b5286f920e5042631c7e7e043f6a5ec0faf7",
+        "msg":"test",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["test.rb"],
-        "commitId"=>"d88b2774e0b9938e52425091e1cd8fd83ee7c97f",
-        "timestamp"=>1383737799000,
-        "author"=>
+        "affectedPaths":["test.rb"],
+        "commitId":"d88b2774e0b9938e52425091e1cd8fd83ee7c97f",
+        "timestamp":1383737799000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"save\n",
-        "date"=>"2013-11-06 15:36:39 +0400",
-        "id"=>"d88b2774e0b9938e52425091e1cd8fd83ee7c97f",
-        "msg"=>"save",
-        "paths"=>[
+        "comment":"save\n",
+        "date":"2013-11-06 15:36:39 +0400",
+        "id":"d88b2774e0b9938e52425091e1cd8fd83ee7c97f",
+        "msg":"save",
+        "paths":[
           {
-          "editType"=>"add",
-          "file"=>"test.rb"
+          "editType":"add",
+          "file":"test.rb"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"0116bfa427475c2d2fc5e0dbea1e447f67f0c185",
-        "timestamp"=>1383738072000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"0116bfa427475c2d2fc5e0dbea1e447f67f0c185",
+        "timestamp":1383738072000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"save\n",
-        "date"=>"2013-11-06 15:41:12 +0400",
-        "id"=>"0116bfa427475c2d2fc5e0dbea1e447f67f0c185",
-        "msg"=>"save",
-        "paths"=>[
+        "comment":"save\n",
+        "date":"2013-11-06 15:41:12 +0400",
+        "id":"0116bfa427475c2d2fc5e0dbea1e447f67f0c185",
+        "msg":"save",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       },
 
       {
-        "affectedPaths"=>["README.rdoc"],
-        "commitId"=>"83029b76cc49c8c3a7d8910dc30931500fa429f0",
-        "timestamp"=>1383738140000,
-        "author"=>
+        "affectedPaths":["README.rdoc"],
+        "commitId":"83029b76cc49c8c3a7d8910dc30931500fa429f0",
+        "timestamp":1383738140000,
+        "author":
         {
-          "fullName"=>"Andrey Kumanyaev"
+          "fullName":"Andrey Kumanyaev"
         },
-        "comment"=>"save\n",
-        "date"=>"2013-11-06 15:42:20 +0400",
-        "id"=>"83029b76cc49c8c3a7d8910dc30931500fa429f0",
-        "msg"=>"save",
-        "paths"=>[
+        "comment":"save\n",
+        "date":"2013-11-06 15:42:20 +0400",
+        "id":"83029b76cc49c8c3a7d8910dc30931500fa429f0",
+        "msg":"save",
+        "paths":[
           {
-          "editType"=>"edit",
-          "file"=>"README.rdoc"
+          "editType":"edit",
+          "file":"README.rdoc"
         }]
       }],
-      "kind"=>nil
+      "kind":null
     },
-    "culprits"=>[
+    "culprits":[
       {
-      "description"=>nil,
-      "fullName"=>"Andrey Kumanyaev",
-      "id"=>"Andrey Kumanyaev",
-      "property"=>[
+      "description":null,
+      "fullName":"Andrey Kumanyaev",
+      "id":"Andrey Kumanyaev",
+      "property":[
         {
 
       },
@@ -344,11 +344,11 @@
       },
 
       {
-        "insensitiveSearch"=>false
+        "insensitiveSearch":false
       },
 
       {
-        "address"=>"me@zzet.org"
+        "address":"me@zzet.org"
       },
 
       {
@@ -356,514 +356,514 @@
       }]
     }]
   },
-  "testResult"=>
+  "testResult":
   {
-    "failCount"=>0,
-    "skipCount"=>0,
-    "totalCount"=>27,
-    "urlName"=>"testReport"
+    "failCount":0,
+    "skipCount":0,
+    "totalCount":27,
+    "urlName":"testReport"
   },
-  "coverage"=>
+  "coverage":
   {
-    "Unit Tests"=>
+    "Unit Tests":
     {
-      "coverage"=>
+      "coverage":
       {
-        "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/api/application_controller.rb"=>[1,
-          nil],
-          "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/application_controller.rb"=>[1,
+        "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/api/application_controller.rb":[1,
+          null],
+          "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/application_controller.rb":[1,
             1,
-            nil,
+            null,
             1,
             1,
             0,
             0,
-            nil,
-            nil,
-            nil],
-            "/var/lib/jenkins/workspace/Build Merge Request #10/app/helpers/application_helper.rb"=>[1,
+            null,
+            null,
+            null],
+            "/var/lib/jenkins/workspace/Build Merge Request #10/app/helpers/application_helper.rb":[1,
               1,
               0,
               0,
               0,
-              nil,
-              nil,
+              null,
+              null,
               1,
               0,
               0,
-              nil,
-              nil,
+              null,
+              null,
               1,
               0,
-              nil,
-              nil],
-              "/var/lib/jenkins/workspace/Build Merge Request #10/lib/audio_info_grabber.rb"=>[1,
-                nil,
+              null,
+              null],
+              "/var/lib/jenkins/workspace/Build Merge Request #10/lib/audio_info_grabber.rb":[1,
+                null,
                 1,
-                nil,
-                1,
-                1,
-                1,
-                nil,
+                null,
                 1,
                 1,
                 1,
-                nil,
+                null,
                 1,
-                nil,
                 1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                nil,
-                nil,
                 1,
-                nil,
+                null,
+                1,
+                null,
                 1,
                 0,
                 0,
                 0,
                 0,
-                nil,
-                nil,
-                nil,
+                0,
+                null,
+                null,
                 1,
-                0,
-                nil,
-                0,
-                0,
-                nil,
-                nil,
-                1,
-                0,
-                nil,
-                nil,
-                1,
-                0,
-                nil,
-                nil,
-                1,
-                0,
-                nil,
-                nil,
-                1,
-                0,
-                nil,
-                nil,
+                null,
                 1,
                 0,
                 0,
-                nil,
-                nil,
-                nil],
-                "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/api/audio_tracks_controller.rb"=>[1,
+                0,
+                0,
+                null,
+                null,
+                null,
+                1,
+                0,
+                null,
+                0,
+                0,
+                null,
+                null,
+                1,
+                0,
+                null,
+                null,
+                1,
+                0,
+                null,
+                null,
+                1,
+                0,
+                null,
+                null,
+                1,
+                0,
+                null,
+                null,
+                1,
+                0,
+                0,
+                null,
+                null,
+                null],
+                "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/api/audio_tracks_controller.rb":[1,
                   1,
-                  nil,
+                  null,
                   1,
                   0,
                   0,
                   0,
-                  nil,
-                  nil,
+                  null,
+                  null,
                   0,
-                  nil,
+                  null,
                   0,
-                  nil,
-                  nil,
-                  0,
-                  0,
+                  null,
+                  null,
                   0,
                   0,
-                  nil,
                   0,
-                  nil,
                   0,
-                  nil,
-                  nil,
+                  null,
                   0,
-                  nil,
-                  nil,
-                  nil,
+                  null,
                   0,
-                  nil,
-                  nil],
-                  "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track.rb"=>[1,
+                  null,
+                  null,
+                  0,
+                  null,
+                  null,
+                  null,
+                  0,
+                  null,
+                  null],
+                  "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track.rb":[1,
                     1,
                     1,
-                    nil,
+                    null,
                     1,
                     1,
-                    nil,
+                    null,
                     1,
                     1,
-                    nil,
+                    null,
                     1,
                     1,
                     1,
                     1,
                     1,
-                    nil,
+                    null,
                     1,
                     1,
-                    nil,
-                    nil,
+                    null,
+                    null,
                     1,
                     1,
-                    nil,
-                    nil,
+                    null,
+                    null,
                     1,
                     1,
-                    nil,
-                    nil,
-                    nil,
+                    null,
+                    null,
+                    null,
                     1,
                     0,
-                    nil,
-                    nil,
+                    null,
+                    null,
                     1,
                     0,
-                    nil,
-                    nil,
+                    null,
+                    null,
                     1,
                     1,
                     0,
-                    nil,
-                    nil],
-                    "/var/lib/jenkins/workspace/Build Merge Request #10/app/uploaders/audio_file_uploader.rb"=>[nil,
-                      nil,
+                    null,
+                    null],
+                    "/var/lib/jenkins/workspace/Build Merge Request #10/app/uploaders/audio_file_uploader.rb":[null,
+                      null,
                       1,
                       1,
-                      nil,
-                      1,
-                      0,
-                      nil,
-                      nil,
+                      null,
                       1,
                       0,
-                      nil,
-                      nil,
+                      null,
+                      null,
+                      1,
+                      0,
+                      null,
+                      null,
                       1,
                       1,
                       0,
                       0,
-                      nil,
-                      nil],
-                      "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/web/application_controller.rb"=>[1,
+                      null,
+                      null],
+                      "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/web/application_controller.rb":[1,
                         1,
-                        nil],
-                        "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/web/audio_tracks_controller.rb"=>[1,
+                        null],
+                        "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/web/audio_tracks_controller.rb":[1,
                           1,
                           0,
                           0,
                           0,
-                          nil,
-                          nil,
-                          nil,
+                          null,
+                          null,
+                          null,
                           1,
                           0,
-                          nil,
-                          nil,
-                          nil],
-                          "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track/information.rb"=>[1,
+                          null,
+                          null,
+                          null],
+                          "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track/information.rb":[1,
                             1,
                             1,
-                            nil],
-                            "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track/log.rb"=>[1,
+                            null],
+                            "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track/log.rb":[1,
                               1,
                               1,
-                              nil]
+                              null]
       },
-      "timestamp"=>1383741448
+      "timestamp":1383741448
     },
-    "Functional Tests"=>
+    "Functional Tests":
     {
-      "coverage"=>
+      "coverage":
       {
-        "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/api/application_controller.rb"=>[1,
-          nil],
-          "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/application_controller.rb"=>[1,
+        "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/api/application_controller.rb":[1,
+          null],
+          "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/application_controller.rb":[1,
             1,
-            nil,
+            null,
             1,
             1,
             3,
             3,
-            nil,
-            nil,
-            nil],
-            "/var/lib/jenkins/workspace/Build Merge Request #10/app/helpers/application_helper.rb"=>[1,
+            null,
+            null,
+            null],
+            "/var/lib/jenkins/workspace/Build Merge Request #10/app/helpers/application_helper.rb":[1,
               1,
               1,
               1,
               1,
-              nil,
-              nil,
+              null,
+              null,
               1,
               1,
               1,
-              nil,
-              nil,
+              null,
+              null,
               1,
               0,
-              nil,
-              nil],
-              "/var/lib/jenkins/workspace/Build Merge Request #10/lib/audio_info_grabber.rb"=>[1,
-                nil,
+              null,
+              null],
+              "/var/lib/jenkins/workspace/Build Merge Request #10/lib/audio_info_grabber.rb":[1,
+                null,
                 1,
-                nil,
-                1,
-                1,
-                1,
-                nil,
+                null,
                 1,
                 1,
                 1,
-                nil,
+                null,
                 1,
-                nil,
                 1,
-                23,
-                23,
-                23,
-                23,
-                23,
-                nil,
-                nil,
                 1,
-                nil,
+                null,
+                1,
+                null,
                 1,
                 23,
                 23,
                 23,
                 23,
-                nil,
-                nil,
-                nil,
+                23,
+                null,
+                null,
+                1,
+                null,
+                1,
+                23,
+                23,
+                23,
+                23,
+                null,
+                null,
+                null,
                 1,
                 3,
-                nil,
+                null,
                 3,
                 3,
-                nil,
-                nil,
+                null,
+                null,
                 1,
                 0,
-                nil,
-                nil,
+                null,
+                null,
                 1,
                 23,
-                nil,
-                nil,
+                null,
+                null,
                 1,
                 23,
-                nil,
-                nil,
+                null,
+                null,
                 1,
                 23,
-                nil,
-                nil,
+                null,
+                null,
                 1,
                 23,
                 23,
-                nil,
-                nil,
-                nil],
-                "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/api/audio_tracks_controller.rb"=>[1,
+                null,
+                null,
+                null],
+                "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/api/audio_tracks_controller.rb":[1,
                   1,
-                  nil,
+                  null,
                   1,
                   24,
                   24,
                   23,
-                  nil,
-                  nil,
+                  null,
+                  null,
                   23,
-                  nil,
+                  null,
                   23,
-                  nil,
-                  nil,
+                  null,
+                  null,
                   23,
                   23,
                   7,
                   16,
-                  nil,
+                  null,
                   7,
-                  nil,
+                  null,
                   16,
-                  nil,
-                  nil,
+                  null,
+                  null,
                   0,
-                  nil,
-                  nil,
-                  nil,
+                  null,
+                  null,
+                  null,
                   24,
-                  nil,
-                  nil],
-                  "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track.rb"=>[1,
+                  null,
+                  null],
+                  "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track.rb":[1,
                     1,
                     1,
-                    nil,
+                    null,
                     1,
                     1,
-                    nil,
+                    null,
                     1,
                     1,
-                    nil,
+                    null,
                     1,
                     1,
                     1,
                     1,
                     1,
-                    nil,
+                    null,
                     1,
                     1,
-                    nil,
-                    nil,
+                    null,
+                    null,
                     1,
                     1,
-                    nil,
-                    nil,
+                    null,
+                    null,
                     1,
                     1,
-                    nil,
-                    nil,
-                    nil,
-                    1,
-                    23,
-                    nil,
-                    nil,
+                    null,
+                    null,
+                    null,
                     1,
                     23,
-                    nil,
-                    nil,
+                    null,
+                    null,
+                    1,
+                    23,
+                    null,
+                    null,
                     1,
                     1,
                     46,
-                    nil,
-                    nil],
-                    "/var/lib/jenkins/workspace/Build Merge Request #10/app/uploaders/audio_file_uploader.rb"=>[nil,
-                      nil,
+                    null,
+                    null],
+                    "/var/lib/jenkins/workspace/Build Merge Request #10/app/uploaders/audio_file_uploader.rb":[null,
+                      null,
                       1,
                       1,
-                      nil,
+                      null,
                       1,
                       1,
-                      nil,
-                      nil,
+                      null,
+                      null,
                       1,
                       51,
-                      nil,
-                      nil,
+                      null,
+                      null,
                       1,
                       1,
                       1,
                       1,
-                      nil,
-                      nil],
-                      "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/web/application_controller.rb"=>[1,
+                      null,
+                      null],
+                      "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/web/application_controller.rb":[1,
                         1,
-                        nil],
-                        "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/web/audio_tracks_controller.rb"=>[1,
+                        null],
+                        "/var/lib/jenkins/workspace/Build Merge Request #10/app/controllers/web/audio_tracks_controller.rb":[1,
                           1,
                           2,
                           2,
                           1,
-                          nil,
-                          nil,
-                          nil,
+                          null,
+                          null,
+                          null,
                           1,
                           1,
-                          nil,
-                          nil,
-                          nil],
-                          "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track/information.rb"=>[1,
+                          null,
+                          null,
+                          null],
+                          "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track/information.rb":[1,
                             1,
                             1,
-                            nil],
-                            "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track/log.rb"=>[1,
+                            null],
+                            "/var/lib/jenkins/workspace/Build Merge Request #10/app/models/audio_track/log.rb":[1,
                               1,
                               1,
-                              nil],
-                              "/var/lib/jenkins/workspace/Build Merge Request #10/lib/audio_info_grabber/gateway/audiotag.rb"=>[1,
-                                nil,
+                              null],
+                              "/var/lib/jenkins/workspace/Build Merge Request #10/lib/audio_info_grabber/gateway/audiotag.rb":[1,
+                                null,
                                 1,
-                                nil,
+                                null,
                                 23,
-                                nil,
-                                nil,
-                                nil,
-                                nil,
-                                nil,
-                                nil,
-                                nil,
-                                23,
-                                23,
-                                nil,
-                                23,
-                                nil,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
                                 23,
                                 23,
-                                nil,
+                                null,
                                 23,
-                                nil,
-                                nil,
+                                null,
+                                23,
+                                23,
+                                null,
+                                23,
+                                null,
+                                null,
                                 1,
                                 23,
-                                nil,
+                                null,
                                 23,
-                                nil,
+                                null,
                                 23,
-                                nil,
-                                nil,
+                                null,
+                                null,
                                 1,
                                 6,
-                                nil,
-                                nil,
+                                null,
+                                null,
                                 1,
-                                nil,
-                                nil,
-                                nil,
+                                null,
+                                null,
+                                null,
                                 0,
-                                nil,
-                                nil,
-                                nil,
+                                null,
+                                null,
+                                null,
                                 1,
-                                nil,
+                                null,
                                 1,
-                                nil,
-                                nil,
+                                null,
+                                null,
                                 6,
-                                nil,
-                                nil,
+                                null,
+                                null,
                                 1,
-                                nil,
-                                nil,
+                                null,
+                                null,
                                 23,
-                                nil,
-                                nil,
-                                1,
-                                23,
-                                nil,
-                                nil,
+                                null,
+                                null,
                                 1,
                                 23,
-                                nil,
+                                null,
+                                null,
+                                1,
                                 23,
-                                nil,
+                                null,
+                                23,
+                                null,
                                 1,
                                 1,
-                                nil,
-                                nil,
+                                null,
+                                null,
                                 22,
                                 22,
-                                nil,
-                                nil,
-                                nil,
-                                nil],
-                                "/var/lib/jenkins/workspace/Build Merge Request #10/lib/audio_info_grabber/parser.rb"=>[1,
-                                  nil,
+                                null,
+                                null,
+                                null,
+                                null],
+                                "/var/lib/jenkins/workspace/Build Merge Request #10/lib/audio_info_grabber/parser.rb":[1,
+                                  null,
                                   1,
                                   3,
                                   3,
@@ -873,55 +873,55 @@
                                   3,
                                   3,
                                   3,
-                                  nil,
-                                  nil,
+                                  null,
+                                  null,
                                   1,
-                                  nil,
-                                  nil,
-                                  nil,
-                                  nil,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
                                   3,
-                                  nil,
-                                  nil,
+                                  null,
+                                  null,
                                   1,
-                                  nil,
+                                  null,
                                   1,
                                   3,
                                   2,
                                   10,
-                                  nil,
-                                  nil,
-                                  nil,
-                                  nil,
-                                  nil,
-                                  nil,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
                                   10,
-                                  nil,
-                                  nil,
-                                  nil,
-                                  nil,
+                                  null,
+                                  null,
+                                  null,
+                                  null,
                                   1,
                                   3,
-                                  nil,
-                                  nil,
+                                  null,
+                                  null,
                                   1,
                                   3,
-                                  nil,
-                                  nil,
+                                  null,
+                                  null,
                                   1,
                                   3,
                                   3,
                                   3,
-                                  nil,
-                                  nil,
+                                  null,
+                                  null,
                                   1,
                                   3,
-                                  nil,
-                                  nil,
-                                  nil]
+                                  null,
+                                  null,
+                                  null]
       },
-      "timestamp"=>1383741487
+      "timestamp":1383741487
     }
   },
-  "consoleLog"=>"Started\nСобирается удаленно на ci03.undev.cc-deb6 in workspace /var/lib/jenkins/workspace/Build Merge Request #10\nCheckout:Build Merge Request #10 / /var/lib/jenkins/workspace/Build Merge Request #10 - hudson.remoting.Channel@54902af:ci03.undev.cc-deb6\nUsing strategy: Default\nFetching changes from [org.eclipse.jgit.transport.RemoteConfig@19c29fb1, org.eclipse.jgit.transport.RemoteConfig@38822aad] remote Git repositories\nFetching upstream changes from git@gitlab-staging-01.undev.cc:admon-ror/audiotag.git\nFetching upstream changes from git@gitlab-staging-01.undev.cc:admon-ror/audiotag.git\nSeen branch in repository sourceRepo/HEAD\nSeen branch in repository sourceRepo/develop\nSeen branch in repository sourceRepo/feature/tests\nSeen branch in repository sourceRepo/master\nSeen branch in repository sourceRepo/staging\nSeen branch in repository sourceRepo/test_mr\nSeen branch in repository targetRepo/develop\nSeen branch in repository targetRepo/feature/tests\nSeen branch in repository targetRepo/master\nSeen branch in repository targetRepo/staging\nSeen branch in repository targetRepo/test_mr\nCommencing build of Revision 83029b76cc49c8c3a7d8910dc30931500fa429f0 (sourceRepo/test_mr)\nMerging Revision 83029b76cc49c8c3a7d8910dc30931500fa429f0 (sourceRepo/test_mr) onto develop\nSeen branch in repository sourceRepo/HEAD\nSeen branch in repository sourceRepo/develop\nSeen branch in repository sourceRepo/feature/tests\nSeen branch in repository sourceRepo/master\nSeen branch in repository sourceRepo/staging\nSeen branch in repository sourceRepo/test_mr\nSeen branch in repository targetRepo/develop\nSeen branch in repository targetRepo/feature/tests\nSeen branch in repository targetRepo/master\nSeen branch in repository targetRepo/staging\nSeen branch in repository targetRepo/test_mr\n[Build Merge Request #10] $ /bin/bash -i /tmp/hudson533592978227751973.sh\nbash: no job control in this shell\nUsing /var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nUsing rake (0.9.2.2) \nUsing i18n (0.6.1) \nUsing multi_json (1.3.6) \nUsing activesupport (3.2.8) \nUsing builder (3.0.0) \nUsing activemodel (3.2.8) \nUsing erubis (2.7.0) \nUsing journey (1.0.4) \nUsing rack (1.4.1) \nUsing rack-cache (1.2) \nUsing rack-test (0.6.1) \nUsing hike (1.2.1) \nUsing tilt (1.3.3) \nUsing sprockets (2.1.3) \nUsing actionpack (3.2.8) \nUsing mime-types (1.19) \nUsing polyglot (0.3.3) \nUsing treetop (1.4.10) \nUsing mail (2.4.4) \nUsing actionmailer (3.2.8) \nUsing arel (3.0.2) \nUsing tzinfo (0.3.33) \nUsing activerecord (3.2.8) \nUsing activeresource (3.2.8) \nUsing airbrake (3.1.2) \nUsing blankslate (2.1.2.4) \nUsing highline (1.6.14) \nUsing net-ssh (2.5.2) \nUsing net-scp (1.0.4) \nUsing net-sftp (2.0.5) \nUsing net-ssh-gateway (1.1.0) \nUsing capistrano (2.13.3) \nUsing capi (0.1.1) \nUsing capistrano-ext (1.2.1) \nUsing capistrano_colors (0.5.5) \nUsing carrierwave (0.6.2) \nUsing ci_reporter (1.7.1) \nUsing coffee-script-source (1.3.3) \nUsing execjs (1.4.0) \nUsing coffee-script (2.2.0) \nUsing rack-ssl (1.3.2) \nUsing json (1.7.5) \nUsing rdoc (3.12) \nUsing thor (0.16.0) \nUsing railties (3.2.8) \nUsing coffee-rails (3.2.2) \nUsing commonjs (0.2.6) \nUsing configus (0.0.4) \nUsing draper (0.17.0) \nUsing factory_girl (4.0.0) \nUsing factory_girl_rails (4.0.0) \nUsing ffi (1.1.5) \nUsing haml (3.1.7) \nUsing haml-rails (0.3.4) \nUsing jbuilder (0.4.3) \nUsing jquery-rails (2.1.1) \nUsing kgio (2.7.4) \nUsing less (2.2.1) \nUsing less-rails (2.2.3) \nUsing libv8 (3.3.10.4) \nUsing metaclass (0.0.1) \nUsing minitest (3.3.0) \nUsing mocha (0.12.3) \nUsing pg (0.14.1) \nUsing bundler (1.3.5) \nUsing rails (3.2.8) \nUsing raindrops (0.10.0) \nUsing rvm-capistrano (1.2.6) \nUsing sass (3.2.1) \nUsing sass-rails (3.2.5) \nUsing simple_form (2.0.2) \nUsing simplecov-html (0.5.3) \nUsing simplecov (0.6.4) \nUsing state_machine (1.1.2) \nUsing term-ansicolor (1.0.7) \nUsing tconsole (1.2.5) \nUsing therubyracer (0.10.2) \nUsing twitter-bootstrap-rails (2.1.3) \nUsing typhoeus (0.4.2) \nUsing uglifier (1.3.0) \nUsing unicorn (4.3.1) \nUsing usefull_scopes (0.0.1) from https://github.com/kaize/usefull_scopes.git (at master) \nYour bundle is complete!\nUse `bundle show [gemname]` to see where a bundled gem is installed.\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nMocha deprecation warning: Test::Unit or MiniTest must be loaded *before* Mocha.\nMocha deprecation warning: If you're integrating with another test library, you should probably require 'mocha_standalone' instead of 'mocha'\nrm -rf test/reports\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_tracks_id_seq\" for serial column \"audio_tracks.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_tracks_pkey\" for table \"audio_tracks\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_track_information_id_seq\" for serial column \"audio_track_information.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_track_information_pkey\" for table \"audio_track_information\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_track_logs_id_seq\" for serial column \"audio_track_logs.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_track_logs_pkey\" for table \"audio_track_logs\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_track_information_id_seq\" for serial column \"audio_track_information.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_track_information_pkey\" for table \"audio_track_information\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_track_logs_id_seq\" for serial column \"audio_track_logs.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_track_logs_pkey\" for table \"audio_track_logs\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_tracks_id_seq\" for serial column \"audio_tracks.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_tracks_pkey\" for table \"audio_tracks\"\n==  CreateAudioTracks: migrating ==============================================\n-- create_table(:audio_tracks)\n   -> 0.0145s\n==  CreateAudioTracks: migrated (0.0145s) =====================================\n\n==  CreateAudioTrackInformation: migrating ====================================\n-- create_table(:audio_track_information)\n   -> 0.0224s\n==  CreateAudioTrackInformation: migrated (0.0225s) ===========================\n\n==  CreateAudioTrackLogs: migrating ===========================================\n-- create_table(:audio_track_logs)\n   -> 0.0115s\n==  CreateAudioTrackLogs: migrated (0.0116s) ==================================\n\n==  AddSourceLinkToAudioTrack: migrating ======================================\n-- add_column(:audio_tracks, :source_link, :string)\n   -> 0.0018s\n==  AddSourceLinkToAudioTrack: migrated (0.0019s) =============================\n\n==  UpdateStateFromRecivedToReceived: migrating ===============================\n==  UpdateStateFromRecivedToReceived: migrated (0.8455s) ======================\n\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nRun options: --seed 16487\n\n# Running tests:\n\n\n\nFinished tests in 0.079467s, 0.0000 tests/s, 0.0000 assertions/s.\n\n0 tests, 0 assertions, 0 failures, 0 errors, 0 skips\nCoverage report generated for Unit Tests to /var/lib/jenkins/workspace/Build Merge Request #10/coverage. 69 / 119 LOC (57.98%) covered.\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nRun options: --seed 5075\n\n# Running tests:\n\n...........................\n\nFinished tests in 20.824709s, 1.2965 tests/s, 3.4094 assertions/s.\n\n27 tests, 71 assertions, 0 failures, 0 errors, 0 skips\nCoverage report generated for Functional Tests, Unit Tests to /var/lib/jenkins/workspace/Build Merge Request #10/coverage. 174 / 178 LOC (97.75%) covered.\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nRecording test results\n"
+  "consoleLog":"Started\nСобирается удаленно на ci03.undev.cc-deb6 in workspace /var/lib/jenkins/workspace/Build Merge Request #10\nCheckout:Build Merge Request #10 / /var/lib/jenkins/workspace/Build Merge Request #10 - hudson.remoting.Channel@54902af:ci03.undev.cc-deb6\nUsing strategy: Default\nFetching changes from [org.eclipse.jgit.transport.RemoteConfig@19c29fb1, org.eclipse.jgit.transport.RemoteConfig@38822aad] remote Git repositories\nFetching upstream changes from git@gitlab-staging-01.undev.cc:admon-ror/audiotag.git\nFetching upstream changes from git@gitlab-staging-01.undev.cc:admon-ror/audiotag.git\nSeen branch in repository sourceRepo/HEAD\nSeen branch in repository sourceRepo/develop\nSeen branch in repository sourceRepo/feature/tests\nSeen branch in repository sourceRepo/master\nSeen branch in repository sourceRepo/staging\nSeen branch in repository sourceRepo/test_mr\nSeen branch in repository targetRepo/develop\nSeen branch in repository targetRepo/feature/tests\nSeen branch in repository targetRepo/master\nSeen branch in repository targetRepo/staging\nSeen branch in repository targetRepo/test_mr\nCommencing build of Revision 83029b76cc49c8c3a7d8910dc30931500fa429f0 (sourceRepo/test_mr)\nMerging Revision 83029b76cc49c8c3a7d8910dc30931500fa429f0 (sourceRepo/test_mr) onto develop\nSeen branch in repository sourceRepo/HEAD\nSeen branch in repository sourceRepo/develop\nSeen branch in repository sourceRepo/feature/tests\nSeen branch in repository sourceRepo/master\nSeen branch in repository sourceRepo/staging\nSeen branch in repository sourceRepo/test_mr\nSeen branch in repository targetRepo/develop\nSeen branch in repository targetRepo/feature/tests\nSeen branch in repository targetRepo/master\nSeen branch in repository targetRepo/staging\nSeen branch in repository targetRepo/test_mr\n[Build Merge Request #10] $ /bin/bash -i /tmp/hudson533592978227751973.sh\nbash: no job control in this shell\nUsing /var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nUsing rake (0.9.2.2) \nUsing i18n (0.6.1) \nUsing multi_json (1.3.6) \nUsing activesupport (3.2.8) \nUsing builder (3.0.0) \nUsing activemodel (3.2.8) \nUsing erubis (2.7.0) \nUsing journey (1.0.4) \nUsing rack (1.4.1) \nUsing rack-cache (1.2) \nUsing rack-test (0.6.1) \nUsing hike (1.2.1) \nUsing tilt (1.3.3) \nUsing sprockets (2.1.3) \nUsing actionpack (3.2.8) \nUsing mime-types (1.19) \nUsing polyglot (0.3.3) \nUsing treetop (1.4.10) \nUsing mail (2.4.4) \nUsing actionmailer (3.2.8) \nUsing arel (3.0.2) \nUsing tzinfo (0.3.33) \nUsing activerecord (3.2.8) \nUsing activeresource (3.2.8) \nUsing airbrake (3.1.2) \nUsing blankslate (2.1.2.4) \nUsing highline (1.6.14) \nUsing net-ssh (2.5.2) \nUsing net-scp (1.0.4) \nUsing net-sftp (2.0.5) \nUsing net-ssh-gateway (1.1.0) \nUsing capistrano (2.13.3) \nUsing capi (0.1.1) \nUsing capistrano-ext (1.2.1) \nUsing capistrano_colors (0.5.5) \nUsing carrierwave (0.6.2) \nUsing ci_reporter (1.7.1) \nUsing coffee-script-source (1.3.3) \nUsing execjs (1.4.0) \nUsing coffee-script (2.2.0) \nUsing rack-ssl (1.3.2) \nUsing json (1.7.5) \nUsing rdoc (3.12) \nUsing thor (0.16.0) \nUsing railties (3.2.8) \nUsing coffee-rails (3.2.2) \nUsing commonjs (0.2.6) \nUsing configus (0.0.4) \nUsing draper (0.17.0) \nUsing factory_girl (4.0.0) \nUsing factory_girl_rails (4.0.0) \nUsing ffi (1.1.5) \nUsing haml (3.1.7) \nUsing haml-rails (0.3.4) \nUsing jbuilder (0.4.3) \nUsing jquery-rails (2.1.1) \nUsing kgio (2.7.4) \nUsing less (2.2.1) \nUsing less-rails (2.2.3) \nUsing libv8 (3.3.10.4) \nUsing metaclass (0.0.1) \nUsing minitest (3.3.0) \nUsing mocha (0.12.3) \nUsing pg (0.14.1) \nUsing bundler (1.3.5) \nUsing rails (3.2.8) \nUsing raindrops (0.10.0) \nUsing rvm-capistrano (1.2.6) \nUsing sass (3.2.1) \nUsing sass-rails (3.2.5) \nUsing simple_form (2.0.2) \nUsing simplecov-html (0.5.3) \nUsing simplecov (0.6.4) \nUsing state_machine (1.1.2) \nUsing term-ansicolor (1.0.7) \nUsing tconsole (1.2.5) \nUsing therubyracer (0.10.2) \nUsing twitter-bootstrap-rails (2.1.3) \nUsing typhoeus (0.4.2) \nUsing uglifier (1.3.0) \nUsing unicorn (4.3.1) \nUsing usefull_scopes (0.0.1) from https://github.com/kaize/usefull_scopes.git (at master) \nYour bundle is complete!\nUse `bundle show [gemname]` to see where a bundled gem is installed.\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nMocha deprecation warning: Test::Unit or MiniTest must be loaded *before* Mocha.\nMocha deprecation warning: If you're integrating with another test library, you should probably require 'mocha_standalone' instead of 'mocha'\nrm -rf test/reports\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_tracks_id_seq\" for serial column \"audio_tracks.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_tracks_pkey\" for table \"audio_tracks\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_track_information_id_seq\" for serial column \"audio_track_information.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_track_information_pkey\" for table \"audio_track_information\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_track_logs_id_seq\" for serial column \"audio_track_logs.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_track_logs_pkey\" for table \"audio_track_logs\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_track_information_id_seq\" for serial column \"audio_track_information.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_track_information_pkey\" for table \"audio_track_information\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_track_logs_id_seq\" for serial column \"audio_track_logs.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_track_logs_pkey\" for table \"audio_track_logs\"\nNOTICE:  CREATE TABLE will create implicit sequence \"audio_tracks_id_seq\" for serial column \"audio_tracks.id\"\nNOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index \"audio_tracks_pkey\" for table \"audio_tracks\"\n==  CreateAudioTracks: migrating ==============================================\n-- create_table(:audio_tracks)\n   -> 0.0145s\n==  CreateAudioTracks: migrated (0.0145s) =====================================\n\n==  CreateAudioTrackInformation: migrating ====================================\n-- create_table(:audio_track_information)\n   -> 0.0224s\n==  CreateAudioTrackInformation: migrated (0.0225s) ===========================\n\n==  CreateAudioTrackLogs: migrating ===========================================\n-- create_table(:audio_track_logs)\n   -> 0.0115s\n==  CreateAudioTrackLogs: migrated (0.0116s) ==================================\n\n==  AddSourceLinkToAudioTrack: migrating ======================================\n-- add_column(:audio_tracks, :source_link, :string)\n   -> 0.0018s\n==  AddSourceLinkToAudioTrack: migrated (0.0019s) =============================\n\n==  UpdateStateFromRecivedToReceived: migrating ===============================\n==  UpdateStateFromRecivedToReceived: migrated (0.8455s) ======================\n\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nRun options: --seed 16487\n\n# Running tests:\n\n\n\nFinished tests in 0.079467s, 0.0000 tests/s, 0.0000 assertions/s.\n\n0 tests, 0 assertions, 0 failures, 0 errors, 0 skips\nCoverage report generated for Unit Tests to /var/lib/jenkins/workspace/Build Merge Request #10/coverage. 69 / 119 LOC (57.98%) covered.\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nRun options: --seed 5075\n\n# Running tests:\n\n...........................\n\nFinished tests in 20.824709s, 1.2965 tests/s, 3.4094 assertions/s.\n\n27 tests, 71 assertions, 0 failures, 0 errors, 0 skips\nCoverage report generated for Functional Tests, Unit Tests to /var/lib/jenkins/workspace/Build Merge Request #10/coverage. 174 / 178 LOC (97.75%) covered.\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.4.gemspec]: Illformed requirement [\"< 2.2, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.2.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nInvalid gemspec in [/var/lib/jenkins/.rvm/gems/ruby-1.9.3-p125/specifications/ZenTest-4.9.3.gemspec]: Illformed requirement [\"< 2.1, >= 1.8\"]\nRecording test results\n"
 }

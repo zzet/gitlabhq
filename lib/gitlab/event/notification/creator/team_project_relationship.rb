@@ -18,7 +18,7 @@ class Gitlab::Event::Notification::Creator::TeamProjectRelationship < Gitlab::Ev
     subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
     subscriptions.each do |subscription|
       if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
       end
     end
 
@@ -32,7 +32,7 @@ class Gitlab::Event::Notification::Creator::TeamProjectRelationship < Gitlab::Ev
     subscriptions = ::Event::Subscription.by_target(team).by_source_type(event.source_type)
     subscriptions.each do |subscription|
       if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
       end
     end
 
@@ -47,7 +47,7 @@ class Gitlab::Event::Notification::Creator::TeamProjectRelationship < Gitlab::Ev
       subscriptions = ::Event::Subscription.by_target(member).by_source_type(event.source_type)
       subscriptions.each do |subscription|
         if subscriber_can_get_notification?(subscription, event)
-          notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+          notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
         end
       end
     end

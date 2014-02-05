@@ -17,17 +17,19 @@ class TeamGroupRelationship < ActiveRecord::Base
   belongs_to :group
   belongs_to :team
 
-  has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
-
   validates :group,           presence: true
   validates :team,            presence: true
+  validates :team_id, uniqueness: { scope: :group_id }
+
+  watch do
+    source watchable_name do
+      from :create,  to: :created
+      from :update,  to: :updated
+      from :destroy, to: :deleted
+    end
+  end
 
   scope :with_group, ->(group) {where(group_id: group)}
 
   delegate :name, to: :team, allow_nil: true, prefix: true
-
-  actions_to_watch [:created, :deleted, :updated]
 end

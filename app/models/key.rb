@@ -16,7 +16,6 @@ require 'digest/md5'
 
 class Key < ActiveRecord::Base
   include Gitlab::Popen
-  include Watchable
 
   belongs_to :user
 
@@ -33,8 +32,6 @@ class Key < ActiveRecord::Base
   validates :fingerprint, uniqueness: true, presence: { message: 'cannot be generated' }
 
   delegate :name, :email, to: :user, prefix: true
-
-  actions_to_watch [:created, :updated, :deleted]
 
   def strip_white_space
     self.key = key.strip unless key.blank?

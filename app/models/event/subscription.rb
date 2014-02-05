@@ -81,10 +81,10 @@ class Event::Subscription < ActiveRecord::Base
     where(est[:source_type].eq(source_type).or(est[:source_category].eq(source_type.downcase)))
   end
 
-  scope :with_source, -> { where("source_id IS NOT NULL") }
-  scope :without_source, -> { where(source_id: nil) }
-  scope :with_target, -> { where("target_type IS NOT NULL").uniq_by_target }
-  scope :with_target_category, -> { where("target_category IS NOT NULL").uniq_by_target }
+  scope :with_source,          -> { where.not(source_id: nil) }
+  scope :without_source,       -> { where(source_id: nil) }
+  scope :with_target,          -> { where.not(target_type: nil).uniq_by_target }
+  scope :with_target_category, -> { where.not(target_category: nil).uniq_by_target }
 
   class << self
     def global_entity_to_subscription

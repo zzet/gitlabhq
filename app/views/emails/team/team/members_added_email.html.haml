@@ -1,0 +1,23 @@
+= raw "#{ link_to @user.name, user_url(@user.username) } added #{@members.count} members to '#{ link_to @team.path, team_url(@team.path) }' team:"
+%br
+%table
+  %caption Added members
+  %tr
+    %th Name
+    %td Team access
+  - @members.each do |tm|
+    %tr
+      %td= link_to tm.user.name, user_url(tm.user.username)
+      %td= tm.human_access
+%br
+
+%table
+  %caption Team members now
+  %tr
+    %th Name
+    %td Team access
+  - @team.team_user_relationships.each do |tm|
+    %tr
+      %td= link_to tm.user.name, user_url(tm.user.username)
+      %td= tm.human_access
+%br

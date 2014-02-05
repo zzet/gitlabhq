@@ -244,6 +244,7 @@ FactoryGirl.define do
 
   factory :project_hook do
     url
+    project
   end
 
   factory :project_snippet do

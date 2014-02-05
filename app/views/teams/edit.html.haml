@@ -5,26 +5,28 @@
         Team settings:
       %hr
       .form-holder
-        = form_for @team do |f|
+        = form_for @team, html: { class: "edit_project form-horizontal" } do |f|
           - if @team.errors.any?
             .alert.alert-error
               %span= @team.errors.full_messages.first
-          .control-group
-            = f.label :name do
+          .form-group
+            = f.label :name, class: 'control-label' do
               Team name is
-            .controls
-              = f.text_field :name, placeholder: "Ex. OpenSource", class: "input-xxlarge left"
+            .col-sm-10
+              = f.text_field :name, placeholder: "Example Team", class: "form-control"
 
-          .control-group
-            = f.label :public do
+          .form-group
+            = f.label :description, class: 'control-label' do
+              Team description
+              %span.light (optional)
+            .col-sm-10
+              = f.text_area :description, placeholder: "Awesome team", maxlength: 250, class: "form-control js-gfm-input", rows: 3
+
+          .form-group
+            = f.label :public, class: 'control-label' do
               Team is public
-            .controls
+            .col-sm-10
               = f.check_box :public
-
-          .control-group.group-description-holder
-            = f.label :description, "Details"
-            .controls
-              = f.text_area :description, maxlength: 250, class: "input-xxlarge js-gfm-input", rows: 4
 
           .form-actions
             = f.submit 'Save team', class: "btn btn-save"
@@ -48,6 +50,6 @@
               %br
               %strong Removed team cannot be restored!
 
-            = link_to 'Remove team', @team, confirm: remove_team_message(@team), method: :delete, class: "btn btn-remove"
+            = link_to 'Remove team', @team, date: { confirm: remove_team_message(@team) }, method: :delete, class: "btn btn-remove"
       - else
         %p.nothing_here_message Only team owner can remove a team

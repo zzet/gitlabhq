@@ -22,8 +22,8 @@ class Emails::Group::UsersGroup < Emails::Group::Base
     @user                 = @event.author
     @upr                  = @event.source
     data                  = JSON.load(@event.data)
-    @group                = Group.find(data["group_id"])
-    @member               = User.find(data["user_id"])
+    @group                = Group.find_by_id(data["group_id"])
+    @member               = User.find_by_id(data["user_id"])
     @changes              = data["previous_changes"]
     unless @changes.blank?
       @previous_permission  = Gitlab::Access.options_with_owner.key(@changes["group_access"].first)
@@ -44,8 +44,8 @@ class Emails::Group::UsersGroup < Emails::Group::Base
     @user         = @event.author
     @ug           = JSON.load(@event.data)
     @group        = @event.target
-    @member       = User.find(@ug["user_id"])
-    @group        = Group.find(@ug["group_id"]) if @group.nil? || @group.is_a?(UsersGroup)
+    @member       = User.find_by_id(@ug["user_id"])
+    @group        = Group.find_by_id(@ug["group_id"]) if @group.nil? || @group.is_a?(UsersGroup)
 
     if @member && @group
     headers 'X-Gitlab-Entity' => 'group',

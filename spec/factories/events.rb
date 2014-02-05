@@ -29,7 +29,6 @@ FactoryGirl.define do
     author
     action :pushed
     data { "{\"repository\": \"any\"}" }
-    source_id nil
-    source_type "Push_summary"
+    source { create :push }
   end
 end

@@ -14,7 +14,7 @@
     - if show_controls && user != team.creator && user != current_user
       = link_to '#', class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
         %i.icon-edit
-      = link_to team_member_path(team, user.username), confirm: remove_user_from_team_message(team, user), method: :delete, class: "btn-tiny btn btn-remove", title: 'Remove user from team' do
+      = link_to team_member_path(team, user.username), data: { confirm: remove_user_from_team_message(team, user) }, method: :delete, class: "btn-tiny btn btn-remove", title: 'Remove user from team' do
         %i.icon-minus.icon-white
 
   .edit-member.hide.js-toggle-content

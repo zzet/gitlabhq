@@ -1,0 +1,14 @@
+= raw "#{ link_to @user.name, user_url(@user.username) } assign #{@teams.count} teams to #{ link_to @group.name, group_url(@group.path) } group:"
+%br
+%table
+  %caption Assigned teams
+  %tr
+    %th Name
+  - @teams.each do |t|
+    %tr
+      %td
+        = link_to team_url(t.path) do
+          = "#{ t.name } (#{ t.path })"
+%br
+%br
+NOTE: All teams members has access to groups teams with access, configured in each team.

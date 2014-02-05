@@ -85,8 +85,6 @@ class Service < ActiveRecord::Base
     state :inactive
   end
 
-  actions_to_watch [:created, :updated, :deleted]
-
   scope :with_project, ->(project){ where(project_id: project) }
   scope :avaliable, -> { where(active_state: :active) }
   scope :public_list, -> { avaliable.where(public_state: :published) }

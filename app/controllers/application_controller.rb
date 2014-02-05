@@ -1,3 +1,5 @@
+require 'gon'
+
 class ApplicationController < ActionController::Base
   before_filter :authenticate_user!
   before_filter :reject_blocked!
@@ -7,8 +9,10 @@ class ApplicationController < ActionController::Base
   before_filter :dev_tools if Rails.env == 'development'
   before_filter :default_headers
   before_filter :add_gon_variables
+  before_filter :configure_permitted_parameters, if: :devise_controller?
 
-  protect_from_forgery
+  protect_from_forgery with: :exception
+  #protect_from_forgery
 
   helper_method :abilities, :can?
 
@@ -81,6 +85,9 @@ class ApplicationController < ActionController::Base
 
     if @project
       @project
+    elsif current_user.nil?
+      @project = nil
+      authenticate_user!
     else
       @project = nil
       render_404 and return
@@ -108,7 +115,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_code_access!
-    return access_denied! unless can?(current_user, :download_code, project) || project.public?
+    return access_denied! unless can?(current_user, :download_code, project)
   end
 
   def authorize_push!
@@ -160,6 +167,9 @@ class ApplicationController < ActionController::Base
   def default_headers
     headers['X-Frame-Options'] = 'DENY'
     headers['X-XSS-Protection'] = '1; mode=block'
+    headers['X-UA-Compatible'] = 'IE=edge'
+    headers['X-Content-Type-Options'] = 'nosniff'
+    headers['Strict-Transport-Security'] = 'max-age=31536000' if Gitlab.config.gitlab.https
   end
 
   def add_gon_variables
@@ -183,5 +193,32 @@ class ApplicationController < ActionController::Base
   def event_filter
     filters = cookies['event_filter'].split(',') if cookies['event_filter'].present?
     @event_filter ||= EventFilter.new(filters)
+  end
+
+  # JSON for infinite scroll via Pager object
+  def pager_json(partial, count)
+    html = render_to_string(
+      partial,
+      layout: false,
+      formats: [:html]
+    )
+
+    render json: {
+      html: html,
+      count: count
+    }
+  end
+
+  def view_to_html_string(partial)
+    render_to_string(
+      partial,
+      layout: false,
+      formats: [:html]
+    )
+  end
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.for(:sign_in) { |u| u.permit(:username, :email, :password, :login, :remember_me) }
+    devise_parameter_sanitizer.for(:sign_up) { |u| u.permit(:username, :email, :name, :password, :password_confirmation) }
   end
 end

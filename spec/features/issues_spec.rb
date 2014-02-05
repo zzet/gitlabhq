@@ -101,21 +101,21 @@ describe "Issues" do
     titles.each_with_index do |title, index|
       let!(title.to_sym) { create(:issue, title: title, project: project, created_at: Time.now - (index * 60)) }
     end
-    let(:newer_due_milestone) { create(:milestone, :due_date => '2013-12-11') }
-    let(:later_due_milestone) { create(:milestone, :due_date => '2013-12-12') }
+    let(:newer_due_milestone) { create(:milestone, due_date: '2013-12-11') }
+    let(:later_due_milestone) { create(:milestone, due_date: '2013-12-12') }
 
     it 'sorts by newest' do
       visit project_issues_path(project, sort: 'newest')
-      
-      page.should have_selector("ul.issues-list li:first-child", :text => 'foo')
-      page.should have_selector("ul.issues-list li:last-child", :text => 'baz')
+
+      first_issue.should include("foo")
+      last_issue.should include("baz")
     end
 
     it 'sorts by oldest' do
       visit project_issues_path(project, sort: 'oldest')
 
-      page.should have_selector("ul.issues-list li:first-child", :text => 'baz')
-      page.should have_selector("ul.issues-list li:last-child", :text => 'foo')
+      first_issue.should include("baz")
+      last_issue.should include("foo")
     end
 
     it 'sorts by most recently updated' do
@@ -123,7 +123,7 @@ describe "Issues" do
       baz.save
       visit project_issues_path(project, sort: 'recently_updated')
 
-      page.should have_selector("ul.issues-list li:first-child", :text => 'baz')
+      first_issue.should include("baz")
     end
 
     it 'sorts by least recently updated' do
@@ -131,12 +131,11 @@ describe "Issues" do
       baz.save
       visit project_issues_path(project, sort: 'last_updated')
 
-      page.should have_selector("ul.issues-list li:first-child", :text => 'baz')
+      first_issue.should include("baz")
     end
 
     describe 'sorting by milestone' do
-      
-      before :each do 
+      before :each do
         foo.milestone = newer_due_milestone
         foo.save
         bar.milestone = later_due_milestone
@@ -146,18 +145,17 @@ describe "Issues" do
       it 'sorts by recently due milestone' do
         visit project_issues_path(project, sort: 'milestone_due_soon')
 
-        page.should have_selector("ul.issues-list li:first-child", :text => 'foo')
+        first_issue.should include("foo")
       end
 
       it 'sorts by least recently due milestone' do
         visit project_issues_path(project, sort: 'milestone_due_later')
 
-        page.should have_selector("ul.issues-list li:first-child", :text => 'bar')
+        first_issue.should include("bar")
       end
     end
 
     describe 'combine filter and sort' do
-
       let(:user2) { create(:user) }
 
       before :each do
@@ -170,12 +168,94 @@ describe "Issues" do
       it 'sorts with a filter applied' do
         visit project_issues_path(project, sort: 'oldest', assignee_id: user2.id)
 
-        page.should have_selector("ul.issues-list li:first-child", :text => 'bar')
-        page.should have_selector("ul.issues-list li:last-child", :text => 'foo')
+        first_issue.should include("bar")
+        last_issue.should include("foo")
         page.should_not have_content 'baz'
-
       end
     end
   end
 
+  describe 'update assignee from issue#show' do
+    let(:issue) { create(:issue, project: project, author: @user) }
+
+    context 'by autorized user' do
+
+      it 'with dropdown menu' do
+        visit project_issue_path(project, issue)
+
+        find('.edit-issue.inline-update').select(project.team.members.first.name, from: 'issue_assignee_id')
+        click_button 'Update Issue'
+
+        page.should have_content "currently assigned to"
+        page.has_select?('issue_assignee_id', :selected => project.team.members.first.name)
+      end
+    end
+
+    context 'by unauthorized user' do
+
+      let(:guest) { create(:user) }
+
+      before :each do
+        project.team << [[guest], :guest]
+        issue.assignee = @user
+        issue.save
+      end
+
+      it 'shows assignee text' do
+        logout
+        login_with guest
+
+        visit project_issue_path(project, issue)
+        page.should have_content "currently assigned to #{issue.assignee.name}"
+
+      end
+    end
+
+  end
+
+  describe 'update milestone from issue#show' do
+    let!(:issue) { create(:issue, project: project, author: @user) }
+    let!(:milestone) { create(:milestone, project: project) }
+
+    context 'by authorized user' do
+
+      it 'with dropdown menu' do
+        visit project_issue_path(project, issue)
+
+        find('.edit-issue.inline-update').select(milestone.title, from: 'issue_milestone_id')
+        click_button 'Update Issue'
+
+        page.should have_content "Attached to milestone"
+        page.has_select?('issue_assignee_id', :selected => milestone.title)
+      end
+    end
+
+    context 'by unauthorized user' do
+
+      let(:guest) { create(:user) }
+
+      before :each do
+        project.team << [[guest], :guest]
+        issue.milestone = milestone
+        issue.save
+      end
+
+      it 'shows milestone text' do
+        logout
+        login_with guest
+
+        visit project_issue_path(project, issue)
+
+        page.should have_content "Attached to milestone #{milestone.title}"
+      end
+    end
+  end
+
+  def first_issue
+    all("ul.issues-list li").first.text
+  end
+
+  def last_issue
+    all("ul.issues-list li").last.text
+  end
 end

@@ -25,6 +25,7 @@ class Emails::Project::UsersProject < Emails::Project::Base
     @project              = Project.find(data["project_id"])
     @member               = User.find(data["user_id"])
     @changes              = data["previous_changes"]
+
     unless @changes.blank?
       @previous_permission  = UsersProject.access_roles.key(@changes["project_access"].first)
       @current_permission   = UsersProject.access_roles.key(@changes["project_access"].last)
@@ -44,8 +45,8 @@ class Emails::Project::UsersProject < Emails::Project::Base
     @user         = @event.author
     @up           = JSON.load(@event.data)
     @project      = @event.target
-    @member       = User.find(@up["user_id"])
-    @project      = Project.find(@up["project_id"]) if @project.nil? || @project.is_a?(UsersProject)
+    @member       = User.find_by_id(@up["user_id"])
+    @project      = Project.find_by_id(@up["project_id"]) if @project.nil? || @project.is_a?(UsersProject)
 
     if @member && @project
     headers 'X-Gitlab-Entity' => 'project',

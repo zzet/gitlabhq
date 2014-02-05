@@ -17,21 +17,23 @@ class UsersProject < ActiveRecord::Base
   include Gitlab::Access
 
   attr_accessible :user, :user_id, :project_access, :source_id, :source_type, :source
+  attr_accessor :skip_git
 
   belongs_to :user
   belongs_to :project
-
-  has_many :events,         as: :source
-  has_many :subscriptions,  as: :target, class_name: Event::Subscription
-  has_many :notifications,  through: :subscriptions
-  has_many :subscribers,    through: :subscriptions
-
-  attr_accessor :skip_git
 
   validates :user, presence: true
   validates :user_id, uniqueness: { scope: [:project_id], message: "already exists in project" }
   validates :project_access, inclusion: { in: Gitlab::Access.values_with_owner }, presence: true
   validates :project, presence: true
+
+  watch do
+    source watchable_name do
+      from :create,  to: :created
+      from :update,  to: :updated
+      from :destroy, to: :deleted
+    end
+  end
 
   delegate :name, :username, :email, to: :user, prefix: true
 
@@ -44,8 +46,6 @@ class UsersProject < ActiveRecord::Base
   scope :in_project, ->(project) { where(project_id: project.id) }
   scope :in_projects, ->(projects) { where(project_id: projects) }
   scope :with_user, ->(user) { where(user_id: user.id) }
-
-  actions_to_watch [:created, :updated, :deleted]
 
   class << self
 
