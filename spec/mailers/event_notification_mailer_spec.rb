@@ -1685,9 +1685,11 @@ describe EventNotificationMailer do
       context "when create team" do
         before do
           collect_mails_data do
-            @team = create :team, creator: @another_user
+            params = attributes_for :team, creator: @another_user
+            @team = TeamsService.new(@another_user, params).create
           end
         end
+
         it "only one message" do
           @mails_count.should == 1
         end
