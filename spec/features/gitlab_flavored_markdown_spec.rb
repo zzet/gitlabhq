@@ -19,6 +19,7 @@ describe "GitLab Flavored Markdown" do
   before do
     login_as :user
     project.team << [@user, :developer]
+    Rails.cache.clear
   end
 
   describe "for commits" do

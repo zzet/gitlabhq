@@ -76,7 +76,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
   end
 
   def create
-    Projects::Users::CreateRelationContext.new(@current_user, @project, params).execute
+    ProjectsService.new(@current_user, @project, params).add_membership
 
     if params[:redirect_to]
       redirect_to params[:redirect_to]
@@ -86,7 +86,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
   end
 
   def update
-    unless Projects::Users::UpdateRelationContext.new(@current_user, @project, member, params).execute
+    unless ProjectsService.new(@current_user, @project, params).update_membership(member)
       flash[:alert] = "User should have at least one role"
     end
 
@@ -94,7 +94,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
   end
 
   def destroy
-    Projects::Users::RemoveRelationContext.new(@current_user, @project, member, params).execute
+    ProjectsService.new(@current_user, @project, params).remove_membership(member)
 
     respond_to do |format|
       format.html { redirect_to project_team_index_path(@project) }
@@ -103,7 +103,7 @@ class Projects::TeamMembersController < Projects::ApplicationController
   end
 
   def leave
-    project.users_projects.find_by_user_id(current_user).destroy
+    project.users_projects.find_by(user_id: current_user).destroy
 
     respond_to do |format|
       format.html { redirect_to :back }
@@ -112,15 +112,31 @@ class Projects::TeamMembersController < Projects::ApplicationController
   end
 
   def apply_import
-    status = Projects::Users::ImportRelationContext.new(@current_user, @project, params).execute
+    status = ProjectsService.new(@current_user, @project, params).import_memberships
     notice = status ? "Succesfully imported" : "Import failed"
 
     redirect_to project_team_index_path(project), notice: notice
   end
 
+  def batch_update
+    ProjectsService.new(@current_user, @project, params).batch_update_memberships
+
+    respond_to do |format|
+      format.js { render nothing: true }
+    end
+  end
+
+  def batch_delete
+    ProjectsService.new(@current_user, @project, params).batch_remove_memberships
+
+    respond_to do |format|
+      format.js { render nothing: true }
+    end
+  end
+
   protected
 
   def member
-    @member ||= User.find_by_username(params[:id])
+    @member ||= User.find_by(username: params[:id])
   end
 end

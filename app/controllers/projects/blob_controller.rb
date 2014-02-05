@@ -13,10 +13,10 @@ class Projects::BlobController < Projects::ApplicationController
   end
 
   def destroy
-    result = Projects::Files::RemoveContext.new(current_user, @project, params, @ref, @path).execute
+    result = ProjectsService.new(current_user, @project, params).repository.create_file(@ref, @path)
 
     if result[:status] == :success
-      flash[:notice] = "Your changes have been successfully commited"
+      flash[:notice] = "Your changes have been successfully committed"
       redirect_to project_tree_path(@project, @ref)
     else
       flash[:alert] = result[:error]

@@ -1,5 +1,5 @@
 class Emails::Project::ProtectedBranch < Emails::Project::Base
-  def created_email(notification)
+  def protected_email(notification)
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
@@ -14,7 +14,7 @@ class Emails::Project::ProtectedBranch < Emails::Project::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] [#{@branch.name}] Branch status")
   end
 
-  def deleted_email(notification)
+  def unprotected_email(notification)
     @notification = notification
     @event        = @notification.event
     data          = JSON.load(@event.data).to_hash

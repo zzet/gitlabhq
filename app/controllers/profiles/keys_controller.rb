@@ -1,8 +1,6 @@
-class Profiles::KeysController < ApplicationController
-  layout "profile"
-
+class Profiles::KeysController < Profiles::ApplicationController
   def index
-    @keys = current_user.keys.order('id DESC').all
+    @keys = current_user.keys.order('id DESC')
   end
 
   def show

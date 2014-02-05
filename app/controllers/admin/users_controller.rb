@@ -2,8 +2,7 @@ class Admin::UsersController < Admin::ApplicationController
   before_filter :user, only: [:show, :edit, :update, :destroy]
 
   def index
-    @users = User.scoped
-    @users = @users.filter(params[:filter])
+    @users = User.filter(params[:filter])
     @users = @users.search(params[:name]) if params[:name].present?
     @users = @users.alphabetically.page(params[:page])
   end
@@ -23,7 +22,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def block
-    if Users::BlockContext.new(@current_user, user).execute
+    if UsersService.new(@current_user, user).block
       redirect_to :back, alert: "Successfully blocked"
     else
       redirect_to :back, alert: "Error occurred. User was not blocked"
@@ -50,7 +49,7 @@ class Admin::UsersController < Admin::ApplicationController
     @user.admin = (admin && admin.to_i > 0)
     @user.created_by_id = current_user.id
     @user.generate_password
-    @user.confirm!
+    @user.skip_confirmation!
 
     respond_to do |format|
       if @user.save
@@ -88,11 +87,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def destroy
-    # 1. Remove groups where user is the only owner
-    user.solo_owned_groups.map(&:destroy)
-
-    # 2. Remove user with all authored content including personal projects
-    user.destroy
+    UsersService.new(current_user, user).delete
 
     respond_to do |format|
       format.html { redirect_to admin_users_path }
@@ -103,6 +98,6 @@ class Admin::UsersController < Admin::ApplicationController
   protected
 
   def user
-    @user ||= User.find_by_username!(params[:id])
+    @user ||= User.find_by!(username: params[:id])
   end
 end

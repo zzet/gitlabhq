@@ -13,6 +13,14 @@ describe "Private Project Access" do
 
     # readonly
     project.team << [reporter, :reporter]
+
+    Rails.cache.clear
+  end
+
+  describe "Project should be private" do
+    subject { project }
+
+    its(:private?) { should be_true }
   end
 
   describe "GET /:project_path" do

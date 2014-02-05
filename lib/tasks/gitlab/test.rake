@@ -4,9 +4,9 @@ namespace :gitlab do
     cmds = [
       "rake db:setup",
       "rake db:seed_fu",
-      "rake spinach",
-      "rake spec",
-      "rake jasmine:ci"
+      "rake spinach --trace",
+      "rake spec --trace",
+      "rake jasmine:ci --trace"
     ]
 
     cmds.each do |cmd|

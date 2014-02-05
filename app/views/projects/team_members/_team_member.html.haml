@@ -1,27 +1,32 @@
 - user = member.user
 %li{id: dom_id(user), class: "team_member_row access-#{member.human_access.downcase} js-toggle-container"}
+  .batch-action-column
+    = check_box_tag "ids[]", member.id, false, id: "user_batch_select_#{member.id}", class: 'js-batch-action-item'
   = link_to user_path(user) do
     = image_tag avatar_icon(user.email, 16), class: "avatar s16"
   %strong= link_to user.name, user_path(user)
   %span.cgray= user.username
+  - if user == current_user
+    %span.label.label-success It's you
 
   .pull-right
-    %strong= member.human_access
+    .pull-left
+      %strong
+        = member.human_access
+        &nbsp;
+
     - if current_user_can_admin_project
       - unless @project.personal? && user == current_user
-        = link_to '#', id: dom_id(user, "toggle_edit_form"), class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
-          %i.icon-edit
-        = link_to project_team_member_path(@project, user), confirm: remove_from_project_team_message(@project, user), method: :delete, class: "btn-tiny btn btn-remove", title: 'Remove user from team' do
-          %i.icon-minus.icon-white
+        .pull-left
+          = link_to '#', id: dom_id(user, "toggle_edit_form"), class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
+            %i.icon-edit
+          &nbsp;
+          = link_to project_team_member_path(@project, user), data: { confirm: remove_from_project_team_message(@project, user)}, method: :delete, class: "btn-tiny btn btn-remove", title: 'Remove user from team' do
+            %i.icon-minus.icon-white
 
   .edit-member.hide.js-toggle-content
-    = form_for(member, as: :team_member, url: project_team_member_path(@project, member.user)) do |f|
-      .alert.prepend-top-20
-        = f.select :project_access, options_for_select(UsersProject.access_roles, member.project_access), {}, class: "medium project-access-select span2"
+    = form_for(member, as: :team_member, url: project_team_member_path(@project, member.user), html: { class: "form-horizontal"}) do |f|
+      .form-group.prepend-top-10
+        .col-sm-3
+          = f.select :project_access, options_for_select(UsersProject.access_roles, member.project_access), {}, class: "medium project-access-select form-control"
         = f.submit 'Save', class: 'btn btn-save'
-    &nbsp;
-
-
-
-
-

@@ -23,13 +23,17 @@ class Dispatcher
       when 'dashboard:show'
         new Dashboard()
         new Activities()
+        new SidebarSort()
       when 'projects:commit:show'
         new Commit()
       when 'projects:compare:show', 'projects:compare:index'
         new Compare()
+      when 'projects:commits:show', 'projects:merge_requests:index', 'projects:merge_requests:show'
+        new JenkinsBuild()
       when 'groups:show'
         new Activities()
         new SidebarFilter()
+        new SidebarSort()
         new SidebarTabs('groups')
       when 'projects:show'
         new Activities()
@@ -38,6 +42,7 @@ class Dispatcher
       when 'teams:show'
         new Activities()
         new SidebarFilter()
+        new SidebarSort()
         new SidebarTabs('teams')
       when 'projects:new', 'projects:edit'
         new Project()
@@ -67,5 +72,9 @@ class Dispatcher
 
 
   initSearch: ->
-    autocomplete_json = $('.search-autocomplete-json').data('autocomplete-opts')
-    new SearchAutocomplete(autocomplete_json)
+    opts = $('.search-autocomplete-opts')
+    path = opts.data('autocomplete-path')
+    project_id = opts.data('autocomplete-project-id')
+    project_ref = opts.data('autocomplete-project-ref')
+
+    new SearchAutocomplete(path, project_id, project_ref)

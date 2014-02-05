@@ -15,7 +15,7 @@ class Gitlab::Event::Notification::Creator::UsersProject < Gitlab::Event::Notifi
     subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
     subscriptions.each do |subscription|
       if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
       end
     end
 
@@ -29,7 +29,7 @@ class Gitlab::Event::Notification::Creator::UsersProject < Gitlab::Event::Notifi
     subscriptions = ::Event::Subscription.by_target(user).by_source_type(event.source_type)
     subscriptions.each do |subscription|
       if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: event, subscriber: subscription.user, notification_state: :delayed)
+        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
       end
     end
 

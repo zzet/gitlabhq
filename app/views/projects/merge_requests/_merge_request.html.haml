@@ -10,7 +10,7 @@
       %span.pull-right
         - if merge_request.for_fork?
           %span.light
-            = "#{merge_request.source_project.path_with_namespace}"
+            = "#{merge_request.source_project_path}"
           = "#{merge_request.source_branch}"
           %i.icon-angle-right.light
           = "#{merge_request.target_branch}"
@@ -32,10 +32,7 @@
         %i.icon-time
         = merge_request.milestone.title
     - if merge_request.ci_builds.any?
-      %span
-        .label{class: "label-#{ci_build_status_class(merge_request.ci_builds.last.state)}"}
-          %i.icon-repeat
-          = merge_request.ci_builds.last.state
-
+      = render 'shared/projects/build_status', build: merge_request.ci_builds.last,
+       project: merge_request.source_project
     .pull-right
-      %small updated #{time_ago_in_words(merge_request.updated_at)} ago
+      %small updated #{time_ago_with_tooltip(merge_request.updated_at, 'bottom', 'merge_request_updated_ago')}

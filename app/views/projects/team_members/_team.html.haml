@@ -1,9 +1,22 @@
-.team-table
+.team-table.js-batch-action-container
   - can_admin_project = (can? current_user, :admin_project, @project)
   .ui-box
     .title
+      .batch-action-column
+        = check_box_tag :check_ids, nil, false, class: 'js-batch-action-check-all'
       %strong #{@project.name}
       project members (#{members.count})
     %ul.well-list
       - members.each do |team_member|
         = render 'team_member', member: team_member, current_user_can_admin_project: can_admin_project
+
+  .js-batch-action-content.hide
+    - member = UsersProject.new
+    = form_for(member, as: :team_member, url: batch_update_project_team_members_path(@project), method: :post, html: { class: 'form-horizontal users-group-form' }) do |f|
+      .alert.prepend-top-20
+        .form-group
+          .col-sm-2
+            = f.select :project_access, options_for_select(UsersProject.access_roles, member.project_access), {}, class: "input-large medium project-access-select form-control"
+          = f.submit 'Save', class: 'btn btn-save'
+          or
+          = link_to 'Remove', batch_delete_project_team_members_path(@project), class: 'btn btn-danger js-batch-action-remove-link', data: { confirm: "remove from project team?" }

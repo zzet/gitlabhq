@@ -11,7 +11,7 @@ class Projects::IssuesController < Projects::ApplicationController
   # Allow modify issue
   before_filter :authorize_modify_issue!, only: [:edit, :update]
 
-  respond_to :js, :html
+  respond_to :html
 
   def index
     terms = params['issue_search']
@@ -28,9 +28,13 @@ class Projects::IssuesController < Projects::ApplicationController
 
 
     respond_to do |format|
-      format.html # index.html.erb
-      format.js
+      format.html
       format.atom { render layout: false }
+      format.json do
+        render json: {
+          html: view_to_html_string("projects/issues/_issues")
+        }
+      end
     end
   end
 
@@ -45,13 +49,10 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def show
     @note = @project.notes.new(noteable: @issue)
-    @target_type = :issue
-    @target_id = @issue.id
+    @notes = @issue.notes.inc_author.fresh
+    @noteable = @issue
 
-    respond_to do |format|
-      format.html
-      format.js
-    end
+    respond_with(@issue)
   end
 
   def create
@@ -73,6 +74,7 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def update
     @issue.update_attributes(params[:issue].merge(author_id_of_changes: current_user.id))
+    @issue.reset_events_cache
 
     respond_to do |format|
       format.js
@@ -87,7 +89,7 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def bulk_update
-    result = Projects::Issues::BulkUpdateContext.new(current_user, project, params).execute
+    result = ProjectsService.new(current_user, project, params).issue.bulk_update
     redirect_to :back, notice: "#{result[:count]} issues updated"
   end
 
@@ -95,7 +97,7 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def issue
     @issue ||= begin
-                 @project.issues.find_by_iid!(params[:id])
+                 @project.issues.find_by!(iid: params[:id])
                rescue ActiveRecord::RecordNotFound
                  redirect_old
                end
@@ -114,7 +116,9 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def issues_filtered
-    @issues = Projects::Issues::ListContext.new(current_user, project, params).execute
+    params[:scope] = 'all' if params[:scope].blank?
+    params[:state] = 'opened' if params[:state].blank?
+    @issues = FilteringService.new.execute(current_user, Issue, params.merge(project_id: @project.id))
   end
 
   # Since iids are implemented only in 6.1
@@ -123,7 +127,7 @@ class Projects::IssuesController < Projects::ApplicationController
   # To prevent 404 errors we provide a redirect to correct iids until 7.0 release
   #
   def redirect_old
-    issue = @project.issues.find_by_id(params[:id])
+    issue = @project.issues.find_by(id: params[:id])
 
     if issue
       redirect_to project_issue_path(@project, issue)

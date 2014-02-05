@@ -35,7 +35,7 @@ describe Service::Assembla do
         service_hook: true,
         token: 'verySecret'
       )
-      @sample_data = GitPushService.new.sample_data(project, user)
+      @sample_data = GitPushService.new(user, project).sample_data
       @api_url = 'https://atlas.assembla.com/spaces/ouposp/github_tool?secret_key=verySecret'
       WebMock.stub_request(:post, @api_url)
     end

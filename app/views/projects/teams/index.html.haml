@@ -4,7 +4,7 @@
   members access to project.
 %hr
 - admin_team_member =  current_user.can? :admin_team_member, @project
-.ui-box.span5.no_margin
+.ui-box.col-md-6.no_margin
   .title
     %strong #{@project.name_with_namespace}
     project teams
@@ -14,5 +14,5 @@
     - @teams.each do |team|
       = render 'team', team: team, show_controls: admin_team_member
 - if admin_team_member
-  .span5.pull-right
+  .col-md-6.pull-right
     = render "new_team"

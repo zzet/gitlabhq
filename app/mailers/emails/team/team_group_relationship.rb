@@ -20,14 +20,16 @@ class Emails::Team::TeamGroupRelationship < Emails::Team::Base
     @event        = @notification.event
     @user         = @event.author
     @source       = JSON.load(@event.data).to_hash
-    @group        = Group.find(@source["group_id"])
-    @team         = Team.find(@source["team_id"])
+    @group        = Group.find_by_id(@source["group_id"])
+    @team         = Team.find_by_id(@source["team_id"])
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'left',
-            'X-Gitlab-Source' => 'team-group-relationship',
-            'In-Reply-To'     => "team-#{@team.path}-group-#{@group.path}"
+    if @team && @group
+      headers 'X-Gitlab-Entity' => 'team',
+              'X-Gitlab-Action' => 'left',
+              'X-Gitlab-Source' => 'team-group-relationship',
+              'In-Reply-To'     => "team-#{@team.path}-group-#{@group.path}"
 
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' assignation to '#{@group.name}' group")
+      mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' assignation to '#{@group.name}' group")
+    end
   end
 end

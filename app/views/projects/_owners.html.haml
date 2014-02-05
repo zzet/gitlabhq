@@ -1,6 +1,6 @@
 .ui-box
   .title.clearfix
-    = search_field_tag :filter_team, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter'
+    = search_field_tag :filter_team, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter form-control'
   %ul.well-list.js-sidebar-list
     - owners.each do |member|
       %li.member-row

@@ -30,11 +30,21 @@ class Redcarpet::Render::GitlabHTML < Redcarpet::Render::HTML
     HTML
   end
 
+  JSDUCK_IMG_PATTERN = %r{({@img ([\S]+)})}.freeze
+
+  def parse_jsduck_images(text)
+    # parse js_duck
+    text.gsub!(JSDUCK_IMG_PATTERN) do |match|
+      "![#{$2}](#{$2})"
+    end
+  end
+
   def link(link, title, content)
     h.link_to_gfm(content, link, title: title)
   end
 
   def preprocess(full_document)
+    parse_jsduck_images(full_document)
     if @project
       h.create_relative_links(full_document, @project, @ref, @request_path, is_wiki?)
     else

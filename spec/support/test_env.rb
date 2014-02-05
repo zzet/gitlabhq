@@ -44,10 +44,12 @@ module TestEnv
 
   def disable_mailer
     NotificationService.any_instance.stub(mailer: double.as_null_object)
+    Gitlab::Event::Notification::Factory.any_instance.stub(:create_notifications).and_return(true)
   end
 
   def enable_mailer
     NotificationService.any_instance.unstub(:mailer)
+    Gitlab::Event::Notification::Factory.any_instance.unstub(:create_notifications)
   end
 
   def setup_stubs()

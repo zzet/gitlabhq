@@ -27,6 +27,7 @@ module API
     mount Groups
     mount Users
     mount Projects
+    mount Teams
     mount Repositories
     mount Issues
     mount Milestones

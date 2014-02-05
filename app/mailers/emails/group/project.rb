@@ -30,7 +30,7 @@ class Emails::Group::Project < Emails::Group::Base
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Project was updated")
   end
 
-  def transfer_email(notification)
+  def removed_email(notification)
     @notification   = notification
     @event          = @notification.event
     @user           = @event.author

@@ -2,7 +2,7 @@ class Admin::GroupsController < Admin::ApplicationController
   before_filter :group, only: [:edit, :show, :update, :destroy, :project_update, :project_teams_update]
 
   def index
-    @groups = ::Group.order('name ASC')
+    @groups = ::Group.order(name: :asc)
     @groups = @groups.search(params[:name]) if params[:name].present?
     @groups = @groups.page(params[:page]).per(20)
   end
@@ -12,13 +12,12 @@ class Admin::GroupsController < Admin::ApplicationController
     @members = @group.users
     @teams = @group.teams
 
-    @projects = Project.scoped
+    @projects = Project.all
     @projects = @projects.not_in_group(@group) if @group.projects.present?
-    @projects = @projects.all
     @projects.reject!(&:empty_repo?)
 
     @users = User.active
-    @available_teams = group.teams.any? ? Team.where("id not in (?)", group.teams) : Team.scoped
+    @available_teams = group.teams.any? ? Team.where.not(id: group.teams.pluck(:id)) : Team.all
 
     session[:redirect_to] = admin_group_path(@group)
   end
@@ -31,11 +30,9 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 
   def create
-    @group = ::Group.new(params[:group])
-    @group.path = @group.name.dup.parameterize if @group.name
+    @group = ::GroupsService.new(current_user, params[:group]).create
 
-    if @group.save
-      @group.add_owner(current_user)
+    if @group.persisted?
       redirect_to [:admin, @group], notice: 'Group was successfully created.'
     else
       render "new"
@@ -58,7 +55,7 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 
   def destroy
-    ::Groups::RemoveContext.new(current_user, group).execute
+    ::GroupsService.new(current_user, group).delete
 
     redirect_to admin_groups_path, notice: 'Group was successfully deleted.'
   end
@@ -66,6 +63,6 @@ class Admin::GroupsController < Admin::ApplicationController
   private
 
   def group
-    @group = ::Group.find_by_path(params[:id])
+    @group = Group.find_by(path: params[:id])
   end
 end

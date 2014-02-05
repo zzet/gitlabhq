@@ -1,12 +1,13 @@
 = link_to project_path(project), class: dom_class(project) do
-  %small.access-icon
-    = privacy_icon(project)
-  %span.namespace-name
-    - if project.namespace
-      = project.namespace.human_name
-      \/
-  %span.project-name.filter-title
-    = truncate(project.name, length: 25)
+  .dash-project-access-icon
+    = visibility_level_icon(project.visibility_level)
+  %span.str-truncated
+    %span.namespace-name
+      - if project.namespace
+        = project.namespace.human_name
+        \/
+    %span.project-name.filter-title
+      = project.name
   %span.arrow
     %i.icon-angle-right
   %span.last-activity
@@ -14,4 +15,4 @@
     %span.date= project_last_activity(project)
   %span.last-activity.clearfix
     %span Last push:
-    %span.date= project_last_push(project)
+    %span.date.js-last-push{'data-sort-by-last-push' => project.last_pushed_at}= project_last_push(project)

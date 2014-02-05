@@ -3,6 +3,8 @@ class DashboardController < ApplicationController
 
   before_filter :load_projects, except: [:projects]
   before_filter :event_filter, only: :show
+  before_filter :default_filter, only: [:issues, :merge_requests]
+
 
   def show
     # Fetch only 30 projects.
@@ -23,33 +25,9 @@ class DashboardController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.js
+      format.json { pager_json("events/_events", @events.count) }
       format.atom { render layout: false }
     end
-  end
-
-  def projects
-    @projects = case params[:scope]
-                when 'personal' then
-                  current_user.namespace.projects
-                when 'joined' then
-                  current_user.authorized_projects.joined(current_user)
-                when 'owned' then
-                  current_user.owned_projects
-                else
-                  current_user.authorized_projects
-                end.sorted_by_push_date
-
-    @projects = @projects.where(namespace_id: Group.find_by_name(params[:group])) if params[:group].present?
-    @projects = @projects.where(id: Team.find_by_name(params[:team]).projects) if params[:team].present?
-    @projects = @projects.includes(:namespace).sorted_by_activity
-
-    @labels = current_user.authorized_projects.tags_on(:labels)
-    @groups = current_user.groups
-    @teams = current_user.teams
-
-    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
-    @projects = @projects.page(params[:page]).per(30)
   end
 
   def teams
@@ -75,18 +53,43 @@ class DashboardController < ApplicationController
     @teams = @teams.page(params[:page]).per(30)
   end
 
+  def projects
+    @projects = case params[:scope]
+                when 'personal' then
+                  current_user.namespace.projects
+                when 'joined' then
+                  current_user.authorized_projects.joined(current_user)
+                when 'owned' then
+                  current_user.owned_projects
+                else
+                  current_user.authorized_projects
+                end.sorted_by_push_date
 
-  # Get authored or assigned open merge requests
+    @projects = @projects.where(namespace_id: Group.find_by(name: params[:group])) if params[:group].present?
+    @projects = @projects.where(id: Team.find_by(name: params[:team]).projects) if params[:team].present?
+    @projects = @projects.where(visibility_level: params[:visibility_level]) if params[:visibility_level].present?
+    @projects = @projects.includes(:namespace)
+    #@projects = @projects.includes(:namespace).sorted_by_activity
+    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
+    @projects = @projects.page(params[:page]).per(30)
+
+    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
+    @projects = @projects.sort(@sort = params[:sort])
+    @projects = @projects.page(params[:page]).per(30)
+
+    @labels = current_user.authorized_projects.tags_on(:labels)
+    @groups = current_user.groups
+    @teams = current_user.teams
+  end
+
+
   def merge_requests
-    @merge_requests = current_user.cared_merge_requests
-    @merge_requests = FilterContext.new(@current_user, @merge_requests, params).execute
+    @merge_requests = FilteringService.new.execute(current_user, MergeRequest, params)
     @merge_requests = @merge_requests.recent.page(params[:page]).per(20)
   end
 
-  # Get only assigned issues
   def issues
-    @issues = current_user.assigned_issues
-    @issues = FilterContext.new(@current_user, @issues, params).execute
+    @issues = FilteringService.new.execute(current_user, Issue, params)
     @issues = @issues.recent.page(params[:page]).per(20)
     @issues = @issues.includes(:author, :project)
 
@@ -99,7 +102,12 @@ class DashboardController < ApplicationController
   protected
 
   def load_projects
-    @projects = current_user.authorized_projects.sorted_by_push_date
-    @authorized_projects = @projects.count < 20 ? current_user.authorized_projects.where("projects.id not in (?)", @projects.pluck(:id)).sorted_by_push_date.limit(10) : []
+    @projects = current_user.authorized_projects.sorted_by_push_date.non_archived
+    @authorized_projects = @projects.count < 20 ? current_user.authorized_projects.where.not(id: @projects).sorted_by_push_date.non_archived.limit(10) : []
+  end
+
+  def default_filter
+    params[:scope] = 'assigned-to-me' if params[:scope].blank?
+    params[:state] = 'opened' if params[:state].blank?
   end
 end

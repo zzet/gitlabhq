@@ -2,13 +2,16 @@
 #
 # Table name: web_hooks
 #
-#  id         :integer          not null, primary key
-#  url        :string(255)
-#  project_id :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  type       :string(255)      default("ProjectHook")
-#  service_id :integer
+#  id                    :integer          not null, primary key
+#  url                   :string(255)
+#  project_id            :integer
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  type                  :string(255)      default("ProjectHook")
+#  service_id            :integer
+#  push_events           :boolean          default(TRUE), not null
+#  issues_events         :boolean          default(FALSE), not null
+#  merge_requests_events :boolean          default(FALSE), not null
 #
 
 require 'spec_helper'
@@ -19,7 +22,7 @@ describe ProjectHook do
   end
 
   describe "Mass assignment" do
-    it { should_not allow_mass_assignment_of(:project_id) }
+    it { should allow_mass_assignment_of(:project_id) }
   end
 
   describe "Validations" do
@@ -40,9 +43,8 @@ describe ProjectHook do
 
   describe "execute" do
     before(:each) do
-      @project_hook = create(:project_hook)
       @project = create(:project)
-      @project.hooks << [@project_hook]
+      @project_hook = create(:project_hook, project_id: @project.id)
       @data = { before: 'oldrev', after: 'newrev', ref: 'ref'}
 
       WebMock.stub_request(:post, @project_hook.url)

@@ -35,6 +35,11 @@ production: &base
     ## Project settings
     default_projects_limit: 10
     git_daemon_enabled: true
+
+    # Restrict setting visibility levels for non-admin users.
+    # The default is to allow all levels.
+    #restricted_visibility_levels: [ "public" ]
+
     signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
     # Default project features settings
     default_projects_features:

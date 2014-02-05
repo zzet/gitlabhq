@@ -8,7 +8,13 @@ class Gitlab::Event::Action
       user = current_user if user.blank?
 
       event = "gitlab.#{action}.#{source_name}".downcase
-      event << ".#{detailed_event}" unless detailed_event.blank?
+      if detailed_event.present?
+        event << ".#{detailed_event}"
+      else
+        if RequestStore.store[:borders] && RequestStore.store[:borders].many?
+          event << ".#{RequestStore.store[:borders][RequestStore.store[:borders].count - 2]}"
+        end
+      end
 
       ActiveSupport::Notifications.instrument event, {source: source, user: user, data: data}
     end
@@ -22,6 +28,7 @@ class Gitlab::Event::Action
       info.shift # Shift "gitlab"
       {
         action: info.shift.to_sym,
+        source: info.shift.to_sym,
         details: info
       }
     end

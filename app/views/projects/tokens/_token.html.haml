@@ -1,5 +1,5 @@
 %li
-  %span.span10
+  %span.col-md-10
     .token-title
       = link_to project_raw_path(token.project, "#{token.source_ref}/#{token.file}", file_auth_token: token.token) do
         %h5.inline
@@ -29,6 +29,6 @@
           \|
           Usage count:
           = token.usage_count
-  %span.span1
+  %span.col-md-2
     - if can?(current_user, :admin_project, token.project) || current_user == token.user
       = link_to 'Remove', project_token_path(token.project.path_with_namespace, token.id), confirm: "You are shure?", method: :delete, class: "btn btn-small btn-remove"

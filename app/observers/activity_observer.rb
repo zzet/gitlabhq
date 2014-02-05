@@ -1,7 +1,7 @@
 class ActivityObserver < ActiveRecord::Observer
   observe :issue,           # +
-          :key,             # +
           :merge_request,   # +
+          :key,             # +
           :milestone,       # +
           :group,           # +
           :note,            # +
@@ -19,42 +19,34 @@ class ActivityObserver < ActiveRecord::Observer
           :project_hook,    # +
           :system_hook
 
-  def after_create(model)
-    Gitlab::Event::Action.trigger :created, model
-  end
+  #def after_create(model)
+    #Gitlab::Event::Action.trigger :created, model
+  #end
 
-  def after_close(model, transition)
-    EventHierarchyWorker.reset
-    Gitlab::Event::Action.trigger :closed, model
-  end
+  #def around_transition(model, transition)
+    #RequestStore.store[:borders] ||= []
+    #RequestStore.store[:borders].push("gitlab.#{transition.event}.#{model.class.name.underscore}")
+    #yield
+    ##EventHierarchyWorker.reset
+    #Gitlab::Event::Action.trigger :"#{transition.event}", model
+    #RequestStore.store[:borders].pop
+  #end
 
-  def after_block(model, transition)
-    EventHierarchyWorker.reset
-    Gitlab::Event::Action.trigger :blocked, model
-  end
+  #def before_transition(model, transition)
+    #RequestStore.store[:borders] ||= []
+    #RequestStore.store[:borders].push("gitlab.#{transition.event}.#{model.class.name.underscore}")
+  #end
 
-  def after_activate(model, transition)
-    EventHierarchyWorker.reset
-    Gitlab::Event::Action.trigger :activate, model
-  end
+  #def after_transition(model, transition)
+    #EventHierarchyWorker.reset
+    #Gitlab::Event::Action.trigger :"#{transition.event}", model
+    #RequestStore.store[:borders].pop
+  #end
 
-  def after_merge(model, transition)
-    EventHierarchyWorker.reset
-    Gitlab::Event::Action.trigger :merged, model
-  end
-
-  def after_reopen(model, transition)
-    EventHierarchyWorker.reset
-    Gitlab::Event::Action.trigger :reopened, model
-  end
-
-  def after_update(model)
-    Gitlab::Event::Action.trigger :updated, model unless updated_by_system?(model)
-  end
-
-  def after_destroy(model)
-    #Gitlab::Event::Action.trigger :deleted, model
-  end
+  #def after_failure_to_transition(model, transition)
+    #Rails.logger.info "gitlab.#{transition.event}.#{model.class.name} fail"
+    #RequestStore.store[:borders].pop
+  #end
 
   def updated_by_system?(model)
     project_system_update?(model) || user_system_update?(model)

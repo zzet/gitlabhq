@@ -1,10 +1,12 @@
-require 'spec_helper'
 require 'rake'
+require 'spec_helper'
+require 'pry'
 
 describe 'gitlab:app namespace rake task' do
   before :all do
     Rake.application.rake_require "tasks/gitlab/task_helpers"
     Rake.application.rake_require "tasks/gitlab/backup"
+    Rake.application.rake_require "tasks/gitlab/shell"
     # empty task as env is already loaded
     Rake::Task.define_task :environment
   end
@@ -26,6 +28,9 @@ describe 'gitlab:app namespace rake task' do
         Dir.stub :chdir
         File.stub exists?: true
         Kernel.stub system: true
+        FileUtils.stub cp_r: true
+        FileUtils.stub mv: true
+        Rake::Task["gitlab:shell:setup"].stub invoke: true
       end
 
       let(:gitlab_version) { %x{git rev-parse HEAD}.gsub(/\n/,"") }
@@ -39,7 +44,8 @@ describe 'gitlab:app namespace rake task' do
         YAML.stub load_file: {gitlab_version: gitlab_version}
         Rake::Task["gitlab:backup:db:restore"].should_receive :invoke
         Rake::Task["gitlab:backup:repo:restore"].should_receive :invoke
-        expect { run_rake_task }.to_not raise_error SystemExit
+        Rake::Task["gitlab:shell:setup"].should_receive :invoke
+        expect { run_rake_task }.to_not raise_error
       end
     end
 

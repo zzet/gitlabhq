@@ -1,28 +1,28 @@
 class Admin::TeamsController < Admin::ApplicationController
   def index
-    @teams = Team.order('name ASC')
+    @teams = Team.order(name: :asc)
     @teams_count = @teams.count
 
-    if params[:member].present?
-      user = User.find_by_username(params[:member])
+    if params[:member_id].present?
+      user = User.find_by(id: params[:member_id])
       team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
 
-    if params[:owner].present?
-      user = User.find_by_username(params[:owner])
-      team_ids = TeamUserRelationship.where(user_id: user).pluck(:team_id)
+    if params[:owner_id].present?
+      user = User.find_by(id: params[:owner_id])
+      team_ids = TeamUserRelationship.where(user_id: user, team_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER]).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
 
-    if params[:group].present?
-      group = Group.find_by_path(params[:group])
+    if params[:group_id].present?
+      group = Group.find_by(id: params[:group_id])
       team_ids = TeamGroupRelationship.where(group_id: group).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
 
-    if params[:project].present?
-      project = Project.find_with_namespace(params[:project])
+    if params[:project_id].present?
+      project = Project.find_by(id: params[:project])
       team_ids = TeamProjectRelationship.where(project_id: project).pluck(:team_id)
       @teams = @teams.where(id: team_ids)
     end
@@ -53,11 +53,9 @@ class Admin::TeamsController < Admin::ApplicationController
   end
 
   def create
-    @team = Team.new(params[:team])
-    @team.path = @team.name.dup.parameterize if @team.name
-    @team.owner = current_user
+    @team = TeamsService.new(current_user, params[:team]).create
 
-    if @team.save
+    if @team.persisted?
       redirect_to admin_team_path(@team), notice: 'Team of users was successfully created.'
     else
       render action: "new"
@@ -72,7 +70,7 @@ class Admin::TeamsController < Admin::ApplicationController
       team.owner = User.find(owner_id)
     end
 
-    if team.update_attributes(team_params)
+    if team.update(team_params)
       redirect_to admin_team_path(team), notice: 'Team of users was successfully updated.'
     else
       render action: "edit"
@@ -80,7 +78,7 @@ class Admin::TeamsController < Admin::ApplicationController
   end
 
   def destroy
-    ::Teams::RemoveContext.new(current_user, team).execute
+    ::TeamsService.new(current_user, team).delete
 
     redirect_to admin_teams_path, notice: 'Team of users was successfully deleted.'
   end
@@ -88,7 +86,7 @@ class Admin::TeamsController < Admin::ApplicationController
   protected
 
   def team
-    @team ||= Team.find_by_path(params[:id])
+    @team ||= Team.find_by(path: params[:id])
   end
 
 end

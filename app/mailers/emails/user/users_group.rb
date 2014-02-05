@@ -44,15 +44,15 @@ class Emails::User::UsersGroup < Emails::User::Base
     @user         = @event.author
     @up           = JSON.load(@event.data)
     @member       = @event.target
-    @group        = Group.find(@up["group_id"])
-    @member       = User.find(@up["user_id"]) if @member.nil? || @member.is_a?(UsersGroup)
+    @group        = Group.find_by_id(@up["group_id"])
+    @member       = User.find_by_id(@up["user_id"]) if @member.nil? || @member.is_a?(UsersGroup)
 
-    headers 'X-Gitlab-Entity' => 'user',
-            'X-Gitlab-Action' => 'left',
-            'X-Gitlab-Source' => 'group-user-relationship',
-            'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+    if @group && @member
+      headers 'X-Gitlab-Entity' => 'user',
+              'X-Gitlab-Action' => 'left',
+              'X-Gitlab-Source' => 'group-user-relationship',
+              'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
 
-    if @group
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was removed from '#{@group.path}' group team")
     end
   end

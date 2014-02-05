@@ -16,4 +16,11 @@
 #
 
 class PersonalSnippet < Snippet
+  include Watchable
+
+  source watchable_name do
+    from :create,   to: :created
+    from :update,   to: :updated
+    from :destroy,  to: :deleted
+  end
 end

@@ -3,7 +3,6 @@ require 'spec_helper'
 describe GitPushService do
   let (:user)          { create :user }
   let (:project)       { create :project_with_code }
-  let (:service) { GitPushService.new }
 
   before do
     @blankrev = '0000000000000000000000000000000000000000'
@@ -14,7 +13,8 @@ describe GitPushService do
 
   describe "Git Push Data" do
     before do
-      service.execute(project, user, @oldrev, @newrev, @ref)
+      service = GitPushService.new(user, project, @oldrev, @newrev, @ref)
+      service.execute
       @push_data = service.push_data
       @commit = project.repository.commit(@newrev)
     end
@@ -63,50 +63,32 @@ describe GitPushService do
 
   describe "Push Event" do
     before do
-      service.execute(project, user, @oldrev, @newrev, @ref)
+      @service = GitPushService.new(user, project, @oldrev, @newrev, @ref)
+      @service.execute
       @event = OldEvent.last
     end
 
     it { @event.should_not be_nil }
     it { @event.project.should == project }
     it { @event.action.should == OldEvent::PUSHED }
-    it { @event.data.should == service.push_data }
+    it { @event.data.should == @service.push_data }
   end
 
   describe "Web Hooks" do
-    context "with web hooks" do
-      before do
-        @project_hook = create(:project_hook)
-        @project_hook_2 = create(:project_hook)
-        project.hooks << [@project_hook, @project_hook_2]
-
-        stub_request(:post, @project_hook.url)
-        stub_request(:post, @project_hook_2.url)
-      end
-
-      it "executes multiple web hook" do
-        @project_hook.should_receive(:async_execute).once
-        @project_hook_2.should_receive(:async_execute).once
-
-        service.execute(project, user, @oldrev, @newrev, @ref)
-      end
-    end
-
     context "execute web hooks" do
-      before do
-        @project_hook = create(:project_hook)
-        project.hooks << [@project_hook]
-        stub_request(:post, @project_hook.url)
+      it "when pushing a branch for the first time" do
+        project.should_receive(:execute_hooks)
+        GitPushService.new(user, project, @blankrev, 'newrev', 'refs/heads/master').execute
       end
 
-      it "when pushing a branch for the first time" do
-        @project_hook.should_receive(:async_execute)
-        service.execute(project, user, @blankrev, 'newrev', 'refs/heads/master')
+      it "when pushing new commits to existing branch" do
+        project.should_receive(:execute_hooks)
+        GitPushService.new(user, project, 'oldrev', 'newrev', 'refs/heads/master').execute
       end
 
       it "when pushing tags" do
-        @project_hook.should_receive(:async_execute)
-        service.execute(project, user, 'newrev', 'newrev', 'refs/tags/v1.0.0')
+        project.should_receive(:execute_hooks)
+        GitPushService.new(user, project, 'newrev', 'newrev', 'refs/tags/v1.0.0').execute
       end
     end
   end
@@ -129,7 +111,7 @@ describe GitPushService do
     it "creates a note if a pushed commit mentions an issue" do
       Note.should_receive(:create_cross_reference_note).with(issue, commit, commit_author, project)
 
-      service.execute(project, user, @oldrev, @newrev, @ref)
+      GitPushService.new(user, project, @oldrev, @newrev, @ref).execute
     end
 
     it "only creates a cross-reference note if one doesn't already exist" do
@@ -137,14 +119,14 @@ describe GitPushService do
 
       Note.should_not_receive(:create_cross_reference_note).with(issue, commit, commit_author, project)
 
-      service.execute(project, user, @oldrev, @newrev, @ref)
+      GitPushService.new(user, project, @oldrev, @newrev, @ref).execute
     end
 
     it "defaults to the pushing user if the commit's author is not known" do
       commit.stub(author_name: 'unknown name', author_email: 'unknown@email.com')
       Note.should_receive(:create_cross_reference_note).with(issue, commit, user, project)
 
-      service.execute(project, user, @oldrev, @newrev, @ref)
+      GitPushService.new(user, project, @oldrev, @newrev, @ref).execute
     end
 
     it "finds references in the first push to a non-default branch" do
@@ -153,7 +135,7 @@ describe GitPushService do
 
       Note.should_receive(:create_cross_reference_note).with(issue, commit, commit_author, project)
 
-      service.execute(project, user, @blankrev, @newrev, 'refs/heads/other')
+      GitPushService.new(user, project, @blankrev, @newrev, 'refs/heads/other').execute
     end
 
     it "finds references in the first push to a default branch" do
@@ -162,7 +144,7 @@ describe GitPushService do
 
       Note.should_receive(:create_cross_reference_note).with(issue, commit, commit_author, project)
 
-      service.execute(project, user, @blankrev, @newrev, 'refs/heads/master')
+      GitPushService.new(user, project, @blankrev, @newrev, 'refs/heads/master').execute
     end
   end
 
@@ -184,20 +166,20 @@ describe GitPushService do
     end
 
     it "closes issues with commit messages" do
-      service.execute(project, user, @oldrev, @newrev, @ref)
+      GitPushService.new(user, project, @oldrev, @newrev, @ref).execute
 
       Issue.find(issue.id).should be_closed
     end
 
     it "passes the closing commit as a thread-local" do
-      service.execute(project, user, @oldrev, @newrev, @ref)
+      GitPushService.new(user, project, @oldrev, @newrev, @ref).execute
 
       RequestStore.store[:current_commit].should == closing_commit
     end
 
     it "doesn't create cross-reference notes for a closing reference" do
       expect {
-        service.execute(project, user, @oldrev, @newrev, @ref)
+        GitPushService.new(user, project, @oldrev, @newrev, @ref).execute
       }.not_to change { Note.where(project_id: project.id, system: true).count }
     end
 
@@ -206,7 +188,7 @@ describe GitPushService do
 
       # The push still shouldn't create cross-reference notes.
       expect {
-        service.execute(project, user, @oldrev, @newrev, 'refs/heads/hurf')
+        GitPushService.new(user, project, @oldrev, @newrev, 'refs/heads/hurf').execute
       }.not_to change { Note.where(project_id: project.id, system: true).count }
 
       Issue.find(issue.id).should be_opened

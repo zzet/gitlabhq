@@ -32,12 +32,18 @@
 }
 .project-home-panel {
   border-bottom: 1px solid #DDD;
-  padding-bottom: 25px;
+  padding-bottom: 15px;
   margin-bottom: 30px;
+
+  &.empty-project {
+      border-bottom: 0px;
+      padding-bottom: 15px;
+      margin-bottom: 0px;
+  }
 
   .project-home-title {
     font-size: 18px;
-    color: #777;
+    color: #444;
     margin: 0;
     line-height: 32px;
   }
@@ -46,40 +52,52 @@
 
     .project-home-desc {
       float: left;
-      color: #999;
+      color: #777;
+      margin-bottom: 10px;
     }
 
     .project-home-links {
       float: right;
       a {
         margin-left: 10px;
+        font-weight: 500;
       }
     }
   }
 
-  .public-label {
-    font-size: 14px;
+  .visibility-level-label {
+    font-size: 17px;
     background: #f1f1f1;
-    padding: 8px 10px;
     border-radius: 4px;
-    margin-left: 10px;
     color: #888;
+    position: absolute;
+    margin-left: -55px;
     text-shadow: 0 1px 1px #FFF;
+    width: 40px;
+    text-align: center;
+    padding: 6px;
+
+    i {
+      color: inherit;
+    }
   }
 }
 
 .git-clone-holder {
-  float: right;
-  border: 1px solid #E1E1E1;
-  @include border-radius(4px);
+  .project-home-dropdown + & {
+    margin-right: 45px;
+  }
+
+  .btn,
+  .form-control {
+    border: 1px solid #E1E1E1;
+    box-shadow: none;
+    padding: 6px 9px;
+  }
 
   .btn {
-    margin-left: 3px;
-    border: none;
     background: none;
-    box-shadow: none;
     color: #29b;
-    padding: 6px;
 
     &.active {
       color: #333;
@@ -87,18 +105,32 @@
     }
   }
 
-  input[type="text"] {
-    border: none;
-    border-radius: 0;
+  .form-control {
+    cursor: auto;
     @extend .monospace;
-    box-shadow: none;
     background: #FAFAFA;
+    width: 100%;
   }
 }
 
-.project-public-holder {
-  .help-inline {
-    padding-top: 7px;
+.project-visibility-level-holder {
+  .radio {
+    margin-bottom: 10px;
+
+    i {
+      margin: 0 3px;
+      font-size: 20px;
+    }
+
+    .option-title {
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .option-descr {
+      margin-left: 24px;
+      color: #666;
+    }
   }
 }
 
@@ -139,7 +171,8 @@ ul.nav.nav-projects-tabs {
   margin: 0px;
 }
 
-.my-projects {
+.my-projects,
+.public-projects {
   li {
     .project-info {
       margin-bottom: 10px;
@@ -179,11 +212,26 @@ ul.nav.nav-projects-tabs {
 .project-side {
   .btn-block {
     background-image: none;
-    background-color: #F1f1f1;
-    border-color: #EEE;
-    &:hover {
-      background-color: #eee;
-      border-color: #DDD;
+    .btn,
+    &.btn,
+    &.btn-group ul.dropdown-menu {
+      background-color: #F1f1f1;
+      border-color: #EEE;
+      &:hover {
+        background-color: #eee;
+        border-color: #DDD;
+      }
+    }
+    &.btn-group-justified {
+        .btn {
+            width: 100%;
+        }
+        .dropdown-toggle {
+            width: 26px;
+        }
+    }
+    ul {
+        width: 100%;
     }
   }
   .project-fork-icon {
@@ -194,42 +242,37 @@ ul.nav.nav-projects-tabs {
   }
 }
 
-.transfer-project .chosen-container {
+.transfer-project .select2-container {
   min-width: 200px;
 }
 
-/** Branch/tag selector **/
-.project-refs-form {
-  margin: 0;
-  span {
-    background:none !important;
-    position:static !important;
-    width:auto !important;
-    height:auto !important;
-  }
-}
-.project-refs-select {
-  width: 120px;
+.deploy-project-label {
+  margin: 1px;
 }
 
-.project-refs-form .chosen-container {
-  position: relative;
-  top: 0;
-  left: 0;
-  margin-right: 10px;
+.ui-box .title .nav.nav-pills.project-sorting-tabs {
+  width: 100%;
+  float: left;
 
-  .chosen-single span {
-    font-weight: bold;
-    color: #555;
+  a {
+    padding: 1px 3px;
+    margin-bottom: -1px;
+    font-size: 11px;
+    line-height: 11px;
+    background: none;
+    border: none;
+    margin-right: 5px;
   }
 
-  &.chosen-container-active {
-    .chosen-drop {
-      min-width: 400px;
-    }
+  li.active a{
+    border-bottom: 1px solid #000;
+  }
+}
 
-    .chosen-results {
-      max-height: 400px;
-    }
+.visibility_level {
+  i {
+    font-size: 30px;
+    float: left;
+    padding-right: 10px;
   }
 }

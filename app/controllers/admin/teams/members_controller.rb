@@ -4,7 +4,7 @@ class Admin::Teams::MembersController < Admin::Teams::ApplicationController
   end
 
   def create
-    ::Teams::Users::CreateRelationContext.new(@current_user, team, params).execute
+    team_service.new(@current_user, team, params).add_memberships
 
     redirect_to admin_team_path(team), notice: 'Members were successfully added into Team of users.'
   end
@@ -14,7 +14,7 @@ class Admin::Teams::MembersController < Admin::Teams::ApplicationController
   end
 
   def update
-    if ::Teams::Users::UpdateRelationContext.new(@current_user, team, team_member, params).execute
+    if team_service.update_memberships(team_member)
       redirect_to admin_team_path(team), notice: "Membership for #{team_member.name} was successfully updated in Team of users."
     else
       render :edit
@@ -22,7 +22,7 @@ class Admin::Teams::MembersController < Admin::Teams::ApplicationController
   end
 
   def destroy
-    ::Teams::Users::RemoveRelationContext.new(@current_user, team, team_member).execute
+    team_service.new(@current_user, team).delete_membership(team_member)
 
     redirect_to admin_team_path(team), notice: "Member #{team_member.name} was successfully removed from Team of users."
   end

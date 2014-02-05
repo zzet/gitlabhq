@@ -30,6 +30,34 @@ module SharedPaths
   end
 
   # ----------------------------------------
+  # Team
+  # ----------------------------------------
+
+  step 'I visit team index page' do
+    visit teams_path
+  end
+
+  step 'I visit team page' do
+    visit team_path(current_team)
+  end
+
+  step 'I visit team settings page' do
+    visit edit_team_path(current_team)
+  end
+
+  step 'I visit members team settings page' do
+    visit team_members_path(current_team)
+  end
+
+  step 'I visit groups team settings page' do
+    visit team_groups_path(current_team)
+  end
+
+  step 'I visit projects team settings page' do
+    visit team_projects_path(current_team)
+  end
+
+  # ----------------------------------------
   # Dashboard
   # ----------------------------------------
 
@@ -241,7 +269,7 @@ module SharedPaths
   end
 
   step 'I visit issue page "Release 0.4"' do
-    issue = Issue.find_by_title("Release 0.4")
+    issue = Issue.find_by(title: "Release 0.4")
     visit project_issue_path(issue.project, issue)
   end
 
@@ -250,12 +278,12 @@ module SharedPaths
   end
 
   step 'I visit merge request page "Bug NS-04"' do
-    mr = MergeRequest.find_by_title("Bug NS-04")
+    mr = MergeRequest.find_by(title: "Bug NS-04")
     visit project_merge_request_path(mr.target_project, mr)
   end
 
   step 'I visit merge request page "Bug NS-05"' do
-    mr = MergeRequest.find_by_title("Bug NS-05")
+    mr = MergeRequest.find_by(title: "Bug NS-05")
     visit project_merge_request_path(mr.target_project, mr)
   end
 
@@ -292,7 +320,7 @@ module SharedPaths
   end
 
   step 'I visit public page for "Community" project' do
-    visit public_project_path(Project.find_by_name("Community"))
+    visit public_project_path(Project.find_by(name: "Community"))
   end
 
   # ----------------------------------------
@@ -316,6 +344,10 @@ module SharedPaths
   end
 
   def project
-    project = Project.find_by_name!("Shop")
+    project = Project.find_by!(name: "Shop")
+  end
+
+  def current_team
+    @team ||= Team.first
   end
 end

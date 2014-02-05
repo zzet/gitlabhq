@@ -10,16 +10,16 @@
 
 %hr
 
-= form_for(@service, as: :service, url: project_service_path(@project, @service.to_param), method: :put) do |f|
+= form_for(@service, as: :service, url: project_service_path(@project, @service.to_param), method: :put, html: { class: 'form-horizontal' }) do |f|
   - if @service.errors.any?
-    .alert.alert-error
+    .alert.alert-danger
       %ul
         - @service.errors.full_messages.each do |msg|
           %li= msg
 
-  .control-group
+  .form-group
     = f.label :state_event, "State", class: "control-label"
-    .controls
+    .col-sm-10
       = f.select(:state_event, @service.state_transitions.map {|s| [s.human_event, s.event]}, include_blank: @service.human_state_name)
 
   - if @service.respond_to?(:configuration)
@@ -31,11 +31,13 @@
         - type = field[:type]
         - placeholder = field[:placeholder]
 
-        .control-group
+        .form-group
           = config.label name, class: "control-label"
-          .controls
+          .col-sm-10
             - if type == 'text'
-              = config.text_field name, class: "input-xlarge", placeholder: placeholder, disabled: disable_state
+              = config.text_field name, class: "form-control", placeholder: placeholder, disabled: disable_state
+            - elsif type == 'textarea'
+              = f.text_area name, rows: 5, class: "form-control", placeholder: placeholder, disabled: disable_state
             - elsif type == 'checkbox'
               = config.check_box name, disabled: disable_state
 

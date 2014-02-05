@@ -1,5 +1,19 @@
 class Emails::MergeRequest::MergeRequest < Emails::Base
   def created_email(notification)
+    case notification.subscription
+    when NilClass
+      Emails::Project::MergeRequest.opened_email(notification).deliver!
+    else
+      case notification.subscription.target
+      when Project
+        Emails::Project::MergeRequest.opened_email(notification).deliver!
+      when MergeRequest
+        # Send notification
+      end
+    end
+  end
+
+  def updated_email(notification)
 
   end
 
