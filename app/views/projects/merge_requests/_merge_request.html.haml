@@ -32,7 +32,8 @@
         %i.icon-time
         = merge_request.milestone.title
     - if merge_request.ci_builds.any?
-      = render 'shared/projects/build_status', build: merge_request.ci_builds.last,
-       project: merge_request.source_project
+      = render 'shared/projects/build_status',
+                build: merge_request.ci_builds.last,
+                project: merge_request.source_project
     .pull-right
       %small updated #{time_ago_with_tooltip(merge_request.updated_at, 'bottom', 'merge_request_updated_ago')}

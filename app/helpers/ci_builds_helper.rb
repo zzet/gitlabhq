@@ -4,15 +4,15 @@ module CiBuildsHelper
     when "success"
       "success"
     when "fail"
-      "important"
+      "danger"
     when "skipped"
-      "info"
+      "primary"
     when "build"
       "warning"
     when "aborted"
-      "inverse"
+      "default"
     when "unstable"
-      "inverse"
+      "info"
     end
   end
 
