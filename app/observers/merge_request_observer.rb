@@ -7,11 +7,7 @@ class MergeRequestObserver < BaseObserver
     end
 
     merge_request.create_cross_references!(merge_request.project, current_user)
-    if merge_request.target_project && merge_request.target_project.jenkins_ci_with_mr?
-      type = (merge_request.target_project == merge_request.source_project ? :project : :fork)
-      service = merge_request.target_project.jenkins_ci
-      service.build_merge_request(merge_request, current_user, type)
-    end
+
     # TODO: check MR hooks
     execute_hooks(merge_request)
   end
