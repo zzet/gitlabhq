@@ -42,6 +42,6 @@ test: &test
   encoding: unicode
   database: gitlabhq_test
   pool: 5
-  username: gitlab
+  username: postgres
   password:
   # socket:
