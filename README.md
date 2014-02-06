@@ -4,7 +4,7 @@
 
 ## Attention!!! Undev version:
 
-![undev_logo](https://raw.github.com/zzet/gitlabhq/d75ecd787b477b3cb08a38f22767eeb106b90f26/public/undev_gitlab_logo.png)
+![undev_logo](https://raw.github.com/zzet/gitlabhq/master/public/undev_gitlab_logo.png)
 
 ![animated-screenshots](https://gist.github.com/fnkr/2f9badd56bfe0ed04ee7/raw/4f48806fbae97f556c2f78d8c2d299c04500cb0d/compiled.gif)
 
