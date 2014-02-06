@@ -159,7 +159,7 @@ module Watchable
 
                     WatchableObserver.send :define_method, :after_failure_to_transition do |model, transition|
                       Rails.logger.info "gitlab.#{transition.event}.#{model.class.name} fail"
-                      RequestStore.store[:borders].pop
+                      RequestStore.store[:borders].pop if RequestStore.store[:borders].present?
                     end unless WatchableObserver.respond_to?(:after_failure_to_transition)
                   end
                 end
