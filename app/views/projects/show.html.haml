@@ -76,12 +76,12 @@
         %p
           %span.light Last push at
           - if @project.last_pushed_at
-            #{@project.last_pushed_at.stamp('Aug 22, 2013')}
+            #{@project.last_pushed_at.stamp('Aug 22, 2013 - 12:00:00')}
           - else
             Never
         %p
           %span.light Last activity at
-          #{@project.last_activity_date.stamp('Aug 22, 2013')}
+          #{@project.last_activity_date.stamp('Aug 22, 2013 - 12:00:00')}
         %p
           %span.light Created on
           #{@project.created_at.stamp('Aug 22, 2013')}
