@@ -65,7 +65,8 @@ module Gitlab
 
     # Enable the asset pipeline
     config.assets.enabled = true
-    config.assets.precompile += ['mailer/base.css']
+    config.assets.paths << Emoji.images_path
+    config.assets.precompile += ['mailer/base.css', 'emoji/*.png']
     config.assets.initialize_on_precompile = true
 
     # Version of your assets, change this if you want to expire all your assets
