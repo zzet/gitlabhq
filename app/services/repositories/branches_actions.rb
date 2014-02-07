@@ -24,8 +24,8 @@ module Repositories::BranchesActions
     end
   end
 
-  def delete_branch(branch)
-    branch = @repository.find_branch(branch)
+  def delete_branch_action(branch)
+    branch = project.repository.find_branch(branch)
     if branch && project.repository.rm_branch(branch.name)
       oldrev = branch.commit.id
       newrev = "0000000000000000000000000000000000000000"
