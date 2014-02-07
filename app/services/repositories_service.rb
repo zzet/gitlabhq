@@ -17,8 +17,8 @@ class RepositoriesService < ProjectsService
     create_branch_action(branch, ref)
   end
 
-  def delete_branch(branch, ref)
-    delete_branch_action(branch, ref)
+  def delete_branch(branch)
+    delete_branch_action(branch)
   end
 
   def protect_branch(branch)
