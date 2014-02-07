@@ -10,4 +10,4 @@ getText = ->
   else
     $(".hide-line-numbers").removeClass "hide-line-numbers"
 
-getSelectedText = window.setInterval(getText, 200)
+# getSelectedText = window.setInterval(getText, 200)
