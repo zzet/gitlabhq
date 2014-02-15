@@ -14,6 +14,7 @@
 
 class Group < Namespace
   include Watchable
+  include GroupsSearch
 
   has_many :team_group_relationships, dependent: :destroy
   has_many :teams,                    through: :team_group_relationships

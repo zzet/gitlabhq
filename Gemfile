@@ -27,6 +27,10 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
 gem 'omniauth-github'
 
+# Search
+gem 'elasticsearch-model', git: 'git://github.com/elasticsearch/elasticsearch-rails.git'
+gem 'elasticsearch-rails', git: 'git://github.com/elasticsearch/elasticsearch-rails.git'
+
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
 gem "gitlab_git", "~> 4.0.0"

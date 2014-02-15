@@ -50,6 +50,7 @@ require 'file_size_validator'
 
 class User < ActiveRecord::Base
   include Watchable
+  include UsersSearch
 
   devise :database_authenticatable, :token_authenticatable, :lockable, :async,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :confirmable, :registerable
@@ -251,10 +252,6 @@ class User < ActiveRecord::Base
       else
         self.active
       end
-    end
-
-    def search query
-      where("name LIKE :query OR email LIKE :query OR username LIKE :query", query: "%#{query}%")
     end
 
     def by_username_or_id(name_or_id)

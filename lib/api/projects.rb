@@ -25,9 +25,9 @@ module API
       # Example Request:
       #   GET /projects
       get do
-        @projects = current_user.known_projects
-        @projects = @projects.search(params[:search]) if params[:search].present?
-        @projects = paginate @projects
+        search_options = { page: params[:page] }
+        search_options[:pids] = current_user.known_projects unless current_user.admin?
+        @projects = Project.search(params[:search], options: search_options)
         present @projects, with: Entities::Project
       end
 
@@ -36,15 +36,13 @@ module API
       # Example Request:
       #   GET /projects/to_assign
       get '/to_assign' do
-        @projects = if current_user.admin?
-                      Project.all
-                    else
-                      Project.where(id: (current_user.master_projects.pluck(:id) +
-                                         current_user.created_projects.pluck(:id) +
-                                         current_user.owned_projects.pluck(:id)))
-                    end
-        @projects = @projects.search(params[:search]) if params[:search].present?
-        @projects = paginate @projects
+        search_options = { page: params[:page] }
+        unless current_user.admin?
+          search_options[:pids] = (current_user.master_projects.pluck(:id) +
+                                   current_user.created_projects.pluck(:id) +
+                                   current_user.owned_projects.pluck(:id))
+        end
+        @projects = Project.search(params[:search], options: search_options)
         present @projects, with: Entities::Project
       end
 
@@ -322,10 +320,10 @@ module API
       # Example Request:
       #   GET /projects/search/:query
       get "/search/:query" do
-        ids = current_user.authorized_projects.map(&:id)
+        ids = current_user.known_projects.pluck(:id)
         visibility_levels = [ Gitlab::VisibilityLevel::INTERNAL, Gitlab::VisibilityLevel::PUBLIC ]
-        projects = Project.where("(id in (?) OR visibility_level in (?)) AND (name LIKE (?))", ids, visibility_levels, "%#{params[:query]}%")
-        present paginate(projects), with: Entities::Project
+        projects = Project.search(params[:query], options: { pids: ids, visibility_levels: visibility_levels, page: params[:page] })
+        present projects, with: Entities::Project
       end
     end
   end
