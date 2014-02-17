@@ -11,6 +11,16 @@ module Groups::UsersActions
     multiple_action("memberships_add", "group", group, user_ids) do
       group.add_users(user_ids, params[:group_access])
     end
+
+    Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
+
+    User.where(id: user_ids).find_each do |user|
+      Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
+    end
+
+    group.projects.find_each do |project|
+      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    end
   end
 
   def remove_user_membership_action(member)
@@ -19,7 +29,16 @@ module Groups::UsersActions
     if gur.user != group.owner
       gur.destroy
       receive_delayed_notifications
+
+      Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
+
+      Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
+
+      group.projects.find_each do |project|
+        Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+      end
     end
+
   end
 
   def update_user_membership_action(member)
@@ -28,6 +47,13 @@ module Groups::UsersActions
 
     if gur.valid?
       receive_delayed_notifications
+
+      Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
+
+      group.projects.find_each do |project|
+        Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+      end
+
       return true
     else
       return false

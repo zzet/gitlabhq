@@ -302,6 +302,14 @@ class Project < ActiveRecord::Base
     team.developers
   end
 
+  def reporters
+    team.reporters
+  end
+
+  def guests
+    team.guests
+  end
+
   def repository
     @repository ||= ::Repository.new(path_with_namespace)
   end

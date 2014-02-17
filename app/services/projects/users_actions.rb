@@ -8,6 +8,12 @@ module Projects::UsersActions
       users = User.where(id: user_ids)
       @project.team << [users, params[:project_access]]
     end
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+
+    project.team.members.where(id: user_ids).find_each do |user|
+      Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
+    end
   end
 
   def update_membership_action(member)
@@ -18,6 +24,10 @@ module Projects::UsersActions
 
     if pur.valid?
       receive_delayed_notifications
+
+      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+      Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
+
       return true
     else
       return false
@@ -27,6 +37,10 @@ module Projects::UsersActions
   def remove_membership_action(member)
     pur = project_member_relation(member)
     pur.destroy
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
+
     receive_delayed_notifications
   end
 
@@ -35,24 +49,44 @@ module Projects::UsersActions
       @project.team.import(giver)
     end
 
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+
+    project.team.members.find_each do |member|
+      Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
+    end
+
     status
   end
 
   def batch_remove_memberships_action
     user_project_ids = params[:ids].respond_to?(:each) ? params[:ids] : params[:ids].split(',')
     user_project_relations = UsersProject.where(id: user_project_ids)
+    user_ids = user_project_relations.pluck(:user_id)
 
     multiple_action("memberships_remove", "project", project, user_project_ids) do
       user_project_relations.destroy_all
+    end
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+
+    User.where(id: user_ids).find_each do |member|
+      Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
     end
   end
 
   def batch_update_memberships_action
     user_project_ids = params[:ids].respond_to?(:each) ? params[:ids] : params[:ids].split(',')
     user_project_relations = UsersProject.where(id: user_project_ids)
+    user_ids = user_project_relations.pluck(:user_id)
 
     multiple_action("memberships_update", "project", project, user_project_ids) do
       user_project_relations.find_each { |membership| membership.update(project_access: params[:team_member][:project_access]) }
+    end
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+
+    User.where(id: user_ids).find_each do |member|
+      Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
     end
   end
 

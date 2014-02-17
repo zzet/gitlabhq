@@ -62,6 +62,18 @@ module Projects::BaseActions
         SubscriptionService.subscribe(current_user, :all, @project, :all)
       end
 
+      group = project.group
+      if group
+        Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
+
+        group.teams.find_each do |team|
+          Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+        end
+      end
+
+      project.team.members.find_each do |member|
+        Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
+      end
     end
 
     receive_delayed_notifications
@@ -111,12 +123,31 @@ module Projects::BaseActions
       allowed_transfer = can?(current_user, :change_namespace, project) || role == :admin
 
       if allowed_transfer && (namespace != project.namespace)
-        #old_namespace = project.namespace
+        old_namespace = project.namespace
+        old_project_teams_ids = project.teams.ids
+        old_group_teams_ids = project.group.present? ? project.teams.ids : []
+        old_teams_ids = (old_group_teams_ids + old_project_teams_ids).flatten
+        old_members_ids = project.team.members.ids
 
         if transfer_to(namespace)
           build_face_service = project.services.where(type: Service::BuildFace).first
           if build_face_service && build_face_service.enabled?
             build_face_service.notify_build_face("transfered")
+          end
+
+          Elastic::BaseIndexer.perform_async(:update, old_namespace.class.name, old_namespace.id)
+          Elastic::BaseIndexer.perform_async(:update, project.namespace.class.name, project.namespace.id)
+
+          teams_ids = old_teams_ids + project.teams.ids
+          teams_ids += project.group.teams if project.group.present?
+          teams_ids = teams_ids.flatten.uniq
+
+          Team.where(id: teams_ids).find_each do |team|
+            Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+          end
+
+          User.where(id: (old_members_ids + project.team.members.ids).flatten.uniq).find_each do |user|
+            Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
           end
 
           receive_delayed_notifications
@@ -156,6 +187,12 @@ module Projects::BaseActions
       end
     else
       from_project.errors.add(:base, "Invalid fork destination")
+    end
+
+    if from_project.persisted?
+      from_project.team.members.find_each do |user|
+        Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
+      end
     end
 
     from_project

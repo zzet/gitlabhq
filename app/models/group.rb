@@ -42,6 +42,10 @@ class Group < Namespace
                                      users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } })},
                         through: :users_groups, source: :user
 
+  has_many :owners,     -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::OWNER } })},
+                        through: :users_groups, source: :user
+
   watch do
     source watchable_name do
       from :create,   to: :created

@@ -9,6 +9,14 @@ module Projects::TeamsActions
           project.team_project_relationships.create(team_id: team_id)
         end
       end
+
+      Team.where(id: team_ids).find_each do |team|
+        Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+      end
+
+      project.team.members.find_each do |user|
+        Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
+      end
     end
   end
 

@@ -22,6 +22,8 @@ module ProjectsSearch
       indexes :owners,              type: :nested
       indexes :masters,             type: :nested
       indexes :developers,          type: :nested
+      indexes :reporters,           type: :nested
+      indexes :guests,              type: :nested
 
       indexes :name_with_namespace_sort, type: :string, index: 'not_analyzed'
     end
@@ -31,7 +33,9 @@ module ProjectsSearch
         include: {
           owners: { only: :id },
           masters: { only: :id },
-          developers: { only: :id }
+          developers: { only: :id },
+          reporters: { only: :id },
+          guests: { only: :id }
         }
       ).merge({
         name_with_namespace: name_with_namespace,

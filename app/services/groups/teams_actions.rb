@@ -2,16 +2,29 @@ module Groups::TeamsActions
   private
 
   def assign_team_action
-    Group.transaction do
-      team_ids = params[:team_ids].respond_to?(:each) ? params[:team_ids] : params[:team_ids].split(',')
+    team_ids = params[:team_ids].respond_to?(:each) ? params[:team_ids] : params[:team_ids].split(',')
 
+    Group.transaction do
       multiple_action("teams_add", "group", group, team_ids) do
         team_ids.each do |team_id|
           group_team_relation = group.team_group_relationships.new(team_id: team_id)
           group_team_relation.save
         end
       end
+    end
 
+    Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
+
+    Team.where(id: team_ids).find_each do |team|
+      Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+
+      team.users.find_each do |user|
+        Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
+      end
+    end
+
+    group.projects.find_each do |project|
+      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
     end
   end
 
@@ -19,6 +32,17 @@ module Groups::TeamsActions
     multiple_action("teams_remove", "group", group, team) do
       gtr = group_team_relation(team)
       gtr.destroy
+    end
+
+    Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
+    Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+
+    team.users.find_each do |user|
+      Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
+    end
+
+    group.projects.find_each do |project|
+      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
     end
   end
 

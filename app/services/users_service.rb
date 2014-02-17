@@ -6,6 +6,13 @@ class UsersService < BaseService
   end
 
   def block
+    projects_ids = (user.projects.ids +
+                    personal_projects.ids +
+                    user.groups.projects.ids +
+                    user.teams.projects.ids).uniq
+    teams_ids = user.teams.ids
+    groups_ids = user.groups.ids
+
     User.transaction do
       if user.block
         user.team_user_relationships.find_each do |membership|
@@ -32,15 +39,48 @@ class UsersService < BaseService
       end
     end
 
+    Project.where(id: projects_ids).find_each do |project|
+      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    end
+
+    Team.where(id: teams_ids).find_each do |team|
+      Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    end
+
+    Group.where(id: groups_ids).find_each do |group|
+      Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
+    end
+
     receive_delayed_notifications
   end
 
   def delete
+    projects_ids = (user.projects.ids +
+                    personal_projects.ids +
+                    user.solo_owned_groups.projects.ids +
+                    user.teams.projects.ids).uniq
+
+    teams_ids = user.teams.ids
+    groups_ids = user.solo_owned_groups.ids
+
     # 1. Remove groups where user is the only owner
     user.solo_owned_groups.map(&:destroy)
 
     # 2. Remove user with all authored content including personal projects
     user.destroy
+
+    Project.where(id: projects_ids).find_each do |project|
+      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    end
+
+    Team.where(id: teams_ids).find_each do |team|
+      Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    end
+
+    Group.where(id: groups_ids).find_each do |group|
+      Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
+    end
+
     receive_delayed_notifications
   end
 end
