@@ -12,8 +12,6 @@ module Groups::UsersActions
       group.add_users(user_ids, params[:group_access])
     end
 
-    Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
-
     group.projects.find_each do |project|
       Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
     end
@@ -25,8 +23,6 @@ module Groups::UsersActions
     if gur.user != group.owner
       gur.destroy
       receive_delayed_notifications
-
-      Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
 
       group.projects.find_each do |project|
         Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
@@ -41,8 +37,6 @@ module Groups::UsersActions
 
     if gur.valid?
       receive_delayed_notifications
-
-      Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
 
       group.projects.find_each do |project|
         Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)

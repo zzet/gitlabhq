@@ -64,8 +64,6 @@ module Projects::BaseActions
 
       group = project.group
       if group
-        Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
-
         group.teams.find_each do |team|
           Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
         end
@@ -119,7 +117,6 @@ module Projects::BaseActions
       allowed_transfer = can?(current_user, :change_namespace, project) || role == :admin
 
       if allowed_transfer && (namespace != project.namespace)
-        old_namespace = project.namespace
         old_project_teams_ids = project.teams.ids
         old_group_teams_ids = project.group.present? ? project.teams.ids : []
         old_teams_ids = (old_group_teams_ids + old_project_teams_ids).flatten
@@ -129,9 +126,6 @@ module Projects::BaseActions
           if build_face_service && build_face_service.enabled?
             build_face_service.notify_build_face("transfered")
           end
-
-          Elastic::BaseIndexer.perform_async(:update, old_namespace.class.name, old_namespace.id)
-          Elastic::BaseIndexer.perform_async(:update, project.namespace.class.name, project.namespace.id)
 
           teams_ids = old_teams_ids + project.teams.ids
           teams_ids += project.group.teams if project.group.present?

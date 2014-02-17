@@ -15,16 +15,11 @@ module Teams::BaseActions
 
   def remove_action
     project_ids = (team.projects.ids + team.accessed_projects).uniq
-    group_ids   = team.groups.ids
 
     team.destroy
 
     Project.where(id: project_ids).find_each do |project|
       Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    end
-
-    Group.where(id: group_ids).find_each do |group|
-      Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
     end
 
     receive_delayed_notifications

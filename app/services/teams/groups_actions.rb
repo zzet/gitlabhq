@@ -16,8 +16,6 @@ module Teams::GroupsActions
     Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
 
     groups.find_each do |group|
-      Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
-
       group.projects.find_each do |project|
         Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
       end
@@ -27,12 +25,9 @@ module Teams::GroupsActions
   def resign_from_groups_action(groups)
     tgrs = team.team_group_relationships.where(group_id: groups)
 
-    group = tgrs.group
     projects = group.projects
 
     tgrs.destroy_all
-
-    Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
 
     projects.find_each do |project|
       Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
