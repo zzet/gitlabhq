@@ -14,10 +14,6 @@ module Groups::UsersActions
 
     Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
 
-    User.where(id: user_ids).find_each do |user|
-      Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
-    end
-
     group.projects.find_each do |project|
       Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
     end
@@ -31,8 +27,6 @@ module Groups::UsersActions
       receive_delayed_notifications
 
       Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
-
-      Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
 
       group.projects.find_each do |project|
         Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)

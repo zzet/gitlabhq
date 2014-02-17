@@ -17,10 +17,6 @@ module Groups::TeamsActions
 
     Team.where(id: team_ids).find_each do |team|
       Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
-
-      team.users.find_each do |user|
-        Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
-      end
     end
 
     group.projects.find_each do |project|
@@ -36,10 +32,6 @@ module Groups::TeamsActions
 
     Elastic::BaseIndexer.perform_async(:update, group.class.name, group.id)
     Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
-
-    team.users.find_each do |user|
-      Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
-    end
 
     group.projects.find_each do |project|
       Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)

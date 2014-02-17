@@ -70,10 +70,6 @@ module Projects::BaseActions
           Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
         end
       end
-
-      project.team.members.find_each do |member|
-        Elastic::BaseIndexer.perform_async(:update, member.class.name, member.id)
-      end
     end
 
     receive_delayed_notifications
@@ -127,7 +123,6 @@ module Projects::BaseActions
         old_project_teams_ids = project.teams.ids
         old_group_teams_ids = project.group.present? ? project.teams.ids : []
         old_teams_ids = (old_group_teams_ids + old_project_teams_ids).flatten
-        old_members_ids = project.team.members.ids
 
         if transfer_to(namespace)
           build_face_service = project.services.where(type: Service::BuildFace).first
@@ -144,10 +139,6 @@ module Projects::BaseActions
 
           Team.where(id: teams_ids).find_each do |team|
             Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
-          end
-
-          User.where(id: (old_members_ids + project.team.members.ids).flatten.uniq).find_each do |user|
-            Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
           end
 
           receive_delayed_notifications
@@ -187,12 +178,6 @@ module Projects::BaseActions
       end
     else
       from_project.errors.add(:base, "Invalid fork destination")
-    end
-
-    if from_project.persisted?
-      from_project.team.members.find_each do |user|
-        Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
-      end
     end
 
     from_project

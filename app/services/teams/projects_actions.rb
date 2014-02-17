@@ -13,10 +13,6 @@ module Teams::ProjectsActions
         Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
       end
     end
-
-    team.members.find_each do |user|
-      Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
-    end
   end
 
   def resign_from_projects_action(projects)
@@ -25,10 +21,6 @@ module Teams::ProjectsActions
 
     Project.where(id: projects).find_each do |project|
       Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    end
-
-    team.members.find_each do |user|
-      Elastic::BaseIndexer.perform_async(:update, user.class.name, user.id)
     end
 
     receive_delayed_notifications
