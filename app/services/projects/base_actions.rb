@@ -64,8 +64,8 @@ module Projects::BaseActions
 
       group = project.group
       if group
-        group.teams.find_each do |team|
-          Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+        group.teams.pluck(:id).each do |team_id|
+          Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
         end
       end
     end
@@ -131,8 +131,8 @@ module Projects::BaseActions
           teams_ids += project.group.teams if project.group.present?
           teams_ids = teams_ids.flatten.uniq
 
-          Team.where(id: teams_ids).find_each do |team|
-            Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+          teams_ids.each do |team_id|
+            Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
           end
 
           receive_delayed_notifications

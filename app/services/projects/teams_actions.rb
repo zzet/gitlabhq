@@ -10,8 +10,8 @@ module Projects::TeamsActions
         end
       end
 
-      Team.where(id: team_ids).find_each do |team|
-        Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+      team_ids.each do |team_id|
+        Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
       end
     end
   end

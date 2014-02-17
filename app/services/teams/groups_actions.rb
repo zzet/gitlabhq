@@ -15,22 +15,20 @@ module Teams::GroupsActions
 
     Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
 
-    groups.find_each do |group|
-      group.projects.find_each do |project|
-        Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-      end
+    groups.projects.pluck(:id).each do |project_id|
+      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
     end
   end
 
   def resign_from_groups_action(groups)
     tgrs = team.team_group_relationships.where(group_id: groups)
 
-    projects = group.projects
+    projects = groups.projects.ids
 
     tgrs.destroy_all
 
-    projects.find_each do |project|
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    projects.each do |project_id|
+      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
     end
 
     receive_delayed_notifications

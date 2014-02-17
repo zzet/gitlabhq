@@ -13,13 +13,11 @@ module Groups::TeamsActions
       end
     end
 
-    Team.where(id: team_ids).find_each do |team|
-      Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    team_ids.each do |team_id|
+      Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
     end
 
-    group.projects.find_each do |project|
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    end
+    update_group_projects_indexes(group)
   end
 
   def resign_team_action(team)
@@ -30,14 +28,18 @@ module Groups::TeamsActions
 
     Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
 
-    group.projects.find_each do |project|
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    end
+    update_group_projects_indexes(group)
   end
 
   private
 
   def group_team_relation(team)
     team.team_group_relationships.find_by(group_id: group)
+  end
+
+  def update_group_projects_indexes(group)
+    group.projects.pluck(:id).each do |project_id|
+      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+    end
   end
 end

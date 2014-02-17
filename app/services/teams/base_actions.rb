@@ -18,8 +18,8 @@ module Teams::BaseActions
 
     team.destroy
 
-    Project.where(id: project_ids).find_each do |project|
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    project_ids.each do |project_id|
+      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
     end
 
     receive_delayed_notifications

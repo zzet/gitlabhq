@@ -12,9 +12,7 @@ module Groups::UsersActions
       group.add_users(user_ids, params[:group_access])
     end
 
-    group.projects.find_each do |project|
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    end
+    update_group_projects_indexes(group)
   end
 
   def remove_user_membership_action(member)
@@ -24,9 +22,7 @@ module Groups::UsersActions
       gur.destroy
       receive_delayed_notifications
 
-      group.projects.find_each do |project|
-        Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-      end
+      update_group_projects_indexes(group)
     end
 
   end
@@ -38,9 +34,7 @@ module Groups::UsersActions
     if gur.valid?
       receive_delayed_notifications
 
-      group.projects.find_each do |project|
-        Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-      end
+      update_group_projects_indexes(group)
 
       return true
     else
@@ -52,5 +46,11 @@ module Groups::UsersActions
 
   def group_member_relation(member)
     member.users_groups.find_by(group_id: group)
+  end
+
+  def update_group_projects_indexes(group)
+    group.projects.pluck(:id).each do |project_id|
+      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+    end
   end
 end

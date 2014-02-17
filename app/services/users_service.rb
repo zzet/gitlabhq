@@ -38,12 +38,12 @@ class UsersService < BaseService
       end
     end
 
-    Project.where(id: projects_ids).find_each do |project|
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    projects_ids.each do |project_id|
+      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
     end
 
-    Team.where(id: teams_ids).find_each do |team|
-      Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    teams_ids.each do |team_id|
+      Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
     end
 
     receive_delayed_notifications
@@ -63,12 +63,12 @@ class UsersService < BaseService
     # 2. Remove user with all authored content including personal projects
     user.destroy
 
-    Project.where(id: projects_ids).find_each do |project|
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    projects_ids.each do |project_id|
+      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
     end
 
-    Team.where(id: teams_ids).find_each do |team|
-      Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    teams_ids.each do |team_id|
+      Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
     end
 
     receive_delayed_notifications
