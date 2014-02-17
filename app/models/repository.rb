@@ -1,4 +1,5 @@
 class Repository
+  include RepositoriesSearch
   include Gitlab::ShellAdapter
 
   attr_accessor :raw_repository, :path_with_namespace
@@ -8,6 +9,10 @@ class Repository
     @raw_repository = Gitlab::Git::Repository.new(path_to_repo) if path_with_namespace
   rescue Gitlab::Git::Repository::NoRepository
     nil
+  end
+
+  def project
+    @project ||= Project.find_with_namespace(@path_with_namespace)
   end
 
   def path_to_repo

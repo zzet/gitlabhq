@@ -146,6 +146,14 @@ GEM
       elasticsearch-transport (= 0.4.8)
     elasticsearch-api (0.4.8)
       multi_json
+    elasticsearch-git (0.0.2)
+      activemodel
+      activesupport
+      charlock_holmes
+      elasticsearch-api
+      elasticsearch-model
+      gitlab-linguist
+      rugged
     elasticsearch-transport (0.4.8)
       faraday
       multi_json
@@ -475,6 +483,7 @@ GEM
     ruby-hmac (0.4.0)
     ruby-progressbar (1.2.0)
     rubyntlm (0.1.1)
+    rugged (0.19.0)
     safe_yaml (0.9.7)
     sanitize (2.0.6)
       nokogiri (>= 1.4.4)
@@ -633,6 +642,7 @@ DEPENDENCIES
   devise (= 3.0.4)
   devise-async (= 0.8.0)
   diffy
+  elasticsearch-git (~> 0.0.2)
   elasticsearch-model!
   elasticsearch-rails!
   email_spec
