@@ -3,7 +3,6 @@ module ApplicationSearch
 
   included do
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
 
     index_name [Rails.application.class.parent_name.downcase, self.name.downcase, Rails.env.to_s].join('-')
 

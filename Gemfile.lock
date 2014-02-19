@@ -146,7 +146,7 @@ GEM
       elasticsearch-transport (= 0.4.8)
     elasticsearch-api (0.4.8)
       multi_json
-    elasticsearch-git (0.0.2)
+    elasticsearch-git (0.0.3)
       activemodel
       activesupport
       charlock_holmes
@@ -642,7 +642,7 @@ DEPENDENCIES
   devise (= 3.0.4)
   devise-async (= 0.8.0)
   diffy
-  elasticsearch-git (~> 0.0.2)
+  elasticsearch-git (~> 0.0.3)
   elasticsearch-model!
   elasticsearch-rails!
   email_spec

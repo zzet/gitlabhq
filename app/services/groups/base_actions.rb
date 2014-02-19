@@ -16,7 +16,7 @@ module Groups::BaseActions
   end
 
   def delete_action
-    team_ids = group.teams.ids
+    team_ids = group.teams.select("teams.id")
 
     group.destroy
 

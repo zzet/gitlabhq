@@ -26,7 +26,7 @@ module API
       #   GET /projects
       get do
         search_options = { page: params[:page] }
-        search_options[:pids] = current_user.known_projects unless current_user.admin?
+        search_options[:pids] = current_user.known_projects.pluck(:id) unless current_user.admin?
         @projects = Project.search(params[:search], options: search_options)
         present @projects, with: Entities::Project
       end
@@ -321,8 +321,7 @@ module API
       #   GET /projects/search/:query
       get "/search/:query" do
         ids = current_user.known_projects.pluck(:id)
-        visibility_levels = [ Gitlab::VisibilityLevel::INTERNAL, Gitlab::VisibilityLevel::PUBLIC ]
-        projects = Project.search(params[:query], options: { pids: ids, visibility_levels: visibility_levels, page: params[:page] })
+        projects = Project.search(params[:query], options: { pids: ids, page: params[:page] })
         present projects, with: Entities::Project
       end
     end

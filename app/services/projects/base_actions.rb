@@ -117,8 +117,8 @@ module Projects::BaseActions
       allowed_transfer = can?(current_user, :change_namespace, project) || role == :admin
 
       if allowed_transfer && (namespace != project.namespace)
-        old_project_teams_ids = project.teams.ids
-        old_group_teams_ids = project.group.present? ? project.teams.ids : []
+        old_project_teams_ids = project.teams.select("teams.id")
+        old_group_teams_ids = project.group.present? ? project.teams.select("teams.id") : []
         old_teams_ids = (old_group_teams_ids + old_project_teams_ids).flatten
 
         if transfer_to(namespace)
@@ -127,8 +127,8 @@ module Projects::BaseActions
             build_face_service.notify_build_face("transfered")
           end
 
-          teams_ids = old_teams_ids + project.teams.ids
-          teams_ids += project.group.teams if project.group.present?
+          teams_ids = old_teams_ids + project.teams.select("teams.id")
+          teams_ids += project.group.teams.select("teams.id") if project.group.present?
           teams_ids = teams_ids.flatten.uniq
 
           teams_ids.each do |team_id|

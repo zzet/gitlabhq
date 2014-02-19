@@ -6,7 +6,7 @@ module Teams::UsersActions
       team.add_users(users, access)
     end
 
-    project_ids = team.projects.ids + team.accessed_projects.ids
+    project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
       Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
@@ -16,7 +16,7 @@ module Teams::UsersActions
   def remove_membership_action(user)
     team.remove_user(user)
 
-    project_ids = team.projects.ids + team.accessed_projects.ids
+    project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
       Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
@@ -31,7 +31,7 @@ module Teams::UsersActions
 
     receive_delayed_notifications
 
-    project_ids = team.projects.ids + team.accessed_projects.ids
+    project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
       Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)

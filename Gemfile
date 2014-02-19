@@ -30,7 +30,7 @@ gem 'omniauth-github'
 # Search
 gem 'elasticsearch-model', git: 'git://github.com/elasticsearch/elasticsearch-rails.git'
 gem 'elasticsearch-rails', git: 'git://github.com/elasticsearch/elasticsearch-rails.git'
-gem 'elasticsearch-git', '~> 0.0.2'
+gem 'elasticsearch-git', '~> 0.0.3'
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library

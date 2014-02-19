@@ -27,15 +27,14 @@ module API
       get do
         search_options = { page: params[:page] }
         search_options[:gids] = current_user.authorized_groups.pluck(:id) unless current_user.admin?
-        @groups = Group.search(params[:search], options: search_options) # if params[:search].present?
-        #@groups = paginate @groups
+        @groups = Group.search(params[:search], options: search_options)
         present @groups, with: Entities::Group
       end
 
       get '/to_assign' do
         search_options = { page: params[:page] }
         search_options[:gids] = current_user.created_groups.pluck(:id) + current_user.owned_groups.pluck(:id) unless current_user.admin?
-        @groups = Group.search(params[:search], options: search_options) # if params[:search].present?
+        @groups = Group.search(params[:search], options: search_options)
         present @groups, with: Entities::Group
       end
 
