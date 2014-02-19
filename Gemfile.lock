@@ -1,10 +1,17 @@
 GIT
   remote: git://github.com/elasticsearch/elasticsearch-rails.git
-  revision: 46734cd4371b58b60872c0aa551de23c4c4a9348
+  revision: 88b6597e47c9f45024b603faeddb0a85b47e1fce
+  ref: 88b6597e47c9f45024b603faeddb0a85b47e1fce
   specs:
     elasticsearch-model (0.1.0.rc1)
-      elasticsearch (~> 0.4)
+      activesupport (> 3)
+      elasticsearch (> 0.4)
       hashie
+
+GIT
+  remote: git://github.com/elasticsearch/elasticsearch-rails.git
+  revision: 88b6597e47c9f45024b603faeddb0a85b47e1fce
+  specs:
     elasticsearch-rails (0.1.0.rc1)
 
 GIT

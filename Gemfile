@@ -28,7 +28,7 @@ gem 'omniauth-twitter'
 gem 'omniauth-github'
 
 # Search
-gem 'elasticsearch-model', git: 'git://github.com/elasticsearch/elasticsearch-rails.git'
+gem 'elasticsearch-model', git: 'git://github.com/elasticsearch/elasticsearch-rails.git', ref: '88b6597e47c9f45024b603faeddb0a85b47e1fce'
 gem 'elasticsearch-rails', git: 'git://github.com/elasticsearch/elasticsearch-rails.git'
 gem 'elasticsearch-git', '~> 0.0.3'
 
