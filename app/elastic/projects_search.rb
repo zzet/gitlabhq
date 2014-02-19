@@ -43,10 +43,8 @@ module ProjectsSearch
         path_with_namespace: path_with_namespace
       })
     end
-  end
 
-  module ClassMethods
-    def search(query, page: 1, per: 20, options: {})
+    def self.search(query, page: 1, per: 20, options: {})
 
       page ||= 1
 

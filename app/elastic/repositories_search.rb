@@ -7,10 +7,8 @@ module RepositoriesSearch
     def repository_id
       project.id
     end
-  end
 
-  module ClassMethods
-    def import
+    def self.import
       Repository.__elasticsearch__.create_index! force: true
 
       Project.find_each do |project|
