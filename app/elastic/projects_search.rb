@@ -26,6 +26,8 @@ module ProjectsSearch
       indexes :guests,              type: :nested
 
       indexes :name_with_namespace_sort, type: :string, index: 'not_analyzed'
+      indexes :created_at_sort, type: :string, index: 'not_analyzed'
+      indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
     def as_indexed_json(options={})
@@ -147,8 +149,22 @@ module ProjectsSearch
         }
       end
 
+      options[:order] = :default if options[:order].blank?
+      order = case options[:order].to_sym
+              when :newest
+                { created_at_sort: { order: :asc, mode: :min } }
+              when :oldest
+                { created_at_sort: { order: :desc, mode: :min } }
+              when :recently_updated
+                { updated_at_sort: { order: :asc, mode: :min } }
+              when :last_updated
+                { updated_at_sort: { order: :desc, mode: :min } }
+              else
+                { name_with_namespace_sort: { order: :asc, mode: :min } }
+              end
+
       query_hash[:sort] = [
-        { name_with_namespace_sort: { order: :asc, mode: :min } },
+        order,
         :_score
       ]
 

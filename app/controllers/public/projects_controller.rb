@@ -6,10 +6,14 @@ class Public::ProjectsController < ApplicationController
   layout 'public'
 
   def index
-    @projects = Project.public_or_internal_only(current_user)
     @sort = params[:sort]
-    @projects = @projects.sort(@sort)
-    @projects = Project.search(params[:search], options: { pids: @projects.pluck(:id) }, page: params[:page], per: 20).pluck(:id)
-    @projects = Project.where(id: @projects).includes(:namespace)
+    visibility_levels = [ Gitlab::VisibilityLevel::PUBLIC ]
+    visibility_levels << Gitlab::VisibilityLevel::INTERNAL if current_user
+
+    @projects = Project.search(params[:search],
+                               options: { visibility_levels: visibility_levels,
+                                          order: @sort },
+                               page: params[:page],
+                               per: 20)
   end
 end
