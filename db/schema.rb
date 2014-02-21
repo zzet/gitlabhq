@@ -60,6 +60,16 @@ ActiveRecord::Schema.define(version: 20140209025651) do
 
   add_index "deploy_keys_projects", ["project_id"], name: "index_deploy_keys_projects_on_project_id", using: :btree
 
+  create_table "emails", force: true do |t|
+    t.integer  "user_id",    null: false
+    t.string   "email",      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "emails", ["email"], name: "index_emails_on_email", unique: true, using: :btree
+  add_index "emails", ["user_id"], name: "index_emails_on_user_id", using: :btree
+
   create_table "event_subscription_notification_settings", force: true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
@@ -166,10 +176,10 @@ ActiveRecord::Schema.define(version: 20140209025651) do
   add_index "keys", ["user_id"], name: "index_keys_on_user_id", using: :btree
 
   create_table "merge_request_diffs", force: true do |t|
-    t.string   "state",                               default: "collected", null: false
-    t.text     "st_commits",       limit: 2147483647
-    t.text     "st_diffs",         limit: 2147483647
-    t.integer  "merge_request_id",                                          null: false
+    t.string   "state",            default: "collected", null: false
+    t.text     "st_commits"
+    t.text     "st_diffs"
+    t.integer  "merge_request_id",                       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -181,8 +191,8 @@ ActiveRecord::Schema.define(version: 20140209025651) do
     t.integer  "author_id"
     t.integer  "assignee_id"
     t.string   "title"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "milestone_id"
     t.string   "state"
     t.string   "merge_status"
@@ -196,6 +206,7 @@ ActiveRecord::Schema.define(version: 20140209025651) do
   add_index "merge_requests", ["created_at"], name: "index_merge_requests_on_created_at", using: :btree
   add_index "merge_requests", ["milestone_id"], name: "index_merge_requests_on_milestone_id", using: :btree
   add_index "merge_requests", ["source_branch"], name: "index_merge_requests_on_source_branch", using: :btree
+  add_index "merge_requests", ["source_project_id"], name: "index_merge_requests_on_project_id", using: :btree
   add_index "merge_requests", ["source_project_id"], name: "index_merge_requests_on_source_project_id", using: :btree
   add_index "merge_requests", ["target_branch"], name: "index_merge_requests_on_target_branch", using: :btree
   add_index "merge_requests", ["title"], name: "index_merge_requests_on_title", using: :btree
@@ -253,16 +264,6 @@ ActiveRecord::Schema.define(version: 20140209025651) do
   add_index "notes", ["project_id", "noteable_type"], name: "index_notes_on_project_id_and_noteable_type", using: :btree
   add_index "notes", ["project_id"], name: "index_notes_on_project_id", using: :btree
 
-  create_table "emails", force: true do |t|
-    t.integer  "user_id",    null: false
-    t.string   "email",      null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "emails", ["email"], name: "index_emails_on_email", unique: true, using: :btree
-  add_index "emails", ["user_id"], name: "index_emails_on_user_id", using: :btree
-
   create_table "old_events", force: true do |t|
     t.string   "target_type"
     t.integer  "target_id"
@@ -275,11 +276,17 @@ ActiveRecord::Schema.define(version: 20140209025651) do
     t.integer  "author_id"
   end
 
+  add_index "old_events", ["action"], name: "index_events_on_action", using: :btree
   add_index "old_events", ["action"], name: "index_old_events_on_action", using: :btree
+  add_index "old_events", ["author_id"], name: "index_events_on_author_id", using: :btree
   add_index "old_events", ["author_id"], name: "index_old_events_on_author_id", using: :btree
+  add_index "old_events", ["created_at"], name: "index_events_on_created_at", using: :btree
   add_index "old_events", ["created_at"], name: "index_old_events_on_created_at", using: :btree
+  add_index "old_events", ["project_id"], name: "index_events_on_project_id", using: :btree
   add_index "old_events", ["project_id"], name: "index_old_events_on_project_id", using: :btree
+  add_index "old_events", ["target_id"], name: "index_events_on_target_id", using: :btree
   add_index "old_events", ["target_id"], name: "index_old_events_on_target_id", using: :btree
+  add_index "old_events", ["target_type"], name: "index_events_on_target_type", using: :btree
   add_index "old_events", ["target_type"], name: "index_old_events_on_target_type", using: :btree
 
   create_table "projects", force: true do |t|
@@ -307,6 +314,7 @@ ActiveRecord::Schema.define(version: 20140209025651) do
   end
 
   add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree
+  add_index "projects", ["creator_id"], name: "index_projects_on_owner_id", using: :btree
   add_index "projects", ["last_activity_at"], name: "index_projects_on_last_activity_at", using: :btree
   add_index "projects", ["last_pushed_at"], name: "index_projects_on_last_pushed_at", using: :btree
   add_index "projects", ["namespace_id"], name: "index_projects_on_namespace_id", using: :btree

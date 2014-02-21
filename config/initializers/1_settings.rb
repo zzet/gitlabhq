@@ -17,9 +17,10 @@ class Settings < Settingslogic
       end
     end
 
-    def build_gitlab_url
+    def build_gitlab_url(protocol = nil)
       custom_port = gitlab_on_standard_port? ? nil : ":#{gitlab.port}"
-      [ gitlab.protocol,
+      protocol ||= gitlab.protocol
+      [ protocol,
         "://",
         gitlab.host,
         custom_port,
