@@ -87,7 +87,7 @@ gem "github-markup", "~> 0.7.4", require: 'github/markup', git: 'https://github.
 gem 'diffy'
 
 # Asciidoc to HTML
-gem  "asciidoctor"
+gem "asciidoctor"
 
 #gem 'activerecord-msgpack_serializer', github: 'zzet/activerecord-msgpack_serializer'
 
