@@ -327,6 +327,18 @@ module API
         projects = Project.where("(id in (?) OR visibility_level in (?)) AND (name LIKE (?))", ids, visibility_levels, "%#{params[:query]}%")
         present paginate(projects), with: Entities::Project
       end
+
+
+      # Get a users list
+      #
+      # Example Request:
+      #  GET /users
+      get ':id/users' do
+        @users = User.where(id: user_project.team.users.map(&:id))
+        @users = @users.search(params[:search]) if params[:search].present?
+        @users = paginate @users
+        present @users, with: Entities::User
+      end
     end
   end
 end

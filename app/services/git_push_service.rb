@@ -125,8 +125,6 @@ class GitPushService
   end
 
   def commit_user commit
-    User.where(email: commit.author_email).first ||
-      User.where(name: commit.author_name).first ||
-      current_user
+    User.find_for_commit(commit.author_email, commit.author_name) || user
   end
 end

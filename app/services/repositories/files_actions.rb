@@ -23,7 +23,7 @@ module Repositories::FilesActions
       return error("Your changes could not be committed, because file name contains not allowed characters")
     end
 
-    blob = repository.blob_at(ref, file_path)
+    blob = repository.blob_at_branch(ref, file_path)
 
     if blob
       return error("Your changes could not be committed, because file with such name exists")
@@ -58,7 +58,7 @@ module Repositories::FilesActions
       return error("You can only create files if you are on top of a branch")
     end
 
-    blob = repository.blob_at(ref, path)
+    blob = repository.blob_at_branch(ref, path)
 
     unless blob
       return error("You can only edit text files")
@@ -93,7 +93,7 @@ module Repositories::FilesActions
       return error("You can only create files if you are on top of a branch")
     end
 
-    blob = repository.blob_at(ref, path)
+    blob = repository.blob_at_branch(ref, path)
 
     unless blob
       return error("You can only edit text files")

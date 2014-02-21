@@ -10,7 +10,7 @@ class Projects::TagsController < Projects::ApplicationController
   rescue_from Errno::EISDIR, with: :gc_in_repository
 
   def index
-    @tags = Kaminari.paginate_array(@repository.tags).page(params[:page]).per(30)
+    @tags = Kaminari.paginate_array(@repository.tags.reverse).page(params[:page]).per(30)
   end
 
   def create

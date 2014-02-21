@@ -3,8 +3,8 @@ class Settings < Settingslogic
   namespace Rails.env
 
   class << self
-    def gitlab_on_non_standard_port?
-      ![443, 80].include?(gitlab.port.to_i)
+    def gitlab_on_standard_port?
+      gitlab.port.to_i == (gitlab.https ? 443 : 80)
     end
 
     private
@@ -17,14 +17,9 @@ class Settings < Settingslogic
       end
     end
 
-    def build_gitlab_url(protocol = nil)
-      if gitlab_on_non_standard_port?
-        custom_port = ":#{gitlab.port}"
-      else
-        custom_port = nil
-      end
-      protocol ||= gitlab.protocol
-      [ protocol,
+    def build_gitlab_url
+      custom_port = gitlab_on_standard_port? ? nil : ":#{gitlab.port}"
+      [ gitlab.protocol,
         "://",
         gitlab.host,
         custom_port,

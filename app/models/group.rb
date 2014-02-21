@@ -12,6 +12,9 @@
 #  description :string(255)      default(""), not null
 #
 
+require 'carrierwave/orm/activerecord'
+require 'file_size_validator'
+
 class Group < Namespace
   include Watchable
 
@@ -79,6 +82,13 @@ class Group < Namespace
 
   scope :without_team, ->(team) { team.groups.present? ? where.not(id: team.groups) : all }
 
+  attr_accessible :avatar
+
+  validate :avatar_type, if: ->(user) { user.avatar_changed? }
+  validates :avatar, file_size: { maximum: 100.kilobytes.to_i }
+
+  mount_uploader :avatar, AttachmentUploader
+
   def human_name
     name
   end
@@ -125,5 +135,11 @@ class Group < Namespace
 
   def members
     users_groups
+  end
+
+  def avatar_type
+    unless self.avatar.image?
+      self.errors.add :avatar, "only images allowed"
+    end
   end
 end

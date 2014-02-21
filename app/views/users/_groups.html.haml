@@ -4,7 +4,8 @@
   %ul.well-list.js-sidebar-list
     - @groups.each do |group|
       %li
-        = link_to group_path(group), class: dom_class(group) do
+        = link_to group_path(group), class: 'profile-groups-avatars', :title => group.name do
+          = image_tag group_icon(group.path)
           %strong.well-title.filter-title= group.human_name
           %span.pull-right.light
             - if group.owner == user

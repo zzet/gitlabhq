@@ -89,7 +89,6 @@ module API
           end
 
           if merge_request.save
-            merge_request.reload_code
             present merge_request, with: Entities::MergeRequest
           else
             handle_merge_request_errors! merge_request.errors
@@ -118,8 +117,6 @@ module API
           authorize! :modify_merge_request, merge_request
 
           if merge_request.update_attributes attrs
-            merge_request.reload_code
-            merge_request.mark_as_unchecked
             present merge_request, with: Entities::MergeRequest
           else
             handle_merge_request_errors! merge_request.errors

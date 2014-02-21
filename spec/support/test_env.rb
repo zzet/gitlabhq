@@ -77,6 +77,10 @@ module TestEnv
       version: '6.3.0'
     )
 
+    Gitlab::Satellite::MergeAction.any_instance.stub(
+      merge!: true,
+    )
+
     Gitlab::Satellite::Satellite.any_instance.stub(
       exists?: true,
       destroy: true,
