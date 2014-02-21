@@ -5,5 +5,6 @@
     = private_icon
   = link_to team.name, team
   .pull-right
-    = link_to 'Members', team_members_path(team), id: "edit_#{dom_id(team)}", class: "btn btn-small"
+    - if current_user.can?(:manage_team, team)
+      = link_to 'Members', team_members_path(team), id: "edit_#{dom_id(team)}", class: "btn btn-small"
     = link_to 'Remove', group_team_path(@group, team), confirm: remove_group_from_team_message(team, @group), method: :delete, class: "btn btn-small btn-remove"
