@@ -19,8 +19,8 @@
 
   .form-group
     = f.label :state_event, "State", class: "control-label"
-    .col-sm-10
-      = f.select(:state_event, @service.state_transitions.map {|s| [s.human_event, s.event]}, include_blank: @service.human_state_name)
+    .col-sm-3
+      = f.select(:state_event, @service.state_transitions.map {|s| [s.human_event, s.event]}, { include_blank: @service.human_state_name}, { class: 'form-control' })
 
   - if @service.respond_to?(:configuration)
     - configuration = @service.configuration
