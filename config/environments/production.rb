@@ -98,4 +98,5 @@ Gitlab::Application.configure do
   config.assets.js_compressor = :uglifier
 
   config.allow_concurrency = false
+  config.react.variant = :production
 end

@@ -13,6 +13,8 @@
   namespaces_path: "/api/:version/namespaces.json"
   project_users_path: "/api/:version/projects/:id/users.json"
 
+  subscriptions: ApiSubscriptions
+
   # Get 20 (depends on api) recent notes
   # and sort the ascending from oldest to newest
   notes: (project_id, callback) ->

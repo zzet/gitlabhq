@@ -27,6 +27,11 @@
 //= require js-routes
 //= require highlightjs.min
 //= require ace/ace
+//= require react
+//= require underscore
+//= require underscore.string.min
+//= require_directory ./api
 //= require_tree .
 //= require d3
-//= require underscore
+
+_.mixin(_.str.exports());

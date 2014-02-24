@@ -13,7 +13,18 @@ class Emails::Note::Note < Emails::Base
         raise "wow"
       end
     else
-      raise "wow"
+      case notification.event.source.noteable
+      when MergeRequest
+        Emails::Project::Note.commented_merge_request_email(notification).deliver!
+      when Commit
+        Emails::Project::Note.commented_commit_email(notification).deliver!
+      when Issue
+        Emails::Project::Note.commented_issue_email(notification).deliver!
+      when NilClass # Project wall
+        Emails::Project::Note.commented_email(notification).deliver!
+      else
+        raise "wow"
+      end
     end
   end
 end

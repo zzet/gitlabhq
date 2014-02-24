@@ -175,6 +175,8 @@ gem "font-awesome-rails", '~> 3.2'
 gem "gemoji", "~> 1.3.0"
 gem "gon", '~> 5.0.0'
 gem "js-routes"
+gem 'react-rails', '~> 0.8.0.0'
+gem "activerecord-import", "~> 0.4.1"
 
 group :development do
   gem "annotate", "~> 2.6.0.beta2"

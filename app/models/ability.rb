@@ -16,6 +16,7 @@ class Ability
       when "Team" then team_abilities(user, subject)
       when "Namespace" then namespace_abilities(user, subject)
       when "UsersGroup" then users_group_abilities(user, subject)
+      when "User" then user_abilities(user, subject)
       else []
       end.concat(global_abilities(user))
     end
@@ -232,6 +233,14 @@ class Ability
           :manage_namespace
         ]
       end
+
+      rules.flatten
+    end
+
+    def user_abilities user, uuser
+      rules = []
+
+      rules.push(:read_user)
 
       rules.flatten
     end

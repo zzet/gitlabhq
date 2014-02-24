@@ -92,5 +92,7 @@ module Gitlab
         resource '/api/*', headers: :any, methods: [:get, :post, :options, :put, :delete]
       end
     end
+
+    config.react.addons = true
   end
 end
