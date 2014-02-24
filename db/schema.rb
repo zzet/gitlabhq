@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140116231608) do
+ActiveRecord::Schema.define(version: 20140224121926) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -347,6 +347,17 @@ ActiveRecord::Schema.define(version: 20140116231608) do
     t.integer  "service_id"
     t.string   "service_type"
     t.string   "token"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "service_configuration_git_checkpoints", force: true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.string   "domain"
+    t.string   "system_hook_path"
+    t.string   "web_hook_path"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
