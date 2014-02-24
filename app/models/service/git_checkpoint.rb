@@ -15,7 +15,7 @@
 #  description        :text
 #
 
-class Service::GitCheckpiont < Service
+class Service::GitCheckpoint < Service
   default_title       "Git Checkpoint"
   default_description "Git Checkpoint service"
   service_name        "git_checkpoint"
