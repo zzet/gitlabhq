@@ -2,9 +2,8 @@ class Admin::UsersController < Admin::ApplicationController
   before_filter :user, only: [:show, :edit, :update, :destroy]
 
   def index
-    @users = User.filter(params[:filter])
-    @users = @users.search(params[:name]) if params[:name].present?
-    @users = @users.alphabetically.page(params[:page])
+    @uids   = User.filter(params[:filter]).pluck(:id)
+    @users  = User.search(params[:name], page: params[:page], options: {uids: @uids})
   end
 
   def show

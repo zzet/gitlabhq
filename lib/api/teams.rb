@@ -25,13 +25,9 @@ module API
       # Example Request:
       #  GET /teams
       get do
-        if current_user.admin
-          @teams = Team
-        else
-          @teams = current_user.known_teams
-        end
-        @teams = @teams.search(params[:search]) if params[:search].present?
-        @teams = paginate @teams
+        search_options = { page: params[:page] }
+        search_options[:tids] = current_user.known_teams.pluck(:id) unless current_user.admin?
+        @teams = Team.search(params[:search], options: search_options)
         present @teams, with: Entities::Team
       end
 

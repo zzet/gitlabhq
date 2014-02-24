@@ -17,6 +17,7 @@ require 'file_size_validator'
 
 class Group < Namespace
   include Watchable
+  include GroupsSearch
 
   has_many :team_group_relationships, dependent: :destroy
   has_many :teams,                    through: :team_group_relationships
@@ -42,6 +43,10 @@ class Group < Namespace
 
   has_many :masters,    -> { where({ users: { state: :active },
                                      users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } })},
+                        through: :users_groups, source: :user
+
+  has_many :owners,     -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::OWNER } })},
                         through: :users_groups, source: :user
 
   watch do

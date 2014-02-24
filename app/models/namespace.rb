@@ -42,10 +42,6 @@ class Namespace < ActiveRecord::Base
   scope :root, -> { where('type IS NULL') }
 
   class << self
-    def search query
-      where("name LIKE :query OR path LIKE :query", query: "%#{query}%")
-    end
-
     def global_id
       'GLN'
     end

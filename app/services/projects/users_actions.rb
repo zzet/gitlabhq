@@ -8,6 +8,8 @@ module Projects::UsersActions
       users = User.where(id: user_ids)
       @project.team << [users, params[:project_access]]
     end
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
   end
 
   def update_membership_action(member)
@@ -18,6 +20,9 @@ module Projects::UsersActions
 
     if pur.valid?
       receive_delayed_notifications
+
+      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+
       return true
     else
       return false
@@ -27,6 +32,9 @@ module Projects::UsersActions
   def remove_membership_action(member)
     pur = project_member_relation(member)
     pur.destroy
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+
     receive_delayed_notifications
   end
 
@@ -34,6 +42,8 @@ module Projects::UsersActions
     status = multiple_action("import", "project", project) do
       @project.team.import(giver)
     end
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
 
     status
   end
@@ -45,6 +55,8 @@ module Projects::UsersActions
     multiple_action("memberships_remove", "project", project, user_project_ids) do
       user_project_relations.destroy_all
     end
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
   end
 
   def batch_update_memberships_action
@@ -54,6 +66,8 @@ module Projects::UsersActions
     multiple_action("memberships_update", "project", project, user_project_ids) do
       user_project_relations.find_each { |membership| membership.update(project_access: params[:team_member][:project_access]) }
     end
+
+    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
   end
 
   private

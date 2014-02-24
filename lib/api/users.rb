@@ -9,10 +9,9 @@ module API
       # Example Request:
       #  GET /users
       get do
-        @users = User.all
-        @users = @users.active if params[:active].present?
-        @users = @users.search(params[:search]) if params[:search].present?
-        @users = paginate @users
+        search_options = { page: params[:page] }
+        search_options[:active] = true if params[:active].present?
+        @users = User.search(params[:search], options: search_options)
         present @users, with: Entities::User
       end
 

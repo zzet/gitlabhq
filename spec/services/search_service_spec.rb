@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'SearchService' do
-  let(:found_namespace) { create(:namespace, name: 'searchable namespace', path:'another_thing') }
+  let(:found_namespace) { create(:group, name: 'searchable namespace', path:'another_thing') }
   let(:user) { create(:user, namespace: found_namespace) }
   let!(:found_project) { create(:project, name: 'searchable_project', creator_id: user.id, namespace: found_namespace, visibility_level: Gitlab::VisibilityLevel::PRIVATE) }
 
@@ -19,6 +19,7 @@ describe 'SearchService' do
   describe '#execute' do
     context 'unauthenticated' do
       it 'should return public projects only' do
+        sleep 1
         context = SearchService.new(nil, search: "searchable")
         results = context.global_search
         results[:projects].should have(1).items
@@ -28,6 +29,7 @@ describe 'SearchService' do
 
     context 'authenticated' do
       it 'should return public, internal and private projects' do
+        sleep 1
         context = SearchService.new(user, search: "searchable")
         results = context.global_search
         results[:projects].should have(3).items
@@ -37,6 +39,7 @@ describe 'SearchService' do
       end
 
       it 'should return only public & internal projects' do
+        sleep 1
         context = SearchService.new(internal_user, search: "searchable")
         results = context.global_search
         results[:projects].should have(2).items
@@ -45,9 +48,10 @@ describe 'SearchService' do
       end
 
       it 'namespace name should be searchable' do
-        context = SearchService.new(user, search: "searchable namespace")
+        sleep 1
+        context = SearchService.new(user, search: found_namespace.name)
         results = context.global_search
-        results[:projects].should == [found_project]
+        results[:projects].to_a.should == [found_project]
       end
     end
   end

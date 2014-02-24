@@ -29,9 +29,16 @@ module TestEnv
     disable_mailer if opts[:mailer] == false
     setup_stubs
 
+    create_indexes_in_es
 
     clear_test_repo_dir if opts[:init_repos] == true
     setup_test_repos(opts) if opts[:repos] == true
+  end
+
+  def create_indexes_in_es
+    [Project, Group, Team, User, Issue, MergeRequest, Repository].each do |e|
+      e.__elasticsearch__.create_index! force: true
+    end
   end
 
   def enable_observers

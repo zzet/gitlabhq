@@ -27,6 +27,7 @@
 
 class Project < ActiveRecord::Base
   include Watchable
+  include ProjectsSearch
   include Gitlab::ShellAdapter
   include Gitlab::VisibilityLevel
   extend Enumerize
@@ -90,8 +91,8 @@ class Project < ActiveRecord::Base
   has_many :deploy_keys_projects, dependent: :destroy
   has_many :deploy_keys, through: :deploy_keys_projects
 
-  delegate :name, to: :owner, allow_nil: true, prefix: true
-  delegate :members, to: :team, prefix: true
+  delegate :name,    to: :owner, prefix: true, allow_nil: true
+  delegate :members, to: :team,  prefix: true
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -254,10 +255,6 @@ class Project < ActiveRecord::Base
       joins(:issues, :notes, :merge_requests).order("issues.created_at, notes.created_at, merge_requests.created_at DESC")
     end
 
-    def search query
-      joins(:namespace).where("projects.archived = ?", false).where("projects.name LIKE :query OR projects.path LIKE :query OR namespaces.name LIKE :query OR projects.description LIKE :query", query: "%#{query}%")
-    end
-
     def search_by_title query
       where("projects.archived = ?", false).where("LOWER(projects.name) LIKE :query", query: "%#{query.downcase}%")
     end
@@ -291,6 +288,26 @@ class Project < ActiveRecord::Base
 
   def team
     @team ||= ProjectTeam.new(self)
+  end
+
+  def owners
+    team.owners
+  end
+
+  def masters
+    team.masters
+  end
+
+  def developers
+    team.developers
+  end
+
+  def reporters
+    team.reporters
+  end
+
+  def guests
+    team.guests
   end
 
   def repository

@@ -50,6 +50,7 @@ require 'file_size_validator'
 
 class User < ActiveRecord::Base
   include Watchable
+  include UsersSearch
 
   devise :database_authenticatable, :token_authenticatable, :lockable, :async,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :confirmable, :registerable
@@ -262,10 +263,6 @@ class User < ActiveRecord::Base
       end
     end
 
-    def search query
-      where("name LIKE :query OR email LIKE :query OR username LIKE :query", query: "%#{query}%")
-    end
-
     def by_username_or_id(name_or_id)
       where('users.username = ? OR users.id = ?', name_or_id.to_s, name_or_id.to_i).first
     end
@@ -359,7 +356,7 @@ class User < ActiveRecord::Base
 
   def known_projects
     @project_ids ||= (personal_projects.pluck(:id) + owned_projects.pluck(:id) + projects.pluck(:id) +
-                      team_projects.pluck(:id)  + team_group_grojects.pluck(:id) + Project.public_only.pluck(:id)).uniq
+                      team_projects.pluck(:id)  + team_group_grojects.pluck(:id) + Project.public_or_internal_only(self).pluck(:id)).uniq
     Project.where(id: @project_ids)
   end
 

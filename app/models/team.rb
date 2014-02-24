@@ -15,6 +15,7 @@
 class Team < ActiveRecord::Base
   include Gitlab::Access
   include Watchable
+  include TeamsSearch
 
   attr_accessible :name, :description, :creator_id, :path, :public
 
@@ -106,10 +107,6 @@ class Team < ActiveRecord::Base
   after_create :add_owner
 
   class << self
-    def search query
-      where("name LIKE :query OR path LIKE :query", query: "%#{query}%")
-    end
-
     def access_roles
       Gitlab::Access.options_with_owner
     end

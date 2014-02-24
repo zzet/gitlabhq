@@ -48,10 +48,6 @@ module Issuable
   end
 
   module ClassMethods
-    def search(query)
-      where("title like :query", query: "%#{query}%")
-    end
-
     def sort(method)
       case method.to_s
       when 'newest' then reorder("#{table_name}.created_at DESC")

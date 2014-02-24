@@ -68,6 +68,8 @@ class GitPushService
 
       process_commit_messages(push)
     end
+
+    Elastic::RepositoryIndexer.perform_async(push.id)
   end
 
   # This method provide a sample data

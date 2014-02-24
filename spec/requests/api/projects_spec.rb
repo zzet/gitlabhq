@@ -695,7 +695,8 @@ describe API::API do
 
     context "when authenticated" do
       it "should return an array of projects" do
-        get api("/projects/search/#{query}",user)
+        sleep 1
+        get api("/projects/search/#{query}", user)
         response.status.should == 200
         json_response.should be_an Array
         json_response.size.should == 6
@@ -705,6 +706,7 @@ describe API::API do
 
     context "when authenticated as a different user" do
       it "should return matching public projects" do
+        sleep 1
         get api("/projects/search/#{query}", user2)
         response.status.should == 200
         json_response.should be_an Array
