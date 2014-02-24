@@ -2,19 +2,18 @@
   %li
     .pull-right
       - if @available_keys.include?(key)
-        = link_to enable_admin_service_key_path(@service, key), class: 'btn btn-small', method: :put do
+        = link_to enable_admin_service_key_path(@service.id, key), class: 'btn btn-small', method: :put do
           %i.icon-plus
           Enable
       - else
         - if key.services.count > 1
-          = link_to disable_admin_service_key_path(@service, key), class: 'btn btn-small', method: :put do
+          = link_to disable_admin_service_key_path(@service.id, key), class: 'btn btn-small', method: :put do
             %i.icon-off
             Disable
         - else
-          = link_to 'Remove', admin_service_key_path(@service, key), confirm: 'You are going to remove service key. Are you sure?', method: :delete, class: "btn btn-remove delete-key btn-small pull-right"
+          = link_to 'Remove', admin_service_key_path(@service.id, key), confirm: 'You are going to remove service key. Are you sure?', method: :delete, class: "btn btn-remove delete-key btn-small pull-right"
 
-
-    = link_to admin_service_key_path(key.services.include?(@service) ? @service : key.services.first, key) do
+    = link_to admin_service_key_path(key.services.include?(@service) ? @service.id : key.services.first.id, key) do
       %i.icon-key
       %strong= key.title
 
