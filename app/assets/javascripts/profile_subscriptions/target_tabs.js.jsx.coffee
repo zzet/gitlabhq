@@ -48,7 +48,7 @@ window.SubscriptionTargetTabs = React.createClass({
     )
 
     tabsClass = cx(
-      'hide': not (@state.projects_count or @state.groups_count or @state.teams_count)
+      'hide': not (@state.projects_count or @state.groups_count or @state.teams_count or @state.users_count)
       'nav': true
       'nav-tabs': true
     )
@@ -159,6 +159,8 @@ window.SubscriptionTargetTabs = React.createClass({
       'groups'
     else if stateOrProps.teams_count
       'teams'
+    else if stateOrProps.users_count
+      'users'
     else
       ''
 })
