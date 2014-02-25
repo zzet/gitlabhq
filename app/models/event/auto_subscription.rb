@@ -5,7 +5,7 @@ class Event::AutoSubscription < ActiveRecord::Base
   belongs_to :namespace, polymorphic: true
   has_many :subscriptions, class_name: Event::Subscription
 
-  validates :target, presence: true, uniqueness: { scope: [:namespace_id, :namespace_type] }
+  validates :target, presence: true
   validates :user,   presence: true
 
   scope :with_namespace,   ->(n) { n.present? ? where(namespace_type: n.class.name, namespace_id: n.id) : where.not(namespace_id: nil) }

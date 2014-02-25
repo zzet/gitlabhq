@@ -8,6 +8,7 @@ window.SubscriptionTargets = React.createClass({
       page: 0
       perPage: perPage
       searchTerm: null
+      totalCount: @props.count
     }
 
   componentWillMount: () ->
@@ -31,6 +32,8 @@ window.SubscriptionTargets = React.createClass({
   render: () ->
     cx = React.addons.classSet
     adjacentClass = cx('hide': this.props.tab != 'groups')
+    targetsClass = cx('hide': @props.count == 0)
+    nothingFoundClass = cx('hide': @props.count > 0)
 
     `<div>
       <form className="navbar-form navbar-left search" role="search">
@@ -40,53 +43,59 @@ window.SubscriptionTargets = React.createClass({
         </div>
         <button type="submit" className="btn btn-default" onClick={this.search}>Submit</button>
       </form>
-      <table className='table'>
-        <tbody>
-          <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Options</th>
-            <th className={adjacentClass}>Adjacent</th>
-            <th>Actions</th>
-          </tr>
-          {this.state.targets.map(function(target) {
-            return <ProfileSubscriptionsTarget
-              target={target}
-              checked={this.checked(target)}
-              toggleOptionsVisibility={this.toggleOptionsVisibility}
-              toggle={this.toggleTarget}
-              toggleOption={this.toggleOption}
-              tab={this.props.tab}
-              targetModel={this.targetType()}
-              toggleAllOption={this.toggleAllOptionHandler}
-              save={this.save}
-              unsubscribe={this.unsubscribe}
-              adjacent={adjacentClass}
-              updateTargets={this.updateTargets}
-              optionsTitles={this.props.optionsTitles}
-            />
-          }.bind(this))}
-        </tbody>
-      </table>
 
-      <Pagination page={this.state.page} pageCount={Math.ceil(this.props.count / this.state.perPage)}
-        pageClickHanlder={this.pageClickHanlder} perPage={this.state.perPage}/>
+      <div className={targetsClass}>
+        <table className='table'>
+          <tbody>
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Options</th>
+              <th className={adjacentClass}>Adjacent</th>
+              <th>Actions</th>
+            </tr>
+            {this.state.targets.map(function(target) {
+              return <ProfileSubscriptionsTarget
+                target={target}
+                checked={this.checked(target)}
+                toggleOptionsVisibility={this.toggleOptionsVisibility}
+                toggle={this.toggleTarget}
+                toggleOption={this.toggleOption}
+                tab={this.props.tab}
+                targetModel={this.targetType()}
+                toggleAllOption={this.toggleAllOptionHandler}
+                save={this.save}
+                unsubscribe={this.unsubscribe}
+                adjacent={adjacentClass}
+                updateTargets={this.updateTargets}
+                optionsTitles={this.props.optionsTitles}
+              />
+            }.bind(this))}
+          </tbody>
+        </table>
 
-      <SubscriptionMassOptions
-        checkedTargets={this.state.checkedTargets}
-        defaultOptions={this.defaultOptions()} type={this.targetType()}
-        updateAfterMass={this.updateAfterMass}
-        optionsTitles={this.props.optionsTitles}
-      />
+        <Pagination page={this.state.page} pageCount={Math.ceil(this.props.count / this.state.perPage)}
+          pageClickHanlder={this.pageClickHanlder} perPage={this.state.perPage}/>
 
+        <SubscriptionMassOptions
+          checkedTargets={this.state.checkedTargets}
+          defaultOptions={this.defaultOptions()} type={this.targetType()}
+          updateAfterMass={this.updateAfterMass}
+          optionsTitles={this.props.optionsTitles}
+          totalCount={this.state.totalCount}
+          target={this.props.tab}
+        />
+      </div>
+
+      <p className={nothingFoundClass}>Sorry, but nothing found.</p>
     </div>`
 
   search: (event) ->
     event.preventDefault()
+    @props.setTerm(@state.searchTerm)
     @loadTargets(0, false)
 
   handleSearchChange: (event) ->
-    @props.setTerm(event.target.value)
     @setState(searchTerm: event.target.value)
 
   save: (target, event) ->

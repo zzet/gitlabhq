@@ -16,12 +16,17 @@ module API
       #   GET /subscriptions/targets
       get "targets" do
         type = params[:type]
+        model = type.constantize
+
+        #target_id can reference to deleted record
+        target_ids = model.ids
         subscriptions = current_user.personal_subscriptions
+                                    .where(target_id: target_ids)
                                     .where(target_type: type)
                                     .includes(:target)
 
         if params[:search].present?
-          tids = type.constantize.search(params[:search]).pluck(:id)
+          tids = model.search(params[:search]).pluck(:id)
           subscriptions = subscriptions.where(target_id: tids)
         end
 
@@ -29,7 +34,7 @@ module API
 
         subscriptions = paginate subscriptions.order(:id)
 
-        present :targets, subscriptions, with: Entities::TargetSubscription
+        present :targets, subscriptions, with: Entities::TargetSubscription, user: current_user
       end
 
       # Create subscription (watch)
