@@ -9,7 +9,7 @@ class MergeRequestDiff < ActiveRecord::Base
 
   belongs_to :merge_request
 
-  attr_accessible :state, :st_commits, :st_diffs
+  attr_accessible :state, :state_event, :st_commits, :st_diffs
 
   delegate :target_branch, :source_branch, to: :merge_request, prefix: nil
 

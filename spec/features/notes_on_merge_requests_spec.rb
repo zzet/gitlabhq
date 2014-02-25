@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "On a merge request", js: true do
   let!(:group) { create(:group) }
-  let!(:project) { create(:project_with_code, namespace: group) }
+  let!(:project) { create(:project, namespace: group) }
   let!(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
   let!(:note) { create(:note_on_merge_request_with_attachment,  project: project) }
 
@@ -138,7 +138,7 @@ end
 
 describe "On a merge request diff", js: true, focus: true do
   let!(:group) { create(:group) }
-  let!(:project) { create(:source_project_with_code, namespace: group) }
+  let!(:project) { create(:source_project, namespace: group) }
   let!(:merge_request) { create(:merge_request_with_diffs, source_project: project, target_project: project) }
 
   before do
@@ -180,7 +180,7 @@ describe "On a merge request diff", js: true, focus: true do
 
   describe "with muliple note forms" do
     let!(:group) { create(:group) }
-    let!(:project) { create(:source_project_with_code, namespace: group) }
+    let!(:project) { create(:source_project, namespace: group) }
     let!(:merge_request) { create(:merge_request_with_diffs, source_project: project, target_project: project) }
 
     before do

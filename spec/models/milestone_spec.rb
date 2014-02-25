@@ -96,7 +96,7 @@ describe Milestone do
   describe :items_count do
     before do
       user = create :admin
-      project = create :project_with_code, creator: user
+      project = create :project, creator: user
       milestone.issues << create(:issue, project: project, author: user)
       milestone.issues << create(:closed_issue, project: project, author: user)
       milestone.merge_requests << create(:merge_request, source_project: project, target_project: project, author: user)

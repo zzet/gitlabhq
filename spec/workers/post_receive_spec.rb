@@ -32,7 +32,7 @@ describe PostReceive do
   end
 
   context "push from" do
-    let(:project) { create(:project_with_code) }
+    let(:project) { create(:project) }
     let(:key) { create(:service_key) }
     let(:key_id) { key.shell_id }
     Service.implement_services.map {|s| s.new }.each do |service|
