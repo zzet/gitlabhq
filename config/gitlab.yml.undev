@@ -16,7 +16,7 @@ production: &base
   gitlab:
     ## Web server settings
     host: git.undev.cc
-    port: 80
+    port: 443
     https: true
     # Uncomment and customize to run in non-root path
     # Note that ENV['RAILS_RELATIVE_URL_ROOT'] in config/unicorn.rb may need to be changed
@@ -167,6 +167,11 @@ development:
 
 test:
   <<: *base
+  gitlab:
+    host: test.gitlab.com
+    port: 80
+    https: false
+    signup_enabled: true
   issues_tracker:
     redmine:
       project_url: "http://redmine/projects/:issues_tracker_id"
@@ -178,7 +183,7 @@ staging:
   gitlab:
     ## Web server settings
     host: gitlab-staging-01.undev.cc
-    port: 80
+    port: 443
     https: false
     signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.
 

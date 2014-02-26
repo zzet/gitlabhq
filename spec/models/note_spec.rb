@@ -258,7 +258,7 @@ describe Note do
       its(:noteable_type) { should == "Commit" }
       its(:noteable_id) { should be_nil }
       its(:commit_id) { should == commit.id }
-      its(:note) { should == "_mentioned in issue ##{issue.iid}_" }
+      its(:note) { should == "_This commit was mentioned in issue ##{issue.iid}_" }
     end
   end
 

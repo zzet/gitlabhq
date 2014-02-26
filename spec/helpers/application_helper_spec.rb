@@ -46,7 +46,7 @@ describe ApplicationHelper do
       group = create(:group)
       group.avatar = File.open(avatar_file_path)
       group.save!
-      group_icon(group.path).to_s.should == "/uploads/group/avatar/#{ group.id }/gitlab_logo.png"
+      group_icon(group.path).to_s.should == "/system/uploads/group/avatar/#{ group.id }/gitlab_logo.png"
     end
 
     it "should give default avatar_icon when no avatar is present" do

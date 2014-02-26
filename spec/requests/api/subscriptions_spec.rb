@@ -6,9 +6,9 @@ describe API::API do
   after(:each) { ActiveRecord::Base.observers.disable(:user_observer) }
 
   let(:user) { create(:user) }
-  let(:project) { create(:project, namespace: user.namespace ) }
+  let(:project) { create(:empty_project, namespace: user.namespace ) }
   let(:group) { create(:group, owner: user) }
-  let(:second_project) { create(:project, namespace: user.namespace ) }
+  let(:second_project) { create(:empty_project, namespace: user.namespace ) }
   before { project.team << [user, :reporter] }
 
   describe "subscriptions api" do

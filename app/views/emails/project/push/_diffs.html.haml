@@ -5,61 +5,63 @@
     %p To prevent performance issue we rejected diff information.
 
 %p{style: "color:gray"}
-  Showing #{pluralize(diffs.count, "changed file")}
+  Showing #{pluralize(diffs.size, "changed file")}
 
 %table{width: "100%", style: "width: 100%;"}
-  - diffs.each_with_index do |diff, i|
+  - diffs.each_delta.each_with_index do |delta, i|
     %tr
-      - if diff.deleted_file
+      - if delta.deleted?
         %td
           %a{href: "#diff-#{i}"}
             -
-            = diff.old_path
-      - elsif diff.renamed_file
+            = delta.old_file[:path]
+      - elsif delta.renamed?
         %td
           %a{href: "#diff-#{i}"}
             -
-            = diff.old_path
+            = delta.old_file[:path]
             = "->"
-            = diff.new_path
-      - elsif diff.new_file
+            = delta.new_file[:path]
+      - elsif delta.added?
         %td
           %a{href: "#diff-#{i}"}
             +
-            = diff.new_path
+            = delta.new_file[:path]
       - else
         %td
           %a{href: "#diff-#{i}"}
             *
-            = diff.new_path
+            = delta.new_file[:path]
 
 - unless @suppress_diff
-  - diffs.each_with_index do |diff, i|
-    - next if diff.diff.empty?
-    - file = @repository.blob_at(@commit.id, diff.new_path)
-    - file = @repository.blob_at(@commit.parent_id, diff.old_path) unless file
+  - diffs.each_patch.each_with_index do |diff, i|
+    - file = nil
+    -#- next if diff.diff.empty?
+    - file = @repository.blob_at(@commit.oid, diff.delta.new_file[:path])
+    - file = @repository.blob_at(@commit.parent_id, diff.delta.old_file[:path]) unless file
     - next unless file
     %br
     %table{id: "diff-#{i}", cellspacing: '0', cellpadding: '0', width: "100%", style: "border:1px solid #ccc; color: #444; width:100%"}
       %tr
         %td{colspan: 3, style: "padding:5px 5px 5px 10px;color:#555;border-bottom:1px solid #ccc;background:#eee;"}
-          - if diff.deleted_file
+          - if diff.delta.deleted?
+            - file = @repository.
             %span{style: "font-size:0.8em"}
-              = diff.old_path
+              = diff.delta.old_file[:path]
               - if @commit.parent_ids.present?
-                = link_to project_blob_url(@project, tree_join(@commit.parent_id, diff.new_path)), {:class => 'btn btn-tiny pull-right view-file'} do
+                = link_to project_blob_url(@project, tree_join(@commit.parent_id, diff.delta.new_file[:path])), {:class => 'btn btn-tiny pull-right view-file'} do
                   View file @
                   %span{style: "font-family:\"Menlo\",\"Liberation Mono\",\"Consolas\",\"Courier New\",\"andale mono\",\"lucida console\",monospace;font-size:smaller"}
-                    = @commit.short_id(6)
+                    = @commit.oid[0..6]
           - else
-            %span= diff.new_path
-            - if diff.a_mode && diff.b_mode && diff.a_mode != diff.b_mode
-              %span.file-mode= "#{diff.a_mode} → #{diff.b_mode}"
+            %span= diff.delta.new_file[:path]
+            - if diff.delta.old_file[:mode] && diff.delta.new_file[:mode] && diff.delta.old_file[:mode] != diff.delta.new_file[:mode]
+              %span.file-mode= "#{'%06o' % delta.old_file[:mode]} → #{'%06o' % delta.new_file[:mode]}"
 
-            = link_to project_blob_url(@project, tree_join(@commit.id, diff.new_path)), {:class => 'btn btn-tiny pull-right view-file'} do
+            = link_to project_blob_url(@project, tree_join(@commit.oid, diff.delta.new_file[:path])), {:class => 'btn btn-tiny pull-right view-file'} do
               View file @
               %span{style: "font-family:monospace;"}
-                = @commit.short_id(6)
+                = @commit.oid[0..6]
 
       %tr
         %td{colspan: 3, style: "overflow:auto;overflow-y:hidden; color:#333; background:#fff; max-width:1024px;"}

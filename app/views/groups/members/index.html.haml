@@ -12,7 +12,7 @@
     %strong #{@group.name}
     group members
     %small
-      (#{@members.total_count})
+      (#{@members.count})
   %ul.well-list
     - @members.each do |member|
       = render 'member', member: member, show_controls: can_manage_group
