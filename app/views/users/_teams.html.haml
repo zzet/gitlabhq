@@ -3,7 +3,7 @@
     = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter form-control'
   %ul.well-list.js-sidebar-list
     - @teams.each do |team|
-      %li
+      %li.js-description-tooltip{"data-title" => "#{team.description}"}
         = link_to team_path(team), class: dom_class(team) do
           %strong.well-title.filter-title= team.name
           %span.pull-right.light

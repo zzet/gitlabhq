@@ -8,7 +8,7 @@
           New group
   %ul.well-list.js-sidebar-list
     - groups.each do |group|
-      %li.group-row
+      %li.group-row.js-description-tooltip{"data-title" => "#{group.description}"}
         = link_to group_path(id: group.path), class: dom_class(group) do
           %span.group-name.filter-title
             = truncate(group.name, length: 35)

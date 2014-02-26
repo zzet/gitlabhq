@@ -23,6 +23,7 @@ class Dispatcher
       when 'dashboard:show'
         new Dashboard()
         new Activities()
+        new DashboardTooltips()
         new SidebarSort()
       when 'projects:commit:show'
         new Commit()
@@ -32,6 +33,7 @@ class Dispatcher
         new JenkinsBuild()
       when 'groups:show'
         new Activities()
+        new DashboardTooltips()
         new SidebarFilter()
         new SidebarSort()
         new SidebarTabs('groups')
@@ -41,6 +43,7 @@ class Dispatcher
         new SidebarTabs('projects')
       when 'teams:show'
         new Activities()
+        new DashboardTooltips()
         new SidebarFilter()
         new SidebarSort()
         new SidebarTabs('teams')
@@ -60,6 +63,7 @@ class Dispatcher
         new BlobView()
       when 'users:show'
         new Activities()
+        new DashboardTooltips()
         new SidebarFilter()
         new SidebarTabs('users')
       when 'profiles:subscriptions:index'
