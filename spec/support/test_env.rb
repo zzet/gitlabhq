@@ -94,6 +94,9 @@ module TestEnv
     OldActivityObserver.any_instance.stub(
       current_user: double("current_user", id: 1)
     )
+
+    Service::GitCheckpoint.any_instance.stub(notify_git_checkpoint: true)
+    Service::BuildFace.any_instance.stub(notify_build_face: true)
   end
 
   def clear_repo_dir(namespace, name)

@@ -48,7 +48,7 @@ production: &base
       wiki: false
       wall: false
       snippets: false
-      public: true
+      visibility_level: "public"
 
     ## Automatic issue closing
     # If a commit message matches this regular express, all issues referenced from the matched text will be closed

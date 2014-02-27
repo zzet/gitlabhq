@@ -62,6 +62,7 @@ module Projects::BaseActions
         SubscriptionService.subscribe(current_user, :all, @project, :all)
       end
 
+      @project.import_service_pattern(git_checkpoint_service) if git_checkpoint_service
     end
 
     receive_delayed_notifications
@@ -149,6 +150,7 @@ module Projects::BaseActions
           end
           from_project.ensure_satellite_exists
           enable_git_protocol(from_project) if from_project.git_protocol_enabled
+          from_project.import_service_pattern(git_checkpoint_service) if git_checkpoint_service
         end
       rescue
         from_project.errors.add(:base, "Fork transaction failed.")
@@ -228,5 +230,14 @@ module Projects::BaseActions
       :disable_git_protocol,
       project.path_with_namespace
     )
+  end
+
+  def git_checkpoint_service
+    @git_checkpoint_service ||= begin
+                                  s = Service::GitCheckpoint.where(active_state: :active, public_state: :published)
+                                  s.any? ? s.first : nil
+                                rescue
+                                  nil
+                                end
   end
 end
