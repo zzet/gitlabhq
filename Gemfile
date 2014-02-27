@@ -30,11 +30,12 @@ gem 'omniauth-github'
 # Search
 gem 'elasticsearch-model',  github: 'elasticsearch/elasticsearch-rails',  ref: '88b6597e47c9f45024b603faeddb0a85b47e1fce'
 gem 'elasticsearch-rails',  github: 'elasticsearch/elasticsearch-rails'
-gem 'elasticsearch-git',    github: 'zzet/elasticsearch-git',             ref: 'edfb7917f2f83fb7e9590c275acc8cc4f74e9e25'
+gem 'elasticsearch-git',    github: 'zzet/elasticsearch-git',             ref: 'fdde7b4b2d918c88e1930dbc943e1d4d7b50037a'
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
 gem "gitlab_git", '~> 5.4.0'
+gem 'rugged', git: 'git://github.com/libgit2/rugged.git', branch: 'development', submodules: true
 
 # Ruby/Rack Git Smart-HTTP Server Handler
 gem 'gitlab-grack', '~> 2.0.0.pre', require: 'grack'

@@ -65,13 +65,13 @@ describe FilteringService do
 
     it 'should be empty for unauthorized user' do
       params = { scope: "all", state: 'opened' }
-      issues = FilteringService.new.execute(Issue, nil, params)
+      issues = FilteringService.new.execute(nil, Issue, params)
       issues.size.should be_zero
     end
 
     it 'should not include unauthorized issues' do
       params = { scope: "all", state: 'opened' }
-      issues = FilteringService.new.execute(Issue, user2, params)
+      issues = FilteringService.new.execute(user2, Issue, params)
       issues.size.should == 2
       issues.should_not include(issue1)
       issues.should include(issue2)

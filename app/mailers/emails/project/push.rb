@@ -134,10 +134,11 @@ class Emails::Project::Push < Emails::Project::Base
   def load_diff_data(oldrev, newrev, ref, project, user)
     diff_result = {}
 
-    r = Rugged::Repository.new(project.repository.path_to_repo)
-
     diff_result[:branch] = ref
     diff_result[:branch].slice!("refs/heads/")
+
+    r = Rugged::Repository.new(project.repository.path_to_repo)
+
     diff_result[:before_commit] = r.lookup(oldrev)
     diff_result[:after_commit]  = r.lookup(newrev)
     diff_result[:commit]        = r.lookup(newrev)
@@ -156,6 +157,8 @@ class Emails::Project::Push < Emails::Project::Base
       diff_result[:commits] = commit_oids.map {|coid| r.lookup(coid) }
 
       diff = r.diff(oldrev, newrev)
+
+      #5000
 
       diff_result[:diffs]   = diff
     end

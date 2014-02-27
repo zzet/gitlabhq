@@ -505,7 +505,7 @@ class Project < ActiveRecord::Base
     # Close merge requests
     mrs = self.merge_requests.opened.where(target_branch: branch_name).to_a
     mrs = mrs.select(&:last_commit).select { |mr| c_ids.include?(mr.last_commit.id) }
-    mrs.each { |merge_request| MergeRequestsService.new(merge_request, user).merge }
+    mrs.each { |merge_request| MergeRequestsService.new(user, merge_request).merge }
 
     true
   end

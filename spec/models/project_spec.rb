@@ -143,7 +143,7 @@ describe Project do
       @merge_request = create(:merge_request_with_diffs, source_project: project, target_project: project)
       @merge_request.reload_code
       @merge_request.last_commit.id.should == "b1e6a9dbf1c85e6616497a5e7bad9143a4bd0828"
-      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a", "refs/heads/master", @key.user)
+      project.update_merge_requests("8716fc78f3c65bbf7bcf7b574febd583bc5d2812", "69b34b7e9ad9f496f0ad10250be37d6265a03bba", "refs/heads/stable", @key.user)
       @merge_request.reload
       @merge_request.merged?.should be_true
     end

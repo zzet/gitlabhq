@@ -981,10 +981,10 @@ describe EventNotificationMailer do
           before do
             @group = create :group, owner: @another_user
 
-            params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @group.id) }
+            params = { project: attributes_for(:empty_project, creator_id: @another_user.id, namespace_id: @group.id) }
             @first_project = ProjectsService.new(@another_user, params[:project]).create
 
-            params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @group.id) }
+            params = { project: attributes_for(:empty_project, creator_id: @another_user.id, namespace_id: @group.id) }
             @second_project = ProjectsService.new(@another_user, params[:project]).create
 
             params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
@@ -1953,8 +1953,8 @@ describe EventNotificationMailer do
           before do
             Gitlab::Event::Subscription.create_auto_subscription(@user, :project)
 
-            @project1 = create :project, namespace: group, creator: @another_user
-            @project2 = create :project, namespace: group, creator: @another_user
+            @project1 = create :empty_project, namespace: group, creator: @another_user
+            @project2 = create :empty_project, namespace: group, creator: @another_user
 
             user1 = create :user
             params = { user_ids: "#{user1.id}", team_access: Gitlab::Access::MASTER }

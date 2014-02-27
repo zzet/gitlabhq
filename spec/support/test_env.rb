@@ -105,6 +105,9 @@ module TestEnv
     OldActivityObserver.any_instance.stub(
       current_user: double("current_user", id: 1)
     )
+
+    #Elastic::BaseIndexer.any_instance.stub(perform: true)
+    #Elastic::RepositoryIndexer.any_instance.stub(perform: true)
   end
 
   def clear_repo_dir(namespace, name)

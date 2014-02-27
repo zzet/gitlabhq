@@ -15,9 +15,17 @@ GIT
     elasticsearch-rails (0.1.0.rc1)
 
 GIT
+  remote: git://github.com/libgit2/rugged.git
+  revision: 0ac443721f775d2402f376e9974967b147a8f44b
+  branch: development
+  submodules: true
+  specs:
+    rugged (0.19.0)
+
+GIT
   remote: git://github.com/zzet/elasticsearch-git.git
-  revision: edfb7917f2f83fb7e9590c275acc8cc4f74e9e25
-  ref: edfb7917f2f83fb7e9590c275acc8cc4f74e9e25
+  revision: fdde7b4b2d918c88e1930dbc943e1d4d7b50037a
+  ref: fdde7b4b2d918c88e1930dbc943e1d4d7b50037a
   specs:
     elasticsearch-git (0.0.3)
       activemodel (~> 4.0.0)
@@ -500,7 +508,6 @@ GEM
     ruby-hmac (0.4.0)
     ruby-progressbar (1.2.0)
     rubyntlm (0.1.1)
-    rugged (0.19.0)
     safe_yaml (0.9.7)
     sanitize (2.0.6)
       nokogiri (>= 1.4.4)
@@ -732,6 +739,7 @@ DEPENDENCIES
   redis-rails
   request_store
   rspec-rails
+  rugged!
   sanitize
   sass-rails
   sdoc

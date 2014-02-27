@@ -39,11 +39,11 @@ module Projects::UsersActions
   end
 
   def import_memberships_action(giver)
-    status = multiple_action("import", "project", project) do
+    status = multiple_action("import", "project", @project) do
       @project.team.import(giver)
     end
 
-    Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    Elastic::BaseIndexer.perform_async(:update, @project.class.name, @project.id)
 
     status
   end
