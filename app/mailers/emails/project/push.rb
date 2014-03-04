@@ -142,28 +142,27 @@ class Emails::Project::Push < Emails::Project::Base
     diff_result[:before_commit] = r.lookup(oldrev)
     diff_result[:after_commit]  = r.lookup(newrev)
     diff_result[:commit]        = r.lookup(newrev)
-    diff_result[:suppress_diff] = false
 
-    walker = Rugged::Walker.new(r)
-    walker.sorting(Rugged::SORT_REVERSE)
-    walker.push(newrev)
-    walker.hide(oldrev)
-    commit_oids = walker.map {|c| c.oid}
-    walker.reset
+    diff = r.diff(oldrev, newrev)
+    diff_stat = diff.stat
 
-    if commit_oids.count > 100
-      diff_result[:suppress_diff] = true
+    diff_result[:suppress_diff] = ((diff_stat.first > 500) || (diff_stat[1] + diff_stat[2] > 10000))
+
+    if diff_result[:suppress_diff]
+      diff_result[:commits] = []
+      diff_result[:diffs]   = nil
     else
+      walker = Rugged::Walker.new(r)
+      walker.sorting(Rugged::SORT_REVERSE)
+      walker.push(newrev)
+      walker.hide(oldrev)
+      commit_oids = walker.map {|c| c.oid}
+      walker.reset
+
       diff_result[:commits] = commit_oids.map {|coid| r.lookup(coid) }
-
-      diff = r.diff(oldrev, newrev)
-
-      #5000
-
       diff_result[:diffs]   = diff
     end
 
     diff_result
   end
-
 end
