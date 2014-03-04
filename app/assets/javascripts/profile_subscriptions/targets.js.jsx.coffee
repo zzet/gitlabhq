@@ -113,10 +113,13 @@ window.SubscriptionTargets = React.createClass({
     @loadTargets(page, false)
 
   unsubscribe: (target, event) ->
-    Api.subscriptions.destroy(@targetType(), target.id, (response) =>
-      withoutRemoved = _.filter(@state.targets, (t) -> t.id != target.id)
-      @setState(targets: withoutRemoved)
-    )
+    question = "Would you like to unsubscribe from #{target.name}?"
+    if confirm(question)
+      Api.subscriptions.destroy(@targetType(), target.id, (response) =>
+        withoutRemoved = _.filter(@state.targets, (t) -> t.id != target.id)
+        @setState(targets: withoutRemoved)
+      )
+
 
   toggleTarget: (target) ->
     checkedTargets = @state.checkedTargets

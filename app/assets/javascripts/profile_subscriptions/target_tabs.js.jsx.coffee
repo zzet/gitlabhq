@@ -48,7 +48,7 @@ window.SubscriptionTargetTabs = React.createClass({
     )
 
     tabsClass = cx(
-      'hide': not (@emptyTab('projects') or @emptyTab('groups') or @emptyTab('teams') or @emptyTab('users'))
+      'hide': @emptyTab('projects') and @emptyTab('groups') and @emptyTab('teams') and @emptyTab('users')
       'nav': true
       'nav-tabs': true
     )
