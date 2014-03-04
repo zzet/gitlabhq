@@ -40,7 +40,9 @@ module SharedNote
   end
 
   Then 'I should not see a comment saying "XML attached"' do
+    sleep 3
     page.should_not have_css(".note")
+    sleep 3
   end
 
   Then 'I should not see the cancel comment button' do

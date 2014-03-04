@@ -181,7 +181,7 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def automerge!(current_user, commit_message = nil)
-    MergeRequestsService.new(self, current_user).auto_merge(commit_message)
+    MergeRequestsService.new(current_user, self).auto_merge(commit_message)
   end
 
   def mr_and_commit_notes

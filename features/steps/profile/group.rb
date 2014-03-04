@@ -17,7 +17,8 @@ class ProfileGroup < Spinach::FeatureSteps
   end
 
   step 'I should not see the "Leave" button for group "Owned"' do
-    find(:css, 'li', text: "Owner").should_not have_selector(:css, 'i.icon-signout')
+    gr = Group.find_by_name("Owned")
+    find("#group-info-#{gr.id}").value.should_not have_content("Leave")
     # poltergeist always confirms popups.
   end
 

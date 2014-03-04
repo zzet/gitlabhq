@@ -54,7 +54,7 @@ class Spinach::Features::PublicProjectsFeature < Spinach::FeatureSteps
   end
 
   step 'I should see project "Community" home page' do
-    within '.project_name' do
+    within '.navbar-inner .title' do
       page.should have_content 'Community'
     end
   end
@@ -65,7 +65,7 @@ class Spinach::Features::PublicProjectsFeature < Spinach::FeatureSteps
   end
 
   step 'I should see project "Internal" home page' do
-    within '.project_name' do
+    within '.navbar-inner .title' do
       page.should have_content 'Internal'
     end
   end

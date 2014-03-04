@@ -20,7 +20,7 @@ class ProjectBrowseCommitsUserLookup < Spinach::FeatureSteps
     page.should have_content ValidCommit::MESSAGE
     check_author_link(ValidCommit::AUTHOR_EMAIL)
   end
-  
+
   Then 'I see other commit info' do
     page.should have_content ValidCommitWithAltEmail::MESSAGE
     check_author_link(ValidCommitWithAltEmail::AUTHOR_EMAIL)
@@ -28,7 +28,7 @@ class ProjectBrowseCommitsUserLookup < Spinach::FeatureSteps
 
   def check_author_link(email)
     author_link = find('.commit-author-link')
-    author_link['href'].should == user_path(@user)
+    author_link['href'].should include user_path(@user)
     author_link['data-original-title'].should == email
     find('.commit-author-name').text.should == @user.name
   end

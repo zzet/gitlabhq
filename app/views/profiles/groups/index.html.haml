@@ -15,7 +15,7 @@
   %ul.well-list
     - @user_groups.each do |user_group|
       - group = user_group.group
-      %li
+      %li{id: "group-info-#{group.id}"}
         .pull-right
           - if can?(current_user, :manage_group, group)
             = link_to edit_group_path(group), class: "btn-small btn grouped" do

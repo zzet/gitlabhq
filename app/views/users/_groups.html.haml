@@ -8,5 +8,5 @@
           = image_tag group_icon(group.path)
           %strong.well-title.filter-title= group.human_name
           %span.pull-right.light
-            - if group.owner == user
+            - if group.owner == @user
               %i.icon-wrench
