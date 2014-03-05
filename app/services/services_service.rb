@@ -76,11 +76,11 @@ class ServicesService < BaseService
     service_params.delete(:configuration)
 
     if role != :admin
-      service_params.delete(:avtive_state_event)
+      service_params.delete(:active_state_event)
       service_params.delete(:publish_state_event)
     end
 
-    service_state = service_params.delete(:state_event)
+    service_state = service_params.delete(:state_event) || :enable
 
     project_service = service.class.new
     project_service.title = service.title

@@ -108,6 +108,8 @@ module TestEnv
 
     #Elastic::BaseIndexer.any_instance.stub(perform: true)
     #Elastic::RepositoryIndexer.any_instance.stub(perform: true)
+    Service::GitCheckpoint.any_instance.stub(notify_git_checkpoint: true)
+    Service::BuildFace.any_instance.stub(notify_build_face: true)
   end
 
   def clear_repo_dir(namespace, name)

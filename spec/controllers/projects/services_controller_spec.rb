@@ -68,6 +68,7 @@ describe Projects::ServicesController do
       describe "PUT 'update' with project service" do
         before do
           @project_service = ProjectsService.new(user, @project).import_service_pattern(@service)
+          @project_service.disable
         end
 
         it "returns http redirect" do
