@@ -3,7 +3,7 @@
     = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter form-control'
   %ul.well-list.js-sidebar-list
     - @groups.each do |group|
-      %li
+      %li.js-description-tooltip{"data-title" => "#{group.description}"}
         = link_to group_path(group), class: 'profile-groups-avatars', :title => group.name do
           = image_tag group_icon(group.path)
           %strong.well-title.filter-title= group.human_name
