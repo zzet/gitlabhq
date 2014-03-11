@@ -96,8 +96,10 @@ module API
 
       expose :adjacent do |subscription, options|
         target = subscription.target
+        user = subscription.user
+
         if target.class.watched_adjacent_sources.any?
-          adjacent = ::Event::AutoSubscription.adjacent(target.class.name, target.id)
+          adjacent = options[:user].auto_subscriptions.adjacent(target.class.name, target.id)
             .pluck(:target).map(&:to_sym)
 
           target.class.watched_adjacent_sources.reduce({}) do |response, source|

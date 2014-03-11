@@ -12,9 +12,10 @@ window.SubscriptionMassOptions = React.createClass({
     cx = React.addons.classSet
     editAllTitleClass = cx('hide': _.any(this.props.checkedTargets))
     editSelectedClass = cx('hide': _.isEmpty(this.props.checkedTargets))
+    setForMessage = "Set for all #{this.props.totalCount} #{this.props.target}"
 
     `<div className='mass'>
-      <h4 className={editAllTitleClass}>Set for all</h4>
+      <h4 className={editAllTitleClass}>{setForMessage}</h4>
 
       <div className={editSelectedClass}>
         <h4>Set for:</h4>
