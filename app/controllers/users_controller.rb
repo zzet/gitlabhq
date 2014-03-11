@@ -5,13 +5,13 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find_by_username!(params[:username])
-    @projects = @user.authorized_projects.includes(:namespace).select {|project| can?(current_user, :read_project, project)}
-    if !current_user && @projects.empty?
+
+    if !current_user
+      # && @projects.empty?
       return authenticate_user!
     end
-    @events = @user.recent_events.where(project_id: @projects.map(&:id)).limit(20)
 
-    @projects       = @user.authorized_projects.where(id: current_user.known_projects.pluck(:id)).includes(:namespace)
+    @projects       = current_user.known_projects.where(id: @user.authorized_projects.pluck(:id)).includes(:namespace)
     @groups         = current_user.authorized_groups.where(id: @user.personal_groups)
     @teams          = current_user.authorized_teams.where(id: @user.personal_teams)
 
