@@ -16,7 +16,7 @@ class UsersController < ApplicationController
     @teams          = current_user.authorized_teams.where(id: @user.personal_teams)
 
     @event_projects = current_user.known_projects
-    @events         = @user.recent_events.where(project_id: @event_projects).reorder('created_at DESC').offset(params[:offset]).limit(params[:limit])
+    @events         = @user.recent_events.where(project_id: @event_projects).reorder('created_at DESC').offset(params[:offset]).limit(params[:limit] || 60)
 
     @title          = @user.name
   end
