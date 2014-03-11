@@ -13,15 +13,14 @@
       %p.nothing_here_message Project activity will be displayed here
     = spinner
   .side.col-md-4
-    .append-bottom-20
+    .append-bottom-20.description-block
       = render "shared/watch_button", current_entity: @group
       = image_tag group_icon(@group.path), class: "avatar s90"
 
       %h3.page_title
         = @group.name
       - if @group.description.present?
-        .description-block
-          = @group.description
+        = @group.description
 
       %hr
       %p

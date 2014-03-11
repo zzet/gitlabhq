@@ -2,7 +2,7 @@
   = nav_link(path: 'projects#edit') do
     = link_to edit_project_path(@project), class: "stat-tab tab " do
       Edit Project
-  = nav_link(controller: [:team_members, :teams]) do
+  = nav_link(controller: :team_members) do
     = link_to project_team_index_path(@project), class: "team-tab tab" do
       %i.icon-group
       Members

@@ -420,6 +420,12 @@ img.emoji {
   @extend .light-well;
   @extend .light;
   margin-bottom: 10px;
+  h3 {
+    font-size: 18px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    color: #000;
+  }
 }
 
 table {

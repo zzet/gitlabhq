@@ -14,9 +14,6 @@
             = truncate(team.name, length: 35)
           %span.arrow
             %i.icon-angle-right
-          %span.owner-info
-            %span Creator:
-            %span.owner= team.creator_name
     - if teams.blank?
       %li
         %h3.nothing_here_message You have no teams yet.
