@@ -16,39 +16,39 @@ window.SubscriptionTargetTabs = React.createClass({
   render: () ->
     cx = React.addons.classSet
     projectsClass = cx(
-      'active': @state.tab == 'projects'
-      'hide': @state.projects_count == 0 and @state.projects_search_term == ''
+      'active': @selectedTab('projects')
+      'hide': @emptyTab('projects')
     )
     projectsContentClass = cx(
-      'hide': @state.tab != 'projects' or not @state.projects_count
+      'hide': @emptyTab('projects') or not @selectedTab('projects')
     )
 
     groupsClass = cx(
-      'active': @state.tab == 'groups'
-      'hide': @state.groups_count == 0 and @state.groups_search_term == ''
+      'active': @selectedTab('groups')
+      'hide': @emptyTab('groups')
     )
     groupsContentClass = cx(
-      'hide': @state.tab != 'groups' or not @state.groups_count
+      'hide': @emptyTab('groups') or not @selectedTab('groups')
     )
 
     teamsClass = cx(
-      'active': @state.tab == 'teams'
-      'hide': @state.teams_count == 0 and @state.teams_search_term == ''
+      'active': @selectedTab('teams')
+      'hide': @emptyTab('teams')
     )
     teamsContentClass = cx(
-      'hide': @state.tab != 'teams' or not @state.teams_count
+      'hide': @emptyTab('teams') or not @selectedTab('teams')
     )
 
     usersClass = cx(
-      'active': @state.tab == 'users'
-      'hide': @state.users_count == 0 and @state.users_search_term == ''
+      'active': @selectedTab('users')
+      'hide': @emptyTab('users')
     )
     usersContentClass = cx(
-      'hide': @state.tab != 'users' or not @state.users_count
+      'hide': @emptyTab('users') or not @selectedTab('users')
     )
 
     tabsClass = cx(
-      'hide': not (@state.projects_count or @state.groups_count or @state.teams_count or @state.users_count)
+      'hide': @emptyTab('projects') and @emptyTab('groups') and @emptyTab('teams') and @emptyTab('users')
       'nav': true
       'nav-tabs': true
     )
@@ -147,7 +147,9 @@ window.SubscriptionTargetTabs = React.createClass({
     @setState(tab: @selectTab(@state)) if tabUpdate
 
   setTerm: (target_term_key, term) ->
-    @setState(target_term_key: term)
+    stateUpdate = {}
+    stateUpdate[target_term_key] = term
+    @setState(stateUpdate)
 
   optionsTitles: (target) ->
     if @props[target] then @props[target].titles else {}
@@ -163,4 +165,9 @@ window.SubscriptionTargetTabs = React.createClass({
       'users'
     else
       ''
+
+  selectedTab: (tab) -> @state.tab == tab
+
+  emptyTab: (tab) ->
+    @state["#{tab}_count"]== 0 and @state["#{tab}_search_term"] == ''
 })

@@ -82,14 +82,18 @@ window.SubscriptionGlobal = React.createClass({
     _.include(_.map(@state.autoSubscriptions, (as)-> as.target), option)
 
   subscribe: (option, event) ->
-    Api.subscriptions.toAll(option, (response) =>
-      $(document).trigger("#{option}s_subscribe")
-    )
+    question = "Would you like to subscribe to all #{option}s?"
+    if confirm(question)
+      Api.subscriptions.toAll(option, (response) =>
+        $(document).trigger("#{option}s_subscribe")
+      )
 
   unSubscribe: (option, event) ->
-    Api.subscriptions.fromAll(option, (response) =>
-      $(document).trigger("#{option}s_unsubscribe")
-    )
+    question = "Would you like to unsubscribe from all #{option}s?"
+    if confirm(question)
+      Api.subscriptions.fromAll(option, (response) =>
+        $(document).trigger("#{option}s_unsubscribe")
+      )
 
   toggleGlobalOption: (option, event) ->
     options = @state.options

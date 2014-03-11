@@ -8,6 +8,9 @@
           = link_to profile_path, class: 'btn' do
             %i.icon-edit
             Edit Profile settings
+      - else
+        = render "shared/watch_button", current_entity: @user
+
       %br
       %span.user-show-username #{@user.username}
       %br
