@@ -10,7 +10,7 @@ module Watchable
   end
 
   module ClassMethods
-    attr_reader :watched_titles
+    attr_reader :watched_titles, :watched_descriptions
 
     # Main DSL method for watch description
     def watch(&block)
@@ -21,6 +21,11 @@ module Watchable
     def title(title)
       @watched_titles ||= {}
       @watched_titles[@watched_sources.last] = title
+    end
+
+    def description(description)
+      @watched_descriptions ||= {}
+      @watched_descriptions[@watched_sources.last] = description
     end
 
     # Related entity, source of action

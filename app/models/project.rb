@@ -119,7 +119,8 @@ class Project < ActiveRecord::Base
 
   watch do
     source watchable_name do
-      title 'self'
+      title 'Project'
+      description 'Notify about project destroy. Settings, owner, team updates.'
       from :create,   to: :created
       from :update,   to: :transfer,  conditions: -> { @source.namespace_id_changed? && @source.namespace_id != @changes[:namespace_id].first } do
         @event_data[:owner_changes] = @changes
@@ -137,6 +138,7 @@ class Project < ActiveRecord::Base
 
     source :push do
       title 'Pushes/branches/tags'
+      description 'Notify about diffs. Tags, branches create/delete.'
       before do: -> { @target = @source.project }
       from :create,   to: :created_branch,  conditions: -> { @source.created_branch? }
       from :create,   to: :created_tag,     conditions: -> { @source.created_tag? }
@@ -147,6 +149,7 @@ class Project < ActiveRecord::Base
 
     source :issue do
       title 'Issues'
+      description "Notify about new issues and it's updates."
       before do: -> { @target = @source.project }
       from :create,   to: :opened
       from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
@@ -157,6 +160,7 @@ class Project < ActiveRecord::Base
 
     source :milestone do
       title 'Milestones'
+      description "Notify about new milestones and it's updates."
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :close,    to: :closed
@@ -166,6 +170,7 @@ class Project < ActiveRecord::Base
 
     source :merge_request do
       title 'Merge requests'
+      description "Notify about new merge requests and it's updates."
       before do: -> { @target = @source.target_project }
       from :create,   to: :opened
       from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
@@ -176,6 +181,7 @@ class Project < ActiveRecord::Base
 
     source :project_snippet do
       title 'Snippets'
+      description "Notify about new snippets and it's updates."
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :update,   to: :updated
@@ -184,6 +190,7 @@ class Project < ActiveRecord::Base
 
     source :note do
       title 'Notes'
+      description "Notify about comments."
       before do: -> { @target = @source.project }
       from :create,   to: :commented_commit,          conditions: -> { @source.commit_id.present? }
       from :create,   to: :commented_merge_request,   conditions: [ unless: -> { @source.commit_id.present? }, if: -> { @source.noteable.present? && @source.noteable.is_a?(MergeRequest) }]
@@ -193,6 +200,7 @@ class Project < ActiveRecord::Base
 
     source :project_hook do
       title 'Project hook'
+      description 'Notify about add/delete project hooks.'
       before do: -> { @target = @source.project }
       from :create,   to: :added
       from :update,   to: :updated
@@ -201,6 +209,7 @@ class Project < ActiveRecord::Base
 
     source :web_hook do
       title 'Web hook'
+      description 'Notify about add/delete web hooks.'
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :update,   to: :updated
@@ -209,6 +218,7 @@ class Project < ActiveRecord::Base
 
     source :protected_branch do
       title 'Protected branches'
+      description 'Notify about add/delete protected branches.'
       before do: -> { @target = @source.project }
       from :create,   to: :protected
       from :destroy,  to: :unprotected
@@ -218,6 +228,7 @@ class Project < ActiveRecord::Base
 
     source :team_project_relationship do
       title 'Team assignation/resignation'
+      description 'Notify about Team assignation/resignation to project.'
       before do: -> { @target = @source.project }
       from :create,   to: :assigned
       from :destroy,  to: :resigned
@@ -225,6 +236,7 @@ class Project < ActiveRecord::Base
 
     source :users_project do
       title "Membership's actions"
+      description 'Notify about users join/left from project.'
       before do: -> { @target = @source.project }
       from :create,   to: :joined
       from :update,   to: :updated

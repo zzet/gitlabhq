@@ -69,6 +69,7 @@ window.SubscriptionTargets = React.createClass({
                 adjacent={adjacentClass}
                 updateTargets={this.updateTargets}
                 optionsTitles={this.props.optionsTitles}
+                optionsDescriptions={this.props.optionsDescriptions}
               />
             }.bind(this))}
           </tbody>
@@ -84,6 +85,7 @@ window.SubscriptionTargets = React.createClass({
           optionsTitles={this.props.optionsTitles}
           totalCount={this.state.totalCount}
           target={this.props.tab}
+          optionsDescriptions={this.props.optionsDescriptions}
         />
       </div>
 

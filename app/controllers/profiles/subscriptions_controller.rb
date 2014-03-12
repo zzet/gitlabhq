@@ -18,7 +18,8 @@ class Profiles::SubscriptionsController < Profiles::ApplicationController
       gon.push({
        "#{res.target_type.underscore.pluralize}" => {
          count: count,
-         titles: res.target_type.constantize.watched_titles
+         titles: res.target_type.constantize.watched_titles,
+         descriptions: res.target_type.constantize.watched_descriptions
        }
       })
     end

@@ -61,7 +61,8 @@ class Team < ActiveRecord::Base
 
   watch do
     source watchable_name do
-      title 'self'
+      title 'Team'
+      description 'Notify about team update/destroy, adding groups, projects or users.'
       from :create,  to: :created
       from :update,  to: :updated
       from :destroy, to: :deleted
@@ -73,6 +74,7 @@ class Team < ActiveRecord::Base
 
     source :team_user_relationship do
       title 'User'
+      description 'Notify about user join/left team.'
       before do: -> { @target = @source.team }
       from :create,  to: :joined
       from :update,  to: :updated
@@ -81,6 +83,7 @@ class Team < ActiveRecord::Base
 
     source :team_project_relationship do
       title 'Project'
+      description 'Notify about project assign/resign.'
       before do: -> { @target = @source.team }
       from :create,  to: :assigned
       from :update,  to: :updated
@@ -89,6 +92,7 @@ class Team < ActiveRecord::Base
 
     source :team_group_relationship do
       title 'Group'
+      description 'Notify about group assign/resign.'
       before do: -> { @target = @source.team }
       from :create,  to: :assigned
       from :update,  to: :updated
