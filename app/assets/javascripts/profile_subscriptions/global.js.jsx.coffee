@@ -1,5 +1,8 @@
 ###* @jsx React.DOM ###
 window.SubscriptionGlobal = React.createClass({
+  componentDidUpdate: () ->
+    $('.js-setting-description').tooltip({placement: 'bottom'})
+
   getInitialState: () ->
     tab: 'settings'
     options: @props.options
@@ -27,10 +30,15 @@ window.SubscriptionGlobal = React.createClass({
 
       <div className={settingsContentClass}>
         {_.keys(this.state.options).map(function(option) {
-            return <button type="button" className="btn btn-small" onClick={this.toggleGlobalOption.bind(null, option)}>
-                <i className={this.optionClass(option)}></i>
-                <span>{_.humanize(option)}</span>
-              </button>;
+            return(
+              <div>
+                <button type="button" className="btn btn-small" onClick={this.toggleGlobalOption.bind(null, option)}>
+                  <i className={this.optionClass(option)}></i>
+                  <span>{_.humanize(option)}</span>
+                </button>
+                {this.description(option)}
+              </div>
+            )
         }.bind(this))}
       </div>
 
@@ -115,4 +123,10 @@ window.SubscriptionGlobal = React.createClass({
   globalTab: (event) ->
     event.preventDefault()
     @setState(tab: 'global')
+
+  description: (option) ->
+    if this.props.descriptions[option]
+      `<i className="icon-question-sign js-setting-description" title={this.props.descriptions[option]}></i>`
+    else
+      ''
 })
