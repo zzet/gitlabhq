@@ -14,16 +14,16 @@
     &nbsp;
     = submit_tag "Compare", class: "btn btn-create commits-compare-btn"
     - if compare_to_mr_button?
-      = link_to compare_mr_path, class: 'prepend-left-10' do
+      = link_to compare_mr_path, class: 'prepend-left-10 btn' do
         %strong Make a merge request
 
   .clearfix.append-bottom-20.path-compare
     %ul.bordered-list#comparePathContainer
       - if params[:compare].present?
         = render partial: 'path_fields', collection: params[:compare][:paths], as: :path
-    .input-prepend
-      %span.add-on.input-xpadding path
-      = text_field_tag :paths, params[:paths], class: "span3 input-xpadding"
+    .input-group.inline-input-group
+      %span.input-group-addon path
+      = text_field_tag :paths, params[:paths], class: "form-control"
 
 :javascript
   var availableTags = #{@project.repository.ref_names.to_json};

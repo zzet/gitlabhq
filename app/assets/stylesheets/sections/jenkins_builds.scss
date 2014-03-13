@@ -1,11 +1,7 @@
 .build{
   .build_status {
     margin-right: 10px;
-  }
-  .build_status_additional{
-    .badge{
-      cursor: pointer;
-    }
+    cursor: pointer;
   }
   .popover{
     color: #000000;

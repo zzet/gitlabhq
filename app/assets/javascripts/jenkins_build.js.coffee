@@ -1,8 +1,8 @@
 class JenkinsBuild
   constructor: ->
-    build_status_additional = $('.build_status_additional')
+    buildStatus = $('.build_status')
 
-    build_status_additional.popover({
+    buildStatus.popover({
       html : true,
       placement: 'left',
       content: ()->
@@ -12,6 +12,6 @@ class JenkinsBuild
 
     $(".build").on "ajax:success", '.popover form', (e, data, status, xhr) ->
       $(e.target).parents('.commit').find('.build_status').empty().append(data)
-      build_status_additional.popover('hide')
+      buildStatus.popover('hide')
 
 @JenkinsBuild = JenkinsBuild

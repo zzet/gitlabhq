@@ -10,6 +10,7 @@ module Teams::ProjectsActions
     multiple_action("projects_add", "team", team, projects) do
       projects.each do |project|
         team.team_project_relationships.create(project_id: project.id)
+        Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
       end
     end
   end
@@ -17,6 +18,10 @@ module Teams::ProjectsActions
   def resign_from_projects_action(projects)
     tprs = team.team_project_relationships.where(project_id: projects)
     tprs.destroy_all
+
+    Project.where(id: projects).find_each do |project|
+      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+    end
 
     receive_delayed_notifications
   end

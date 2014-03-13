@@ -6,7 +6,7 @@ describe Projects::ServicesController do
   before do
     user.create_namespace!(path: user.username, name: user.username) unless user.namespace
 
-    params = { project: attributes_for(:project_with_code) }
+    params = { project: attributes_for(:project) }
     @project = ProjectsService.new(user, params[:project]).create
     sign_in user
   end

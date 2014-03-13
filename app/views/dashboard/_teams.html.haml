@@ -8,7 +8,7 @@
           New team
   %ul.well-list.dash-list
     - teams.each do |team|
-      %li.group-row
+      %li.group-row.js-description-tooltip{"data-title" => "#{team.description}"}
         = link_to team_path(id: team.path), class: dom_class(team) do
           %span.group-name.filter-title
             = truncate(team.name, length: 35)

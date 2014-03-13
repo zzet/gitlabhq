@@ -3,5 +3,5 @@
     = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter form-control'
   %ul.well-list.js-sidebar-list
     - @projects.each do |project|
-      %li
+      %li.js-description-tooltip{"data-title" => "#{project.description}"}
         = link_to_project project

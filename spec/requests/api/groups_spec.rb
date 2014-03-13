@@ -24,6 +24,7 @@ describe API::API do
 
     context "when authenticated as user" do
       it "normal user: should return an array of groups of user1" do
+        sleep 1
         get api("/groups", user1)
         response.status.should == 200
         json_response.should be_an Array
@@ -34,6 +35,7 @@ describe API::API do
 
     context "when authenticated as  admin" do
       it "admin: should return an array of all groups" do
+        sleep 2
         get api("/groups", admin)
         response.status.should == 200
         json_response.should be_an Array

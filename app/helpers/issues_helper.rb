@@ -16,7 +16,7 @@ module IssuesHelper
   def url_for_project_issues
     return "" if @project.nil?
 
-    if @project.used_default_issues_tracker? || !external_issues_tracker_enabled?
+    if gitlab_issue_tracker?(@project) || !external_issues_tracker_enabled?
       project_issues_path(@project)
     else
       url = Gitlab.config.issues_tracker[@project.issues_tracker]["project_url"]
@@ -28,7 +28,7 @@ module IssuesHelper
   def url_for_new_issue
     return "" if @project.nil?
 
-    if @project.used_default_issues_tracker? || !external_issues_tracker_enabled?
+    if gitlab_issue_tracker?(@project) || !external_issues_tracker_enabled?
       url = new_project_issue_path project_id: @project
     else
       url = Gitlab.config.issues_tracker[@project.issues_tracker]["new_issue_url"]
@@ -40,7 +40,7 @@ module IssuesHelper
   def url_for_issue(issue_iid)
     return "" if @project.nil?
 
-    if @project.used_default_issues_tracker? || !external_issues_tracker_enabled?
+    if gitlab_issue_tracker?(@project) || !external_issues_tracker_enabled?
       url = project_issue_url project_id: @project, id: issue_iid
     else
       url = Gitlab.config.issues_tracker[@project.issues_tracker]["issues_url"]
@@ -53,7 +53,7 @@ module IssuesHelper
   def title_for_issue(issue_iid)
     return "" if @project.nil?
 
-    if @project.used_default_issues_tracker? && issue = @project.issues.where(iid: issue_iid).first
+    if gitlab_issue_tracker?(@project) && issue = @project.issues.where(iid: issue_iid).first
       issue.title
     else
       ""
@@ -69,12 +69,16 @@ module IssuesHelper
     end
   end
 
+  def gitlab_issue_tracker?(project)
+    project.issues_tracker.try(:to_sym) == :gitlab
+  end
+
   def bulk_update_milestone_options
-    options_for_select(["None (backlog)", nil]) + options_from_collection_for_select(project_active_milestones, "id", "title", params[:milestone_id])
+    options_for_select(["None (backlog)"]) + options_from_collection_for_select(project_active_milestones, "id", "title", params[:milestone_id])
   end
 
   def bulk_update_assignee_options
-    options_for_select(["None (unassigned)", nil]) + options_from_collection_for_select(@project.team.members, "id", "name", params[:assignee_id])
+    options_for_select(["None (unassigned)"]) + options_from_collection_for_select(@project.team.members, "id", "name", params[:assignee_id])
   end
 
   def assignee_options object
@@ -83,5 +87,13 @@ module IssuesHelper
 
   def milestone_options object
     options_from_collection_for_select(@project.milestones.active, 'id', 'title', object.milestone_id)
+  end
+
+  def issue_alert_class(issue)
+    if issue.closed?
+      'alert-danger'
+    else
+      'alert-success'
+    end
   end
 end

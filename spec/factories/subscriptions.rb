@@ -13,7 +13,6 @@ FactoryGirl.define do
     user
     action :pushed
     target factory: :project
-    source_category :all
     notification_interval 1
     last_notified_at "2013-02-12 16:52:26"
   end

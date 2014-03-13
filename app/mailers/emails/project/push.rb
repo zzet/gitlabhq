@@ -118,12 +118,12 @@ class Emails::Project::Push < Emails::Project::Base
     headers 'X-Gitlab-Entity' => 'group',
       'X-Gitlab-Action' => 'created',
       'X-Gitlab-Source' => 'group',
-      'In-Reply-To'     => "project-#{@project.path_with_namespace}-#{@before_commit.id}"
+      'In-Reply-To'     => "project-#{@project.path_with_namespace}-#{@before_commit.oid}"
 
     subject = if @commits.many?
-                "[#{@project.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.short_id} [undev gitlab commits]"
+                "[#{@project.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.oid[0..10]} [undev gitlab commits]"
               else
-                "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.message.truncate(100, omission: "...")}' to parent commit #{@before_commit.short_id} [undev gitlab commits]"
+                "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.message.delete("\0").truncate(100, omission: "...")}' to parent commit #{@before_commit.oid[0..10]} [undev gitlab commits]"
               end
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: subject)
@@ -134,59 +134,35 @@ class Emails::Project::Push < Emails::Project::Base
   def load_diff_data(oldrev, newrev, ref, project, user)
     diff_result = {}
 
-    key_final = "#{user.id}-#{project.id}-#{oldrev}-#{newrev}-final"
-    diff_result = Rails.cache.fetch(key_final)
+    diff_result[:branch] = ref
+    diff_result[:branch].slice!("refs/heads/")
 
-    if diff_result.nil?
-      diff_result = {}
-      diff_result[:commits] = project.repository.commits_between(oldrev, newrev)
-      diff_result[:suppress_diff] = diff_result[:commits].inject(false) { |mem, var| mem || var.diff_suppress? }
+    r = Rugged::Repository.new(project.repository.path_to_repo)
 
-      key        = "#{user.id}-#{project.id}-#{oldrev}-#{newrev}"
-      before_key = "#{key}-#{oldrev}"
-      after_key  = "#{key}-#{newrev}"
+    diff_result[:before_commit] = r.lookup(oldrev).parents.first
+    diff_result[:after_commit]  = r.lookup(newrev)
+    diff_result[:commit]        = r.lookup(newrev)
 
-      diff_result[:before_commit] = find_commit_in_cache_or_load(before_key, oldrev, project)
-      diff_result[:after_commit]  = find_commit_in_cache_or_load(after_key,  newrev, project)
+    diff = r.diff(oldrev, newrev)
+    diff_stat = diff.stat
 
-      unless diff_result[:suppress_diff]
-        result = Rails.cache.fetch(key)
+    diff_result[:suppress_diff] = ((diff_stat.first > 500) || (diff_stat[1] + diff_stat[2] > 10000))
 
-        if result.nil?
-          result = Gitlab::Git::Compare.new(project.repository.raw_repository, oldrev, newrev)
-          Rails.cache.write(key, result, expires_in: 20.minutes)
+    if diff_result[:suppress_diff]
+      diff_result[:commits] = []
+      diff_result[:diffs]   = nil
+    else
+      walker = Rugged::Walker.new(r)
+      walker.sorting(Rugged::SORT_REVERSE)
+      walker.push(newrev)
+      walker.hide(oldrev)
+      commit_oids = walker.map {|c| c.oid}
+      walker.reset
 
-          if result
-            diff_result[:branch] = ref
-            diff_result[:branch].slice!("refs/heads/")
-
-            diff_result[:commits]       = result.commits
-            diff_result[:commit]        = result.commit
-            diff_result[:diffs]         = result.diffs
-            diff_result[:refs_are_same] = result.same
-
-            diff_result[:suppress_diff] = result.diffs.size > Commit::DIFF_SAFE_FILES
-            diff_result[:suppress_diff] ||= result.diffs.inject(0) { |sum, diff| diff.diff.lines.count } > Commit::DIFF_SAFE_LINES
-
-            diff_result[:line_notes]    = []
-          end
-
-        end
-      end
-
-      Rails.cache.write(key_final, diff_result, expires_in: 20.minutes)
+      diff_result[:commits] = commit_oids.map {|coid| r.lookup(coid) }
+      diff_result[:diffs]   = diff
     end
+
     diff_result
-  end
-
-  def find_commit_in_cache_or_load(key, rev, project)
-    val = Rails.cache.fetch(key)
-
-    if val.nil?
-      val = project.repository.commit(rev)
-      Rails.cache.write(key, val, expires_in: 20.minutes)
-    end
-
-    val
   end
 end

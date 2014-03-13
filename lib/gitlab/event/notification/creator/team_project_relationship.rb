@@ -12,51 +12,34 @@ class Gitlab::Event::Notification::Creator::TeamProjectRelationship < Gitlab::Ev
   private
 
   def create_project_notifications(event)
-    project = event.source.project
+    project = event.target.project
     notifications = []
 
     subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
-    subscriptions.each do |subscription|
-      if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-      end
-    end
+    notifications << create_by_subscriptions(event, subscriptions, :delayed)
 
     notifications
   end
 
   def create_team_notifications(event)
-    team = event.source.team
+    team = event.target.team
     notifications = []
 
     subscriptions = ::Event::Subscription.by_target(team).by_source_type(event.source_type)
-    subscriptions.each do |subscription|
-      if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-      end
-    end
+    notifications << create_by_subscriptions(event, subscriptions, :delayed)
 
     notifications
   end
 
   def create_user_notifications(event)
-    team = event.source.team
+    team = event.target.team
     notifications = []
 
     team.members.each do |member|
       subscriptions = ::Event::Subscription.by_target(member).by_source_type(event.source_type)
-      subscriptions.each do |subscription|
-        if subscriber_can_get_notification?(subscription, event)
-          notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-        end
-      end
+      notifications << create_by_subscriptions(event, subscriptions, :delayed)
     end
 
     notifications
-  end
-
-  def subscriber_can_get_notification?(subscription, event)
-    return false if event.parent_event.present? && event.parent_event.action.to_sym == :transfer
-    super(subscription, event)
   end
 end

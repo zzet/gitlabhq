@@ -9,12 +9,16 @@
   %ul.well-list.js-sidebar-list
     - members.each do |member|
       %li.member-row
+        = image_tag gravatar_icon(member.email, 16), class: "avatar s16"
         = link_to user_path(member), class: dom_class(member) do
-          %span.member-name.filter-title
-            = truncate(member.name, length: 35)
-          %span.pull-right
-            %i.icon-angle-right
-            %span.owner= @team.human_access_for member
+          %strong.filter-title= member.name
+          %span.cgray= member.username
+        - if member == current_user
+          %span.label.label-success It's you
+
+        %span.pull-right
+          %strong= @team.human_access_for member
+
     - if members.blank?
       %li
         %h3.nothing_here_message You have no members yet.

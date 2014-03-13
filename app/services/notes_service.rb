@@ -8,6 +8,7 @@ class NotesService < BaseService
   def create
     note = project.notes.new(params[:note])
     note.author = current_user
+    note.system = false
     note.save
 
     receive_delayed_notifications

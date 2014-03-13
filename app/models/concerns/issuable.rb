@@ -48,21 +48,15 @@ module Issuable
   end
 
   module ClassMethods
-    def search(query)
-      where("title like :query", query: "%#{query}%")
-    end
-
     def sort(method)
       case method.to_s
-      when 'newest' then reorder(created_at: :desc)
-      when 'oldest' then reorder(created_at: :asc)
-      when 'recently_updated' then reorder(updated_at: :desc)
-      when 'last_updated' then reorder(updated_at: :asc)
+      when 'newest' then reorder("#{table_name}.created_at DESC")
+      when 'oldest' then reorder("#{table_name}.created_at ASC")
+      when 'recently_updated' then reorder("#{table_name}.updated_at DESC")
+      when 'last_updated' then reorder("#{table_name}.updated_at ASC")
       when 'milestone_due_soon' then joins(:milestone).reorder("milestones.due_date ASC")
       when 'milestone_due_later' then joins(:milestone).reorder("milestones.due_date DESC")
-      #when 'milestone_due_soon' then joins(:milestone).reorder(milestones: { due_date: :asc })
-      #when 'milestone_due_later' then joins(:milestone).reorder(milestones: { due_date: :desc })
-      else reorder(created_at: :desc)
+      else reorder("#{table_name}.created_at DESC")
       end
     end
   end

@@ -11,47 +11,31 @@ class Gitlab::Event::Notification::Creator::TeamUserRelationship < Gitlab::Event
   private
 
   def create_team_notifications(event)
-    team = event.source.team
+    team = event.target.team
     notifications = []
 
     subscriptions = ::Event::Subscription.by_target(team).by_source_type(event.source_type)
-    subscriptions.each do |subscription|
-      if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-      end
-    end
+    notifications << create_by_subscriptions(event, subscriptions, :delayed)
 
     team.groups.each do |group|
       subscriptions = ::Event::Subscription.by_target(group).by_source_type(event.source_type)
-      subscriptions.each do |subscription|
-        if subscriber_can_get_notification?(subscription, event)
-          notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-        end
-      end
+      notifications << create_by_subscriptions(event, subscriptions, :delayed)
     end
 
     team.projects.each do |project|
       subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
-      subscriptions.each do |subscription|
-        if subscriber_can_get_notification?(subscription, event)
-          notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-        end
-      end
+      notifications << create_by_subscriptions(event, subscriptions, :delayed)
     end
 
     notifications
   end
 
   def create_user_notifications(event)
-    user = event.source.user
+    user = event.target.user
     notifications = []
 
     subscriptions = ::Event::Subscription.by_target(user).by_source_type(event.source_type)
-    subscriptions.each do |subscription|
-      if subscriber_can_get_notification?(subscription, event)
-        notifications << subscription.notifications.create(event: parent_event(event), subscriber: subscription.user, notification_state: :delayed)
-      end
-    end
+    notifications << create_by_subscriptions(event, subscriptions, :delayed)
 
     notifications
   end
