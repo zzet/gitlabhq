@@ -11,7 +11,7 @@
       Message
     %th{ width: '118px' }
       Date
-      = "(#{@commits.first.committer[:time].strftime("%Z")})"
+      = "(#{@commits.first.committer[:time].strftime('%Z')})"
     %th
       Author
   = render partial: "emails/project/push/commit", collection: @commits
