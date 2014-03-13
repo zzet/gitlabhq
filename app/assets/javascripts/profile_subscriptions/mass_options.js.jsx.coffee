@@ -33,6 +33,7 @@ window.SubscriptionMassOptions = React.createClass({
         toggle={this.toggle}
         toggleAll={this.toggleAll}
         optionsTitles={this.props.optionsTitles}
+        optionsDescriptions={this.props.optionsDescriptions}
       />
 
       <button type="button" className="btn btn-primary btn-tiny settings-save-btn"

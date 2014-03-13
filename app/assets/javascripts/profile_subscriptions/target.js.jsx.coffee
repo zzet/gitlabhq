@@ -12,6 +12,7 @@ window.ProfileSubscriptionsTarget = React.createClass({
             toggle={this.props.toggleOption}
             toggleAll={this.props.toggleAllOption}
             optionsTitles={this.props.optionsTitles}
+            optionsDescriptions={this.props.optionsDescriptions}
           />
 
           <button type="button" className="btn btn-primary btn-tiny settings-save-btn"

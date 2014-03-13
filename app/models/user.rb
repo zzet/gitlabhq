@@ -181,7 +181,8 @@ class User < ActiveRecord::Base
 
   watch do
     source watchable_name do
-      title 'self'
+      title 'User'
+      description 'Notify about create, update, block, activate, destroy.'
       from :create,   to: :created
       from :block,    to: :blocked do
         @event_data[:teams]     = @source.teams.map { |t| t.attributes }
@@ -195,6 +196,7 @@ class User < ActiveRecord::Base
 
     source :users_group do
       title 'Group'
+      description 'Notify about join/left group.'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -203,6 +205,7 @@ class User < ActiveRecord::Base
 
     source :users_project do
       title 'Project'
+      description 'Notify about join/left user.'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -211,6 +214,7 @@ class User < ActiveRecord::Base
 
     source :team_user_relationship do
       title 'Team'
+      description 'Notify about join/left team.'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated

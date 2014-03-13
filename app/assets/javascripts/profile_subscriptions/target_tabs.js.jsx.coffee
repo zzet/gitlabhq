@@ -86,6 +86,7 @@ window.SubscriptionTargetTabs = React.createClass({
           changeCount={this.changeProjectsCount}
           setTerm={this.setTerm.bind(null, 'projects_search_term')}
           optionsTitles={this.optionsTitles('projects')}
+          optionsDescriptions={this.optionsDescriptions('projects')}
         />
       </div>
 
@@ -94,6 +95,7 @@ window.SubscriptionTargetTabs = React.createClass({
           changeCount={this.changeGroupsCount}
           setTerm={this.setTerm.bind(null, 'groups_search_term')}
           optionsTitles={this.optionsTitles('groups')}
+          optionsDescriptions={this.optionsDescriptions('groups')}
         />
       </div>
 
@@ -102,6 +104,7 @@ window.SubscriptionTargetTabs = React.createClass({
           changeCount={this.changeTeamsCount}
           setTerm={this.setTerm.bind(null, 'teams_search_term')}
           optionsTitles={this.optionsTitles('teams')}
+          optionsDescriptions={this.optionsDescriptions('teams')}
         />
       </div>
 
@@ -110,6 +113,7 @@ window.SubscriptionTargetTabs = React.createClass({
           changeCount={this.changeUsersCount}
           setTerm={this.setTerm.bind(null, 'users_search_term')}
           optionsTitles={this.optionsTitles('users')}
+          optionsDescriptions={this.optionsDescriptions('users')}
         />
       </div>
     </div>`
@@ -153,6 +157,9 @@ window.SubscriptionTargetTabs = React.createClass({
 
   optionsTitles: (target) ->
     if @props[target] then @props[target].titles else {}
+
+  optionsDescriptions: (target) ->
+    if @props[target] then @props[target].descriptions else {}
 
   selectTab: (stateOrProps) ->
     if stateOrProps.projects_count

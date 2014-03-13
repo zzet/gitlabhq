@@ -52,6 +52,7 @@ class Group < Namespace
   watch do
     source watchable_name do
       title 'Group actions'
+      description 'Notify about group update/destroy. Add/delete users. Assign/Reassign users.'
       from :create,   to: :created
       from :update,   to: :updated
       from :destroy,  to: :deleted
@@ -63,6 +64,7 @@ class Group < Namespace
 
     source :project do
       title 'Project add/delete'
+      description 'Notify about project add/delete from group.'
       before do: -> { @target = @source.group }, conditions: -> { @source.group.present? }
       from :create,   to: :added,   conditions: -> { @source.group.present? }
       from :update,   to: :added,   conditions: -> { @source.group.present? && @source.namespace_id_changed? && @source.namespace_id != @changes["namespace_id"].first }
@@ -75,6 +77,7 @@ class Group < Namespace
 
     source :users_group do
       title "Membership's actions"
+      description 'Notify about add/delete users from projects.'
       before do: -> { @target = @source.group }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -83,6 +86,7 @@ class Group < Namespace
 
     source :team_group_relationship do
       title 'Team assignation/resignation'
+      description 'Notify about team assignation/resignation from group.'
       before do: -> { @target = @source.group }
       from :create,   to: :assigned
       from :destroy,  to: :resigned
