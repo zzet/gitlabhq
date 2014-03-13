@@ -22,8 +22,9 @@ module ProjectsHelper
     if @project.wiki_engine.to_sym == :gitlab || !external_wiki_engines_enabled?
       project_wiki_path(@project, :home)
     else
+      #binding.pry
       url = Gitlab.config.wiki_engine[@project.wiki_engine]["project_url"]
-      url.gsub(':wiki_external_id', @project.wiki_external_id)
+      url.gsub(':wiki_external_id', @project.wiki_external_id.to_s)
     end
   end
 
