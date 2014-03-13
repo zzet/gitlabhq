@@ -34,16 +34,20 @@ describe SearchHelper do
 
       it "includes the user's groups" do
         create(:group).add_owner(user)
+        sleep 1
         search_autocomplete_opts("gro").size.should == 1
       end
 
       it "includes the user's projects" do
-        project = create(:project, namespace: create(:namespace, owner: user))
+        group = create(:group)
+        group.add_owner(user)
+        project = create(:project, namespace: group)
+        sleep 1
         search_autocomplete_opts(project.name).size.should == 1
       end
 
       context "with a current project" do
-        before { @project = create(:project_with_code) }
+        before { @project = create(:project) }
 
         it "includes project-specific sections" do
           search_autocomplete_opts("Files").size.should == 1

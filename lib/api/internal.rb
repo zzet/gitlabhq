@@ -67,7 +67,9 @@ module API
           user = key.user
 
           return false if user.blocked?
-          return false if user.ldap_user? && Gitlab::LDAP::User.blocked?(user.extern_uid)
+          if Gitlab.config.ldap.enabled
+            return false if user.ldap_user? && Gitlab::LDAP::User.blocked?(user.extern_uid)
+          end
 
           user.can?(action, project)
         end

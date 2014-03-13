@@ -7,53 +7,44 @@
 #  action                :string(255)
 #  target_id             :integer
 #  target_type           :string(255)
-#  source_id             :integer
-#  source_type           :string(255)
-#  source_category       :string(255)
-#  notification_interval :integer
-#  last_notified_at      :datetime
+#  source_id             :integer      NOTE DEPRECATED TODO remove
+#  source_type           :string(255)  NOTE DEPRECATED TODO remove
+#  source_category       :string(255)  NOTE DEPRECATED TODO remove
+#  notification_interval :integer      NOTE DEPRECATED TODO remove
+#  last_notified_at      :datetime     NOTE DEPRECATED TODO remove
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  target_category       :string(255)
 #
 
 class Event::Subscription < ActiveRecord::Base
-  include Actionable
-
-  attr_accessible :action,
-                  :last_notified_at,
-                  :notification_interval,
-                  :target_id, :target_type, :target, :target_category,
-                  :source_id, :source_type, :source, :source_category,
-                  :user_id, :user
+  attr_accessible :target_id, :target_type, :target,
+                  :user_id, :user,
+                  :last_notified_at, :notification_interval, :options
 
   # Relations
   belongs_to :user
-  belongs_to :target, polymorphic: true # Aggregation events, for example Project
-  belongs_to :source, polymorphic: true # That generated action, for example Issue
+  belongs_to :target, polymorphic: true
+  belongs_to :auto_subscription,  class_name: Event::AutoSubscription
   has_many :notifications
 
   # Validations
-  validates :user, presence: true
-  validates :source, presence: true, if: :check_presence_of_target_and_source_category
-  validates :target, presence: true, if: :check_presence_of_source_and_source_category
-  validates :source_category, presence: true, if: :check_presence_of_target_and_source
-  validates :target_category, presence: true, if: :check_presence_of_target_and_source_category
-
-  # Custom validations
-  def check_presence_of_target_and_source
-    target.blank? && source.blank?
-  end
-
-  def check_presence_of_target_and_source_category
-    target.blank? && source_category.blank?
-  end
-
-  def check_presence_of_source_and_source_category
-    (source.blank? && source_category.blank?) || (source.present? && source_category.blank?)
-  end
+  validates :user,   presence: true
+  validates :target, presence: true
+  validates :target_id, uniqueness: { scope: [:user_id, :target_type] }
 
   # Scopes
+  scope :by_user, ->(subscriber) { where(user_id: subscriber.id) }
+  scope :by_target, ->(target) { where(target_id: target.id, target_type: target.class.name) }
+  scope :by_source, ->(source) { where("'#{source}' = ANY (options)") }
+  scope :by_event_target, ->(event) { where(target_id: event.target_id, target_type: event.target_type) }
+  scope :by_source_type, ->(source) { by_source(source.underscore) }
+
+
+  scope :with_target, -> { where("target_type IS NOT NULL").uniq_by_target }
+  scope :with_target_category, -> { where("target_category IS NOT NULL").uniq_by_target }
+  scope :uniq_by_target, -> { select("DISTINCT ON (event_subscriptions.target_type, event_subscriptions.target_id, event_subscriptions.user_id) event_subscriptions.*") }
+
   # All subscriptions by action and source type
   scope :base, ->(event) { where(action: event.action, source_type: event.source_type) }
   # All subscriptions on surrent event (current source)
@@ -62,29 +53,7 @@ class Event::Subscription < ActiveRecord::Base
   scope :on_related_event, ->(event) { base(event).where(target_type: event.target_type, target_id: event.target_id) }
 
   scope :by_action, ->(action) { where(action: action.to_sym) }
-  scope :by_user, ->(subscriber) { where(user_id: subscriber.id) }
-  scope :by_source, ->(source) { where(source_id: source.id, source_type: source.class.name) }
-  scope :uniq_by_target, -> { select("DISTINCT ON (event_subscriptions.target_type, event_subscriptions.target_id, event_subscriptions.user_id) event_subscriptions.*") }
-  scope :by_target, ->(target) { where(target_id: target.id, target_type: target.class.name).uniq_by_target }
-  scope :by_event_target, ->(event) { where(target_id: event.target_id, target_type: event.target_type).uniq_by_target }
   scope :by_target_category, ->(target) { where(target_category: target).uniq_by_target }
-
-  scope :by_source_type, ->(source_type) do
-    source_type = source_type.to_s.camelize
-    est = self.arel_table
-    where(est[:source_type].eq(source_type).or(est[:source_category].in([source_type.downcase, :new, :all]))).uniq_by_target #.limit(1)
-  end
-
-  scope :by_source_type_hard, ->(source_type) do
-    source_type = source_type.to_s.camelize
-    est = self.arel_table
-    where(est[:source_type].eq(source_type).or(est[:source_category].eq(source_type.downcase)))
-  end
-
-  scope :with_source,          -> { where.not(source_id: nil) }
-  scope :without_source,       -> { where(source_id: nil) }
-  scope :with_target,          -> { where.not(target_type: nil).uniq_by_target }
-  scope :with_target_category, -> { where.not(target_category: nil).uniq_by_target }
 
   class << self
     def global_entity_to_subscription

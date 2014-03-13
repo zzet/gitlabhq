@@ -22,6 +22,8 @@ module API
     end
 
     format :json
+    content_type :txt, "text/plain"
+
     helpers APIHelpers
 
     mount Groups
@@ -40,6 +42,8 @@ module API
     mount DeployKeys
     mount ProjectHooks
     mount Files
+    mount Commits
     mount Namespaces
+    mount Subscriptions
   end
 end

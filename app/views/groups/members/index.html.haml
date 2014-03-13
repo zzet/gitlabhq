@@ -6,7 +6,7 @@
   %strong= link_to "here", help_permissions_path, class: "vlink"
 
 %hr
-- can_manage_group =  current_user.can? :manage_group, @group
+- can_manage_group = current_user.can? :manage_group, @group
 .ui-box.col-md-6.no_margin
   .title
     %strong #{@group.name}

@@ -25,7 +25,7 @@ describe Service::Flowdock do
 
   describe "Execute" do
     let(:user)    { create(:user) }
-    let(:project) { create(:project_with_code) }
+    let(:project) { create(:project) }
 
     before do
       @flowdock_service = Service::Flowdock.new

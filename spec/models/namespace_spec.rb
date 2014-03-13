@@ -44,15 +44,6 @@ describe Namespace do
     it { namespace.human_name.should == namespace.owner_name }
   end
 
-  describe :search do
-    before do
-      @namespace = create :namespace
-    end
-
-    it { Namespace.search(@namespace.path).should == [@namespace] }
-    it { Namespace.search('unknown').should == [] }
-  end
-
   describe :move_dir do
     before do
       @namespace = create :namespace

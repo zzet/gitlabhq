@@ -41,7 +41,7 @@
 .dash-sidebar-tabs {
   margin-bottom: 2px;
   border: none;
-  margin: 0;
+  margin: 0 !important;
 
   li {
     &.active {
@@ -67,19 +67,17 @@
 
   a {
     display: block;
+    .arrow {
+      float: right;
+      padding: 0px 5px;
+      margin: 0;
+      font-size: 20px;
+      color: #666;
+    }
   }
 
   .project-name, .group-name {
     font-weight: 500;
-  }
-
-  .arrow {
-    float: right;
-    padding: 0px 5px;
-    margin: 0;
-    font-size: 20px;
-    color: #666;
-    margin-top: 15px;
   }
 
   .last-activity {

@@ -27,24 +27,27 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
 gem 'omniauth-github'
 
+# Search
+gem 'elasticsearch-model',  github: 'elasticsearch/elasticsearch-rails',  ref: '88b6597e47c9f45024b603faeddb0a85b47e1fce'
+gem 'elasticsearch-rails',  github: 'elasticsearch/elasticsearch-rails'
+gem 'elasticsearch-git',    github: 'zzet/elasticsearch-git',             ref: '43d71e9e48cabe00a988713418f3758690898242'
+
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
-gem "gitlab_git", "~> 4.0.0"
+gem "gitlab_git", '~> 5.4.0'
+gem 'rugged', git: 'git://github.com/libgit2/rugged.git', branch: 'development', submodules: true
 
 # Ruby/Rack Git Smart-HTTP Server Handler
 gem 'gitlab-grack', '~> 2.0.0.pre', require: 'grack'
 
 # LDAP Auth
-gem 'gitlab_omniauth-ldap', '1.0.3', require: "omniauth-ldap"
-
-# Syntax highlighter
-gem "gitlab-pygments.rb", '~> 0.5.4', require: 'pygments.rb'
+gem 'gitlab_omniauth-ldap', '1.0.4', require: "omniauth-ldap"
 
 # Git Wiki
-gem "gitlab-gollum-lib", "~> 1.0.2", require: 'gollum-lib'
+gem "gitlab-gollum-lib", "~> 1.1.0", require: 'gollum-lib'
 
 # Language detection
-gem "gitlab-linguist", "~> 2.9.6", require: "linguist"
+gem "gitlab-linguist", "~> 3.0.0", require: "linguist"
 
 # API
 gem "grape", "~> 0.6.1"
@@ -90,7 +93,7 @@ gem "github-markup", "~> 0.7.4", require: 'github/markup', git: 'https://github.
 gem 'diffy'
 
 # Asciidoc to HTML
-gem  "asciidoctor"
+gem "asciidoctor"
 
 #gem 'activerecord-msgpack_serializer', github: 'zzet/activerecord-msgpack_serializer'
 
@@ -152,6 +155,9 @@ gem "sanitize"
 # Protect against bruteforcing
 gem "rack-attack"
 
+# Ace editor
+gem 'ace-rails-ap'
+
 gem "sass-rails"
 gem "coffee-rails"
 gem "uglifier"
@@ -170,6 +176,8 @@ gem "font-awesome-rails", '~> 3.2'
 gem "gemoji", "~> 1.3.0"
 gem "gon", '~> 5.0.0'
 gem "js-routes"
+gem 'react-rails', '~> 0.8.0.0'
+gem "activerecord-import", "~> 0.4.1"
 
 group :development do
   gem "annotate", "~> 2.6.0.beta2"
@@ -246,6 +254,10 @@ group :development, :test do
 
   gem 'spork', '~> 1.0rc'
   gem 'jasmine', '2.0.0.rc5'
+
+  gem "spring", '1.1.1'
+  gem "spring-commands-rspec", '1.0.1'
+  gem "spring-commands-spinach", '1.0.0'
 end
 
 group :test do

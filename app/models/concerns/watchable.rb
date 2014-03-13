@@ -10,10 +10,17 @@ module Watchable
   end
 
   module ClassMethods
+    attr_reader :watched_titles
+
     # Main DSL method for watch description
     def watch(&block)
       instance_eval(&block)
       add_watch_callbacks
+    end
+
+    def title(title)
+      @watched_titles ||= {}
+      @watched_titles[@watched_sources.last] = title
     end
 
     # Related entity, source of action
@@ -206,7 +213,7 @@ module Watchable
   end
 
   def watched_by?(user)
-    Event::Subscription.by_user(user).by_target(self).by_action(:all).any?
+    Event::Subscription.by_user(user).by_target(self).any?
   end
 
   def watch_status?(user)

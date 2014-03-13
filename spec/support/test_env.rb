@@ -29,9 +29,16 @@ module TestEnv
     disable_mailer if opts[:mailer] == false
     setup_stubs
 
+    create_indexes_in_es
 
     clear_test_repo_dir if opts[:init_repos] == true
     setup_test_repos(opts) if opts[:repos] == true
+  end
+
+  def create_indexes_in_es
+    [Project, Group, Team, User, Issue, MergeRequest, Repository].each do |e|
+      e.__elasticsearch__.create_index! force: true
+    end
   end
 
   def enable_observers
@@ -44,7 +51,7 @@ module TestEnv
 
   def disable_mailer
     NotificationService.any_instance.stub(mailer: double.as_null_object)
-    Gitlab::Event::Notification::Factory.any_instance.stub(:create_notifications).and_return(true)
+    Gitlab::Event::Notification::Factory.stub(:create_notifications).and_return(true)
   end
 
   def enable_mailer
@@ -77,6 +84,10 @@ module TestEnv
       version: '6.3.0'
     )
 
+    Gitlab::Satellite::MergeAction.any_instance.stub(
+      merge!: true,
+    )
+
     Gitlab::Satellite::Satellite.any_instance.stub(
       exists?: true,
       destroy: true,
@@ -95,6 +106,8 @@ module TestEnv
       current_user: double("current_user", id: 1)
     )
 
+    #Elastic::BaseIndexer.any_instance.stub(perform: true)
+    #Elastic::RepositoryIndexer.any_instance.stub(perform: true)
     Service::GitCheckpoint.any_instance.stub(notify_git_checkpoint: true)
     Service::BuildFace.any_instance.stub(notify_build_face: true)
   end

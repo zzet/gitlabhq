@@ -27,7 +27,7 @@ class Service::Assembla < Service
   delegate :token, to: :configuration, prefix: false
 
   def execute(push)
-    url = "https://atlas.assembla.com/spaces/ouposp/github_tool?secret_key=#{token}"
+    url = "https://atlas.assembla.com/spaces/#{subdomain}/github_tool?secret_key=#{token}"
     Assembla.post(url, body: { payload: push }.to_json, headers: { 'Content-Type' => 'application/json' })
   end
 end

@@ -12,7 +12,7 @@
     - if projects.blank?
       %p.nothing_here_message This groups has no projects yet
     - projects.each do |project|
-      %li.project-row
+      %li.project-row.js-description-tooltip{"data-title" => "#{project.description}"}
         = link_to project_path(project), class: dom_class(project) do
           .dash-project-access-icon
             = visibility_level_icon(project.visibility_level)

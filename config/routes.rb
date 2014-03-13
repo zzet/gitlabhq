@@ -12,6 +12,9 @@ Gitlab::Application.routes.draw do
   API::API.logger Rails.logger
   mount API::API => '/api'
 
+  # Get all keys of user
+  get ':username.keys' => 'profiles/keys#get_keys' , constraints: { username: /.*/ }
+
   constraint = lambda { |request| request.env["warden"].authenticate? and request.env['warden'].user.admin? }
   constraints constraint do
     mount Sidekiq::Web, at: "/admin/sidekiq", as: :sidekiq
@@ -115,21 +118,12 @@ Gitlab::Application.routes.draw do
     root to: "dashboard#index"
   end
 
-  get "errors/githost"
-
   namespace :notifications do
-    resource :subscription, only: [:create, :destroy] do
+    resource :subscription, only: [:create] do
       collection do
-        post :on_all
+        post :mass_create
+        post :to_all
         delete :from_all
-        post :on_own_changes
-        delete :from_own_changes
-        post :on_owner_subscription
-        delete :from_owner_subscription
-        post :on_brave
-        delete :from_brave
-        post :on_adjacent_changes
-        delete :from_adjacent_changes
       end
     end
   end
@@ -150,6 +144,8 @@ Gitlab::Application.routes.draw do
     scope module: :profiles do
       resources :subscriptions
       resources :tokens,  only: [:index, :destroy]
+      resources  :auto_subscriptions, only: [:create, :destroy]
+      resource :notification_settings, only: [:update]
     end
 
     scope module: :profiles do
@@ -161,6 +157,7 @@ Gitlab::Application.routes.draw do
         end
       end
       resources :keys
+      resources :emails, only: [:index, :create, :destroy]
       resources :groups, only: [:index] do
         member do
           delete :leave
@@ -212,6 +209,9 @@ Gitlab::Application.routes.draw do
     end
 
     resources :users_groups, only: [:create, :update, :destroy]
+    scope module: :groups do
+      resource :avatar, only: [:destroy]
+    end
   end
 
   resources :projects, constraints: { id: /[^\/]+/ }, only: [:new, :create]

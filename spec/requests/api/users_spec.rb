@@ -17,6 +17,7 @@ describe API::API do
 
     context "when authenticated" do
       it "should return an array of users" do
+        sleep 3
         get api("/users", user)
         response.status.should == 200
         json_response.should be_an Array

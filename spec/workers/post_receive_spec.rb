@@ -9,21 +9,16 @@ describe PostReceive do
   end
 
   context "web hook" do
-    let(:project) { create(:project_with_code) }
+    let(:project) { create(:project) }
     let(:key) { create(:key, user: project.owner) }
     let(:key_id) { key.shell_id }
-
-    it "fetches the correct project" do
-      Project.should_receive(:find_with_namespace).with(project.path_with_namespace).and_return(project)
-      PostReceive.new.perform(pwd(project), 'sha-old', 'sha-new', 'refs/heads/master', key_id)
-    end
 
     it "does not run if the author is not in the project" do
       Key.stub(:find_by).with(hash_including(id: anything())) { nil }
 
       project.should_not_receive(:execute_hooks)
 
-      PostReceive.new.perform(pwd(project), 'sha-old', 'sha-new', 'refs/heads/master', key_id).should be_false
+      PostReceive.new.perform(pwd(project), 'b98a310def241a6fd9c9a9a3e7934c48e498fe81', 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb', 'refs/heads/master', key_id).should be_false
     end
 
     it "asks the project to trigger all hooks" do
@@ -32,12 +27,12 @@ describe PostReceive do
       project.should_receive(:execute_services)
       project.should_receive(:update_merge_requests)
 
-      PostReceive.new.perform(pwd(project), 'sha-old', 'sha-new', 'refs/heads/master', key_id)
+      PostReceive.new.perform(pwd(project), 'b98a310def241a6fd9c9a9a3e7934c48e498fe81', 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb', 'refs/heads/master', key_id)
     end
   end
 
   context "push from" do
-    let(:project) { create(:project_with_code) }
+    let(:project) { create(:project) }
     let(:key) { create(:service_key) }
     let(:key_id) { key.shell_id }
     Service.implement_services.map {|s| s.new }.each do |service|
@@ -54,7 +49,7 @@ describe PostReceive do
 
         it "should receive data" do
           if @service.user_params.any?
-            PostReceive.new.perform(pwd(project), 'sha-old', 'sha-new', 'refs/heads/master', key_id)
+            PostReceive.new.perform(pwd(project), 'b98a310def241a6fd9c9a9a3e7934c48e498fe81', 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb', 'refs/heads/master', key_id)
           end
         end
       end

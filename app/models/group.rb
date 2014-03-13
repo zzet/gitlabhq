@@ -12,8 +12,12 @@
 #  description :string(255)      default(""), not null
 #
 
+require 'carrierwave/orm/activerecord'
+require 'file_size_validator'
+
 class Group < Namespace
   include Watchable
+  include GroupsSearch
 
   has_many :team_group_relationships, dependent: :destroy
   has_many :teams,                    through: :team_group_relationships
@@ -41,8 +45,13 @@ class Group < Namespace
                                      users_groups: { group_access: [Gitlab::Access::MASTER, Gitlab::Access::OWNER] } })},
                         through: :users_groups, source: :user
 
+  has_many :owners,     -> { where({ users: { state: :active },
+                                     users_groups: { group_access: Gitlab::Access::OWNER } })},
+                        through: :users_groups, source: :user
+
   watch do
     source watchable_name do
+      title 'Group actions'
       from :create,   to: :created
       from :update,   to: :updated
       from :destroy,  to: :deleted
@@ -53,6 +62,7 @@ class Group < Namespace
     end
 
     source :project do
+      title 'Project add/delete'
       before do: -> { @target = @source.group }, conditions: -> { @source.group.present? }
       from :create,   to: :added,   conditions: -> { @source.group.present? }
       from :update,   to: :added,   conditions: -> { @source.group.present? && @source.namespace_id_changed? && @source.namespace_id != @changes["namespace_id"].first }
@@ -64,6 +74,7 @@ class Group < Namespace
     end
 
     source :users_group do
+      title "Membership's actions"
       before do: -> { @target = @source.group }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -71,6 +82,7 @@ class Group < Namespace
     end
 
     source :team_group_relationship do
+      title 'Team assignation/resignation'
       before do: -> { @target = @source.group }
       from :create,   to: :assigned
       from :destroy,  to: :resigned
@@ -78,6 +90,13 @@ class Group < Namespace
   end
 
   scope :without_team, ->(team) { team.groups.present? ? where.not(id: team.groups) : all }
+
+  attr_accessible :avatar
+
+  validate :avatar_type, if: ->(user) { user.avatar_changed? }
+  validates :avatar, file_size: { maximum: 100.kilobytes.to_i }
+
+  mount_uploader :avatar, AttachmentUploader
 
   def human_name
     name
@@ -125,5 +144,11 @@ class Group < Namespace
 
   def members
     users_groups
+  end
+
+  def avatar_type
+    unless self.avatar.image?
+      self.errors.add :avatar, "only images allowed"
+    end
   end
 end

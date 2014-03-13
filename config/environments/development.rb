@@ -44,4 +44,5 @@ Gitlab::Application.configure do
                  "redis://localhost:6379"
                end
   config.cache_store = :redis_store, resque_url
+  config.react.variant = :development
 end

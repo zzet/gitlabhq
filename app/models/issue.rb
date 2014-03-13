@@ -20,6 +20,7 @@
 class Issue < ActiveRecord::Base
   include Issuable
   include InternalId
+  include IssuesSearch
 
   ActsAsTaggableOn.strict_case_match = true
 

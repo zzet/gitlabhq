@@ -1,0 +1,74 @@
+.subscription-settings{
+  .hide{
+    display: none !important;
+  }
+  .settings-save-btn{
+    margin: 10px 0 0 -1px;
+  }
+  table{
+    th{
+      border-top: none!important;
+    }
+  }
+  #projects{
+    .search{
+      width: 100%;
+      padding: 0;
+    }
+    .target-options{
+      &.hide{
+        visibility: hidden;
+        display: block;
+        height: 1px;
+      }
+    }
+    .target-option{
+      position: relative;
+      input{
+        position: absolute;
+      }
+      span{
+        padding-left: 15px;
+        white-space: nowrap;
+      }
+    }
+    .options{
+      width: 100%;
+    }
+    .actions{
+      white-space: nowrap;
+      .icon-th-list{
+        margin-right: 5px;
+        cursor: pointer;
+      }
+    }
+    .adjacent{
+      cursor: pointer;
+      span{
+        margin-left: 1px;
+      }
+    }
+    .mass{
+      .alert.alert-success{
+        padding: 5px 10px;
+        display: none;
+      }
+      a{
+        text-decoration: underline;
+        margin-right: 5px;
+      }
+    }
+  }
+  #global{
+    .settings{
+      padding-top: 10px;
+      button{
+        display: block;
+        margin-bottom: 7px;
+        i{
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}

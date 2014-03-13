@@ -8,9 +8,8 @@
     %hr
     = render 'shared/event_filter'
     .content_list
-    .loading.hide
+    = spinner
   .col-md-4.project-side.hidden-sm
-    .clearfix
     .clearfix
       - if @project.archived?
         .alert

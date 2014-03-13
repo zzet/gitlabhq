@@ -20,22 +20,6 @@ class MergeRequestObserver < BaseObserver
     execute_hooks(merge_request)
   end
 
-  def after_merge(merge_request, transition)
-    # Since MR can be merged via sidekiq
-    # to prevent event duplication do this check
-    return true if merge_request.merge_event
-
-    OldEvent.create(
-      project: merge_request.target_project,
-      target_id: merge_request.id,
-      target_type: merge_request.class.name,
-      action: OldEvent::MERGED,
-      author_id: merge_request.author_id_of_changes
-    )
-
-    execute_hooks(merge_request)
-  end
-
   def after_reopen(merge_request, transition)
     create_event(merge_request, OldEvent::REOPENED)
     Note.create_status_change_note(merge_request, merge_request.target_project, current_user, merge_request.state, nil)

@@ -1,26 +1,21 @@
 $ ->
   $('.watch-button').click ->
     $watch_button = $(this)
-    if ($(this).hasClass('watched'))
-      defered = $.post Routes.notifications_subscription_path(),
-        _method: 'delete'
-        entity:
-          id: $watch_button.attr('data-entity-id')
-          type: $watch_button.attr('data-entity-type')
-        (data) ->
-          $watch_button.removeClass('watched')
-          $watch_button.find('i').removeClass('icon-eye-open').addClass('icon-eye-close')
-          $watch_button.attr('data-original-title', 'Watch')
-          $watch_button.find('span').text('Watch')
+    type = $watch_button.attr('data-entity-type')
+    id = $watch_button.attr('data-entity-id')
+
+    if $watch_button.hasClass('watched')
+      Api.subscriptions.destroy(type, id, () ->
+        $watch_button.removeClass('watched')
+          .find('i').removeClass('icon-eye-open').addClass('icon-eye-close').end()
+          .attr('data-original-title', 'Watch')
+          .find('span').text('Watch').end()
+
+      )
     else
-      $.ajax
-        type: "POST",
-        url: Routes.notifications_subscription_path(),
-        data: 
-          entity:
-            id: $watch_button.attr('data-entity-id')
-            type: $watch_button.attr('data-entity-type')
-        success: (data) ->
-            $watch_button.addClass('watched')
-            $watch_button.find('i').removeClass('icon-eye-close').addClass('icon-eye-open')
-            $watch_button.find('span').text('Unwatch')
+      Api.subscriptions.create(type, id, (data) ->
+        $watch_button.addClass('watched')
+          .find('i').removeClass('icon-eye-close').addClass('icon-eye-open').end()
+          .find('span').text('Unwatch').end()
+      )
+
