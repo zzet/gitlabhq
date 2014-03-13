@@ -1,5 +1,8 @@
 ###* @jsx React.DOM ###
 window.SubscriptionGlobal = React.createClass({
+  componentDidMount: () ->
+    $('.js-setting-description').tooltip({placement: 'bottom'})
+
   componentDidUpdate: () ->
     $('.js-setting-description').tooltip({placement: 'bottom'})
 
@@ -126,7 +129,9 @@ window.SubscriptionGlobal = React.createClass({
 
   description: (option) ->
     if this.props.descriptions[option]
-      `<i className="icon-question-sign js-setting-description" title={this.props.descriptions[option]}></i>`
+      `<span>
+        <i className="icon-question-sign js-setting-description" title={this.props.descriptions[option]}></i>
+      </span>`
     else
       ''
 })

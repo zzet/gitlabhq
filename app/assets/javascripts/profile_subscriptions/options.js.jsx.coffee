@@ -1,7 +1,10 @@
 ###* @jsx React.DOM ###
 window.ProfileSubscriptionsOptions = React.createClass({
+  componentDidMount: () ->
+    $('.js-target-option').tooltip({placement: 'right', container: 'body'})
+
   componentDidUpdate: () ->
-    $('.target-option').tooltip({placement: 'left'})
+    $('.js-target-option').tooltip({placement: 'right', container: 'body'})
 
   render: () ->
     `<div>
@@ -12,10 +15,10 @@ window.ProfileSubscriptionsOptions = React.createClass({
       {Object.keys(this.props.target.options).map(function(option, index) {
         var description = (this.props.optionsDescriptions) ? this.props.optionsDescriptions[option] : ''
         return(
-          <div className="target-option" title={description}>
+          <div className="target-option">
             <input type="checkbox" checked={this.props.target.options[option]}
               onClick={this.toggle.bind(null, option)}/>
-              <span>
+              <span className="js-target-option" title={description}>
                 {this.props.optionsTitles[option]}
               </span>
           </div>)
