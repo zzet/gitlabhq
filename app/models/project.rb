@@ -413,7 +413,11 @@ class Project < ActiveRecord::Base
   end
 
   def can_have_issues_tracker_id?
-    self.issues_enabled && !self.used_default_issues_tracker?
+    self.issues_enabled && self.issues_tracker.try(:to_sym) != :gitlab
+  end
+
+  def can_have_wiki_external_id?
+    self.wiki_enabled && self.wiki_engine.try(:to_sym) != :gitlab
   end
 
   def gitlab_ci

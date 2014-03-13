@@ -89,7 +89,7 @@
 
               .form-group
                 = f.label :wiki_external_id, "Wiki path for project in external wiki", class: 'control-label'
-                .col-sm-10= f.text_field :wiki_external_id, disabled: !@project.wiki_enabled, class: 'form-control'
+                .col-sm-10= f.text_field :wiki_external_id, disabled: !@project.can_have_wiki_external_id?, class: 'form-control'
 
 
             .form-group
