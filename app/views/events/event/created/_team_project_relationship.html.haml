@@ -1,0 +1,7 @@
+- team = Team.find_by(id: event.data['team_id'])
+- project = Project.find_by(id: event.data['project_id'])
+
+assigned
+= link_to_or_deleted(team, 'team')
+to
+= link_to_or_deleted(project, 'project')

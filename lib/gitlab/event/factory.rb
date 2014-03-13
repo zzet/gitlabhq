@@ -39,6 +39,17 @@ class Gitlab::Event::Factory
           event.parent_event = parent_event if parent_event.present? && (event != parent_event)
           event.save
         end
+
+        if parent_event.try(:source).try(:relation_table?)
+          relations = parent_event.source.relations
+          parent_event.first_domain_id = relations.first.id
+          parent_event.first_domain_type = relations.first.class.name
+
+          parent_event.second_domain_id = relations.second.id
+          parent_event.second_domain_type = relations.second.class.name
+
+          parent_event.save
+        end
       end
     end
   end

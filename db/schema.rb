@@ -137,7 +137,14 @@ ActiveRecord::Schema.define(version: 20140416160921) do
     t.datetime "updated_at",      null: false
     t.integer  "parent_event_id"
     t.string   "system_action"
+    t.integer  "first_domain_id"
+    t.string   "first_domain_type"
+    t.integer  "second_domain_id"
+    t.string   "second_domain_type"
   end
+
+  add_index "events", ["target_type", "target_id", "first_domain_type", "first_domain_id", "second_domain_type", "second_domain_id"], name: "for_main_dashboard_index", where: "(parent_event_id IS NULL)", using: :btree
+  add_index "events", ["target_type", "target_id"], name: "index_events_on_target_type_and_target_id", using: :btree
 
   create_table "file_tokens", force: true do |t|
     t.integer  "user_id"

@@ -1,16 +1,17 @@
+- project = event.target
+
 .event-title
   %span.author_name= link_to_author event
   %span.event_label.pushed #{event.push_action_name} #{event.ref_type}
   - if event.rm_ref?
     %strong= event.ref_name
   - else
-    = link_to project_commits_path(event.project, event.ref_name) do
+    = link_to project_commits_path(project, event.ref_name) do
       %strong= truncate(event.ref_name, length: 30)
   at
-  = link_to_project event.project
+  = link_to_target project
 
 - if event.push_with_commits?
-  - project = event.project
   .event-body
     %ul.well-list.event_commits
       - few_commits = event.commits[0...2]
@@ -21,5 +22,5 @@
         %li.commits-stat
           - if event.commits_count > 2
             %span ... and #{event.commits_count - 2} more commits.
-          = link_to project_compare_path(event.project, from: event.commit_from, to: event.commit_to) do
+          = link_to project_compare_path(event.target, from: event.commit_from, to: event.commit_to) do
             %strong Compare &rarr; #{event.commit_from[0..7]}...#{event.commit_to[0..7]}

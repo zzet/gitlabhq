@@ -1,0 +1,5 @@
+- group = Group.find_by(id: event.data['group_id'])
+
+%span.event_label{class: event.action}
+  left
+  = link_to_or_deleted(group, 'group')

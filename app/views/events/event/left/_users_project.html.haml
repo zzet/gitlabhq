@@ -1,0 +1,5 @@
+- project = Project.find_by(id: event.data['project_id'])
+
+%span.event_label{class: event.action}
+  left
+  = link_to_or_deleted(project, 'project')

@@ -1,0 +1,5 @@
+- team = Team.find_by(id: event.data['team_id'])
+
+%span.event_label{class: event.action}
+  joined to
+  = link_to_or_deleted(team, 'team')

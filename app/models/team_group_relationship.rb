@@ -11,6 +11,8 @@
 
 class TeamGroupRelationship < ActiveRecord::Base
   include Watchable
+  include RelationTable
+
 
   attr_accessible :group_id, :team_id
 
@@ -20,6 +22,8 @@ class TeamGroupRelationship < ActiveRecord::Base
   validates :group,           presence: true
   validates :team,            presence: true
   validates :team_id, uniqueness: { scope: :group_id }
+
+  relations(:team, :group)
 
   watch do
     source watchable_name do

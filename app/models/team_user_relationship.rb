@@ -13,6 +13,8 @@
 class TeamUserRelationship < ActiveRecord::Base
   include Gitlab::Access
   include Watchable
+  include RelationTable
+
 
   attr_accessible :team_access, :user_id, :team_id
 
@@ -23,6 +25,8 @@ class TeamUserRelationship < ActiveRecord::Base
   validates :user,        presence: true
   validates :user_id,     uniqueness: { scope: [:team_id], message: "already exists in team" }
   validates :team_access, presence: true, inclusion: { in: Gitlab::Access.values_with_owner }
+
+  relations(:team, :user)
 
   watch do
     source watchable_name do

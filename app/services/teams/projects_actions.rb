@@ -7,7 +7,8 @@ module Teams::ProjectsActions
       projects = projects.where(id: allowed_project_ids)
     end
 
-    multiple_action("projects_add", "team", team, projects) do
+    action = Gitlab::Event::SyntheticActions::PROJECTS_ADD
+    multiple_action(action, "team", team, projects) do
       projects.each do |project|
         team.team_project_relationships.create(project_id: project.id)
         reindex_with_elastic(Project, project.id)

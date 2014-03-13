@@ -55,8 +55,8 @@ class Project < ActiveRecord::Base
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
-  has_one :last_event, -> {order 'old_events.created_at DESC'}, class_name: Event, foreign_key: 'project_id'
-  has_many :old_events,         class_name: OldEvent, dependent: :destroy
+  has_one :last_event, -> {order 'events.created_at DESC'}, class_name: Event, as: :target
+  has_many :events, class_name: Event, as: :target
 
   has_many :services,           dependent: :destroy
 
