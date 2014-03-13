@@ -2,13 +2,12 @@ module Teams::UsersActions
   private
 
   def add_memberships_action(users, access)
-    multiple_action("memberships_add", "team", team, users) do
+    action = Gitlab::Event::SyntheticActions::MEMBERSHIPS_ADD
+    multiple_action(action, "team", team, users) do
       team.add_users(users, access)
     end
 
-    project_ids = team.projects.pluck(:id) + team.accessed_projects.pluck(:id)
-
-    project_ids.each do |project_id|
+    team_projects_ids.each do |project_id|
       reindex_with_elastic(Project, project_id)
     end
   end
@@ -16,9 +15,7 @@ module Teams::UsersActions
   def remove_membership_action(user)
     team.remove_user(user)
 
-    project_ids = team.projects.pluck(:id) + team.accessed_projects.pluck(:id)
-
-    project_ids.each do |project_id|
+    team_projects_ids.each do |project_id|
       reindex_with_elastic(Project, project_id)
     end
 
@@ -38,5 +35,11 @@ module Teams::UsersActions
     end
 
     result
+  end
+
+  private
+
+  def team_projects_ids
+    team.projects.pluck(:id) + team.accessed_projects.pluck(:id)
   end
 end

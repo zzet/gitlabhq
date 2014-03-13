@@ -4,7 +4,8 @@ module Projects::UsersActions
   def add_membership_action
     user_ids = params[:user_ids].respond_to?(:each) ? params[:user_ids] : params[:user_ids].split(',')
 
-    multiple_action("memberships_add", "project", project, user_ids) do
+    action = Gitlab::Event::SyntheticActions::MEMBERSHIPS_ADD
+    multiple_action(action, "project", project, user_ids) do
       users = User.where(id: user_ids)
       @project.team << [users, params[:project_access]]
     end
@@ -39,7 +40,8 @@ module Projects::UsersActions
   end
 
   def import_memberships_action(giver)
-    status = multiple_action("import", "project", @project) do
+    action = Gitlab::Event::SyntheticActions::IMPORT
+    status = multiple_action(action, "project", @project) do
       @project.team.import(giver)
     end
 
@@ -52,7 +54,8 @@ module Projects::UsersActions
     user_project_ids = params[:ids].respond_to?(:each) ? params[:ids] : params[:ids].split(',')
     user_project_relations = UsersProject.where(id: user_project_ids)
 
-    multiple_action("memberships_remove", "project", project, user_project_ids) do
+    action = Gitlab::Event::SyntheticActions::MEMBERSHIPS_REMOVE
+    multiple_action(action, "project", project, user_project_ids) do
       user_project_relations.destroy_all
     end
 
@@ -63,7 +66,8 @@ module Projects::UsersActions
     user_project_ids = params[:ids].respond_to?(:each) ? params[:ids] : params[:ids].split(',')
     user_project_relations = UsersProject.where(id: user_project_ids)
 
-    multiple_action("memberships_update", "project", project, user_project_ids) do
+    action = Gitlab::Event::SyntheticActions::MEMBERSHIPS_UPDATE
+    multiple_action(action, "project", project, user_project_ids) do
       user_project_relations.find_each { |membership| membership.update(project_access: params[:team_member][:project_access]) }
     end
 

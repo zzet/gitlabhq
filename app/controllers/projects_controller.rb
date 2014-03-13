@@ -10,6 +10,7 @@ class ProjectsController < ApplicationController
 
   layout 'navless', only: [:new, :create, :fork]
   before_filter :set_title, only: [:new, :create]
+  before_filter :event_filter, only: :show
 
   def new
     @project = Project.new
@@ -60,9 +61,10 @@ class ProjectsController < ApplicationController
 
     limit = (params[:limit] || 20).to_i
 
-    @events = @project.old_events.recent
-    @events = event_filter.apply_filter(@events)
-    @events = @events.limit(limit).offset(params[:offset] || 0)
+    @dashboard = @project.class
+    @events = Event.for_dashboard(@project)
+    @events = @event_filter.apply_filter(@events) if (@event_filter.params - %w(team group)).any?
+    @events = @events.limit(limit).offset(params[:offset] || 0).recent
 
     @owners     = @project.team.owners
     @masters    = @project.team.masters     - @owners

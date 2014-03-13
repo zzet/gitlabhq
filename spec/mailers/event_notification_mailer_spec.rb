@@ -5,10 +5,10 @@ describe EventNotificationMailer do
   include EmailSpec::Matchers
 
   def clear_prepare_data
-    Event.destroy_all
-    Event::Subscription::Notification.destroy_all;
-    ActionMailer::Base.deliveries.clear;
-    EventHierarchyWorker.reset;
+    Event.delete_all
+    Event::Subscription::Notification.delete_all
+    ActionMailer::Base.deliveries.clear
+    EventHierarchyWorker.reset
     RequestStore.store[:borders] = []
   end
 

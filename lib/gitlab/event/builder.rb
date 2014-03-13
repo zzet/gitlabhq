@@ -47,7 +47,7 @@ class Gitlab::Event::Builder
                 instance_exec(&action[:yield])
 
                 @actions << action[:name]
-                @events << ::Event.new(action: action[:name], data: @event_data.to_json, author: data[:user],
+                @events << ::Event.new(action: action[:name], data: @event_data, author: data[:user],
                                        source_id: @source.id, source_type: @source.class.name,
                                        target_id: @target.id, target_type: @target.class.name,
                                        system_action: meta[:action])
@@ -72,6 +72,11 @@ class Gitlab::Event::Builder
         user        = event_info[:user]    if event_info[:user].present?
 
         level = 0
+
+        # NOTE not sure that this condition is sensibly, but it works now
+        if action_meta[:action].to_s.in?(::Gitlab::Event::SyntheticActions::ALL)
+          return nil
+        end
 
         if source.present? && user.present? && source.respond_to?(:id)
           candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,

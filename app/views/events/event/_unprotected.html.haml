@@ -1,0 +1,8 @@
+.event-title
+  %span.author_name= link_to_author event
+  %span.event_label made branch
+  %strong
+    = link_to event.data['name'], project_protected_branches_path(event.target)
+  unprotected
+  at
+  = link_to_event_target(event)

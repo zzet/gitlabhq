@@ -44,6 +44,7 @@ class Dispatcher
         new Activities()
         new SidebarFilter()
         new SidebarTabs('projects')
+        new Events()
       when 'teams:show'
         new Activities()
         new DashboardTooltips()

@@ -7,7 +7,8 @@ module Teams::GroupsActions
       groups = groups.where(id: allowed_group_ids)
     end
 
-    multiple_action("groups_add", "team", team, groups) do
+    action = Gitlab::Event::SyntheticActions::GROUPS_ADD
+    multiple_action(action, "team", team, groups) do
       groups.each do |group|
         team.team_group_relationships.create(group_id: group.id)
       end

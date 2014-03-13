@@ -19,7 +19,7 @@ class Emails::Team::TeamProjectRelationship < Emails::Team::Base
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
-    @source       = JSON.load(@event.data).to_hash
+    @source       = @event.data
     @project      = Project.find_by_id(@source["project_id"])
     @team         = Team.find_by_id(@source["team_id"])
 

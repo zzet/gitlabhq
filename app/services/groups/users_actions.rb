@@ -8,7 +8,8 @@ module Groups::UsersActions
                  params[:user_ids].split(',')
                end
 
-    multiple_action("memberships_add", "group", group, user_ids) do
+    action = Gitlab::Event::SyntheticActions::MEMBERSHIPS_ADD
+    multiple_action(action, "group", group, user_ids) do
       group.add_users(user_ids, params[:group_access])
     end
 

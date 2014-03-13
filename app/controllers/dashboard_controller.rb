@@ -17,9 +17,9 @@ class DashboardController < ApplicationController
     @projects_count = @projects.count
     @projects = @projects.limit(@projects_limit)
 
-    @events = OldEvent.in_projects(current_user.authorized_projects.pluck(:id))
+    @events = Event.for_main_dashboard(current_user)
     @events = @event_filter.apply_filter(@events)
-    @events = @events.limit(20).offset(params[:offset] || 0)
+    @events = @events.limit(20).offset(params[:offset] || 0).recent
 
     @last_push = current_user.recent_push
 

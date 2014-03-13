@@ -1,0 +1,12 @@
+- mr = event.source
+
+.event-title
+  %span.author_name= link_to_author event
+  %span.event_label opened merge request
+  = link_to "##{mr.iid}", project_merge_request_path(event.target, mr)
+  at
+  = link_to_event_target(event)
+
+.event-body
+  .event-note
+    = mr.title

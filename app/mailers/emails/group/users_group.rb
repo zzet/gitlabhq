@@ -21,7 +21,7 @@ class Emails::Group::UsersGroup < Emails::Group::Base
     @event                = @notification.event
     @user                 = @event.author
     @upr                  = @event.source
-    data                  = JSON.load(@event.data)
+    data                  = @event.data
     @group                = Group.find_by_id(data["group_id"])
     @member               = User.find_by_id(data["user_id"])
     @changes              = data["previous_changes"]
@@ -42,7 +42,7 @@ class Emails::Group::UsersGroup < Emails::Group::Base
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
-    @ug           = JSON.load(@event.data)
+    @ug           = @event.data
     @group        = @event.target
     @member       = User.find_by_id(@ug["user_id"])
     @group        = Group.find_by_id(@ug["group_id"]) if @group.nil? || @group.is_a?(UsersGroup)

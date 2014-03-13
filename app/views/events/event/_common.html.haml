@@ -7,7 +7,7 @@
     %strong= gfm event.target_title
   at
   - if event.project
-    = link_to_project event.project
+    = link_to_target event.project
   - else
     = event.project_name
 - if event.target.respond_to?(:title)
