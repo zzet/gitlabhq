@@ -57,6 +57,7 @@ production: &base
 
 
   ## External issues trackers
+  default_issues_tracker: redmine
   issues_tracker:
     redmine:
       title: "Redmine (pm.undev.cc)"
@@ -72,6 +73,13 @@ production: &base
       ##  :id                - Issue id (from commit messages)
       issues_url: "http://pm.undev.cc/issues/:id"
       new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
+      all_issues_url: "http://pm.undev.cc/stuff_to_do"
+
+  default_wiki_engine: undev
+  wiki_engine:
+    undev:
+      title: "Undev wiki (wiki.undev.cc)"
+      project_url: "http://wiki.undev.cc/:wiki_external_id"
 
   ## Gravatar
   gravatar:
@@ -196,8 +204,11 @@ staging:
       public: true
 
   ## External issues trackers
+  default_issues_tracker: redmine
   issues_tracker:
     redmine:
+      title: "Redmine"
       project_url: "http://pm.undev.cc/projects/:issues_tracker_id"
       issues_url: "http://pm.undev.cc/issues/:id"
       new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
+      all_issues_url: "http://pm.undev.cc/stuff_to_do"

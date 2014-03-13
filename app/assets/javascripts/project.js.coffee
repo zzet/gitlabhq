@@ -10,6 +10,7 @@ class Project
   initEvents: ->
     disableButtonIfEmptyField '#project_name', '.project-submit'
 
+    # Issues
     $('#project_issues_enabled').change ->
       if ($(this).is(':checked') == true)
         $('#project_issues_tracker').removeAttr('disabled')
@@ -19,10 +20,25 @@ class Project
       $('#project_issues_tracker').change()
 
     $('#project_issues_tracker').change ->
-      if ($(this).val() == gon.default_issues_tracker || $(this).is(':disabled'))
+      if ($(this).val() == "gitlab" || $(this).is(':disabled'))
         $('#project_issues_tracker_id').attr('disabled', 'disabled')
       else
         $('#project_issues_tracker_id').removeAttr('disabled')
+
+    # Wiki
+    $('#project_wiki_enabled').change ->
+      if ($(this).is(':checked') == true)
+        $('#project_wiki_engine').removeAttr('disabled')
+      else
+        $('#project_wiki_engine').attr('disabled', 'disabled')
+
+      $('#project_wiki_engine').change()
+
+    $('#project_wiki_engine').change ->
+      if ($(this).val() == "gitlab" || $(this).is(':disabled'))
+        $('#project_wiki_external_id').attr('disabled', 'disabled')
+      else
+        $('#project_wiki_external_id').removeAttr('disabled')
 
 
 @Project = Project

@@ -36,7 +36,8 @@ class Project < ActiveRecord::Base
 
   attr_accessible :name, :path, :description, :issues_tracker, :label_list,
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
-    :wiki_enabled, :visibility_level, :import_url, :last_activity_at, :last_pushed_at, :git_protocol_enabled, as: [:default, :admin]
+    :wiki_enabled, :visibility_level, :import_url, :last_activity_at, :last_pushed_at, :git_protocol_enabled,
+    :wiki_engine, :wiki_external_id, :wiki_external_id, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
 
@@ -252,7 +253,8 @@ class Project < ActiveRecord::Base
   scope :public_or_internal_only, ->(user) { where(visibility_level: (user ? [ INTERNAL, PUBLIC ] : [ PUBLIC ])) }
   scope :non_archived,        -> { where(archived: false) }
 
-  enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
+  enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: (Gitlab.config.default_issues_tracker || :gitlab)
+  enumerize :wiki_engine, in: (Gitlab.config.wiki_engine.keys).append(:gitlab), default: (Gitlab.config.default_wiki_engine || :gitlab)
 
   class << self
     def abandoned

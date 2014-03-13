@@ -9,9 +9,13 @@
     = link_to teams_dashboard_path do
       Teams
   = nav_link(path: 'dashboard#issues') do
-    = link_to issues_dashboard_path do
-      Issues
-      %span.count= current_user.assigned_issues.opened.count
+    - if Project.issues_tracker.default_value.to_sym == :gitlab
+      = link_to issues_dashboard_path do
+        Issues
+        %span.count= current_user.assigned_issues.opened.count
+    - else
+      = link_to Gitlab.config.issues_tracker[Project.issues_tracker.default_value]["all_issues_url"] do
+        Issues
   = nav_link(path: 'dashboard#merge_requests') do
     = link_to merge_requests_dashboard_path do
       Merge Requests

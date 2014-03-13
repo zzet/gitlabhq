@@ -16,6 +16,21 @@ module ProjectsHelper
     end
   end
 
+  def url_for_project_wiki
+    return "" if @project.nil?
+
+    if @project.wiki_engine.to_sym == :gitlab || !external_wiki_engines_enabled?
+      project_wiki_path(@project, :home)
+    else
+      url = Gitlab.config.wiki_engine[@project.wiki_engine]["project_url"]
+      url.gsub(':wiki_external_id', @project.wiki_external_id)
+    end
+  end
+
+  def external_wiki_engines_enabled?
+    Gitlab.config.issues_tracker && Gitlab.config.issues_tracker.values.any?
+  end
+
   def link_to_member(project, author, opts = {})
     default_opts = { avatar: true, name: true, size: 16 }
     opts = default_opts.merge(opts)
@@ -148,6 +163,18 @@ module ProjectsHelper
     end
 
     options_for_select(values, current_tracker)
+  end
+
+  def project_wiki_engines(current_engine = nil)
+    values = Project.wiki_engine.values.map do |engine_key|
+      if engine_key.to_sym == :gitlab
+        ['GitLab', engine_key]
+      else
+        [Gitlab.config.wiki_engine[engine_key]['title'] || engine_key, engine_key]
+      end
+    end
+
+    options_for_select(values, current_engine)
   end
 
   private

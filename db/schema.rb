@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140224074015) do
+ActiveRecord::Schema.define(version: 20140312073105) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,8 +21,8 @@ ActiveRecord::Schema.define(version: 20140224074015) do
     t.datetime "starts_at"
     t.datetime "ends_at"
     t.integer  "alert_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string   "color"
     t.string   "font"
   end
@@ -42,8 +42,8 @@ ActiveRecord::Schema.define(version: 20140224074015) do
     t.text     "trace"
     t.text     "coverage"
     t.text     "data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.datetime "build_time"
     t.time     "duration"
     t.integer  "skipped_count",     default: 0
@@ -323,6 +323,8 @@ ActiveRecord::Schema.define(version: 20140224074015) do
     t.string   "import_url"
     t.integer  "visibility_level",       default: 0,        null: false
     t.boolean  "archived",               default: false,    null: false
+    t.string   "wiki_engine"
+    t.string   "wiki_external_id"
   end
 
   add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree
