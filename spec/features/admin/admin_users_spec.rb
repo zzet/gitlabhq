@@ -13,7 +13,7 @@ describe "Admin::Users" do
     end
 
     it "should have users list" do
-      sleep 2
+      sleep 3
       page.should have_content(@user.email)
       page.should have_content(@user.name)
     end

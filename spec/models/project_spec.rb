@@ -207,15 +207,15 @@ describe Project do
   end
 
   describe :used_default_issues_tracker? do
-    let(:project) { create(:project) }
+    let(:project) { create(:project, issues_tracker: :gitlab) }
     let(:ext_project) { create(:redmine_project) }
 
     it "should be true if used internal tracker" do
-      project.used_default_issues_tracker?.should be_true
+      project.issues_tracker.should == "gitlab"
     end
 
     it "should be false if used other tracker" do
-      ext_project.used_default_issues_tracker?.should be_false
+      ext_project.issues_tracker.should == "redmine"
     end
   end
 
