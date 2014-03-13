@@ -82,6 +82,16 @@
                   = f.check_box :wiki_enabled
                   %span.descr Pages for project documentation
 
+            - if Project.wiki_engine.values.count > 1
+              .form-group
+                = f.label :wiki_engine, "Wiki engine", class: 'control-label'
+                .col-sm-10= f.select(:wiki_engine, project_wiki_engines(@project.wiki_engine), {}, { disabled: !@project.wiki_enabled })
+
+              .form-group
+                = f.label :wiki_external_id, "Wiki path for project in external wiki", class: 'control-label'
+                .col-sm-10= f.text_field :wiki_external_id, disabled: !@project.can_have_wiki_external_id?, class: 'form-control'
+
+
             .form-group
               = f.label :wall_enabled, "Wall", class: 'control-label'
               .col-sm-10
@@ -198,6 +208,7 @@
 
 .save-project-loader.hide
   %center
-    = image_tag "ajax_loader.gif"
-    %h3 Saving project.
+    %h2
+      %i.icon-spinner.icon-spin
+      Saving project.
     %p Please wait a moment, this page will automatically refresh when ready.

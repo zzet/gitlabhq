@@ -13,6 +13,7 @@ describe "Admin::Users" do
     end
 
     it "should have users list" do
+      sleep 3
       page.should have_content(@user.email)
       page.should have_content(@user.name)
     end
@@ -53,6 +54,7 @@ describe "Admin::Users" do
 
   describe "GET /admin/users/:id" do
     before do
+      sleep 1
       visit admin_users_path
       click_link "#{@user.name}"
     end
@@ -66,6 +68,7 @@ describe "Admin::Users" do
   describe "GET /admin/users/:id/edit" do
     before do
       @simple_user = create(:user)
+      sleep 2
       visit admin_users_path
       click_link "edit_user_#{@simple_user.id}"
     end

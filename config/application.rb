@@ -12,7 +12,7 @@ module Gitlab
     # -- all .rb files in that directory are automatically loaded.
 
     # Custom directories with classes and modules you want to be autoloadable.
-    config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/services #{config.root}/app/models/concerns #{config.root}/app/models/service)
+    config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/elastic #{config.root}/app/services #{config.root}/app/models/concerns #{config.root}/app/models/service)
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
@@ -92,5 +92,7 @@ module Gitlab
         resource '/api/*', headers: :any, methods: [:get, :post, :options, :put, :delete]
       end
     end
+
+    config.react.addons = true
   end
 end

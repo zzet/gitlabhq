@@ -4,6 +4,7 @@ module SearchHelper
 
     resources_results = [
       groups_autocomplete(term),
+      teams_autocomplete(term),
       projects_autocomplete(term),
       public_projects_autocomplete(term),
     ].flatten
@@ -71,8 +72,8 @@ module SearchHelper
   end
 
   # Autocomplete results for the current user's groups
-  def groups_autocomplete(term, limit = 5)
-    current_user.authorized_groups.search(term).limit(limit).map do |group|
+  def groups_autocomplete(term, limit = 10)
+    Group.search(term, options: { gids: current_user.authorized_groups.pluck(:id)}, per: limit).map do |group|
       {
         label: "group: #{search_result_sanitize(group.name)}",
         url: group_path(group)
@@ -80,9 +81,19 @@ module SearchHelper
     end
   end
 
+  # Autocomplete results for the current user's groups
+  def teams_autocomplete(term, limit = 10)
+    Team.search(term, options: { tids: current_user.known_teams.pluck(:id)}, per: limit).map do |team|
+      {
+        label: "team: #{search_result_sanitize(team.name)}",
+        url: team_path(team)
+      }
+    end
+  end
+
   # Autocomplete results for the current user's projects
-  def projects_autocomplete(term, limit = 5)
-    current_user.authorized_projects.search_by_title(term).non_archived.limit(limit).map do |p|
+  def projects_autocomplete(term, limit = 10)
+    Project.search(term, options: { pids: current_user.known_projects.pluck(:id), non_archived: true }, per: limit).map do |p|
       {
         label: "project: #{search_result_sanitize(p.name_with_namespace)}",
         url: project_path(p)
@@ -91,8 +102,8 @@ module SearchHelper
   end
 
   # Autocomplete results for the current user's projects
-  def public_projects_autocomplete(term, limit = 5)
-    Project.public_or_internal_only(current_user).search_by_title(term).non_archived.limit(limit).map do |p|
+  def public_projects_autocomplete(term, limit = 10)
+    Project.search(term, options: { pids: Project.public_or_internal_only(current_user).pluck(:id), non_archived: true }, per: limit).map do |p|
       {
         label: "project: #{search_result_sanitize(p.name_with_namespace)}",
         url: project_path(p)

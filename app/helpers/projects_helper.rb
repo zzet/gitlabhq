@@ -16,6 +16,21 @@ module ProjectsHelper
     end
   end
 
+  def url_for_project_wiki
+    return "" if @project.nil?
+
+    if @project.wiki_engine.to_sym == :gitlab || !external_wiki_engines_enabled?
+      project_wiki_path(@project, :home)
+    else
+      url = Gitlab.config.wiki_engine[@project.wiki_engine]["project_url"]
+      url.gsub(':wiki_external_id', @project.wiki_external_id.to_s)
+    end
+  end
+
+  def external_wiki_engines_enabled?
+    Gitlab.config.issues_tracker && Gitlab.config.issues_tracker.values.any?
+  end
+
   def link_to_member(project, author, opts = {})
     default_opts = { avatar: true, name: true, size: 16 }
     opts = default_opts.merge(opts)
@@ -92,6 +107,31 @@ module ProjectsHelper
     project_nav_tabs.include? name
   end
 
+  def selected_label?(label_name)
+    params[:label_name].to_s.split(',').include?(label_name)
+  end
+
+  def labels_filter_path(label_name)
+    label_name =
+      if selected_label?(label_name)
+        params[:label_name].split(',').reject { |l| l == label_name }.join(',')
+      elsif params[:label_name].present?
+        "#{params[:label_name]},#{label_name}"
+      else
+        label_name
+      end
+
+    project_filter_path(label_name: label_name)
+  end
+
+  def label_filter_class(label_name)
+    if selected_label?(label_name)
+      'label-filter-item active'
+    else
+      'label-filter-item light'
+    end
+  end
+
   def project_filter_path(options={})
     exist_opts = {
       state: params[:state],
@@ -123,6 +163,18 @@ module ProjectsHelper
     end
 
     options_for_select(values, current_tracker)
+  end
+
+  def project_wiki_engines(current_engine = nil)
+    values = Project.wiki_engine.values.map do |engine_key|
+      if engine_key.to_sym == :gitlab
+        ['GitLab', engine_key]
+      else
+        [Gitlab.config.wiki_engine[engine_key]['title'] || engine_key, engine_key]
+      end
+    end
+
+    options_for_select(values, current_engine)
   end
 
   private

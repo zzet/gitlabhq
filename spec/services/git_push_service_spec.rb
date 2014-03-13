@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe GitPushService do
   let (:user)          { create :user }
-  let (:project)       { create :project_with_code }
+  let (:project)       { create :project }
 
   before do
     @blankrev = '0000000000000000000000000000000000000000'
@@ -78,17 +78,17 @@ describe GitPushService do
     context "execute web hooks" do
       it "when pushing a branch for the first time" do
         project.should_receive(:execute_hooks)
-        GitPushService.new(user, project, @blankrev, 'newrev', 'refs/heads/master').execute
+        GitPushService.new(user, project, @blankrev, @newrev, 'refs/heads/master').execute
       end
 
       it "when pushing new commits to existing branch" do
         project.should_receive(:execute_hooks)
-        GitPushService.new(user, project, 'oldrev', 'newrev', 'refs/heads/master').execute
+        GitPushService.new(user, project, @oldrev, @newrev, 'refs/heads/master').execute
       end
 
       it "when pushing tags" do
         project.should_receive(:execute_hooks)
-        GitPushService.new(user, project, 'newrev', 'newrev', 'refs/tags/v1.0.0').execute
+        GitPushService.new(user, project, @newrev, @newrev, 'refs/tags/v1.0.0').execute
       end
     end
   end

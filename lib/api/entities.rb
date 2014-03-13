@@ -6,6 +6,12 @@ module API
       expose :is_admin?, as: :is_admin
       expose :can_create_group?, as: :can_create_group
       expose :can_create_project?, as: :can_create_project
+
+      expose :avatar_url do |user, options|
+        if user.avatar.present?
+          user.avatar.url
+        end
+      end
     end
 
     class UserSafe < Grape::Entity
@@ -44,6 +50,66 @@ module API
       expose :issues_enabled, :merge_requests_enabled, :wall_enabled, :wiki_enabled, :snippets_enabled, :created_at, :last_activity_at
       expose :namespace
       expose :forked_from_project, using: Entities::ForkedFromProject, :if => lambda{ | project, options | project.forked? }
+    end
+
+    class TargetSubscription < Grape::Entity
+      expose :id do |subscription, options|
+        subscription.target_id
+      end
+
+      expose :namespace do |subscription, options|
+        if subscription.target.respond_to?(:namespace)
+          subscription.target.namespace.human_name
+        end
+      end
+
+      expose :name do |subscription, options|
+        subscription.target.try(:name)
+      end
+
+      expose :link do |subscription, options|
+        h = Rails.application.routes.url_helpers
+
+        case subscription.target.class.name
+          when 'Project'
+            h.project_path(subscription.target)
+          when 'Team'
+            h.team_path(subscription.target)
+          when 'Group'
+            h.group_path(subscription.target)
+          when 'User'
+            h.user_path(subscription.target)
+          else
+            ''
+        end
+      end
+
+      expose :options do |subscription, options|
+        available_sources = subscription.target.class.watched_sources.map(&:to_s)
+        sources = subscription.options
+
+        available_sources.reduce({}) do |response, source|
+          response[source] = sources.include?(source)
+          response
+        end
+      end
+
+      expose :adjacent do |subscription, options|
+        target = subscription.target
+        user = subscription.user
+
+        if target.class.watched_adjacent_sources.any?
+          adjacent = options[:user].auto_subscriptions.adjacent(target.class.name, target.id)
+            .pluck(:target).map(&:to_sym)
+
+          target.class.watched_adjacent_sources.reduce({}) do |response, source|
+            response[source] = adjacent.include?(source)
+            response
+          end
+        else
+          {}
+        end
+      end
     end
 
     class ProjectMember < UserBasic
@@ -93,11 +159,30 @@ module API
     end
 
     class RepoObject < Grape::Entity
-      expose :name, :commit
+      expose :name
+
+      expose :commit do |repo_obj, options|
+        if repo_obj.respond_to?(:commit)
+          repo_obj.commit
+        elsif options[:project]
+          options[:project].repository.commit(repo_obj.target)
+        end
+      end
+
       expose :protected do |repo, options|
         if options[:project]
           options[:project].protected_branch? repo.name
         end
+      end
+    end
+
+    class RepoTreeObject < Grape::Entity
+      expose :id, :name, :type
+
+      expose :mode do |obj, options|
+        filemode = obj.mode.to_s(8)
+        filemode = "0" + filemode if filemode.length < 6
+        filemode
       end
     end
 
@@ -163,6 +248,10 @@ module API
 
     class Namespace < Grape::Entity
       expose :id, :path, :kind
+    end
+
+    class Subscription < Grape::Entity
+      expose :id
     end
   end
 end

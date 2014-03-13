@@ -1,4 +1,42 @@
 GIT
+  remote: git://github.com/elasticsearch/elasticsearch-rails.git
+  revision: 88b6597e47c9f45024b603faeddb0a85b47e1fce
+  ref: 88b6597e47c9f45024b603faeddb0a85b47e1fce
+  specs:
+    elasticsearch-model (0.1.0.rc1)
+      activesupport (> 3)
+      elasticsearch (> 0.4)
+      hashie
+
+GIT
+  remote: git://github.com/elasticsearch/elasticsearch-rails.git
+  revision: 88b6597e47c9f45024b603faeddb0a85b47e1fce
+  specs:
+    elasticsearch-rails (0.1.0.rc1)
+
+GIT
+  remote: git://github.com/libgit2/rugged.git
+  revision: 0ac443721f775d2402f376e9974967b147a8f44b
+  branch: development
+  submodules: true
+  specs:
+    rugged (0.19.0)
+
+GIT
+  remote: git://github.com/zzet/elasticsearch-git.git
+  revision: 43d71e9e48cabe00a988713418f3758690898242
+  ref: 43d71e9e48cabe00a988713418f3758690898242
+  specs:
+    elasticsearch-git (0.0.3)
+      activemodel (~> 4.0.0)
+      activesupport (~> 4.0.0)
+      charlock_holmes (~> 0.6.9)
+      elasticsearch-api (> 0.4.0)
+      elasticsearch-model
+      gitlab-linguist (> 2.9.0)
+      rugged (~> 0.19.0)
+
+GIT
   remote: https://github.com/gitlabhq/markup.git
   revision: 61ade389c1e1c159359338f570d18464a44ddbc4
   ref: 61ade389c1e1c159359338f570d18464a44ddbc4
@@ -9,11 +47,12 @@ GEM
   remote: http://rubygems.org/
   remote: http://gems.undev.cc/
   specs:
-    actionmailer (4.0.2)
-      actionpack (= 4.0.2)
+    ace-rails-ap (2.0.1)
+    actionmailer (4.0.3)
+      actionpack (= 4.0.3)
       mail (~> 2.5.4)
-    actionpack (4.0.2)
-      activesupport (= 4.0.2)
+    actionpack (4.0.3)
+      activesupport (= 4.0.3)
       builder (~> 3.1.0)
       erubis (~> 2.7.0)
       rack (~> 1.5.2)
@@ -22,16 +61,18 @@ GEM
       actionpack (>= 4.0.0, < 5.0)
     actionpack-page_caching (1.0.2)
       actionpack (>= 4.0.0, < 5)
-    activemodel (4.0.2)
-      activesupport (= 4.0.2)
+    activemodel (4.0.3)
+      activesupport (= 4.0.3)
       builder (~> 3.1.0)
-    activerecord (4.0.2)
-      activemodel (= 4.0.2)
+    activerecord (4.0.3)
+      activemodel (= 4.0.3)
       activerecord-deprecated_finders (~> 1.0.2)
-      activesupport (= 4.0.2)
+      activesupport (= 4.0.3)
       arel (~> 4.0.0)
     activerecord-deprecated_finders (1.0.3)
-    activesupport (4.0.2)
+    activerecord-import (0.4.1)
+      activerecord (>= 3.0)
+    activesupport (4.0.3)
       i18n (~> 0.6, >= 0.6.4)
       minitest (~> 4.2)
       multi_json (~> 1.3)
@@ -47,7 +88,7 @@ GEM
     annotate (2.6.0)
       activerecord (>= 2.3.0)
       rake (>= 0.8.7)
-    arel (4.0.1)
+    arel (4.0.2)
     asciidoctor (0.1.4)
     atomic (1.1.14)
     awesome_print (1.2.0)
@@ -132,6 +173,14 @@ GEM
     diffy (3.0.1)
     docile (1.1.1)
     dotenv (0.9.0)
+    elasticsearch (0.4.8)
+      elasticsearch-api (= 0.4.8)
+      elasticsearch-transport (= 0.4.8)
+    elasticsearch-api (0.4.8)
+      multi_json
+    elasticsearch-transport (0.4.8)
+      faraday
+      multi_json
     email_spec (1.5.0)
       launchy (~> 2.1)
       mail (~> 2.2)
@@ -179,36 +228,32 @@ GEM
     gitlab-flowdock-git-hook (0.4.2.2)
       gitlab-grit (>= 2.4.1)
       multi_json
-    gitlab-gollum-lib (1.0.2)
+    gitlab-gollum-lib (1.1.0)
       github-markdown (~> 0.5.3)
       github-markup (>= 0.7.5, < 1.0.0)
       gitlab-grit (~> 2.6.1)
-      gitlab-pygments.rb (~> 0.5.4)
       nokogiri (~> 1.5.9)
       sanitize (~> 2.0.3)
       stringex (~> 1.5.1)
     gitlab-grack (2.0.0.pre)
       rack (~> 1.5.1)
-    gitlab-grit (2.6.3)
+    gitlab-grit (2.6.4)
       charlock_holmes (~> 0.6.9)
       diff-lcs (~> 1.1)
       mime-types (~> 1.15)
       posix-spawn (~> 0.3.6)
-    gitlab-linguist (2.9.6)
+    gitlab-linguist (3.0.0)
       charlock_holmes (~> 0.6.6)
       escape_utils (~> 0.2.4)
-      gitlab-pygments.rb (~> 0.5.4)
       mime-types (~> 1.19)
-    gitlab-pygments.rb (0.5.4)
-      posix-spawn (~> 0.3.6)
-      yajl-ruby (~> 1.1.0)
-    gitlab_git (4.0.0)
+    gitlab_git (5.4.0)
       activesupport (~> 4.0.0)
+      charlock_holmes (~> 0.6.9)
       gitlab-grit (~> 2.6.1)
-      gitlab-linguist (~> 2.9.5)
-      gitlab-pygments.rb (~> 0.5.4)
+      gitlab-linguist (~> 3.0.0)
+      rugged (~> 0.19.0)
     gitlab_meta (6.0)
-    gitlab_omniauth-ldap (1.0.3)
+    gitlab_omniauth-ldap (1.0.4)
       net-ldap (~> 0.3.1)
       omniauth (~> 1.0)
       pyu-ruby-sasl (~> 0.0.3.1)
@@ -353,8 +398,8 @@ GEM
       cliver (~> 0.2.1)
       multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
-    polyglot (0.3.3)
-    posix-spawn (0.3.6)
+    polyglot (0.3.4)
+    posix-spawn (0.3.8)
     protected_attributes (1.0.5)
       activemodel (>= 4.0.1, < 5.0)
     pry (0.9.12.4)
@@ -383,13 +428,13 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
-    rails (4.0.2)
-      actionmailer (= 4.0.2)
-      actionpack (= 4.0.2)
-      activerecord (= 4.0.2)
-      activesupport (= 4.0.2)
+    rails (4.0.3)
+      actionmailer (= 4.0.3)
+      actionpack (= 4.0.3)
+      activerecord (= 4.0.3)
+      activesupport (= 4.0.3)
       bundler (>= 1.3.0, < 2.0)
-      railties (= 4.0.2)
+      railties (= 4.0.3)
       sprockets-rails (~> 2.0.0)
     rails-observers (0.1.2)
       activemodel (~> 4.0)
@@ -402,9 +447,9 @@ GEM
       i18n
       require_all
       ruby-progressbar
-    railties (4.0.2)
-      actionpack (= 4.0.2)
-      activesupport (= 4.0.2)
+    railties (4.0.3)
+      actionpack (= 4.0.3)
+      activesupport (= 4.0.3)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     raindrops (0.12.0)
@@ -415,6 +460,11 @@ GEM
       ffi (>= 0.5.0)
     rdoc (3.12.2)
       json (~> 1.4)
+    react-rails (0.8.0.0)
+      execjs
+      rails (>= 3.1)
+      react-source (= 0.8.0)
+    react-source (0.8.0)
     redcarpet (2.2.2)
     redis (3.0.6)
     redis-actionpack (4.0.0)
@@ -508,6 +558,11 @@ GEM
       railties (>= 3)
       spinach (>= 0.4)
     spork (1.0.0rc4)
+    spring (1.1.1)
+    spring-commands-rspec (1.0.1)
+      spring (>= 0.9.1)
+    spring-commands-spinach (1.0.0)
+      spring (>= 0.9.1)
     sprockets (2.10.1)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -585,14 +640,15 @@ GEM
       activerecord (>= 3.0.0)
     xpath (2.0.0)
       nokogiri (~> 1.3)
-    yajl-ruby (1.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  ace-rails-ap
   actionpack-action_caching
   actionpack-page_caching
+  activerecord-import (~> 0.4.1)
   acts-as-taggable-on
   airbrake
   annotate (~> 2.6.0.beta2)
@@ -616,6 +672,9 @@ DEPENDENCIES
   devise (= 3.0.4)
   devise-async (= 0.8.0)
   diffy
+  elasticsearch-git!
+  elasticsearch-model!
+  elasticsearch-rails!
   email_spec
   email_validator (~> 1.4.0)
   enumerize
@@ -627,13 +686,12 @@ DEPENDENCIES
   gemoji (~> 1.3.0)
   github-markup (~> 0.7.4)!
   gitlab-flowdock-git-hook (~> 0.4.2)
-  gitlab-gollum-lib (~> 1.0.2)
+  gitlab-gollum-lib (~> 1.1.0)
   gitlab-grack (~> 2.0.0.pre)
-  gitlab-linguist (~> 2.9.6)
-  gitlab-pygments.rb (~> 0.5.4)
-  gitlab_git (~> 4.0.0)
+  gitlab-linguist (~> 3.0.0)
+  gitlab_git (~> 5.4.0)
   gitlab_meta (= 6.0)
-  gitlab_omniauth-ldap (= 1.0.3)
+  gitlab_omniauth-ldap (= 1.0.4)
   gon (~> 5.0.0)
   grape (~> 0.6.1)
   grape-entity (~> 0.3.0)
@@ -676,10 +734,12 @@ DEPENDENCIES
   raphael-rails (~> 2.1.2)
   rb-fsevent
   rb-inotify
+  react-rails (~> 0.8.0.0)
   redcarpet (~> 2.2.2)
   redis-rails
   request_store
   rspec-rails
+  rugged!
   sanitize
   sass-rails
   sdoc
@@ -695,6 +755,9 @@ DEPENDENCIES
   slim
   spinach-rails
   spork (~> 1.0rc)
+  spring (= 1.1.1)
+  spring-commands-rspec (= 1.0.1)
+  spring-commands-spinach (= 1.0.0)
   stamp
   state_machine
   test_after_commit

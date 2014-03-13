@@ -62,7 +62,14 @@ module Projects::BaseActions
         SubscriptionService.subscribe(current_user, :all, @project, :all)
       end
 
-      @project.import_service_pattern(git_checkpoint_service) if git_checkpoint_service
+      group = project.group
+      if group
+        group.teams.pluck(:id).each do |team_id|
+          Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
+        end
+      end
+
+      ProjectsService.new(current_user, @project).import_service_pattern(git_checkpoint_service) if git_checkpoint_service
     end
 
     receive_delayed_notifications
@@ -112,12 +119,22 @@ module Projects::BaseActions
       allowed_transfer = can?(current_user, :change_namespace, project) || role == :admin
 
       if allowed_transfer && (namespace != project.namespace)
-        #old_namespace = project.namespace
+        old_project_teams_ids = project.teams.select("teams.id")
+        old_group_teams_ids = project.group.present? ? project.teams.select("teams.id") : []
+        old_teams_ids = (old_group_teams_ids + old_project_teams_ids).flatten
 
         if transfer_to(namespace)
           build_face_service = project.services.where(type: Service::BuildFace).first
           if build_face_service && build_face_service.enabled?
             build_face_service.notify_build_face("transfered")
+          end
+
+          teams_ids = old_teams_ids + project.teams.select("teams.id")
+          teams_ids += project.group.teams.select("teams.id") if project.group.present?
+          teams_ids = teams_ids.flatten.uniq
+
+          teams_ids.each do |team_id|
+            Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
           end
 
           receive_delayed_notifications
@@ -142,7 +159,7 @@ module Projects::BaseActions
           #First save the DB entries as they can be rolled back if the repo fork fails
           from_project.build_forked_project_link(forked_to_project_id: from_project.id, forked_from_project_id: project.id)
           if from_project.save
-            from_project.users_projects.create(from_project_access: UsersProject::MASTER, user: current_user)
+            from_project.users_projects.create(project_access: UsersProject::MASTER, user: current_user)
           end
           #Now fork the repo
           unless gitlab_shell.fork_repository(project.path_with_namespace, from_project.namespace.path)
@@ -150,7 +167,7 @@ module Projects::BaseActions
           end
           from_project.ensure_satellite_exists
           enable_git_protocol(from_project) if from_project.git_protocol_enabled
-          from_project.import_service_pattern(git_checkpoint_service) if git_checkpoint_service
+          ProjectsService.new(current_user, from_project).import_service_pattern(git_checkpoint_service) if git_checkpoint_service
         end
       rescue
         from_project.errors.add(:base, "Fork transaction failed.")

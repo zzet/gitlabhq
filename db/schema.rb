@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140224121926) do
+ActiveRecord::Schema.define(version: 20140312073105) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,8 +21,8 @@ ActiveRecord::Schema.define(version: 20140224121926) do
     t.datetime "starts_at"
     t.datetime "ends_at"
     t.integer  "alert_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string   "color"
     t.string   "font"
   end
@@ -42,8 +42,8 @@ ActiveRecord::Schema.define(version: 20140224121926) do
     t.text     "trace"
     t.text     "coverage"
     t.text     "data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.datetime "build_time"
     t.time     "duration"
     t.integer  "skipped_count",     default: 0
@@ -60,6 +60,25 @@ ActiveRecord::Schema.define(version: 20140224121926) do
 
   add_index "deploy_keys_projects", ["project_id"], name: "index_deploy_keys_projects_on_project_id", using: :btree
 
+  create_table "emails", force: true do |t|
+    t.integer  "user_id",    null: false
+    t.string   "email",      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "emails", ["email"], name: "index_emails_on_email", unique: true, using: :btree
+  add_index "emails", ["user_id"], name: "index_emails_on_user_id", using: :btree
+
+  create_table "event_auto_subscriptions", force: true do |t|
+    t.integer  "user_id"
+    t.string   "target"
+    t.integer  "namespace_id"
+    t.string   "namespace_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "event_subscription_notification_settings", force: true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
@@ -69,6 +88,7 @@ ActiveRecord::Schema.define(version: 20140224121926) do
     t.boolean  "brave"
     t.boolean  "subscribe_if_owner",     default: true
     t.boolean  "subscribe_if_developer", default: true
+    t.boolean  "system_notifications"
   end
 
   create_table "event_subscription_notifications", force: true do |t|
@@ -79,6 +99,13 @@ ActiveRecord::Schema.define(version: 20140224121926) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "subscriber_id"
+  end
+
+  create_table "event_subscription_options", force: true do |t|
+    t.integer  "subscription_id"
+    t.string   "source"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "event_subscriptions", force: true do |t|
@@ -94,6 +121,8 @@ ActiveRecord::Schema.define(version: 20140224121926) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "target_category"
+    t.integer  "auto_subscription_id"
+    t.string   "options",               default: [], array: true
   end
 
   create_table "events", force: true do |t|
@@ -165,6 +194,15 @@ ActiveRecord::Schema.define(version: 20140224121926) do
 
   add_index "keys", ["user_id"], name: "index_keys_on_user_id", using: :btree
 
+  create_table "merge_request_diffs", force: true do |t|
+    t.string   "state",            default: "collected", null: false
+    t.text     "st_commits"
+    t.text     "st_diffs"
+    t.integer  "merge_request_id",                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "merge_requests", force: true do |t|
     t.string   "target_branch",     null: false
     t.string   "source_branch",     null: false
@@ -174,8 +212,6 @@ ActiveRecord::Schema.define(version: 20140224121926) do
     t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "st_commits"
-    t.text     "st_diffs"
     t.integer  "milestone_id"
     t.string   "state"
     t.string   "merge_status"
@@ -215,6 +251,7 @@ ActiveRecord::Schema.define(version: 20140224121926) do
     t.datetime "updated_at"
     t.string   "type"
     t.string   "description", default: "", null: false
+    t.string   "avatar"
   end
 
   add_index "namespaces", ["name"], name: "index_namespaces_on_name", using: :btree
@@ -286,6 +323,8 @@ ActiveRecord::Schema.define(version: 20140224121926) do
     t.string   "import_url"
     t.integer  "visibility_level",       default: 0,        null: false
     t.boolean  "archived",               default: false,    null: false
+    t.string   "wiki_engine"
+    t.string   "wiki_external_id"
   end
 
   add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree

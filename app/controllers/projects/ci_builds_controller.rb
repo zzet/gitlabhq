@@ -14,6 +14,6 @@ class Projects::CiBuildsController < Projects::ApplicationController
   private
 
   def build
-    @build ||= project.jenkins_ci.builds.find(params[:id])
+    @build ||= @project.jenkins_ci.builds.find(params[:id])
   end
 end

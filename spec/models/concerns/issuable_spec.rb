@@ -34,7 +34,9 @@ describe Issue, "Issuable" do
     let!(:searchable_issue) { create(:issue, title: "Searchable issue") }
 
     it "matches by title" do
-      described_class.search('able').should == [searchable_issue]
+      searchable_issue.__elasticsearch__.index_document
+      sleep 1
+      described_class.search('able').to_a.should == [searchable_issue]
     end
   end
 

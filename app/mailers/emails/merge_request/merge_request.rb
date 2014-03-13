@@ -18,29 +18,44 @@ class Emails::MergeRequest::MergeRequest < Emails::Base
   end
 
   def assigned_email(notification)
-    case notification.subscription.target
-    when Project
+    case notification.subscription
+    when NilClass
       Emails::Project::MergeRequest.assigned_email(notification).deliver!
-    when MergeRequest
-      # Send notification
+    else
+      case notification.subscription.target
+      when Project
+        Emails::Project::MergeRequest.assigned_email(notification).deliver!
+      when MergeRequest
+        # Send notification
+      end
     end
   end
 
   def reassigned_email(notification)
-    case notification.subscription.target
-    when Project
+    case notification.subscription
+    when NilClass
       Emails::Project::MergeRequest.reassigned_email(notification).deliver!
-    when MergeRequest
-      # Send notification
+    else
+      case notification.subscription.target
+      when Project
+        Emails::Project::MergeRequest.reassigned_email(notification).deliver!
+      when MergeRequest
+        # Send notification
+      end
     end
   end
 
   def reopened_email(notification)
-    case notification.subscription.target
-    when Project
+    case notification.subscription
+    when NilClass
       Emails::Project::MergeRequest.reopened_email(notification).deliver!
-    when MergeRequest
-      # Send notification
+    else
+      case notification.subscription.target
+      when Project
+        Emails::Project::MergeRequest.reopened_email(notification).deliver!
+      when MergeRequest
+        # Send notification
+      end
     end
   end
 

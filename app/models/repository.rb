@@ -1,4 +1,5 @@
 class Repository
+  include RepositoriesSearch
   include Gitlab::ShellAdapter
 
   attr_accessor :raw_repository, :path_with_namespace
@@ -8,6 +9,10 @@ class Repository
     @raw_repository = Gitlab::Git::Repository.new(path_to_repo) if path_with_namespace
   rescue Gitlab::Git::Repository::NoRepository
     nil
+  end
+
+  def project
+    @project ||= Project.find_with_namespace(@path_with_namespace)
   end
 
   def path_to_repo
@@ -57,7 +62,7 @@ class Repository
 
   def recent_branches(limit = 20)
     branches.sort do |a, b|
-      b.commit.committed_date <=> a.commit.committed_date
+      commit(b.target).committed_date <=> commit(a.target).committed_date
     end[0..limit]
   end
 
@@ -163,7 +168,49 @@ class Repository
 
   def readme
     Rails.cache.fetch(cache_key(:readme)) do
-      Tree.new(self, self.root_ref).readme
+      tree(:head).readme
     end
+  end
+
+  def head_commit
+    commit(self.root_ref)
+  end
+
+  def tree(sha = :head, path = nil)
+    if sha == :head
+      sha = head_commit.sha
+    end
+
+    Tree.new(self, sha, path)
+  end
+
+  def blob_at_branch(branch_name, path)
+    last_commit = commit(branch_name)
+
+    if last_commit
+      blob_at(last_commit.sha, path)
+    else
+      nil
+    end
+  end
+
+  # Returns url for submodule
+  #
+  # Ex.
+  #   @repository.submodule_url_for('master', 'rack')
+  #   # => git@localhost:rack.git
+  #
+  def submodule_url_for(ref, path)
+    if submodules.any?
+      submodule = submodules(ref)[path]
+
+      if submodule
+        submodule['url']
+      end
+    end
+  end
+
+  def last_commit_for_path(sha, path)
+    commits(sha, path, 1).last
   end
 end

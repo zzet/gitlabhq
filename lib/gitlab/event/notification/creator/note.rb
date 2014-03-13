@@ -1,44 +1,40 @@
 class Gitlab::Event::Notification::Creator::Note < Gitlab::Event::Notification::Creator::Default
   def create(event)
-    return [] if %(deleted updated).include?(event.action)
+    notifications = []
 
-    notifications = super(event)
+    return notifications if %(deleted updated).include?(event.action)
 
-    notifications << create_notification_for_commit_author(event) if can_create_for_commit_author?(event)
-
+    notifications << create_notification_for_project_subscriptions(event)
+    notifications << create_notification_for_commit_author(event)
     notifications << create_notification_for_mentioned_users(event, notifications.flatten)
+
+    notifications.flatten
   end
 
-  def can_create_for_commit_author?(event)
-    correct_commit_author?(event) && no_notification?(event, event.source.commit_author)
+  def create_notification_for_project_subscriptions(event)
+    project = event.target.project
+    notifications = []
+
+    subscriptions = ::Event::Subscription.by_target(project).by_source_type(event.source_type)
+    notifications << create_by_subscriptions(event, subscriptions, :delayed)
   end
 
   def create_notification_for_commit_author(event)
-    ::Event::Subscription::Notification.create(event: event, subscriber: event.source.commit_author, notification_state: :delayed)
-  end
-
-  def correct_commit_author?(event)
-    event.source.commit_author.present? && event.source.commit_author != event.author
-  end
-
-  def no_notification?(event, user)
-    notifications = ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user)
-    return false if notifications.any?
-
-    parent_event = parent_event_for event
-    return true if parent_event.blank?
-
-    notifications = ::Event::Subscription::Notification.where(event_id: parent_event, subscriber_id: user)
-    return true if notifications.blank? && no_notification?(parent_event, user)
-
-    false
+    if correct_commit_author?(event)
+      user = event.target.commit_author
+      create_by_event(event, user, :delayed)
+    end
   end
 
   def create_notification_for_mentioned_users(event, notifications)
-    notified_user_ids = notifications.map { |n| n.subscriber_id }
-    user_to_notify = event.source.mentioned_users.reject { |u| notified_user_ids.include?(u.id) }
+    notified_user_ids = notifications.compact.map { |n| n.subscriber_id }
+    user_to_notify = event.target.mentioned_users.reject { |u| notified_user_ids.include?(u.id) }
     user_to_notify.each do |user|
-      ::Event::Subscription::Notification.create(event: event, subscriber: user, notification_state: :delayed) if no_notification?(event, user)
+      create_by_event(event, user, :delayed)
     end
+  end
+
+  def correct_commit_author?(event)
+    event.source.commit_author.present?
   end
 end

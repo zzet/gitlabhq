@@ -50,6 +50,7 @@ require 'file_size_validator'
 
 class User < ActiveRecord::Base
   include Watchable
+  include UsersSearch
 
   devise :database_authenticatable, :token_authenticatable, :lockable, :async,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :confirmable, :registerable
@@ -79,6 +80,7 @@ class User < ActiveRecord::Base
 
   # Profile
   has_many :keys, dependent: :destroy
+  has_many :emails, dependent: :destroy
 
   # Groups
   has_many :users_groups,             dependent: :destroy
@@ -133,6 +135,7 @@ class User < ActiveRecord::Base
 
   # Notifications & Subscriptions
   has_many :personal_subscriptions,   dependent: :destroy, class_name: Event::Subscription
+  has_many :auto_subscriptions,       dependent: :destroy, class_name: Event::AutoSubscription
   has_many :subscriptions,            dependent: :destroy, class_name: Event::Subscription, as: :target
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
@@ -147,13 +150,14 @@ class User < ActiveRecord::Base
   validates :bio, length: { maximum: 255 }, allow_blank: true
   validates :extern_uid, allow_blank: true, uniqueness: {scope: :provider}
   validates :projects_limit, presence: true, numericality: {greater_than_or_equal_to: 0}
-  validates :username, presence: true, uniqueness: true,
+  validates :username, presence: true, uniqueness: { case_sensitive: false },
             exclusion: { in: Gitlab::Blacklist.path },
             format: { with: Gitlab::Regex.username_regex,
                       message: "only letters, digits & '_' '-' '.' allowed. Letter should be first" }
 
   validate :namespace_uniq, if: ->(user) { user.username_changed? }
   validate :avatar_type, if: ->(user) { user.avatar_changed? }
+  validate :unique_email, if: ->(user) { user.email_changed? }
   validates :avatar, file_size: { maximum: 100.kilobytes.to_i }
 
   before_validation :generate_password, on: :create
@@ -177,9 +181,12 @@ class User < ActiveRecord::Base
 
   watch do
     source watchable_name do
+      title 'User'
+      description 'Notify about create, update, block, activate, destroy.'
       from :create,   to: :created
       from :block,    to: :blocked do
         @event_data[:teams]     = @source.teams.map { |t| t.attributes }
+        @event_data[:groups]    = @source.groups.map { |t| t.attributes }
         @event_data[:projects]  = @source.projects.map { |pr| pr.attributes }
       end
       from :activate, to: :activate
@@ -188,6 +195,8 @@ class User < ActiveRecord::Base
     end
 
     source :users_group do
+      title 'Group'
+      description 'Notify about join/left group.'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -195,6 +204,8 @@ class User < ActiveRecord::Base
     end
 
     source :users_project do
+      title 'Project'
+      description 'Notify about join/left user.'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -202,6 +213,8 @@ class User < ActiveRecord::Base
     end
 
     source :team_user_relationship do
+      title 'Team'
+      description 'Notify about join/left team.'
       before do: -> { @target = @source.user }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -242,6 +255,13 @@ class User < ActiveRecord::Base
         where(conditions).first
       end
     end
+    
+    def find_for_commit(email, name)
+      # Prefer email match over name match
+      User.where(email: email).first ||
+        User.joins(:emails).where(emails: { email: email }).first ||
+        User.where(name: name).first
+    end
 
     def filter filter_name
       case filter_name
@@ -251,10 +271,6 @@ class User < ActiveRecord::Base
       else
         self.active
       end
-    end
-
-    def search query
-      where("name LIKE :query OR email LIKE :query OR username LIKE :query", query: "%#{query}%")
     end
 
     def by_username_or_id(name_or_id)
@@ -320,6 +336,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def unique_email
+    self.errors.add(:email, 'has already been taken') if Email.exists?(email: self.email)
+  end
+
   # Groups user has access to
   def authorized_groups
     @authorized_groups ||= (self.admin? ? Group.all : personal_groups)
@@ -346,7 +366,7 @@ class User < ActiveRecord::Base
 
   def known_projects
     @project_ids ||= (personal_projects.pluck(:id) + owned_projects.pluck(:id) + projects.pluck(:id) +
-                      team_projects.pluck(:id)  + team_group_grojects.pluck(:id) + Project.public_only.pluck(:id)).uniq
+                      team_projects.pluck(:id)  + team_group_grojects.pluck(:id) + Project.public_or_internal_only(self).pluck(:id)).uniq
     Project.where(id: @project_ids)
   end
 
@@ -529,5 +549,9 @@ class User < ActiveRecord::Base
 
   def short_website_url
     website_url.gsub(/https?:\/\//, '')
+  end
+
+  def all_ssh_keys
+    keys.map(&:key)
   end
 end

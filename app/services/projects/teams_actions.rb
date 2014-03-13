@@ -9,6 +9,10 @@ module Projects::TeamsActions
           project.team_project_relationships.create(team_id: team_id)
         end
       end
+
+      team_ids.each do |team_id|
+        Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
+      end
     end
   end
 

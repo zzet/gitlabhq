@@ -8,15 +8,12 @@
           Assign team
   %ul.well-list.js-sidebar-list
     - teams.each do |team|
-      %li.group-row
+      %li.group-row.js-description-tooltip{"data-title" => "#{team.description}"}
         = link_to team_path(id: team.path), class: dom_class(team) do
           %span.group-name.filter-title
             = truncate(team.name, length: 35)
           %span.arrow
             %i.icon-angle-right
-          %span.owner-info
-            %span Creator:
-            %span.owner= team.creator_name
     - if teams.blank?
       %li
         %h3.nothing_here_message You have no teams yet.

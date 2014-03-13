@@ -15,6 +15,8 @@ class Ability
       when "Group" then group_abilities(user, subject)
       when "Team" then team_abilities(user, subject)
       when "Namespace" then namespace_abilities(user, subject)
+      when "UsersGroup" then users_group_abilities(user, subject)
+      when "User" then user_abilities(user, subject)
       else []
       end.concat(global_abilities(user))
     end
@@ -127,6 +129,8 @@ class Ability
       project_report_rules + [
         :write_merge_request,
         :write_wiki,
+        :modify_issue,
+        :admin_issue,
         :push_code
       ]
     end
@@ -233,6 +237,14 @@ class Ability
       rules.flatten
     end
 
+    def user_abilities user, uuser
+      rules = []
+
+      rules.push(:read_user)
+
+      rules.flatten
+    end
+
     [:issue, :note, :project_snippet, :personal_snippet, :merge_request].each do |name|
       define_method "#{name}_abilities" do |user, subject|
         if subject.author == user
@@ -252,6 +264,20 @@ class Ability
           subject.respond_to?(:project) ? project_abilities(user, subject.project) : []
         end
       end
+    end
+
+    def users_group_abilities(user, subject)
+      rules = []
+      target_user = subject.user
+      group = subject.group
+      can_manage = group_abilities(user, group).include?(:manage_group)
+      if can_manage && (user != target_user)
+        rules << :modify
+      end
+      if !group.last_owner?(user) && (can_manage || (user == target_user))
+        rules << :destroy
+      end
+      rules
     end
   end
 end

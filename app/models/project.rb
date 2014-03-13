@@ -27,6 +27,7 @@
 
 class Project < ActiveRecord::Base
   include Watchable
+  include ProjectsSearch
   include Gitlab::ShellAdapter
   include Gitlab::VisibilityLevel
   extend Enumerize
@@ -35,7 +36,8 @@ class Project < ActiveRecord::Base
 
   attr_accessible :name, :path, :description, :issues_tracker, :label_list,
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
-    :wiki_enabled, :visibility_level, :import_url, :last_activity_at, :last_pushed_at, :git_protocol_enabled, as: [:default, :admin]
+    :wiki_enabled, :visibility_level, :import_url, :last_activity_at, :last_pushed_at, :git_protocol_enabled,
+    :wiki_engine, :wiki_external_id, :wiki_external_id, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
 
@@ -90,8 +92,8 @@ class Project < ActiveRecord::Base
   has_many :deploy_keys_projects, dependent: :destroy
   has_many :deploy_keys, through: :deploy_keys_projects
 
-  delegate :name, to: :owner, allow_nil: true, prefix: true
-  delegate :members, to: :team, prefix: true
+  delegate :name,    to: :owner, prefix: true, allow_nil: true
+  delegate :members, to: :team,  prefix: true
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -119,6 +121,8 @@ class Project < ActiveRecord::Base
 
   watch do
     source watchable_name do
+      title 'Project'
+      description 'Notify about project destroy. Settings, owner, team updates.'
       from :create,   to: :created
       from :update,   to: :transfer,  conditions: -> { @source.namespace_id_changed? && @source.namespace_id != @changes[:namespace_id].first } do
         @event_data[:owner_changes] = @changes
@@ -135,6 +139,8 @@ class Project < ActiveRecord::Base
     end
 
     source :push do
+      title 'Pushes/branches/tags'
+      description 'Notify about diffs. Tags, branches create/delete.'
       before do: -> { @target = @source.project }
       from :create,   to: :created_branch,  conditions: -> { @source.created_branch? }
       from :create,   to: :created_tag,     conditions: -> { @source.created_tag? }
@@ -144,6 +150,8 @@ class Project < ActiveRecord::Base
     end
 
     source :issue do
+      title 'Issues'
+      description "Notify about new issues and it's updates."
       before do: -> { @target = @source.project }
       from :create,   to: :opened
       from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
@@ -153,6 +161,8 @@ class Project < ActiveRecord::Base
     end
 
     source :milestone do
+      title 'Milestones'
+      description "Notify about new milestones and it's updates."
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :close,    to: :closed
@@ -161,6 +171,8 @@ class Project < ActiveRecord::Base
     end
 
     source :merge_request do
+      title 'Merge requests'
+      description "Notify about new merge requests and it's updates."
       before do: -> { @target = @source.target_project }
       from :create,   to: :opened
       from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
@@ -170,6 +182,8 @@ class Project < ActiveRecord::Base
     end
 
     source :project_snippet do
+      title 'Snippets'
+      description "Notify about new snippets and it's updates."
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :update,   to: :updated
@@ -177,6 +191,8 @@ class Project < ActiveRecord::Base
     end
 
     source :note do
+      title 'Notes'
+      description "Notify about comments."
       before do: -> { @target = @source.project }
       from :create,   to: :commented_commit,          conditions: -> { @source.commit_id.present? }
       from :create,   to: :commented_merge_request,   conditions: [ unless: -> { @source.commit_id.present? }, if: -> { @source.noteable.present? && @source.noteable.is_a?(MergeRequest) }]
@@ -185,6 +201,8 @@ class Project < ActiveRecord::Base
     end
 
     source :project_hook do
+      title 'Project hook'
+      description 'Notify about add/delete project hooks.'
       before do: -> { @target = @source.project }
       from :create,   to: :added
       from :update,   to: :updated
@@ -192,6 +210,8 @@ class Project < ActiveRecord::Base
     end
 
     source :web_hook do
+      title 'Web hook'
+      description 'Notify about add/delete web hooks.'
       before do: -> { @target = @source.project }
       from :create,   to: :created
       from :update,   to: :updated
@@ -199,6 +219,8 @@ class Project < ActiveRecord::Base
     end
 
     source :protected_branch do
+      title 'Protected branches'
+      description 'Notify about add/delete protected branches.'
       before do: -> { @target = @source.project }
       from :create,   to: :protected
       from :destroy,  to: :unprotected
@@ -207,12 +229,16 @@ class Project < ActiveRecord::Base
     # TODO. Add services
 
     source :team_project_relationship do
+      title 'Team assignation/resignation'
+      description 'Notify about Team assignation/resignation to project.'
       before do: -> { @target = @source.project }
       from :create,   to: :assigned
       from :destroy,  to: :resigned
     end
 
     source :users_project do
+      title "Membership's actions"
+      description 'Notify about users join/left from project.'
       before do: -> { @target = @source.project }
       from :create,   to: :joined
       from :update,   to: :updated
@@ -239,7 +265,8 @@ class Project < ActiveRecord::Base
   scope :public_or_internal_only, ->(user) { where(visibility_level: (user ? [ INTERNAL, PUBLIC ] : [ PUBLIC ])) }
   scope :non_archived,        -> { where(archived: false) }
 
-  enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: :gitlab
+  enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: (Gitlab.config.default_issues_tracker || :gitlab)
+  enumerize :wiki_engine, in: (Gitlab.config.wiki_engine.keys).append(:gitlab), default: (Gitlab.config.default_wiki_engine || :gitlab)
 
   class << self
     def abandoned
@@ -252,10 +279,6 @@ class Project < ActiveRecord::Base
 
     def active
       joins(:issues, :notes, :merge_requests).order("issues.created_at, notes.created_at, merge_requests.created_at DESC")
-    end
-
-    def search query
-      joins(:namespace).where("projects.archived = ?", false).where("projects.name LIKE :query OR projects.path LIKE :query OR namespaces.name LIKE :query OR projects.description LIKE :query", query: "%#{query}%")
     end
 
     def search_by_title query
@@ -291,6 +314,26 @@ class Project < ActiveRecord::Base
 
   def team
     @team ||= ProjectTeam.new(self)
+  end
+
+  def owners
+    team.owners
+  end
+
+  def masters
+    team.masters
+  end
+
+  def developers
+    team.developers
+  end
+
+  def reporters
+    team.reporters
+  end
+
+  def guests
+    team.guests
   end
 
   def repository
@@ -370,7 +413,11 @@ class Project < ActiveRecord::Base
   end
 
   def can_have_issues_tracker_id?
-    self.issues_enabled && !self.used_default_issues_tracker?
+    self.issues_enabled && self.issues_tracker.try(:to_sym) != :gitlab
+  end
+
+  def can_have_wiki_external_id?
+    self.wiki_enabled && self.wiki_engine.try(:to_sym) != :gitlab
   end
 
   def gitlab_ci
@@ -476,7 +523,7 @@ class Project < ActiveRecord::Base
     # Close merge requests
     mrs = self.merge_requests.opened.where(target_branch: branch_name).to_a
     mrs = mrs.select(&:last_commit).select { |mr| c_ids.include?(mr.last_commit.id) }
-    mrs.each { |merge_request| merge_request.merge!(user.id) }
+    mrs.each { |merge_request| MergeRequestsService.new(user, merge_request).merge }
 
     true
   end

@@ -6,27 +6,59 @@ module SharedPaths
   end
 
   # ----------------------------------------
+  # User
+  # ----------------------------------------
+
+  step 'I visit user "John Doe" page' do
+    visit user_path("john_doe")
+  end
+
+  # ----------------------------------------
   # Group
   # ----------------------------------------
 
-  step 'I visit group page' do
-    visit group_path(current_group)
+  step 'I visit group "Owned" page' do
+    visit group_path(Group.find_by(name:"Owned"))
   end
 
-  step 'I visit group issues page' do
-    visit issues_group_path(current_group)
+  step 'I visit group "Owned" issues page' do
+    visit issues_group_path(Group.find_by(name:"Owned"))
   end
 
-  step 'I visit group merge requests page' do
-    visit merge_requests_group_path(current_group)
+  step 'I visit group "Owned" merge requests page' do
+    visit merge_requests_group_path(Group.find_by(name:"Owned"))
+  end
+
+  step 'I visit group "Owned" members page' do
+    visit members_group_path(Group.find_by(name:"Owned"))
+  end
+
+  step 'I visit group "Owned" settings page' do
+    visit edit_group_path(Group.find_by(name:"Owned"))
+  end
+
+  step 'I visit group "Guest" page' do
+    visit group_path(Group.find_by(name:"Guest"))
+  end
+
+  step 'I visit group "Guest" issues page' do
+    visit issues_group_path(Group.find_by(name:"Guest"))
+  end
+
+  step 'I visit group "Guest" merge requests page' do
+    visit merge_requests_group_path(Group.find_by(name:"Guest"))
   end
 
   step 'I visit group members page' do
     visit group_members_path(current_group)
   end
 
-  step 'I visit group settings page' do
-    visit edit_group_path(current_group)
+  step 'I visit group "Guest" members page' do
+    visit members_group_path(Group.find_by(name:"Guest"))
+  end
+
+  step 'I visit group "Guest" settings page' do
+    visit edit_group_path(Group.find_by(name:"Guest"))
   end
 
   # ----------------------------------------
@@ -111,6 +143,14 @@ module SharedPaths
 
   step 'I visit profile history page' do
     visit history_profile_path
+  end
+
+  step 'I visit profile groups page' do
+    visit profile_groups_path
+  end
+
+  step 'I should be redirected to the profile groups page' do
+    current_path.should == profile_groups_path
   end
 
   # ----------------------------------------
@@ -337,6 +377,14 @@ module SharedPaths
 
   Given 'I visit new snippet page' do
     visit new_snippet_path
+  end
+
+  # ----------------------------------------
+  # Errors
+  # ----------------------------------------
+
+  Then 'page status code should be 404' do
+    page.status_code.should == 404
   end
 
   def root_ref

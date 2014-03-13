@@ -16,7 +16,14 @@ module Groups::BaseActions
   end
 
   def delete_action
+    team_ids = group.teams.select("teams.id")
+
     group.destroy
+
+    team_ids.each do |team_id|
+      Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
+    end
+
     receive_delayed_notifications
   end
 end

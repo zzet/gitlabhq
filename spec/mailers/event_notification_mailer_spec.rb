@@ -21,16 +21,16 @@ describe EventNotificationMailer do
   end
 
   def clean_destroy
-    EventSubscriptionCleanWorker.any_instance.stub(:perform).and_return(true)
+    EventSubscriptionDestroyWorker.any_instance.stub(:perform).and_return(true)
     yield
   end
 
-  let(:group)   { g  = create :group,             owner:   @another_user;                                     clear_prepare_data; g }
-  let(:project) { pr = create :project_with_code, creator: @another_user, namespace: group; clear_prepare_data; pr }
+  let(:group)   { g  = create :group,             owner:   @another_user;                   clear_prepare_data; g }
+  let(:project) { pr = create :project, creator: @another_user, namespace: group; clear_prepare_data; pr }
 
   before do
     ActiveRecord::Base.observers.enable(:user_observer) do
-      @user = create :user
+      @user = create :user, admin: true
       @another_user = create :user
       @commiter_user = create :user, { email: "dmitriy.zaporozhets@gmail.com" }
     end
@@ -50,7 +50,7 @@ describe EventNotificationMailer do
   #end
 
   describe "Project mails" do
-    before { SubscriptionService.subscribe(@user, :all, :project, :all) }
+    before { Gitlab::Event::Subscription.create_auto_subscription(@user, :project) }
 
     context "when event source - project " do
       context "when create project" do
@@ -215,7 +215,7 @@ describe EventNotificationMailer do
     end
 
     context "on exist project" do
-      before { SubscriptionService.subscribe(@user, :all, project, :all) if Event::Subscription.by_target(project).empty? }
+      before { Gitlab::Event::Subscription.subscribe(@user, project) if Event::Subscription.by_target(project).empty? }
 
       context "when event source - issue" do
         context "when create issue" do
@@ -572,17 +572,27 @@ describe EventNotificationMailer do
             end
 
             it "only one message" do
-              @mails_count.should == 1
+              @mails_count.should == 2
             end
 
-            it "correct email" do
-              @email.from.first.should == @another_user.email
-              @email.to.should be_nil
-              @email.cc.should be_nil
-              @email.bcc.count.should == 1
-              @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "project-#{project.path_with_namespace}-merge_request-#{@merge_request.iid}"
-              @email.body.should_not be_empty
+            it "correct email for subscriber" do
+              @mails.last.from.first.should == @another_user.email
+              @mails.first.to.should be_nil
+              @mails.first.cc.should be_nil
+              @mails.first.bcc.count.should == 1
+              @mails.first.bcc.first.should == @user.email
+              @mails.first.in_reply_to.should == "project-#{project.path_with_namespace}-merge_request-#{@merge_request.iid}"
+              @mails.first.body.should_not be_empty
+            end
+
+            it "correct email for assignee" do
+              @mails.last.from.first.should == @another_user.email
+              @mails.last.to.should be_nil
+              @mails.last.cc.should be_nil
+              @mails.last.bcc.count.should == 1
+              @mails.last.bcc.first.should == @another_user.email
+              @mails.last.in_reply_to.should == "project-#{project.path_with_namespace}-merge_request-#{@merge_request.iid}"
+              @mails.last.body.should_not be_empty
             end
           end
 
@@ -971,10 +981,10 @@ describe EventNotificationMailer do
           before do
             @group = create :group, owner: @another_user
 
-            params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @group.id) }
+            params = { project: attributes_for(:empty_project, creator_id: @another_user.id, namespace_id: @group.id) }
             @first_project = ProjectsService.new(@another_user, params[:project]).create
 
-            params = { project: attributes_for(:project, creator_id: @another_user.id, namespace_id: @group.id) }
+            params = { project: attributes_for(:empty_project, creator_id: @another_user.id, namespace_id: @group.id) }
             @second_project = ProjectsService.new(@another_user, params[:project]).create
 
             params = { user_ids: [@user_1_to_project.id, @user_2_to_project.id], project_access: Gitlab::Access::DEVELOPER }
@@ -1241,14 +1251,15 @@ describe EventNotificationMailer do
   describe "Group mails" do
     context "when user subscribed only on group" do
       before do
-        SubscriptionService.subscribe(@user, :all, :group, :all)
+        Gitlab::Event::Subscription.create_auto_subscription(@user, :group)
       end
 
       context "when event source - group " do
         context "when create group" do
           before do
             collect_mails_data do
-              @group = create :group, owner: @another_user
+              params = attributes_for :group, owner: @another_user.id
+              @group = GroupsService.new(@another_user, params).create
             end
           end
 
@@ -1269,7 +1280,8 @@ describe EventNotificationMailer do
 
         context "when group present" do
           before do
-            @group = create :group, owner: @another_user
+            params = attributes_for :group, owner: @another_user.id
+            @group = GroupsService.new(@another_user, params).create
           end
 
           context "when update group" do
@@ -1322,7 +1334,8 @@ describe EventNotificationMailer do
 
       context "when group present" do
         before do
-          @group = create :group, owner: @another_user
+          params = attributes_for :group, owner: @another_user.id
+          @group = GroupsService.new(@another_user, params).create
         end
 
         context "when event source - project" do
@@ -1352,7 +1365,8 @@ describe EventNotificationMailer do
           context "when project moved to group" do
             before do
               @project = ProjectsService.new(@another_user, attributes_for(:project, namespace_id: nil)).create
-              @another_group = create :group, owner: @another_user
+              params = attributes_for :group, owner: @another_user.id
+              @another_group = GroupsService.new(@another_user, params).create
               params = { project: { namespace_id: @another_group.id }}
               collect_mails_data do
                 ProjectsService.new(@another_user, @project, params).transfer
@@ -1610,9 +1624,9 @@ describe EventNotificationMailer do
       before do
         @user.notification_setting.adjacent_changes = true
         @user.notification_setting.save
-        SubscriptionService.subscribe(@user, :all, :group, :all)
+        Gitlab::Event::Subscription.create_auto_subscription(@user, :group)
         @group = create :group, owner: @another_user
-        SubscriptionService.subscribe(@user, :all, @group, :project)
+        Gitlab::Event::Subscription.create_auto_subscription(@user, :project, @group)
       end
 
       context "when update project" do
@@ -1643,7 +1657,7 @@ describe EventNotificationMailer do
 
       context "when update project with subscription on project" do
         before do
-          SubscriptionService.subscribe(@user, :all, :project, :all)
+          Gitlab::Event::Subscription.create_auto_subscription(@user, :project)
 
           params = attributes_for(:project, namespace_id: @group.id)
           @project = ProjectsService.new(@another_user, params).create
@@ -1656,7 +1670,7 @@ describe EventNotificationMailer do
         end
 
         it "subscriptions count == 5" do
-          Event::Subscription.count.should == 5
+          Event::Subscription.count.should == 2
         end
 
         it "only one message" do
@@ -1678,14 +1692,14 @@ describe EventNotificationMailer do
 
   describe "Teams emails" do
     before do
-      SubscriptionService.subscribe(@user, :all, :team, :all)
+      Gitlab::Event::Subscription.create_auto_subscription(@user, :team)
     end
 
     context "when event source - team" do
       context "when create team" do
         before do
           collect_mails_data do
-            params = attributes_for :team, creator: @another_user
+            params = attributes_for :team, creator: @another_user.id
             @team = TeamsService.new(@another_user, params).create
           end
         end
@@ -1707,13 +1721,14 @@ describe EventNotificationMailer do
 
       context "when team present" do
         before do
-          @team = create :team, creator: @another_user
+          params = attributes_for :team, creator: @another_user.id
+          @team = TeamsService.new(@another_user, params).create
         end
 
         context "when update team" do
           before do
             collect_mails_data do
-              @team.update_attributes(attributes_for(:team))
+              @team.update(attributes_for(:team))
             end
           end
           it "only one message" do
@@ -1759,7 +1774,8 @@ describe EventNotificationMailer do
 
     context "when team present" do
       before do
-        @team = create :team, creator: @another_user
+        params = attributes_for :team, creator: @another_user.id
+        @team = TeamsService.new(@another_user, params).create
       end
 
       context "when event source - team_user_relationship" do
@@ -1897,8 +1913,8 @@ describe EventNotificationMailer do
       context "when event source - team_group_relationship" do
         context "when assign team to group" do
           before do
-            SubscriptionService.subscribe(@user, :all, :group, :all)
-            SubscriptionService.subscribe(@user, :all, :project, :all)
+            Gitlab::Event::Subscription.create_auto_subscription(@user, :group)
+            Gitlab::Event::Subscription.create_auto_subscription(@user, :project)
 
             double(create :project, namespace: group, creator: @another_user)
 
@@ -1935,10 +1951,10 @@ describe EventNotificationMailer do
 
         context "assign team to group with subscriptions on projects only" do
           before do
-            SubscriptionService.subscribe(@user, :all, :project, :all)
+            Gitlab::Event::Subscription.create_auto_subscription(@user, :project)
 
-            @project1 = create :project, namespace: group, creator: @another_user
-            @project2 = create :project, namespace: group, creator: @another_user
+            @project1 = create :empty_project, namespace: group, creator: @another_user
+            @project2 = create :empty_project, namespace: group, creator: @another_user
 
             user1 = create :user
             params = { user_ids: "#{user1.id}", team_access: Gitlab::Access::MASTER }
@@ -1999,7 +2015,7 @@ describe EventNotificationMailer do
 
   describe "Users mails" do
     before do
-      SubscriptionService.subscribe(@user, :all, :user, :all)
+      Gitlab::Event::Subscription.create_auto_subscription(@user, :user)
     end
 
     context "when event source - user" do

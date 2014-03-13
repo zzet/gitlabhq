@@ -68,6 +68,8 @@ class GitPushService
 
       process_commit_messages(push)
     end
+
+    Elastic::RepositoryIndexer.perform_async(push.id)
   end
 
   # This method provide a sample data
@@ -125,8 +127,6 @@ class GitPushService
   end
 
   def commit_user commit
-    User.where(email: commit.author_email).first ||
-      User.where(name: commit.author_name).first ||
-      current_user
+    User.find_for_commit(commit.author_email, commit.author_name) || current_user
   end
 end
