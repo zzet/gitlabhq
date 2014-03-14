@@ -24,8 +24,8 @@ GIT
 
 GIT
   remote: git://github.com/zzet/elasticsearch-git.git
-  revision: 43d71e9e48cabe00a988713418f3758690898242
-  ref: 43d71e9e48cabe00a988713418f3758690898242
+  revision: 0ac0472620ae66a0b59dd46c720692d56597212e
+  ref: 0ac0472620ae66a0b59dd46c720692d56597212e
   specs:
     elasticsearch-git (0.0.3)
       activemodel (~> 4.0.0)
