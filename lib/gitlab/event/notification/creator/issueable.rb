@@ -19,7 +19,7 @@ class Gitlab::Event::Notification::Creator::Issueable < Gitlab::Event::Notificat
 
   def create_notification_for_assigned(event)
     if can_create_for_assigned?(event)
-      create_by_event(event, event.source.assignee, :delayed)
+      create_by_event(event, event.target.assignee, :delayed)
     end
   end
 
