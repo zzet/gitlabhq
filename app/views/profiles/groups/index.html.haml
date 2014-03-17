@@ -16,7 +16,9 @@
     - @user_groups.each do |user_group|
       - group = user_group.group
       %li{id: "group-info-#{group.id}"}
+
         .pull-right
+          = render "shared/watch_button", current_entity: group
           - if can?(current_user, :manage_group, group)
             = link_to edit_group_path(group), class: "btn-small btn grouped" do
               %i.icon-cogs
@@ -26,6 +28,7 @@
             = link_to leave_profile_group_path(group), data: { confirm: leave_group_message(group.name) }, method: :delete, class: "btn-small btn grouped", title: 'Remove user from group' do
               %i.icon-signout
               Leave
+          &nbsp;
 
         = link_to group, class: 'group-name' do
           %strong= group.name
