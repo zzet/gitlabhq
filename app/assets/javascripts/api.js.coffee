@@ -156,6 +156,9 @@
       url: url
       data:
         private_token: gon.api_token
+        search: query
+        per_page: 20
+        active: true
       dataType: "json"
     ).done (users) ->
       callback(users)

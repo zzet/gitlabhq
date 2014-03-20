@@ -4,6 +4,10 @@ module ApplicationSearch
   included do
     include Elasticsearch::Model
 
+    # $ host git-elasticsearch-1.production.infra.home
+    # git-elasticsearch-1.production.infra.home has address 10.40.56.23
+    self.__elasticsearch__.client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port
+
     index_name [Rails.application.class.parent_name.downcase, self.name.downcase, Rails.env.to_s].join('-')
 
     settings \

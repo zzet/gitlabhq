@@ -4,6 +4,8 @@ module RepositoriesSearch
   included do
     include Elasticsearch::Git::Repository
 
+    self.__elasticsearch__.client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port
+
     def repository_id
       project.id
     end
@@ -13,8 +15,14 @@ module RepositoriesSearch
 
       Project.find_each do |project|
         if project.repository.exists? && !project.repository.empty?
-          project.repository.index_commits
-          project.repository.index_blobs
+          begin
+            project.repository.index_commits
+          rescue
+          end
+          begin
+            project.repository.index_blobs
+          rescue
+          end
         end
       end
     end

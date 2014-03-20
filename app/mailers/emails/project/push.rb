@@ -123,7 +123,7 @@ class Emails::Project::Push < Emails::Project::Base
     subject = if @commits.many?
                 "[#{@project.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.oid[0..10]} [undev gitlab commits]"
               else
-                "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.message.delete("\0").truncate(100, omission: "...")}' to parent commit #{@before_commit.oid[0..10]} [undev gitlab commits]"
+                "[#{@project.path_with_namespace}] [#{@branch}] Pushed commit '#{@commit.message.force_encoding('UTF-8').delete("\n").truncate(100, omission: "...")}' to parent commit #{@before_commit.oid[0..10]} [undev gitlab commits]"
               end
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: subject)
@@ -139,7 +139,8 @@ class Emails::Project::Push < Emails::Project::Base
 
     r = Rugged::Repository.new(project.repository.path_to_repo)
 
-    diff_result[:before_commit] = r.lookup(oldrev).parents.first
+    diff_result[:before_commit] = r.lookup(oldrev)
+    diff_result[:before_commit] = diff_result[:before_commit].parents.first if diff_result[:before_commit].parents.any?
     diff_result[:after_commit]  = r.lookup(newrev)
     diff_result[:commit]        = r.lookup(newrev)
 
