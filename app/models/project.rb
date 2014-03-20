@@ -401,7 +401,7 @@ class Project < ActiveRecord::Base
   end
 
   def issue_exists?(issue_id)
-    if used_default_issues_tracker?
+    if issues_tracker.try(:to_sym) == :gitlab
       self.issues.where(iid: issue_id).first.present?
     else
       true

@@ -43,7 +43,7 @@ module GroupsSearch
           },
         },
         size: per,
-        from: per * (page - 1)
+        from: per * (page.to_i - 1)
       }
 
       if query.blank?
