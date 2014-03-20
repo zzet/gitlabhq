@@ -2,6 +2,7 @@ class SearchService < BaseService
   def global_search
     query = params[:search]
     query = Shellwords.shellescape(query) if query.present?
+
     return global_search_result unless query.present?
 
     known_projects_ids = []
@@ -13,9 +14,14 @@ class SearchService < BaseService
     search_options = { pids: known_projects_ids }
     search_options[:namespace_id] = group.id if group
 
+    global_search_result[:groups]         = Group.search(query, options: search_options, page: params[:page])
+    global_search_result[:teams]          = Team.search(query, options: search_options, page: params[:page])
+    global_search_result[:users]          = User.search(query, options: search_options, page: params[:page])
     global_search_result[:projects]       = Project.search(query, options: search_options, page: params[:page])
     global_search_result[:merge_requests] = MergeRequest.search(query, options: { projects_ids: known_projects_ids, page: params[:page] })
     global_search_result[:issues]         = Issue.search(query, options: { projects_ids: known_projects_ids, page: params[:page] })
+    global_search_result[:repositories]   = Repository.search(query, options: search_options, page: params[:page])
+
     global_search_result[:total_results]  = %w(projects issues merge_requests).sum { |items| global_search_result[items.to_sym].size }
 
     global_search_result
@@ -44,9 +50,13 @@ class SearchService < BaseService
 
   def global_search_result
     @result ||= {
+      groups: [],
+      teams: [],
+      users: [],
       projects: [],
       merge_requests: [],
       issues: [],
+      code: [],
       total_results: 0,
     }
   end
@@ -56,6 +66,7 @@ class SearchService < BaseService
       merge_requests: [],
       issues: [],
       blobs: [],
+      commits: [],
       total_results: 0,
     }
   end

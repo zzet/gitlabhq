@@ -87,6 +87,10 @@ production: &base
     # plain_url: "http://..."     # default: http://www.gravatar.com/avatar/%{hash}?s=%{size}&d=mm
     # ssl_url:   "https://..."    # default: https://secure.gravatar.com/avatar/%{hash}?s=%{size}&d=mm
 
+  elasticsearch:
+    host: '10.40.56.23'
+    port: 9200
+
   #
   # 2. Auth settings
   # ==========================
@@ -173,6 +177,10 @@ production: &base
 development:
   <<: *base
 
+  elasticsearch:
+    host: 'localhost'
+    port: 9200
+
 test:
   <<: *base
   gitlab:
@@ -185,6 +193,10 @@ test:
       project_url: "http://redmine/projects/:issues_tracker_id"
       issues_url: "http://redmine/:project_id/:issues_tracker_id/:id"
       new_issue_url: "http://redmine/projects/:issues_tracker_id/issues/new"
+
+  elasticsearch:
+    host: 'localhost'
+    port: 9200
 
 staging:
   <<: *base
@@ -212,3 +224,7 @@ staging:
       issues_url: "http://pm.undev.cc/issues/:id"
       new_issue_url: "http://pm.undev.cc/projects/:issues_tracker_id/issues/new"
       all_issues_url: "http://pm.undev.cc/stuff_to_do"
+
+  elasticsearch:
+    host: 'localhost'
+    port: 9200
