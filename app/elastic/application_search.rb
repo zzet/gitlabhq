@@ -6,7 +6,7 @@ module ApplicationSearch
 
     # $ host git-elasticsearch-1.production.infra.home
     # git-elasticsearch-1.production.infra.home has address 10.40.56.23
-    self.class.__elasticsearch__.client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port
+    self.__elasticsearch__.client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port
 
     index_name [Rails.application.class.parent_name.downcase, self.name.downcase, Rails.env.to_s].join('-')
 

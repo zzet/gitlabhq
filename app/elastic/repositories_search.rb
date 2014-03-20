@@ -4,7 +4,7 @@ module RepositoriesSearch
   included do
     include Elasticsearch::Git::Repository
 
-    self.class.__elasticsearch__.client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port
+    self.__elasticsearch__.client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port
 
     def repository_id
       project.id
