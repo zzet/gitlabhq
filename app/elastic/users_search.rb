@@ -30,6 +30,7 @@ module UsersSearch
     def self.search(query, page: 1, per: 20, options: {})
 
       page ||= 1
+      page ||= 20
 
       if options[:in].blank?
         options[:in] = %w(name^3 username^2 email)

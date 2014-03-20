@@ -330,10 +330,16 @@ module API
       #
       # Example Request:
       #  GET /users
+      params do
+        optional :search, type: String
+        optional :page, type: Integer
+        optional :per_page, type: Integer
+      end
       get ':id/users' do
-        @users = User.where(id: user_project.team.users.map(&:id))
-        @users = @users.search(params[:search]) if params[:search].present?
-        @users = paginate @users
+        uids = user_project.team.users.pluck(:id)
+
+        @users = User.search(params[:search], page: params[:page],
+                             per: params[:per_page], options: {uids: uids})
         present @users, with: Entities::User
       end
     end
