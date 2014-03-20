@@ -14,11 +14,11 @@ module RepositoriesSearch
       Project.find_each do |project|
         if project.repository.exists? && !project.repository.empty?
           begin
-          project.repository.index_commits
+            project.repository.index_commits
           rescue
           end
           begin
-          project.repository.index_blobs
+            project.repository.index_blobs
           rescue
           end
         end
