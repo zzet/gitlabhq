@@ -3,7 +3,7 @@ class Elastic::BaseIndexer
   sidekiq_options queue: 'elasticsearch', retry: false, backtrace: true
 
   Logger = Sidekiq.logger.level == Logger::DEBUG ? Sidekiq.logger : nil
-  Client = Elasticsearch::Client.new host: (ENV['ELASTICSEARCH_URL'] || 'http://localhost:9200'), logger: Logger
+  Client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port, logger: Logger
 
   def perform(operation, klass, record_id, options={})
     logger.debug [operation, "#{klass}##{record_id} #{options.inspect}"]
