@@ -147,7 +147,7 @@ class Emails::Project::Push < Emails::Project::Base
     diff = r.diff(oldrev, newrev)
     diff_stat = diff.stat
 
-    diff_result[:suppress_diff] = ((diff_stat.first > 500) || (diff_stat[1] + diff_stat[2] > 10000))
+    diff_result[:suppress_diff] = ((diff_stat.first > 500) || (diff_stat[1] + diff_stat[2] > 5000))
 
     if diff_result[:suppress_diff]
       diff_result[:commits] = []
