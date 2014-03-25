@@ -9,7 +9,10 @@ module Teams::UsersActions
     project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
-      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      rescue
+      end
     end
   end
 
@@ -19,7 +22,10 @@ module Teams::UsersActions
     project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
-      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      rescue
+      end
     end
 
     receive_delayed_notifications
@@ -34,7 +40,10 @@ module Teams::UsersActions
     project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
-      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      rescue
+      end
     end
 
     result
