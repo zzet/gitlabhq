@@ -1,17 +1,32 @@
-%ul.nav.nav-tabs
-  %li{class: ("active" if params[:search_code].present?)}
-    = link_to search_path(params.merge(search_code: true)) do
-      Repository Code
-  %li{class: ("active" if params[:search_code].blank?)}
-    = link_to search_path(params.merge(search_code: nil)) do
-      Issues and Merge requests
-
+.pull-right
+  .dropdown.inline
+    %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+      %span.light sort:
+      - if @sort.present?
+        = @sort.humanize
+      - else
+        Name
+      %b.caret
+    %ul.dropdown-menu
+      %li
+        = link_to search_filter_path(params[:search], type: :project, sort: :name) do
+          Name
+        = link_to search_filter_path(params[:search], type: :project, sort: :created, order: :desc) do
+          Newest
+        = link_to search_filter_path(params[:search], type: :project, sort: :created, order: :asc) do
+          Oldest
+        = link_to search_filter_path(params[:search], type: :project, sort: :updated, order: :desc) do
+          Recently updated
+        = link_to search_filter_path(params[:search], type: :project, sort: :updated, order: :asc) do
+          Last updated
+        = link_to search_filter_path(params[:search], type: :project, sort: :push, order: :desc) do
+          Recently pushed
+        = link_to search_filter_path(params[:search], type: :project, sort: :push, order: :asc) do
+          Last pushed
+%h4
+  #{@search_results[:projects].total_count} results found
+%hr
 .search_results
-  - if params[:search_code].present?
-    .blob-results
-      = render partial: "search/results/blob", collection: @search_results[:blobs]
-      = paginate @search_results[:blobs], theme: 'gitlab'
-  - else
-    %ul.bordered-list
-      = render partial: "search/results/merge_request", collection: @search_results[:merge_requests]
-      = render partial: "search/results/issue", collection: @search_results[:issues]
+  %ul.bordered-list
+    = render partial: "search/results/project", collection: @search_results[:projects]
+  = paginate @search_results[:projects], theme: 'gitlab'

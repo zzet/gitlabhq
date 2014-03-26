@@ -23,9 +23,14 @@ GIT
     rugged (0.19.0)
 
 GIT
-  remote: git://github.com/zzet/elasticsearch-git.git
-  revision: 0ac0472620ae66a0b59dd46c720692d56597212e
-  ref: 0ac0472620ae66a0b59dd46c720692d56597212e
+  remote: https://github.com/gitlabhq/markup.git
+  revision: 61ade389c1e1c159359338f570d18464a44ddbc4
+  ref: 61ade389c1e1c159359338f570d18464a44ddbc4
+  specs:
+    github-markup (0.7.6)
+
+PATH
+  remote: /rest/u/apps/elasticsearch-git
   specs:
     elasticsearch-git (0.0.3)
       activemodel (~> 4.0.0)
@@ -35,13 +40,6 @@ GIT
       elasticsearch-model
       gitlab-linguist (> 2.9.0)
       rugged (~> 0.19.0)
-
-GIT
-  remote: https://github.com/gitlabhq/markup.git
-  revision: 61ade389c1e1c159359338f570d18464a44ddbc4
-  ref: 61ade389c1e1c159359338f570d18464a44ddbc4
-  specs:
-    github-markup (0.7.6)
 
 GEM
   remote: http://rubygems.org/
