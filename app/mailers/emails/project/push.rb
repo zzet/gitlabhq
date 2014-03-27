@@ -1,3 +1,5 @@
+require 'open3'
+
 class Emails::Project::Push < Emails::Project::Base
   def created_branch_email(notification)
     @notification = notification
@@ -153,15 +155,23 @@ class Emails::Project::Push < Emails::Project::Base
       diff_result[:commits] = []
       diff_result[:diffs]   = nil
     else
-      walker = Rugged::Walker.new(r)
-      walker.sorting(Rugged::SORT_REVERSE)
-      walker.push(newrev)
-      walker.hide(oldrev)
-      commit_oids = walker.map {|c| c.oid}
-      walker.reset
+      # Temp remove Rugged with kernel bug in walker
+      #walker = Rugged::Walker.new(r)
+      #walker.sorting(Rugged::SORT_REVERSE)
+      #walker.push(newrev)
+      #walker.hide(oldrev)
+      #commit_oids = walker.map {|c| c.oid}
+      #walker.reset
+      out, err, status = Open3.capture3("git log #{revbefore}...#{revafter} --format=\"%H\"", chdir: project.repository.path_to_repo)
+      if status.success? && err.blank?
+        commit_oids = out.split("\n")
 
-      diff_result[:commits] = commit_oids.map {|coid| r.lookup(coid) }
-      diff_result[:diffs]   = diff
+        diff_result[:commits] = commit_oids.map {|coid| r.lookup(coid) }
+        diff_result[:diffs]   = diff
+      else
+        diff_result[:commits] = []
+        diff_result[:diffs]   = nil
+      end
     end
 
     diff_result
