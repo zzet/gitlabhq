@@ -11,7 +11,7 @@ class SearchService < BaseService
 
     group = Group.find_by_id(params[:group_id]) if params[:group_id].present?
 
-    search_options = { pids: known_projects_ids }
+    search_options = { pids: known_projects_ids, order: params[:order] }
     search_options[:namespace_id] = group.id if group
 
     page = params[:page].to_i

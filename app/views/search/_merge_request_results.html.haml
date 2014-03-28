@@ -2,27 +2,24 @@
   .dropdown.inline
     %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
       %span.light sort:
-      - if @sort.present?
-        = @sort.humanize
+      - if params[:order].present?
+        = params[:order].humanize
       - else
-        Name
+        Title
       %b.caret
     %ul.dropdown-menu
       %li
-        = link_to search_filter_path(params[:search], type: :merge_request, sort: :name) do
-          Name
-        = link_to search_filter_path(params[:search], type: :merge_request, sort: :created, order: :desc) do
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :title) do
+          Title
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :newest) do
           Newest
-        = link_to search_filter_path(params[:search], type: :merge_request, sort: :created, order: :asc) do
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :oldest) do
           Oldest
-        = link_to search_filter_path(params[:search], type: :merge_request, sort: :updated, order: :desc) do
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :recently_updated) do
           Recently updated
-        = link_to search_filter_path(params[:search], type: :merge_request, sort: :updated, order: :asc) do
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :last_updated) do
           Last updated
-        = link_to search_filter_path(params[:search], type: :merge_request, sort: :push, order: :desc) do
-          Recently pushed
-        = link_to search_filter_path(params[:search], type: :merge_request, sort: :push, order: :asc) do
-          Last pushed
+
 %h4
   #{@search_results[:merge_requests].total_count} results found
 %hr

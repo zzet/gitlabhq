@@ -19,18 +19,22 @@ module UsersSearch
       indexes :admin,       type: :boolean
 
       indexes :name_sort,   type: :string, index: 'not_analyzed'
+      indexes :created_at_sort, type: :string, index: 'not_analyzed'
+      indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
     def as_indexed_json(options = {})
       as_json.merge({
-        name_sort: name
+        name_sort: name.downcase,
+        updated_at_sort: updated_at,
+        created_at_sort: created_at
       })
     end
 
     def self.search(query, page: 1, per: 20, options: {})
 
       page ||= 1
-      page ||= 20
+      per ||= 20
 
       if options[:in].blank?
         options[:in] = %w(name^3 username^2 email)
@@ -77,8 +81,23 @@ module UsersSearch
         }
       end
 
+      options[:order] = :default if options[:order].blank?
+      order = case options[:order].to_sym
+              when :newest
+                { created_at_sort: { order: :asc, mode: :min } }
+              when :oldest
+                { created_at_sort: { order: :desc, mode: :min } }
+              when :recently_updated
+                { updated_at_sort: { order: :asc, mode: :min } }
+              when :last_updated
+                { updated_at_sort: { order: :desc, mode: :min } }
+              else
+                { name_sort: { order: :asc, mode: :min } }
+              end
+
+
       query_hash[:sort] = [
-        { name_sort: { order: :asc, mode: :min }},
+        order,
         :_score
       ]
 

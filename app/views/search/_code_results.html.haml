@@ -2,27 +2,19 @@
   .dropdown.inline
     %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
       %span.light sort:
-      - if @sort.present?
-        = @sort.humanize
+      - if params[:order].present?
+        = params[:order].humanize
       - else
-        Name
+        Best match
       %b.caret
     %ul.dropdown-menu
       %li
-        = link_to search_filter_path(params[:search], type: :code, sort: :name) do
-          Name
-        = link_to search_filter_path(params[:search], type: :code, sort: :created, order: :desc) do
-          Newest
-        = link_to search_filter_path(params[:search], type: :code, sort: :created, order: :asc) do
-          Oldest
-        = link_to search_filter_path(params[:search], type: :code, sort: :updated, order: :desc) do
-          Recently updated
-        = link_to search_filter_path(params[:search], type: :code, sort: :updated, order: :asc) do
-          Last updated
-        = link_to search_filter_path(params[:search], type: :code, sort: :push, order: :desc) do
-          Recently pushed
-        = link_to search_filter_path(params[:search], type: :code, sort: :push, order: :asc) do
-          Last pushed
+        = link_to search_filter_path(params[:search], type: :code, order: :best_match) do
+          Best match
+        = link_to search_filter_path(params[:search], type: :code, order: :recently_indexed) do
+          Recently indexed
+        = link_to search_filter_path(params[:search], type: :code, order: :last_indexed) do
+          Least recently indexed
 %h4
   #{@search_results[:repositories][:blobs][:results].total_count} results found
 %hr

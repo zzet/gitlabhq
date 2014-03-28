@@ -2,27 +2,23 @@
   .dropdown.inline
     %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
       %span.light sort:
-      - if @sort.present?
-        = @sort.humanize
+      - if params[:order].present?
+        = params[:order].humanize
       - else
-        Name
+        Title
       %b.caret
     %ul.dropdown-menu
       %li
-        = link_to search_filter_path(params[:search], type: :issue, sort: :name) do
-          Name
-        = link_to search_filter_path(params[:search], type: :issue, sort: :created, order: :desc) do
+        = link_to search_filter_path(params[:search], type: :issue, order: :title) do
+          Title
+        = link_to search_filter_path(params[:search], type: :issue, order: :newest) do
           Newest
-        = link_to search_filter_path(params[:search], type: :issue, sort: :created, order: :asc) do
+        = link_to search_filter_path(params[:search], type: :issue, order: :oldest) do
           Oldest
-        = link_to search_filter_path(params[:search], type: :issue, sort: :updated, order: :desc) do
+        = link_to search_filter_path(params[:search], type: :issue, order: :recently_updated) do
           Recently updated
-        = link_to search_filter_path(params[:search], type: :issue, sort: :updated, order: :asc) do
+        = link_to search_filter_path(params[:search], type: :issue, order: :last_updated) do
           Last updated
-        = link_to search_filter_path(params[:search], type: :issue, sort: :push, order: :desc) do
-          Recently pushed
-        = link_to search_filter_path(params[:search], type: :issue, sort: :push, order: :asc) do
-          Last pushed
 %h4
   #{@search_results[:issues].total_count} results found
 %hr
