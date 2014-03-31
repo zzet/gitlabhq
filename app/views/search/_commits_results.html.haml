@@ -9,11 +9,11 @@
       %b.caret
     %ul.dropdown-menu
       %li
-        = link_to search_filter_path(params[:search], type: :commit, order: :best_match) do
+        = link_to search_filter_path(params[:search], type: :commits, order: :best_match) do
           Best match
-        = link_to search_filter_path(params[:search], type: :commit, order: :recently_indexed) do
+        = link_to search_filter_path(params[:search], type: :commits, order: :recently_indexed) do
           Recently indexed
-        = link_to search_filter_path(params[:search], type: :commit, order: :last_indexed) do
+        = link_to search_filter_path(params[:search], type: :commits, order: :last_indexed) do
           Least recently indexed
 
 %h4
