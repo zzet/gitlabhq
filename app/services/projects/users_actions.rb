@@ -9,10 +9,7 @@ module Projects::UsersActions
       @project.team << [users, params[:project_access]]
     end
 
-    begin
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    rescue
-    end
+    reindex_with_elastic(:update, Project.name, project.id)
   end
 
   def update_membership_action(member)
@@ -24,10 +21,7 @@ module Projects::UsersActions
     if pur.valid?
       receive_delayed_notifications
 
-      begin
-        Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-      rescue
-      end
+      reindex_with_elastic(:update, Project.name, project.id)
 
       return true
     else
@@ -39,10 +33,7 @@ module Projects::UsersActions
     pur = project_member_relation(member)
     pur.destroy
 
-    begin
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    rescue
-    end
+    reindex_with_elastic(:update, Project.name, project.id)
 
     receive_delayed_notifications
   end
@@ -52,10 +43,7 @@ module Projects::UsersActions
       @project.team.import(giver)
     end
 
-    begin
-      Elastic::BaseIndexer.perform_async(:update, @project.class.name, @project.id)
-    rescue
-    end
+    reindex_with_elastic(:update, Project.name, @project.id)
 
     status
   end
@@ -68,10 +56,7 @@ module Projects::UsersActions
       user_project_relations.destroy_all
     end
 
-    begin
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    rescue
-    end
+    reindex_with_elastic(:update, Project.name, project.id)
   end
 
   def batch_update_memberships_action
@@ -82,10 +67,7 @@ module Projects::UsersActions
       user_project_relations.find_each { |membership| membership.update(project_access: params[:team_member][:project_access]) }
     end
 
-    begin
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
-    rescue
-    end
+    reindex_with_elastic(:update, Project.name, project.id)
   end
 
   private

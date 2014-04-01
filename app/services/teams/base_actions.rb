@@ -19,10 +19,7 @@ module Teams::BaseActions
     team.destroy
 
     project_ids.each do |project_id|
-      begin
-        Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
-      rescue
-      end
+      reindex_with_elastic(:update, Project.name, project_id)
     end
 
     receive_delayed_notifications

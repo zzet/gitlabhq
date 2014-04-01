@@ -65,10 +65,7 @@ module Projects::BaseActions
       group = project.group
       if group
         group.teams.pluck(:id).each do |team_id|
-          begin
-            Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
-          rescue
-          end
+          reindex_with_elastic(:update, Team.name, team_id)
         end
       end
 
@@ -137,10 +134,7 @@ module Projects::BaseActions
           teams_ids = teams_ids.flatten.uniq
 
           teams_ids.each do |team_id|
-            begin
-              Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
-            rescue
-            end
+            reindex_with_elastic(:update, Team.name, team_id)
           end
 
           receive_delayed_notifications

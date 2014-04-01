@@ -24,6 +24,13 @@ class BaseService
     end
   end
 
+  def reindex_with_elastic(action, model, id)
+    begin
+      Elastic::BaseIndexer.perform_async(action, model, id)
+    rescue
+    end
+  end
+
   def multiple_action(action_name, action_source, source, items = nil, &block)
     RequestStore.store[:borders] ||= []
 
