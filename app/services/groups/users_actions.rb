@@ -50,7 +50,7 @@ module Groups::UsersActions
 
   def update_group_projects_indexes(group)
     group.projects.pluck(:id).each do |project_id|
-      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
   end
 end

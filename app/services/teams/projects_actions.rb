@@ -10,7 +10,7 @@ module Teams::ProjectsActions
     multiple_action("projects_add", "team", team, projects) do
       projects.each do |project|
         team.team_project_relationships.create(project_id: project.id)
-        Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+        reindex_with_elastic(Project, project.id)
       end
     end
   end
@@ -20,7 +20,7 @@ module Teams::ProjectsActions
     tprs.destroy_all
 
     Project.where(id: projects).find_each do |project|
-      Elastic::BaseIndexer.perform_async(:update, project.class.name, project.id)
+      reindex_with_elastic(Project, project.id)
     end
 
     receive_delayed_notifications

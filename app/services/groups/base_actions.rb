@@ -21,7 +21,7 @@ module Groups::BaseActions
     group.destroy
 
     team_ids.each do |team_id|
-      Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
+      reindex_with_elastic(Team, team_id)
     end
 
     receive_delayed_notifications

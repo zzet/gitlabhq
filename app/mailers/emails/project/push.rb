@@ -162,7 +162,7 @@ class Emails::Project::Push < Emails::Project::Base
       #walker.hide(oldrev)
       #commit_oids = walker.map {|c| c.oid}
       #walker.reset
-      out, err, status = Open3.capture3("git log #{revbefore}...#{revafter} --format=\"%H\"", chdir: project.repository.path_to_repo)
+      out, err, status = Open3.capture3("git log #{oldrev}...#{newrev} --format=\"%H\"", chdir: project.repository.path_to_repo)
       if status.success? && err.blank?
         commit_oids = out.split("\n")
 
