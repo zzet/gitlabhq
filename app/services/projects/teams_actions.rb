@@ -11,7 +11,7 @@ module Projects::TeamsActions
       end
 
       team_ids.each do |team_id|
-        reindex_with_elastic(:update, Team.name, team_id)
+        reindex_with_elastic(Team, team_id)
       end
     end
   end

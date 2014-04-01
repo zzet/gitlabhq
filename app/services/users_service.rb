@@ -39,11 +39,11 @@ class UsersService < BaseService
     end
 
     projects_ids.each do |project_id|
-      reindex_with_elastic(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
 
     teams_ids.each do |team_id|
-      reindex_with_elastic(:update, TEam.name, team_id)
+      reindex_with_elastic(Team, team_id)
     end
 
     receive_delayed_notifications
@@ -63,11 +63,11 @@ class UsersService < BaseService
     user.destroy
 
     projects_ids.each do |project_id|
-      reindex_with_elastic(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
 
     teams_ids.each do |team_id|
-      reindex_with_elastic(:update, Team.name, team_id)
+      reindex_with_elastic(Team, team_id)
     end
 
     receive_delayed_notifications

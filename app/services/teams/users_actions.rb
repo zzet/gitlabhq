@@ -9,7 +9,7 @@ module Teams::UsersActions
     project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
-      reindex_with_elastic(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
   end
 
@@ -19,7 +19,7 @@ module Teams::UsersActions
     project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
-      reindex_with_elastic(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
 
     receive_delayed_notifications
@@ -34,7 +34,7 @@ module Teams::UsersActions
     project_ids = team.projects.select("projects.id") + team.accessed_projects.select("projects.id")
 
     project_ids.each do |project_id|
-      reindex_with_elastic(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
 
     result

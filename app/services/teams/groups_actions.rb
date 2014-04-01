@@ -13,12 +13,12 @@ module Teams::GroupsActions
       end
     end
 
-    reindex_with_elastic(:update, Team.name, team.id)
+    reindex_with_elastic(Team, team.id)
 
     projects = Project.where(namespace_id: groups.pluck(:id)).pluck(:id)
 
     projects.each do |project_id|
-      reindex_with_elastic(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
   end
 
@@ -30,7 +30,7 @@ module Teams::GroupsActions
     tgrs.destroy_all
 
     projects.each do |project_id|
-      reindex_with_elastic(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
 
     receive_delayed_notifications

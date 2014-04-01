@@ -14,7 +14,7 @@ module Groups::TeamsActions
     end
 
     team_ids.each do |team_id|
-      reindex_with_elastic(:update, Team.name, team_id)
+      reindex_with_elastic(Team, team_id)
     end
 
     update_group_projects_indexes(group)
@@ -26,7 +26,7 @@ module Groups::TeamsActions
       gtr.destroy
     end
 
-    reindex_with_elastic(:update, Team.name, team.id)
+    reindex_with_elastic(Team, team.id)
 
     update_group_projects_indexes(group)
   end
@@ -39,7 +39,7 @@ module Groups::TeamsActions
 
   def update_group_projects_indexes(group)
     group.projects.pluck(:id).each do |project_id|
-      reindex_with_elastic(:update, Project.name, project_id)
+      reindex_with_elastic(Project, project_id)
     end
   end
 end

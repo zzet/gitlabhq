@@ -24,9 +24,9 @@ class BaseService
     end
   end
 
-  def reindex_with_elastic(action, model, id)
+  def reindex_with_elastic(klass, id, action = :update)
     begin
-      Elastic::BaseIndexer.perform_async(action, model, id)
+      Elastic::BaseIndexer.perform_async(action, klass.name, id)
     rescue
     end
   end
