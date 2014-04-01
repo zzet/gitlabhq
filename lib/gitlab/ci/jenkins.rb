@@ -66,8 +66,12 @@ module Gitlab
     end
 
     def commits
-      @commits = build_result["changeSet"]["items"].map { |item| item["commitId"] }
-      @commits << build_result["actions"][2]["buildsByBranchName"]["detached"]["revision"]["SHA1"] if build_result["actions"].first.blank?
+      @commits = []
+      begin
+        @commits = build_result["changeSet"]["items"].map { |item| item["commitId"] }
+        @commits << build_result["actions"][2]["buildsByBranchName"]["detached"]["revision"]["SHA1"] if build_result["actions"].first.blank?
+      rescue
+      end
       @commits
     end
   end
