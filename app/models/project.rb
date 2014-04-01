@@ -32,6 +32,8 @@ class Project < ActiveRecord::Base
   include Gitlab::VisibilityLevel
   extend Enumerize
 
+  default_value_for :archived, false
+
   ActsAsTaggableOn.strict_case_match = true
 
   attr_accessible :name, :path, :description, :issues_tracker, :label_list,
@@ -56,12 +58,12 @@ class Project < ActiveRecord::Base
   has_one :last_event, -> {order 'old_events.created_at DESC'}, class_name: Event, foreign_key: 'project_id'
   has_many :old_events,         class_name: OldEvent, dependent: :destroy
 
-  has_many :services
+  has_many :services,           dependent: :destroy
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests,     dependent: :destroy, foreign_key: "target_project_id"
   # Merge requests from source project should be kept when source project was removed
-  has_many :fork_merge_requests,dependent: :destroy, foreign_key: "source_project_id", class_name: MergeRequest
+  has_many :fork_merge_requests, foreign_key: "source_project_id", class_name: MergeRequest
 
   has_many :issues,   -> { order "state DESC, created_at DESC" }, dependent: :destroy
   has_many :milestones,         dependent: :destroy
@@ -108,15 +110,12 @@ class Project < ActiveRecord::Base
   validates :issues_enabled, :wall_enabled, :merge_requests_enabled,
             :wiki_enabled, inclusion: { in: [true, false] }
   validates :issues_tracker_id, length: { maximum: 255 }, allow_blank: true
-
   validates :namespace, presence: true
   validates_uniqueness_of :name, scope: :namespace_id
   validates_uniqueness_of :path, scope: :namespace_id
-
   validates :import_url,
     format: { with: URI::regexp(%w(git http https)), message: "should be a valid url" },
     if: :import?
-
   validate :check_limit, on: :create
 
   watch do
@@ -262,15 +261,56 @@ class Project < ActiveRecord::Base
   scope :joined,        ->(user) { where.not(namespace_id: user.namespace_id) }
   scope :public_via_git,      -> { where(git_protocol_enabled: true) }
   scope :public_only,         -> { where(visibility_level: PUBLIC) }
+  scope :public_and_internal_only, -> { where(visibility_level: Project.public_and_internal_levels) }
   scope :public_or_internal_only, ->(user) { where(visibility_level: (user ? [ INTERNAL, PUBLIC ] : [ PUBLIC ])) }
   scope :non_archived,        -> { where(archived: false) }
 
   enumerize :issues_tracker, in: (Gitlab.config.issues_tracker.keys).append(:gitlab), default: (Gitlab.config.default_issues_tracker || :gitlab)
   enumerize :wiki_engine, in: (Gitlab.config.wiki_engine.keys).append(:gitlab), default: (Gitlab.config.default_wiki_engine || :gitlab)
 
+  state_machine :import_status, initial: :none do
+    event :import_start do
+      transition :none => :started
+    end
+
+    event :import_finish do
+      transition :started => :finished
+    end
+
+    event :import_fail do
+      transition :started => :failed
+    end
+
+    event :import_retry do
+      transition :failed => :started
+    end
+
+    state :started
+    state :finished
+    state :failed
+
+    after_transition any => :started, :do => :add_import_job
+  end
+
   class << self
+    def public_and_internal_levels
+      [Project::PUBLIC, Project::INTERNAL]
+    end
+
     def abandoned
       where('projects.last_pushed_at < ?', 6.months.ago)
+    end
+
+    def publicish(user)
+      visibility_levels = [Project::PUBLIC]
+      visibility_levels += [Project::INTERNAL] if user
+      where(visibility_level: visibility_levels)
+    end
+
+    def accessible_to(user)
+      accessible_ids = publicish(user).pluck(:id)
+      accessible_ids += user.authorized_projects.pluck(:id) if user
+      where(id: accessible_ids)
     end
 
     def with_push
@@ -286,15 +326,13 @@ class Project < ActiveRecord::Base
     end
 
     def find_with_namespace(id)
-      if id.include?("/")
-        id = id.split("/")
-        namespace = Namespace.find_by(path: id.first)
-        return nil unless namespace
+      return nil unless id.include?("/")
 
-        where(namespace_id: namespace.id).find_by(path: id.second)
-      else
-        where(path: id, namespace_id: nil).last
-      end
+      id = id.split("/")
+      namespace = Namespace.find_by(path: id.first)
+      return nil unless namespace
+
+      where(namespace_id: namespace.id).find_by(path: id.second)
     end
 
     def visibility_levels
@@ -344,12 +382,28 @@ class Project < ActiveRecord::Base
     id && persisted?
   end
 
+  def add_import_job
+    RepositoryImportWorker.perform_in(2.seconds, id)
+  end
+
   def import?
     import_url.present?
   end
 
   def imported?
-    imported
+    import_finished?
+  end
+
+  def import_in_progress?
+    import? && import_status == 'started'
+  end
+
+  def import_failed?
+    import_status == 'failed'
+  end
+
+  def import_finished?
+    import_status == 'finished'
   end
 
   def check_limit
@@ -513,17 +567,16 @@ class Project < ActiveRecord::Base
     branch_name = ref.gsub("refs/heads/", "")
     c_ids = self.repository.commits_between(oldrev, newrev).map(&:id)
 
-    # Update code for merge requests into project between project branches
-    mrs = self.merge_requests.opened.by_branch(branch_name).to_a
-    # Update code for merge requests between project and project fork
-    mrs += self.fork_merge_requests.opened.by_branch(branch_name).to_a
-
-    mrs.each { |merge_request| merge_request.reload_code; merge_request.mark_as_unchecked }
-
     # Close merge requests
     mrs = self.merge_requests.opened.where(target_branch: branch_name).to_a
     mrs = mrs.select(&:last_commit).select { |mr| c_ids.include?(mr.last_commit.id) }
     mrs.each { |merge_request| MergeRequestsService.new(user, merge_request).merge }
+
+    # Update code for merge requests into project between project branches
+    mrs = self.merge_requests.opened.by_branch(branch_name).to_a
+    # Update code for merge requests between project and project fork
+    mrs += self.fork_merge_requests.opened.by_branch(branch_name).to_a
+    mrs.each { |merge_request| merge_request.reload_code; merge_request.mark_as_unchecked }
 
     true
   end

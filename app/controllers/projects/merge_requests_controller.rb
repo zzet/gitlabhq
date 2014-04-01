@@ -21,7 +21,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     params[:scope] = 'all' if params[:scope].blank?
     params[:state] = 'opened' if params[:state].blank?
 
-    @merge_requests = FilteringService.new.execute(current_user, MergeRequest, params.merge(project_id: @project.id))
+    @merge_requests = MergeRequestsFinder.new.execute(current_user, params.merge(project_id: @project.id))
     @merge_requests = @merge_requests.page(params[:page]).per(20)
 
     @sort = params[:sort].humanize
@@ -66,7 +66,11 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   def new
     @merge_request = MergeRequest.new(params[:merge_request])
     @merge_request.source_project = @project unless @merge_request.source_project
-    @merge_request.target_project = @project unless @merge_request.target_project
+    @merge_request.target_project ||= (@project.forked_from_project || @project)
+    @target_branches = @merge_request.target_project.nil? ? [] : @merge_request.target_project.repository.branch_names
+
+    @merge_request.target_branch ||= @merge_request.target_project.default_branch
+
     @source_project = @merge_request.source_project
     @merge_request
   end
@@ -99,7 +103,14 @@ class Projects::MergeRequestsController < Projects::ApplicationController
         opts = { notice: 'Merge request was successfully updated.' }
       end
 
-      redirect_to [@merge_request.target_project, @merge_request], opts
+      respond_to do |format|
+        format.js
+        format.html do
+          redirect_to [@merge_request.target_project, @merge_request], opts
+        end
+
+        return
+      end
     else
       if params[:merge_request].has_key?(:state_event)
         opts = { alert: "Failed to #{params[:merge_request][:state_event]} merge request." }
@@ -122,7 +133,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   def automerge
     return access_denied! unless allowed_to_merge?
 
-    if @merge_request.opened? && @merge_request.can_be_merged?
+    if @merge_request.open? && @merge_request.can_be_merged?
       @merge_request.should_remove_source_branch = params[:should_remove_source_branch]
       @merge_request.automerge!(current_user, params[:merge_commit_message])
       @status = true
@@ -145,7 +156,6 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   def update_branches
     @target_project = selected_target_project
     @target_branches = @target_project.repository.branch_names
-    @target_branches
 
     respond_to do |format|
       format.js
@@ -218,7 +228,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
 
     @merge_request_diff = @merge_request.merge_request_diff
     @allowed_to_merge = allowed_to_merge?
-    @show_merge_controls = @merge_request.opened? && @commits.any? && @allowed_to_merge
+    @show_merge_controls = @merge_request.open? && @commits.any? && @allowed_to_merge
   end
 
   def allowed_to_merge?

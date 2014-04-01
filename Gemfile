@@ -16,6 +16,9 @@ gem 'rails-observers'
 gem 'actionpack-page_caching'
 gem 'actionpack-action_caching'
 
+# Default values for AR models
+gem "default_value_for", "~> 3.0.0"
+
 # Supported DBs
 gem "pg"
 
@@ -34,7 +37,7 @@ gem 'elasticsearch-git',    github: 'zzet/elasticsearch-git',             ref: '
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
-gem "gitlab_git", '~> 5.4.0'
+gem "gitlab_git", '~> 5.7.1'
 gem 'rugged', git: 'git://github.com/libgit2/rugged.git', branch: 'development', submodules: true
 
 # Ruby/Rack Git Smart-HTTP Server Handler
@@ -51,7 +54,8 @@ gem "gitlab-linguist", "~> 3.0.0", require: "linguist"
 
 # API
 gem "grape", "~> 0.6.1"
-gem "grape-entity", "~> 0.3.0"
+# Replace with rubygems when nesteted entities get released
+gem "grape-entity", "~> 0.4.1", ref: 'd904381c951e86250c3f44213b349a3dd8e83fb1', git: 'https://github.com/intridea/grape-entity.git' 
 gem 'rack-cors', require: 'rack/cors'
 
 # Email validation
@@ -130,6 +134,7 @@ gem 'settingslogic'
 
 # Misc
 gem "foreman"
+gem 'version_sorter'
 
 # Cache
 gem "redis-rails"
@@ -142,6 +147,12 @@ gem "hipchat", "~> 0.14.0"
 
 # Flowdock integration
 gem "gitlab-flowdock-git-hook", "~> 0.4.2"
+
+# Gemnasium integration
+gem "gemnasium-gitlab-service", "~> 0.2"
+
+# Slack integration
+gem "slack-notifier", "~> 0.2.0"
 
 # d3
 gem "d3_rails", "~> 3.1.4"
@@ -173,8 +184,9 @@ gem "modernizr",        "2.6.2"
 gem "raphael-rails", "~> 2.1.2"
 gem 'bootstrap-sass', '~> 3.0'
 gem "font-awesome-rails", '~> 3.2'
-gem "gemoji", "~> 1.3.0"
+gem "gitlab_emoji", "~> 0.0.1.1"
 gem "gon", '~> 5.0.0'
+gem 'nprogress-rails'
 gem "js-routes"
 gem 'react-rails', '~> 0.8.0.0'
 gem "activerecord-import", "~> 0.4.1"
@@ -183,7 +195,7 @@ group :development do
   gem "annotate", "~> 2.6.0.beta2"
   gem "letter_opener"
   gem 'quiet_assets', '~> 1.0.1'
-  gem 'rack-mini-profiler'
+  gem 'rack-mini-profiler', require: false
 
   # Better errors handler
   gem 'better_errors'
@@ -252,7 +264,6 @@ group :development, :test do
   # PhantomJS driver for Capybara
   gem 'poltergeist', '~> 1.4.1'
 
-  gem 'spork', '~> 1.0rc'
   gem 'jasmine', '2.0.0.rc5'
 
   gem "spring", '1.1.1'

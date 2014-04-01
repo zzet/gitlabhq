@@ -23,6 +23,8 @@ class Snippet < ActiveRecord::Base
   belongs_to :author, class_name: User
   has_many :notes,    as: :noteable,  dependent: :destroy
 
+  default_value_for :private, true
+
   validates :author, presence: true
   validates :title, presence: true, length: { within: 0..255 }
   validates :file_name, presence: true, length: { within: 0..255 }

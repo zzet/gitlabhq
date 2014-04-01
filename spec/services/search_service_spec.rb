@@ -1,20 +1,19 @@
 require 'spec_helper'
 
 describe 'SearchService' do
-  let(:found_namespace) { create(:group, name: 'searchable namespace', path:'another_thing') }
   let(:user) { create(:user, namespace: found_namespace) }
-  let!(:found_project) { create(:project, name: 'searchable_project', creator_id: user.id, namespace: found_namespace, visibility_level: Gitlab::VisibilityLevel::PRIVATE) }
-
-  let(:unfound_namespace) { create(:namespace, name: 'unfound namespace', path: 'yet_something_else') }
-  let!(:unfound_project) { create(:project, name: 'unfound_project', creator_id: user.id, namespace: unfound_namespace, visibility_level: Gitlab::VisibilityLevel::PRIVATE) }
-
-  let(:internal_namespace) { create(:namespace, path: 'something_internal',name: 'searchable internal namespace') }
-  let(:internal_user) { create(:user, namespace: internal_namespace) }
-  let!(:internal_project) { create(:project, name: 'searchable_internal_project', creator_id: internal_user.id, namespace: internal_namespace, visibility_level: Gitlab::VisibilityLevel::INTERNAL) }
-
-  let(:public_namespace) { create(:namespace, path: 'something_public',name: 'searchable public namespace') }
   let(:public_user) { create(:user, namespace: public_namespace) }
-  let!(:public_project) { create(:project, name: 'searchable_public_project', creator_id: public_user.id, namespace: public_namespace, visibility_level: Gitlab::VisibilityLevel::PUBLIC) }
+  let(:internal_user) { create(:user, namespace: internal_namespace) }
+
+  let(:found_namespace) { create(:namespace, name: 'searchable namespace', path:'another_thing') }
+  let(:unfound_namespace) { create(:namespace, name: 'unfound namespace', path: 'yet_something_else') }
+  let(:internal_namespace) { create(:namespace, name: 'searchable internal namespace', path: 'something_internal') }
+  let(:public_namespace) { create(:namespace, name: 'searchable public namespace', path: 'something_public') }
+
+  let!(:found_project) { create(:project, :private, name: 'searchable_project', creator_id: user.id, namespace: found_namespace) }
+  let!(:unfound_project) { create(:project, :private, name: 'unfound_project', creator_id: user.id, namespace: unfound_namespace) }
+  let!(:internal_project) { create(:project, :internal, name: 'searchable_internal_project', creator_id: internal_user.id, namespace: internal_namespace) }
+  let!(:public_project) { create(:project, :public, name: 'searchable_public_project', creator_id: public_user.id, namespace: public_namespace) }
 
   describe '#execute' do
     context 'unauthenticated' do

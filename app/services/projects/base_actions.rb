@@ -58,6 +58,28 @@ module Projects::BaseActions
         )
       end
 
+      @project.update_column(:last_activity_at, @project.created_at)
+
+      if @project.import?
+        @project.import_start
+      else
+        GitlabShellWorker.perform_async(
+          :add_repository,
+          @project.path_with_namespace
+        )
+      end
+
+      if @project.wiki_enabled?
+        begin
+          # force the creation of a wiki,
+          GollumWiki.new(@project, @project.owner).wiki
+        rescue GollumWiki::CouldNotCreateWikiError => ex
+          # Prevent project observer crash
+          # if failed to create wiki
+          nil
+        end
+      end
+
       if current_user.notification_setting && current_user.notification_setting.subscribe_if_owner
         SubscriptionService.subscribe(current_user, :all, @project, :all)
       end

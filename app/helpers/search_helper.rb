@@ -5,8 +5,7 @@ module SearchHelper
     resources_results = [
       groups_autocomplete(term),
       teams_autocomplete(term),
-      projects_autocomplete(term),
-      public_projects_autocomplete(term),
+      projects_autocomplete(term)
     ].flatten
 
     generic_results = project_autocomplete + default_autocomplete + help_autocomplete
@@ -94,16 +93,6 @@ module SearchHelper
   # Autocomplete results for the current user's projects
   def projects_autocomplete(term, limit = 10)
     Project.search(term, options: { pids: current_user.known_projects.pluck(:id), non_archived: true }, per: limit).map do |p|
-      {
-        label: "project: #{search_result_sanitize(p.name_with_namespace)}",
-        url: project_path(p)
-      }
-    end
-  end
-
-  # Autocomplete results for the current user's projects
-  def public_projects_autocomplete(term, limit = 10)
-    Project.search(term, options: { pids: Project.public_or_internal_only(current_user).pluck(:id), non_archived: true }, per: limit).map do |p|
       {
         label: "project: #{search_result_sanitize(p.name_with_namespace)}",
         url: project_path(p)

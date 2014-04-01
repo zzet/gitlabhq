@@ -43,16 +43,18 @@ class GitPushService
 
     project.ensure_satellite_exists
     project.repository.expire_cache
-    Rails.cache.delete(project.repository.cache_key(:branch_names)) if push.branch?
-    Rails.cache.delete(project.repository.cache_key(:tag_names)) if push.tag?
 
     if push.to_existing_branch?
       project.update_merge_requests(oldrev, newrev, ref, @current_user)
       process_commit_messages(push)
     end
 
-    project.execute_hooks(@push_data.dup, :push_hooks)
-    project.execute_services(@push_data.dup)
+    if push.tag?
+      project.execute_hooks(@push_data.dup, :tag_push_hooks)
+    else
+      project.execute_hooks(@push_data.dup, :push_hooks)
+      project.execute_services(@push_data.dup)
+    end
 
     if push.created_branch?
       # Re-find the pushed commits.

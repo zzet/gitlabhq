@@ -47,20 +47,12 @@ class OldEvent < ActiveRecord::Base
   scope :in_projects, ->(project_ids) { where(project_id: project_ids).recent }
 
   class << self
-    def determine_action(record)
-      if [Issue, MergeRequest].include? record.class
-        OldEvent::CREATED
-      elsif record.kind_of? Note
-        OldEvent::COMMENTED
-      end
-    end
-
     def create_ref_event(project, user, ref, action = 'add', prefix = 'refs/heads')
       if action.to_s == 'add'
         before = '00000000'
-        after = ref.commit.id
+        after = commit.id
       else
-        before = ref.commit.id
+        before = commit.id
         after = '00000000'
       end
 

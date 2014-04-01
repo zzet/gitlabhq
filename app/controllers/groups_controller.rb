@@ -1,4 +1,5 @@
 class GroupsController < ApplicationController
+  skip_before_filter :authenticate_user!, only: [:show, :issues, :members, :merge_requests]
   respond_to :html
   before_filter :group, except: [:new, :create]
 
@@ -38,7 +39,7 @@ class GroupsController < ApplicationController
     @events = OldEvent.in_projects(project_ids)
     @events = event_filter.apply_filter(@events)
     @events = @events.limit(20).offset(params[:offset] || 0)
-    @last_push = current_user.recent_push
+    @last_push = current_user.recent_push if current_user
 
     @teams = @group.teams
     @projects = @group.projects.sorted_by_push_date
@@ -73,16 +74,15 @@ class GroupsController < ApplicationController
   end
 
   def merge_requests
-    @merge_requests = FilteringService.new.execute(current_user, MergeRequest, params)
-    @merge_requests = @merge_requests.of_group(@group)
-    @merge_requests = @merge_requests.recent.page(params[:page]).per(20)
+    @merge_requests = MergeRequestsFinder.new.execute(current_user, params)
+    @merge_requests = @merge_requests.page(params[:page]).per(20)
+    @merge_requests = @merge_requests.preload(:author, :target_project)
   end
 
   def issues
-    @issues = FilteringService.new.execute(current_user, Issue, params)
-    @issues = @issues.of_group(@group)
-    @issues = @issues.recent.page(params[:page]).per(20)
-    @issues = @issues.includes(:author, :project)
+    @issues = IssuesFinder.new.execute(current_user, params)
+    @issues = @issues.page(params[:page]).per(20)
+    @issues = @issues.preload(:author, :project)
 
     respond_to do |format|
       format.html
@@ -128,17 +128,21 @@ class GroupsController < ApplicationController
   end
 
   def projects
-    @projects ||= (current_user.admin? ? Project.all : current_user.known_projects).where(namespace_id: group.id).sorted_by_push_date
+    @projects ||= ProjectsFinder.new.execute(current_user, group: group).sorted_by_push_date.non_archived
   end
 
   def project_ids
-    projects.map(&:id)
+    projects.pluck(:id)
   end
 
   # Dont allow unauthorized access to group
   def authorize_read_group!
     unless @group and (projects.present? or can?(current_user, :read_group, @group))
-      return render_404
+      if current_user.nil?
+        return authenticate_user!
+      else
+        return render_404
+      end
     end
   end
 
@@ -161,13 +165,21 @@ class GroupsController < ApplicationController
   def determine_layout
     if [:new, :create].include?(action_name.to_sym)
       'navless'
-    else
+    elsif current_user
       'group'
+    else
+      'public_group'
     end
   end
 
   def default_filter
-    params[:scope] = 'assigned-to-me' if params[:scope].blank?
+    if params[:scope].blank?
+      if current_user
+        params[:scope] = 'assigned-to-me'
+      else
+        params[:scope] = 'all'
+      end
+    end
     params[:state] = 'opened' if params[:state].blank?
     params[:group_id] = @group.id
   end

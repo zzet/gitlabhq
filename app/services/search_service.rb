@@ -5,9 +5,7 @@ class SearchService < BaseService
 
     return global_search_result unless query.present?
 
-    known_projects_ids = []
-    known_projects_ids += current_user.known_projects.pluck(:id) if current_user
-    known_projects_ids += Project.public_or_internal_only(current_user).pluck(:id)
+    known_projects_ids = current_user.present? ? known_projects.pluck(:id) : Project.public_only
 
     group = Group.find_by_id(params[:group_id]) if params[:group_id].present?
 

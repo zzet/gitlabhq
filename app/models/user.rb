@@ -255,7 +255,7 @@ class User < ActiveRecord::Base
         where(conditions).first
       end
     end
-    
+
     def find_for_commit(email, name)
       # Prefer email match over name match
       User.where(email: email).first ||
@@ -315,7 +315,7 @@ class User < ActiveRecord::Base
   def namespace_uniq
     namespace_name = self.username
     if Namespace.find_by(path: namespace_name)
-      self.errors.add :username, "already exist"
+      self.errors.add :username, "already exists"
     end
   end
 
@@ -358,15 +358,24 @@ class User < ActiveRecord::Base
   # Projects user has access to
   def authorized_projects
     @authorized_projects ||= begin
-                               project_ids = (personal_projects.pluck(:id) + projects.pluck(:id) + owned_projects.pluck(:id) +
-                                              team_projects.pluck(:id)   + team_group_grojects.pluck(:id)).uniq
+                               project_ids = personal_projects.pluck(:id)
+                               project_ids += projects.pluck(:id)
+                               project_ids += owned_projects.pluck(:id)
+                               project_ids += team_projects.pluck(:id)
+                               project_ids += team_group_grojects.pluck(:id)
+                               project_ids = project_ids.uniq
+
                                Project.where(id: project_ids).joins(:namespace).order('namespaces.name ASC')
                              end
   end
 
   def known_projects
-    @project_ids ||= (personal_projects.pluck(:id) + owned_projects.pluck(:id) + projects.pluck(:id) +
-                      team_projects.pluck(:id)  + team_group_grojects.pluck(:id) + Project.public_or_internal_only(self).pluck(:id)).uniq
+    @project_ids ||= begin
+                       project_ids = authorized_projects.pluck(:id)
+                       project_ids += Project.public_or_internal_only(self).pluck(:id)
+                       project_ids.uniq
+                     end
+
     Project.where(id: @project_ids)
   end
 
@@ -505,6 +514,14 @@ class User < ActiveRecord::Base
     %w(name username skype linkedin twitter bio).each do |attr|
       value = self.send(attr)
       self.send("#{attr}=", Sanitize.clean(value)) if value.present?
+    end
+  end
+
+  def requires_ldap_check?
+    if ldap_user?
+      !last_credential_check_at || (last_credential_check_at + 1.hour) < Time.now
+    else
+      false
     end
   end
 
