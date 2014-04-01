@@ -13,12 +13,18 @@ module Teams::GroupsActions
       end
     end
 
-    Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    begin
+      Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    rescue
+    end
 
     projects = Project.where(namespace_id: groups.pluck(:id)).pluck(:id)
 
     projects.each do |project_id|
-      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      rescue
+      end
     end
   end
 
@@ -30,7 +36,10 @@ module Teams::GroupsActions
     tgrs.destroy_all
 
     projects.each do |project_id|
-      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      rescue
+      end
     end
 
     receive_delayed_notifications

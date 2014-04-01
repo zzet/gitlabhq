@@ -14,7 +14,10 @@ module Groups::TeamsActions
     end
 
     team_ids.each do |team_id|
-      Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
+      rescue
+      end
     end
 
     update_group_projects_indexes(group)
@@ -26,7 +29,10 @@ module Groups::TeamsActions
       gtr.destroy
     end
 
-    Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    begin
+      Elastic::BaseIndexer.perform_async(:update, team.class.name, team.id)
+    rescue
+    end
 
     update_group_projects_indexes(group)
   end
@@ -39,7 +45,10 @@ module Groups::TeamsActions
 
   def update_group_projects_indexes(group)
     group.projects.pluck(:id).each do |project_id|
-      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      rescue
+      end
     end
   end
 end

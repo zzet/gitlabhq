@@ -69,11 +69,17 @@ class UsersService < BaseService
     user.destroy
 
     projects_ids.each do |project_id|
-      Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Project.name, project_id)
+      rescue
+      end
     end
 
     teams_ids.each do |team_id|
-      Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
+      begin
+        Elastic::BaseIndexer.perform_async(:update, Team.name, team_id)
+      rescue
+      end
     end
 
     receive_delayed_notifications
