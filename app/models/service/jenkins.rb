@@ -83,4 +83,8 @@ class Service::Jenkins < Service
       end
     end
   end
+
+  def can_test?
+    false
+  end
 end

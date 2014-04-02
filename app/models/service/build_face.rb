@@ -103,4 +103,8 @@ class Service::BuildFace < Service
     "Here"
     #project_url + "/status.png?ref=" + project.default_branch
   end
+
+  def can_test?
+    false
+  end
 end

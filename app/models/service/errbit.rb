@@ -19,4 +19,8 @@ class Service::Errbit < Service
   default_title       'Errbit'
   default_description 'Errbit'
   service_name        'errbit'
+
+  def can_test?
+    false
+  end
 end
