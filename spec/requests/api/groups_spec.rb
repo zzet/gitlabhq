@@ -35,6 +35,8 @@ describe API::API do
 
     context "when authenticated as  admin" do
       it "admin: should return an array of all groups" do
+        group1
+        group2
         sleep 2
         get api("/groups", admin)
         response.status.should == 200

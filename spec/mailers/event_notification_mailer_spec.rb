@@ -1127,7 +1127,7 @@ describe EventNotificationMailer do
 
       context "when event source - push action" do
         before do
-          @oldrev = 'b98a310def241a6fd9c9a9a3e7934c48e498fe81'
+          @oldrev = '9ba1224867665844b117fa037e1465bb706b3685'
           @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
           @ref = 'refs/heads/master'
           #project.save

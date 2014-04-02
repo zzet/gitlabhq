@@ -5,11 +5,13 @@ class SearchService < BaseService
 
     return global_search_result unless query.present?
 
-    known_projects_ids = current_user.present? ? current_user.known_projects.pluck(:id) : Project.public_only
+    known_projects_ids = current_user.present? ? current_user.known_projects.pluck(:id) : Project.public_only.pluck(:id)
 
     group = Group.find_by_id(params[:group_id]) if params[:group_id].present?
 
     search_options = { pids: known_projects_ids }
+    search_options[:order] = params[:order] if params[:order].present?
+
     search_options[:namespace_id] = group.id if group
 
     global_search_result[:groups]         = Group.search(query, options: search_options, page: params[:page])
@@ -20,7 +22,7 @@ class SearchService < BaseService
     global_search_result[:issues]         = Issue.search(query, options: { projects_ids: known_projects_ids, page: params[:page] })
     global_search_result[:repositories]   = Repository.search(query, options: search_options, page: params[:page])
 
-    global_search_result[:total_results]  = %w(projects issues merge_requests).sum { |items| global_search_result[items.to_sym].size }
+    #global_search_result[:total_results]  = %w(projects issues merge_requests).sum { |items| global_search_result[items.to_sym].size }
 
     global_search_result
   end

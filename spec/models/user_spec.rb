@@ -293,20 +293,6 @@ describe User do
     end
   end
 
-  describe 'search' do
-    let(:user1) { create(:user, username: 'James', email: 'james@testing.com') }
-    let(:user2) { create(:user, username: 'jameson', email: 'jameson@example.com') }
-
-    it "should be case insensitive" do
-      User.search(user1.username.upcase).to_a.should == [user1]
-      User.search(user1.username.downcase).to_a.should == [user1]
-      User.search(user2.username.upcase).to_a.should == [user2]
-      User.search(user2.username.downcase).to_a.should == [user2]
-      User.search(user1.username.downcase).to_a.count.should == 2
-      User.search(user2.username.downcase).to_a.count.should == 1
-    end
-  end
-
   describe 'by_username_or_id' do
     let(:user1) { create(:user, username: 'foo') }
 
@@ -328,7 +314,7 @@ describe User do
       user.all_ssh_keys.should include(key.key)
     end
   end
-    
+
   describe :avatar_type do
     let(:user) { create(:user) }
 
