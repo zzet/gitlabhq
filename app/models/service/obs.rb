@@ -21,4 +21,8 @@ class Service::Obs < Service
   service_name        'obs'
 
   with_user name: "Obs service", username: "obs_service", email: "example_obs@example.org"
+
+  def can_test?
+    false
+  end
 end

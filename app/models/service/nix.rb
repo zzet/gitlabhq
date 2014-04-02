@@ -21,4 +21,8 @@ class Service::Nix < Service
   service_name        'nix'
 
   with_user name: "Nix service", username: "nix_service", email: "example_nix@example.org"
+
+  def can_test?
+    false
+  end
 end

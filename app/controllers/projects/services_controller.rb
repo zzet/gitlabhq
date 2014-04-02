@@ -35,7 +35,7 @@ class Projects::ServicesController < Projects::ApplicationController
   end
 
   def test
-    data = GitPushService.new.sample_data(current_user, project)
+    data = GitPushService.new(current_user, project).sample_data
 
     service.execute(data)
 

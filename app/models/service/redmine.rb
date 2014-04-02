@@ -19,4 +19,8 @@ class Service::Redmine < Service
   default_title       'Redmine'
   default_description 'Redmine'
   service_name        'redmine'
+
+  def can_test?
+    false
+  end
 end

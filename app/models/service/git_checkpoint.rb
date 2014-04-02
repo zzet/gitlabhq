@@ -76,4 +76,8 @@ class Service::GitCheckpoint < Service
     hook.url = "#{configuration.domain}/#{configuration.web_hook_path}"
     hook.save
   end
+
+  def can_test?
+    false
+  end
 end
