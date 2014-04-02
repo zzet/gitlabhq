@@ -174,6 +174,19 @@
         - else
           .nothing-here-block Only the project owner can transfer a project
 
+        - if can?(current_user, :remove_project, @project)
+          .ui-box.ui-box-danger
+            .title Remove project
+            .body
+              %p
+                Removing the project will delete its repository and all related resources including issues, merge requests etc.
+                %br
+                %strong Removed projects cannot be restored!
+
+              = link_to 'Remove project', @project, data: { confirm: remove_project_message(@project) }, method: :delete, class: "btn btn-remove"
+        - else
+          %p.nothing_here_message Only project owner can remove a project
+
 .save-project-loader.hide
   %center
     %h2

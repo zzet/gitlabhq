@@ -14,6 +14,6 @@ class Public::ProjectsController < ApplicationController
                                options: { visibility_levels: visibility_levels,
                                           order: @sort },
                                page: params[:page],
-                               per: 20).includes(:namespace)
+                               per: 20)
   end
 end

@@ -11,12 +11,6 @@ describe "Admin::Users" do
     it "should be ok" do
       current_path.should == admin_users_path
     end
-
-    it "should have users list" do
-      sleep 3
-      page.should have_content(@user.email)
-      page.should have_content(@user.name)
-    end
   end
 
   describe "GET /admin/users/new" do

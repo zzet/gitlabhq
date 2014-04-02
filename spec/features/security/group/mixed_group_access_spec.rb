@@ -57,7 +57,7 @@ describe "Group access" do
     end
 
     describe "GET /groups/:path/members" do
-      subject { members_group_path(group) }
+      subject { group_members_path(group) }
 
       it { should be_allowed_for owner }
       it { should be_allowed_for master }

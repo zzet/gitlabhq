@@ -16,53 +16,53 @@
 #  api_key     :string(255)
 #
 
-class SlackService < Service
-  attr_accessible :room
-  attr_accessible :subdomain
+#class SlackService < Service
+  #attr_accessible :room
+  #attr_accessible :subdomain
 
-  validates :room, presence: true, if: :activated?
-  validates :subdomain, presence: true, if: :activated?
-  validates :token, presence: true, if: :activated?
+  #validates :room, presence: true, if: :activated?
+  #validates :subdomain, presence: true, if: :activated?
+  #validates :token, presence: true, if: :activated?
 
-  def title
-    'Slack'
-  end
+  #def title
+    #'Slack'
+  #end
 
-  def description
-    'A team communication tool for the 21st century'
-  end
+  #def description
+    #'A team communication tool for the 21st century'
+  #end
 
-  def to_param
-    'slack'
-  end
+  #def to_param
+    #'slack'
+  #end
 
-  def fields
-    [
-      { type: 'text', name: 'subdomain', placeholder: '' },
-      { type: 'text', name: 'token',     placeholder: '' },
-      { type: 'text', name: 'room',      placeholder: 'Ex. #general' },
-    ]
-  end
+  #def fields
+    #[
+      #{ type: 'text', name: 'subdomain', placeholder: '' },
+      #{ type: 'text', name: 'token',     placeholder: '' },
+      #{ type: 'text', name: 'room',      placeholder: 'Ex. #general' },
+    #]
+  #end
 
-  def execute(push_data)
-    message = SlackMessage.new(push_data.merge(
-      project_url: project_url,
-      project_name: project_name
-    ))
+  #def execute(push_data)
+    #message = SlackMessage.new(push_data.merge(
+      #project_url: project_url,
+      #project_name: project_name
+    #))
 
-    notifier = Slack::Notifier.new(subdomain, token)
-    notifier.channel = room
-    notifier.username = 'GitLab'
-    notifier.ping(message.compose)
-  end
+    #notifier = Slack::Notifier.new(subdomain, token)
+    #notifier.channel = room
+    #notifier.username = 'GitLab'
+    #notifier.ping(message.compose)
+  #end
 
-  private
+  #private
 
-  def project_name
-    project.name_with_namespace.gsub(/\s/, '')
-  end
+  #def project_name
+    #project.name_with_namespace.gsub(/\s/, '')
+  #end
 
-  def project_url
-    project.web_url
-  end
-end
+  #def project_url
+    #project.web_url
+  #end
+#end

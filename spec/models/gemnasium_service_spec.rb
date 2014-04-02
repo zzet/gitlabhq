@@ -18,7 +18,7 @@
 
 require 'spec_helper'
 
-describe GemnasiumService do
+describe Service::Gemnasium do
   describe "Associations" do
     it { should belong_to :project }
     it { should have_one :service_hook }
@@ -29,7 +29,7 @@ describe GemnasiumService do
     let(:project) { create(:project) }
 
     before do
-      @gemnasium_service = GemnasiumService.new
+      @gemnasium_service = Service::Gemnasium.new
       @gemnasium_service.stub(
         project_id: project.id,
         project: project,
@@ -37,8 +37,9 @@ describe GemnasiumService do
         token: 'verySecret',
         api_key: 'GemnasiumUserApiKey'
       )
-      @sample_data = GitPushService.new.sample_data(project, user)
+      @sample_data = GitPushService.new(user, project).sample_data
     end
+
     it "should call Gemnasium service" do
       Gemnasium::GitlabService.should_receive(:execute).with(an_instance_of(Hash)).once
       @gemnasium_service.execute(@sample_data)

@@ -486,6 +486,14 @@ class Project < ActiveRecord::Base
     gitlab_ci.present? && gitlab_ci.enabled?
   end
 
+  def gemnasium
+    @gemnasium_service ||= services.where(type: Service::Gemnasium).first
+  end
+
+  def gemnasium?
+    gemnasium.present? && gemnasium.enabled?
+  end
+
   def jenkins_ci?
     jenkins_ci.present? && jenkins_ci.enabled?
   end

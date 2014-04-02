@@ -56,24 +56,24 @@ describe "Group with internal project access" do
     end
 
     describe "GET /groups/:path/members" do
-      subject { members_group_path(group) }
+      subject { group_members_path(group) }
 
+      it { should be_allowed_for :admin }
       it { should be_allowed_for owner }
       it { should be_allowed_for master }
-      it { should be_allowed_for reporter }
-      it { should be_allowed_for :admin }
-      it { should be_allowed_for guest }
-      it { should be_allowed_for :user }
+      it { should be_denied_for reporter }
+      it { should be_denied_for guest }
+      it { should be_denied_for :user }
       it { should be_denied_for :visitor }
     end
 
     describe "GET /groups/:path/edit" do
       subject { edit_group_path(group) }
 
-      it { should be_allowed_for owner }
-      it { should be_denied_for master }
-      it { should be_denied_for reporter }
       it { should be_allowed_for :admin }
+      it { should be_allowed_for owner }
+      it { should be_allowed_for master }
+      it { should be_denied_for reporter }
       it { should be_denied_for guest }
       it { should be_denied_for :user }
       it { should be_denied_for :visitor }

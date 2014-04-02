@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140313092127) do
+ActiveRecord::Schema.define(version: 20140401163952) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,8 +21,8 @@ ActiveRecord::Schema.define(version: 20140313092127) do
     t.datetime "starts_at"
     t.datetime "ends_at"
     t.integer  "alert_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string   "color"
     t.string   "font"
   end
@@ -320,14 +320,13 @@ ActiveRecord::Schema.define(version: 20140313092127) do
     t.boolean  "snippets_enabled",       default: true,     null: false
     t.boolean  "git_protocol_enabled"
     t.datetime "last_activity_at"
-    t.boolean  "imported",               default: false,    null: false
     t.datetime "last_pushed_at"
     t.string   "import_url"
-    t.string   "import_status"
     t.integer  "visibility_level",       default: 0,        null: false
     t.boolean  "archived",               default: false,    null: false
     t.string   "wiki_engine"
     t.string   "wiki_external_id"
+    t.string   "import_status"
   end
 
   add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree
@@ -389,6 +388,15 @@ ActiveRecord::Schema.define(version: 20140313092127) do
     t.integer  "service_id"
     t.string   "service_type"
     t.string   "token"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "service_configuration_gemnasia", force: true do |t|
+    t.string   "token"
+    t.string   "api_key"
+    t.integer  "service_id"
+    t.string   "service_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -618,7 +626,6 @@ ActiveRecord::Schema.define(version: 20140313092127) do
     t.integer  "notification_level",       default: 1,     null: false
     t.datetime "password_expires_at"
     t.integer  "created_by_id"
-    t.datetime "last_credential_check_at"
     t.string   "avatar"
     t.string   "confirmation_token"
     t.datetime "confirmed_at"
@@ -626,6 +633,7 @@ ActiveRecord::Schema.define(version: 20140313092127) do
     t.string   "unconfirmed_email"
     t.boolean  "hide_no_ssh_key",          default: false
     t.string   "website_url",              default: "",    null: false
+    t.datetime "last_credential_check_at"
   end
 
   add_index "users", ["admin"], name: "index_users_on_admin", using: :btree

@@ -45,13 +45,6 @@ describe 'SearchService' do
         results[:projects].should include(internal_project)
         results[:projects].should include(public_project)
       end
-
-      it 'namespace name should be searchable' do
-        sleep 1
-        context = SearchService.new(user, search: found_namespace.name)
-        results = context.global_search
-        results[:projects].to_a.should == [found_project]
-      end
     end
   end
 end

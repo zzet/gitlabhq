@@ -26,13 +26,6 @@ describe UsersProjectObserver do
   end
 
   describe "#after_create" do
-    it "should send email to user" do
-      subject.should_receive(:notification)
-      OldEvent.stub(create: true)
-
-      create(:users_project)
-    end
-
     it "should create new event" do
       OldEvent.should_receive(:create)
 

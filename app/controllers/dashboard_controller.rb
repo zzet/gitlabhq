@@ -70,14 +70,13 @@ class DashboardController < ApplicationController
     @projects = @projects.where(namespace_id: Group.find_by(name: params[:group])) if params[:group].present?
     @projects = @projects.where(id: Team.find_by(name: params[:team]).projects) if params[:team].present?
     @projects = @projects.where(visibility_level: params[:visibility_level]) if params[:visibility_level].present?
+    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
+    @projects = @projects.page(params[:page]).per(30)
     @projects = @projects.includes(:namespace)
     #@projects = @projects.includes(:namespace).sorted_by_activity
-    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
-    @projects = @projects.page(params[:page]).per(30)
+    @sort = params[:sort]
+    @projects = @projects.sort(@sort)
 
-    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
-    @projects = @projects.sort(@sort = params[:sort])
-    @projects = @projects.page(params[:page]).per(30)
 
     @labels = current_user.authorized_projects.tags_on(:labels)
     @groups = current_user.groups
