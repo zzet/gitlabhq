@@ -13,7 +13,7 @@ class CiBuildResultWorker
 
     builds = CiBuild.where(source_sha: parser.commits).where.not(id: source_build.id)
 
-    CiBuild.where(id: [builds.ids, source_build.id]).find_each do |build|
+    CiBuild.where(id: [builds.ids, source_build.id].compact).find_each do |build|
       if build.source_sha != parser.last_sha
         build.to_skipped
       else
