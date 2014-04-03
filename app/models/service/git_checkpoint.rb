@@ -54,7 +54,8 @@ class Service::GitCheckpoint < Service
         name: project.name_with_namespace,
         url: project.ssh_url_to_repo,
         description: project.description,
-        homepage: project.http_url_to_repo
+        homepage: project.http_url_to_repo,
+        categories: project.categories.map {|c| c.name }
       }
     }
 

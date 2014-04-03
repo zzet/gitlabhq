@@ -39,6 +39,9 @@ class GitPushService
     @push_data    = push.data.dup
     @push_commits = push.commits.dup
 
+    # For issue Feature #43932 add categories list to hook json
+    @push_data[:repository][:categories] = project.categories.map {|c| c.name }
+
     create_push_event
 
     project.ensure_satellite_exists
