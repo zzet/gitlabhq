@@ -18,7 +18,7 @@ describe 'SearchService' do
   describe '#execute' do
     context 'unauthenticated' do
       it 'should return public projects only' do
-        sleep 1
+        #sleep 1
         context = SearchService.new(nil, search: "searchable")
         results = context.global_search
         results[:projects].should have(1).items
@@ -28,7 +28,7 @@ describe 'SearchService' do
 
     context 'authenticated' do
       it 'should return public, internal and private projects' do
-        sleep 1
+        #sleep 1
         context = SearchService.new(user, search: "searchable")
         results = context.global_search
         results[:projects].should have(3).items
@@ -38,7 +38,7 @@ describe 'SearchService' do
       end
 
       it 'should return only public & internal projects' do
-        sleep 1
+        #sleep 1
         context = SearchService.new(internal_user, search: "searchable")
         results = context.global_search
         results[:projects].should have(2).items

@@ -22,6 +22,7 @@ module IssuesSearch
       indexes :author,      type: :nested
       #indexes :assignee,    type: :nested
 
+      indexes :title_sort, type: :string, index: 'not_analyzed'
       indexes :updated_at_sort, type: :date,   index: :not_analyzed
       indexes :created_at_sort, type: :string, index: :not_analyzed
     end

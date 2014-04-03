@@ -13,7 +13,7 @@ describe API::API do
   let(:snippet) { create(:project_snippet, author: user, project: project, title: 'example') }
   let(:users_project) { create(:users_project, user: user, project: project, project_access: UsersProject::MASTER) }
   let(:users_project2) { create(:users_project, user: user3, project: project, project_access: UsersProject::DEVELOPER) }
-  let(:issue_with_labels) { create(:issue, author: user, assignee: user, project: project, :label_list => "label1, label2") }
+  let(:issue_with_labels) { RequestStore.store[:current_user] = admin; create(:issue, author: user, assignee: user, project: project, :label_list => "label1, label2") }
 
   describe "GET /projects" do
     before { project }
@@ -577,7 +577,7 @@ describe API::API do
 
     context "when authenticated" do
       it "should return an array of projects" do
-        sleep 1
+        #sleep 1
         get api("/projects/search/#{query}", user)
         response.status.should == 200
         json_response.should be_an Array
@@ -588,7 +588,7 @@ describe API::API do
 
     context "when authenticated as a different user" do
       it "should return matching public projects" do
-        sleep 1
+        #sleep 1
         get api("/projects/search/#{query}", user2)
         response.status.should == 200
         json_response.should be_an Array

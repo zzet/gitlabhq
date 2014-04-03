@@ -1,4 +1,4 @@
-class GroupPages < Spinach::FeatureSteps
+class Groups < Spinach::FeatureSteps
   include SharedAuthentication
   include SharedPaths
   include SharedGroup
@@ -111,7 +111,7 @@ class GroupPages < Spinach::FeatureSteps
 
   step 'I should see new group "Owned" avatar' do
     Group.find_by(name: "Owned").avatar.should be_instance_of AttachmentUploader
-    Group.find_by(name: "Owned").avatar.url.should == "/uploads/group/avatar/#{ Group.find_by(name:"Owned").id }/gitlab_logo.png"
+    Group.find_by(name: "Owned").avatar.url.should == "/system/uploads/group/avatar/#{ Group.find_by(name:"Owned").id }/gitlab_logo.png"
   end
 
   step 'I should see the "Remove avatar" button' do

@@ -25,7 +25,7 @@ describe EventNotificationMailer do
     yield
   end
 
-  let(:group)   { g  = create :group,             owner:   @another_user;                   clear_prepare_data; g }
+  let(:group)   { g  = create :group,   owner:   @another_user;                   clear_prepare_data; g }
   let(:project) { pr = create :project, creator: @another_user, namespace: group; clear_prepare_data; pr }
 
   before do
@@ -34,7 +34,6 @@ describe EventNotificationMailer do
       @another_user = create :user
       @commiter_user = create :user, { email: "dmitriy.zaporozhets@gmail.com" }
     end
-
     @user.create_notification_setting(brave: true)
     RequestStore.store[:current_user] = @another_user
     clear_prepare_data
@@ -1127,7 +1126,7 @@ describe EventNotificationMailer do
 
       context "when event source - push action" do
         before do
-          @oldrev = '9ba1224867665844b117fa037e1465bb706b3685'
+          @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
           @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
           @ref = 'refs/heads/master'
           #project.save

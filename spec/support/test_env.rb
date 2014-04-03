@@ -102,9 +102,10 @@ module TestEnv
       size: 12.45
     )
 
-    BaseObserver.any_instance.stub(
-      current_user: double("current_user", id: 1)
-    )
+    # Fucking stub
+    #BaseObserver.any_instance.stub(
+      #current_user: double("current_user", id: 1)
+    #)
 
     #Elastic::BaseIndexer.any_instance.stub(perform: true)
     #Elastic::RepositoryIndexer.any_instance.stub(perform: true)

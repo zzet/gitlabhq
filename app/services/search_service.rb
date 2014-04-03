@@ -3,7 +3,7 @@ class SearchService < BaseService
     query = params[:search]
     query = Shellwords.shellescape(query) if query.present?
 
-    return global_search_result unless query.present?
+    #return global_search_result unless query.present?
 
     known_projects_ids = current_user.present? ? current_user.known_projects.pluck(:id) : Project.public_only.pluck(:id)
 
