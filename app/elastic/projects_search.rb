@@ -41,8 +41,10 @@ module ProjectsSearch
         }
       ).merge({
         name_with_namespace: name_with_namespace,
-        name_with_namespace_sort: name_with_namespace,
-        path_with_namespace: path_with_namespace
+        name_with_namespace_sort: name_with_namespace.downcase,
+        path_with_namespace: path_with_namespace,
+        updated_at_sort: updated_at,
+        created_at_sort: created_at
       })
     end
 

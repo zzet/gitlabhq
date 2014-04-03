@@ -12,11 +12,15 @@ module GroupsSearch
       indexes :created_at,  type: :date
 
       indexes :name_sort,   type: :string, index: :not_analyzed
+      indexes :created_at_sort, type: :string, index: 'not_analyzed'
+      indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
     def as_indexed_json(options = {})
       as_json.merge({
-        name_sort: name
+        name_sort: name.downcase,
+        created_at_sort: created_at,
+        updated_at_sort: updated_at
       })
     end
 
@@ -60,10 +64,29 @@ module GroupsSearch
         }
       end
 
+      options[:order] = :default if options[:order].blank?
+      order = case options[:order].to_sym
+              when :newest
+                { created_at_sort: { order: :asc, mode: :min } }
+              when :oldest
+                { created_at_sort: { order: :desc, mode: :min } }
+              when :recently_updated
+                { updated_at_sort: { order: :asc, mode: :min } }
+              when :last_updated
+                { updated_at_sort: { order: :desc, mode: :min } }
+              else
+                { name_sort: { order: :asc, mode: :min } }
+              end
+
       query_hash[:sort] = [
-        { name_sort: { order: :asc, mode: :min }},
+        order,
         :_score
       ]
+
+      #query_hash[:sort] = [
+        #{ name_sort: { order: :asc, mode: :min }},
+        #:_score
+      #]
 
       if options[:highlight]
         query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }

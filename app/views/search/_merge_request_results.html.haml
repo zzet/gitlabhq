@@ -1,0 +1,29 @@
+.pull-right
+  .dropdown.inline
+    %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+      %span.light sort:
+      - if params[:order].present?
+        = params[:order].humanize
+      - else
+        Title
+      %b.caret
+    %ul.dropdown-menu
+      %li
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :title) do
+          Title
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :newest) do
+          Newest
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :oldest) do
+          Oldest
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :recently_updated) do
+          Recently updated
+        = link_to search_filter_path(params[:search], type: :merge_request, order: :last_updated) do
+          Last updated
+
+%h4
+  #{@search_results[:merge_requests].total_count} results found
+%hr
+.search_results
+  %ul.bordered-list
+    = render partial: "search/results/merge_request", collection: @search_results[:merge_requests]
+  = paginate @search_results[:merge_requests], theme: 'gitlab'

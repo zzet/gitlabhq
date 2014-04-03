@@ -19,6 +19,27 @@ module SearchHelper
     end
   end
 
+  def search_filter_path(query, type: :project, order: :created_at)
+    case type.to_sym
+    when :project
+      search_path(type: :project, search: query, order: order)
+    when :group
+      search_path(type: :group, search: query, order: order)
+    when :team
+      search_path(type: :team, search: query, order: order)
+    when :user
+      search_path(type: :user, search: query, order: order)
+    when :merge_request
+      search_path(type: :merge_request, search: query, order: order)
+    when :issue
+      search_path(type: :issue, search: query, order: order)
+    when :code
+      search_path(type: :code, search: query, order: order)
+    when :commit
+      search_path(type: :commit, search: query, order: order)
+    end
+  end
+
   private
 
   # Autocomplete results for various settings pages
