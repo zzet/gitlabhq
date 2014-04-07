@@ -1,7 +1,8 @@
 class SearchService < BaseService
   def global_search
     query = params[:search]
-    query = Shellwords.shellescape(query) if query.present?
+    # fix bug with search russian text
+    #query = Shellwords.shellescape(query) if query.present?
 
     return global_search_result unless query.present?
 
