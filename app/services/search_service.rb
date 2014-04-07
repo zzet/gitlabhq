@@ -63,7 +63,7 @@ class SearchService < BaseService
       projects: [],
       merge_requests: [],
       issues: [],
-      code: [],
+      repositories: [],
       total_results: 0,
     }
   end
