@@ -25,5 +25,3 @@
 
 :javascript
   $(".search_results .term").highlight("#{escape_javascript(params[:search])}");
-  - params[:search].split(" ").each do |ss|
-    $(".search_results .term").highlight("#{escape_javascript(ss)}");
