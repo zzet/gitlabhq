@@ -53,9 +53,9 @@ module ProjectsSearch
       page ||= 1
 
       if options[:in].blank?
-        options[:in] = %w(name^3 name_with_namespace^2 path_with_namespace^2 path)
+        options[:in] = %w(name^10 name_with_namespace^2 path_with_namespace path^9)
       else
-        options[:in].push(%w(name^3 name_with_namespace^2 path_with_namespace^2 path) - options[:in])
+        options[:in].push(%w(name^10 name_with_namespace^2 path_with_namespace path^9) - options[:in])
       end
 
       query_hash = {

@@ -49,9 +49,9 @@ module TeamsSearch
       page ||= 1
 
       if options[:in].blank?
-        options[:in] = %w(name^2 path)
+        options[:in] = %w(name^10 path^5)
       else
-        options[:in].push(%w(name^2 path) - options[:in])
+        options[:in].push(%w(name^10 path^5) - options[:in])
       end
 
       query_hash = {

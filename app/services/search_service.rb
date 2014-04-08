@@ -15,10 +15,10 @@ class SearchService < BaseService
     page = params[:page].to_i
     page = 1 if page == 0
 
-    global_search_result[:groups]         = Group.search(query, options: search_options, page: page)
-    global_search_result[:teams]          = Team.search(query, options: search_options, page: page)
+    global_search_result[:groups]         = Group.search(query, options: search_options.merge({in: %w(name^10 path^5 description)}), page: page)
+    global_search_result[:teams]          = Team.search(query, options: search_options.merge({in: %w(name^10 path^5 description)}), page: page)
     global_search_result[:users]          = User.search(query, options: search_options, page: page)
-    global_search_result[:projects]       = Project.search(query, options: search_options, page: page)
+    global_search_result[:projects]       = Project.search(query, options: search_options.merge({in: %w(name^10 path^9 description^5 name_with_namespace^2 path_with_namespace)}), page: page)
     global_search_result[:merge_requests] = MergeRequest.search(query, options: { projects_ids: known_projects_ids, page: page })
     global_search_result[:issues]         = Issue.search(query, options: { projects_ids: known_projects_ids, page: page })
 
