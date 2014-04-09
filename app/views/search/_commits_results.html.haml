@@ -16,10 +16,12 @@
         = link_to search_filter_path(params[:search], type: :commits, order: :last_indexed) do
           Least recently indexed
 
+= render "search/facets/repository/project", projects: @search_results[:repositories][:commits][:projects], type: :commits
+
 %h4
-  #{@search_results[:repositories][:commits].total_count} results found
+  #{@search_results[:repositories][:commits][:total_count]} results found
 %hr
 .search_results
   %ul.bordered-list
-    = render partial: "search/results/commit", collection: @search_results[:repositories][:commits]
-  = paginate @search_results[:repositories][:commits], theme: 'gitlab'
+    = render partial: "search/results/commit", collection: @search_results[:repositories][:commits][:results]
+  = paginate @search_results[:repositories][:commits][:results], theme: 'gitlab'

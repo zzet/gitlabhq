@@ -20,9 +20,9 @@
         = link_to search_filter_path(params[:search], type: :team, order: :last_updated) do
           Last updated
 %h4
-  #{@search_results[:teams].total_count} results found
+  #{@search_results[:teams][:total_count]} results found
 %hr
 .search_results
   %ul.bordered-list
-    = render partial: "search/results/team", collection: @search_results[:teams]
-  = paginate @search_results[:users], theme: 'gitlab'
+    = render partial: "search/results/team", collection: @search_results[:teams][:records]
+  = paginate @search_results[:users][:results], theme: 'gitlab'

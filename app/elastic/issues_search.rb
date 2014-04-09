@@ -104,7 +104,7 @@ module IssuesSearch
         query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
       end
 
-      self.__elasticsearch__.search(query_hash).records
+      self.__elasticsearch__.search(query_hash)
     end
   end
 end

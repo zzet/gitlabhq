@@ -6,26 +6,13 @@ class SearchService < BaseService
 
     return global_search_result unless query.present?
 
-    known_projects_ids = projects_ids(params)
-    search_options = { pids: known_projects_ids, order: params[:order] }
-
-    group = Group.find_by(id: params[:group_id]) if params[:group_id].present?
-    search_options[:namespace_id] = group.id if group
-
-    page = params[:page].to_i
-    page = 1 if page == 0
-
-    global_search_result[:groups]         = Group.search(query, options: search_options.merge({in: %w(name^10 path^5 description)}), page: page)
-    global_search_result[:teams]          = Team.search(query, options: search_options.merge({in: %w(name^10 path^5 description)}), page: page)
-    global_search_result[:users]          = User.search(query, options: search_options, page: page)
-    global_search_result[:projects]       = Project.search(query, options: search_options.merge({in: %w(name^10 path^9 description^5 name_with_namespace^2 path_with_namespace)}), page: page)
-    global_search_result[:merge_requests] = MergeRequest.search(query, options: { projects_ids: known_projects_ids, page: page })
-    global_search_result[:issues]         = Issue.search(query, options: { projects_ids: known_projects_ids, page: page })
-
-    repository_search_options = search_options.merge({ repository_id: known_projects_ids, highlight: true })
-    repository_search_options.merge!({ language: params[:language] }) if params[:language].present? && params[:language] != "All"
-
-    global_search_result[:repositories]   = Repository.search(query, options: repository_search_options, page: page)
+    global_search_result[:groups]         = search_in_groups(query)
+    global_search_result[:teams]          = search_in_teams(query)
+    global_search_result[:users]          = search_in_users(query)
+    global_search_result[:projects]       = search_in_projects(query)
+    global_search_result[:merge_requests] = search_in_merge_requests(query)
+    global_search_result[:issues]         = search_in_issues(query)
+    global_search_result[:repositories]   = search_in_repository(query)
 
     # temp disabled
     #global_search_result[:total_results]  = %w(groups teams users projects issues merge_requests).sum { |items| global_search_result[items.to_sym].size }
@@ -35,20 +22,166 @@ class SearchService < BaseService
 
   private
 
-  def projects_ids(params)
-    if params[:project_id].present?
-      project = Project.find_by(id: params[:project_id])
-      if current_user.can?(:read_project, project)
-        [project.id]
-      else
-        known_projects_ids(params)
-      end
-    else
-      known_projects_ids(params)
-    end
+  def search_in_projects(query)
+    opt = {
+      pids: projects_ids,
+      order: params[:order],
+      in: %w(name^10 path^9 description^5
+             name_with_namespace^2 path_with_namespace),
+    }
+
+    group = Group.find_by(id: params[:group_id]) if params[:group_id].present?
+    opt[:namespace_id] = group.id if group
+
+    response = Project.search(query, options: opt, page: page)
+
+    {
+      records: response.records,
+      results: response.results,
+      response: response.response,
+      total_count: response.total_count,
+      namespaces: response.response["facets"]["namespaceFacet"]["terms"].map {|term| { namespace: Namespace.find(term["term"]), count: term["count"] } }
+    }
   end
 
-  def known_projects_ids(params)
+  def search_in_groups(query)
+    opt = {
+      gids: current_user.authorized_groups.ids,
+      order: params[:order],
+      in: %w(name^10 path^5 description),
+    }
+
+    response = Group.search(query, options: opt, page: page)
+
+    {
+      records: response.records,
+      results: response.results,
+      response: response.response,
+      total_count: response.total_count
+    }
+  end
+
+  def search_in_teams(query)
+    opt = {
+      tids: current_user.known_teams.ids,
+      order: params[:order],
+      in: %w(name^10 path^5 description),
+    }
+
+    response = Team.search(query, options: opt, page: page)
+
+    {
+      records: response.records,
+      results: response.results,
+      response: response.response,
+      total_count: response.total_count
+    }
+  end
+
+  def search_in_users(query)
+    opt = {
+      active: true,
+      order: params[:order]
+    }
+
+    response = User.search(query, options: opt, page: page)
+
+    {
+      records: response.records,
+      results: response.results,
+      response: response.response,
+      total_count: response.total_count
+    }
+  end
+
+  def search_in_merge_requests(query)
+    opt = {
+      projects_ids: projects_ids,
+      order: params[:order]
+    }
+
+    response = MergeRequest.search(query, options: opt, page: page)
+
+    {
+      records: response.records,
+      results: response.results,
+      response: response.response,
+      total_count: response.total_count
+    }
+  end
+
+  def search_in_issues(query)
+    opt = {
+      projects_ids: projects_ids,
+      order: params[:order]
+    }
+
+    response = Issue.search(query, options: opt, page: page)
+
+    {
+      records: response.records,
+      results: response.results,
+      response: response.response,
+      total_count: response.total_count
+    }
+  end
+
+  def search_in_repository(query)
+    opt = {
+      repository_id: projects_ids,
+      highlight: true,
+      order: params[:order]
+    }
+    opt.merge!({ language: params[:language] }) if params[:language].present? && params[:language] != "All"
+
+    res = Repository.search(query, options: opt, page: page)
+    res[:blobs][:projects]    = res[:blobs][:repositories].map   { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
+    res[:commits][:projects]  = res[:commits][:repositories].map { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
+    res
+  end
+
+  def projects_ids
+    return @allowed_projects_ids if defined?(@allowed_projects_ids)
+
+    @allowed_projects_ids = begin
+                              project = begin
+                                          if params[:project_id].present?
+                                            Project.find_by(id: params[:project_id])
+                                          elsif params[:project].present?
+                                            Project.find_with_namespace(params[:project])
+                                          end
+                                        end
+
+                              namespace = begin
+                                            if params[:namespace].present?
+                                              Namespace.find_by(path: params[:namespace])
+                                            end
+                                          end
+                              if project
+                                if current_user.can?(:read_project, project)
+                                  [project.id]
+                                else
+                                  known_projects_ids
+                                end
+                              elsif namespace
+                                namespace.projects.map { |pr| pr.id if known_projects_ids.include?(pr.id) }
+                              else
+                                known_projects_ids
+                              end
+                            rescue
+                              []
+                            end
+  end
+
+  def page
+    return @current_page if defined?(@current_page)
+
+    @current_page = params[:page].to_i
+    @current_page = 1 if @current_page == 0
+    @current_page
+  end
+
+  def known_projects_ids
     known_projects_ids = []
     known_projects_ids += current_user.known_projects.pluck(:id) if current_user
     known_projects_ids += Project.public_or_internal_only(current_user).pluck(:id)

@@ -20,9 +20,9 @@
         = link_to search_filter_path(params[:search], type: :issue, order: :last_updated) do
           Last updated
 %h4
-  #{@search_results[:issues].total_count} results found
+  #{@search_results[:issues][:total_count]} results found
 %hr
 .search_results
   %ul.bordered-list
-    = render partial: "search/results/issue", collection: @search_results[:issues]
-  = paginate @search_results[:issues], theme: 'gitlab'
+    = render partial: "search/results/issue", collection: @search_results[:issues][:records]
+  = paginate @search_results[:issues][:results], theme: 'gitlab'
