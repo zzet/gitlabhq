@@ -15,8 +15,11 @@
           Recently indexed
         = link_to search_filter_path(params[:search], type: :code, order: :last_indexed) do
           Least recently indexed
+
+= render "search/facets/repository/project", projects: @search_results[:repositories][:blobs][:projects], type: :code
+
 %h4
-  #{@search_results[:repositories][:blobs][:results].total_count} results found
+  #{@search_results[:repositories][:blobs][:total_count]} results found
 %hr
 .search_results
   %ul.bordered-list

@@ -19,10 +19,13 @@
           Recently updated
         = link_to search_filter_path(params[:search], type: :project, order: :last_updated) do
           Last updated
+
+= render "search/facets/project/group", namespaces: @search_results[:projects][:namespaces], type: :project
+
 %h4
-  #{@search_results[:projects].total_count} results found
+  #{@search_results[:projects][:total_count]} results found
 %hr
 .search_results
   %ul.bordered-list
-    = render partial: "search/results/project", collection: @search_results[:projects]
-  = paginate @search_results[:projects], theme: 'gitlab'
+    = render partial: "search/results/project", collection: @search_results[:projects][:records]
+  = paginate @search_results[:projects][:results], theme: 'gitlab'

@@ -69,6 +69,14 @@ module MergeRequestsSearch
             },
           },
         },
+        facets: {
+          targetProjectFacet: {
+            terms: {
+              field: :target_project_id,
+              all_term: true
+            }
+          }
+        },
         size: per,
         from: per * (page.to_i - 1)
       }
@@ -116,7 +124,7 @@ module MergeRequestsSearch
         query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
       end
 
-      self.__elasticsearch__.search(query_hash).records
+      self.__elasticsearch__.search(query_hash)
     end
   end
 end

@@ -21,9 +21,9 @@
           Last updated
 
 %h4
-  #{@search_results[:merge_requests].total_count} results found
+  #{@search_results[:merge_requests][:total_count]} results found
 %hr
 .search_results
   %ul.bordered-list
-    = render partial: "search/results/merge_request", collection: @search_results[:merge_requests]
-  = paginate @search_results[:merge_requests], theme: 'gitlab'
+    = render partial: "search/results/merge_request", collection: @search_results[:merge_requests][:records]
+  = paginate @search_results[:merge_requests][:results], theme: 'gitlab'
