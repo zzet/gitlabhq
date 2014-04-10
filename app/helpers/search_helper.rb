@@ -93,7 +93,7 @@ module SearchHelper
 
   # Autocomplete results for the current user's groups
   def groups_autocomplete(term, limit = 10)
-    Group.search(term, options: { gids: current_user.authorized_groups.pluck(:id)}, per: limit).map do |group|
+    Group.search(term, options: { gids: current_user.authorized_groups.pluck(:id)}, per: limit).records.map do |group|
       {
         label: "group: #{search_result_sanitize(group.name)}",
         url: group_path(group)
@@ -103,7 +103,7 @@ module SearchHelper
 
   # Autocomplete results for the current user's groups
   def teams_autocomplete(term, limit = 10)
-    Team.search(term, options: { tids: current_user.known_teams.pluck(:id)}, per: limit).map do |team|
+    Team.search(term, options: { tids: current_user.known_teams.pluck(:id)}, per: limit).records.map do |team|
       {
         label: "team: #{search_result_sanitize(team.name)}",
         url: team_path(team)
@@ -113,7 +113,7 @@ module SearchHelper
 
   # Autocomplete results for the current user's projects
   def projects_autocomplete(term, limit = 10)
-    Project.search(term, options: { pids: current_user.known_projects.pluck(:id), non_archived: true }, per: limit).map do |p|
+    Project.search(term, options: { pids: current_user.known_projects.pluck(:id), non_archived: true }, per: limit).records.map do |p|
       {
         label: "project: #{search_result_sanitize(p.name_with_namespace)}",
         url: project_path(p)

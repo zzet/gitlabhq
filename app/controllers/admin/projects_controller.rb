@@ -4,7 +4,7 @@ class Admin::ProjectsController < Admin::ApplicationController
   before_filter :repository, only: [:show, :transfer]
 
   def index
-    @projects = Project.search(params[:name], options: params, page: params[:page])
+    @projects = Project.search(params[:name], options: params, page: params[:page]).records
 
     check_git_protocol
   end

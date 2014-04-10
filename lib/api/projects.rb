@@ -20,7 +20,7 @@ module API
       get do
         search_options = { page: params[:page] }
         search_options[:pids] = current_user.known_projects.pluck(:id) unless current_user.admin?
-        @projects = Project.search(params[:search], options: search_options)
+        @projects = Project.search(params[:search], options: search_options).records
         present @projects, with: Entities::Project
       end
 
@@ -35,7 +35,7 @@ module API
                                    current_user.created_projects.pluck(:id) +
                                    current_user.owned_projects.pluck(:id))
         end
-        @projects = Project.search(params[:search], options: search_options)
+        @projects = Project.search(params[:search], options: search_options).records
         present @projects, with: Entities::Project
       end
 
@@ -216,7 +216,7 @@ module API
       #   GET /projects/search/:query
       get "/search/:query" do
         ids = current_user.known_projects.pluck(:id)
-        projects = Project.search(params[:query], options: { pids: ids, page: params[:page] })
+        projects = Project.search(params[:query], options: { pids: ids, page: params[:page] }).records
         present projects, with: Entities::Project
       end
 
@@ -234,7 +234,7 @@ module API
         uids = user_project.team.users.pluck(:id)
 
         @users = User.search(params[:search], page: params[:page],
-                             per: params[:per_page], options: {uids: uids})
+                             per: params[:per_page], options: {uids: uids}).records
         present @users, with: Entities::User
       end
 

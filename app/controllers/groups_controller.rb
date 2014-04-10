@@ -13,7 +13,7 @@ class GroupsController < ApplicationController
 
   def index
     @groups = current_user.authorized_groups
-    @groups = @groups.search(params[:name]) if params[:name].present?
+    @groups = @groups.search(params[:name]).records if params[:name].present?
   end
 
   before_filter :default_filter, only: [:issues, :merge_requests]
@@ -95,7 +95,7 @@ class GroupsController < ApplicationController
     @members = group.users_groups
 
     if params[:search].present?
-      users = group.users.search(params[:search])
+      users = group.users.search(params[:search]).records
       @members = @members.where(user_id: users)
     end
 

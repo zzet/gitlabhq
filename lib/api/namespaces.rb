@@ -13,7 +13,7 @@ module API
       #  GET /namespaces
       get do
         @namespaces = Namespace.all
-        @namespaces = @namespaces.search(params[:search]) if params[:search].present?
+        @namespaces = @namespaces.search(params[:search]).records if params[:search].present?
         @namespaces = paginate @namespaces
 
         present @namespaces, with: Entities::Namespace

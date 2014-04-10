@@ -97,7 +97,7 @@ class BaseFinder
 
   def by_search(items)
     if params[:search].present?
-      items = items.search(params[:search])
+      items = items.search(params[:search]).records
     end
 
     items
