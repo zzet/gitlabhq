@@ -6,7 +6,7 @@ module Repositories::TagsActions
 
     if new_tag = project.repository.find_tag(tag)
       oldrev = "0000000000000000000000000000000000000000"
-      newrev = new_tag.commit.id
+      newrev = new_tag.target
       ref = "refs/tags/" << new_tag.name
 
       GitPushService.new(current_user, project, oldrev, newrev, ref).execute
@@ -16,7 +16,7 @@ module Repositories::TagsActions
   def delete_tag_action(tag)
     tag = @repository.find_tag(tag)
     if tag && project.repository.rm_tag(tag.name)
-      oldrev = tag.commit.id
+      oldrev = tag.target
       newrev = "0000000000000000000000000000000000000000"
       ref = "refs/tags/" << tag.name
 
