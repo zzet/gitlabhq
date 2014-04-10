@@ -36,7 +36,7 @@
 
   - if @search_results[:repositories].any?
     - if @search_results[:repositories][:blobs][:total_count] > 0
-      %li{class: "#{'active' if params[:type] == "code"}"}
+      %li{class: "#{'active' if params[:type] == "code" || (params[:type].blank? && @search_results[:projects][:records].empty?)}"}
         = link_to search_path(type: "code", search: params[:search]) do
           Code
           %small.pull-right= @search_results[:repositories][:blobs][:total_count]

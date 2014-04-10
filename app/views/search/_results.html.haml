@@ -1,5 +1,11 @@
 - case params[:type]
-- when NilClass, "project"
+- when NilClass
+  - if @search_results[:projects][:records].any?
+    = render "project_results"
+  - elsif @search_results[:repositories][:blobs][:results].any?
+    = render "code_results"
+
+- when "project"
   = render "project_results"
 
 - when "group"
