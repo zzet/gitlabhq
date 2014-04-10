@@ -27,7 +27,7 @@ module API
       get do
         search_options = { page: params[:page] }
         search_options[:tids] = current_user.known_teams.pluck(:id) unless current_user.admin?
-        @teams = Team.search(params[:search], options: search_options)
+        @teams = Team.search(params[:search], options: search_options).records
         present @teams, with: Entities::Team
       end
 

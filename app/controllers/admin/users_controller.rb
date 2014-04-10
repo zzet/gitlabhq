@@ -3,7 +3,7 @@ class Admin::UsersController < Admin::ApplicationController
 
   def index
     @uids   = User.filter(params[:filter]).pluck(:id)
-    @users  = User.search(params[:name], page: params[:page], options: {uids: @uids})
+    @users  = User.search(params[:name], page: params[:page], options: {uids: @uids}).records
   end
 
   def show

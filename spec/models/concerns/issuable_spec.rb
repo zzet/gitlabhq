@@ -36,7 +36,7 @@ describe Issue, "Issuable" do
     it "matches by title" do
       searchable_issue.__elasticsearch__.index_document
       sleep 1
-      described_class.search('able').to_a.should == [searchable_issue]
+      described_class.search('able').records.to_a.should == [searchable_issue]
     end
   end
 
