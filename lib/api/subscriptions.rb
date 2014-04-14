@@ -26,7 +26,7 @@ module API
                                     .includes(:target)
 
         if params[:search].present?
-          tids = model.search(params[:search]).pluck(:id)
+          tids = model.search(params[:search]).records.pluck(:id)
           subscriptions = subscriptions.where(target_id: tids)
         end
 

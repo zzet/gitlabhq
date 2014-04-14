@@ -117,9 +117,9 @@ class Emails::Project::Push < Emails::Project::Base
 
     @line_notes    = []
 
-    headers 'X-Gitlab-Entity' => 'group',
-      'X-Gitlab-Action' => 'created',
-      'X-Gitlab-Source' => 'group',
+    headers 'X-Gitlab-Entity' => 'project',
+      'X-Gitlab-Action' => 'pushed',
+      'X-Gitlab-Source' => 'push',
       'In-Reply-To'     => "project-#{@project.path_with_namespace}-#{@before_commit.oid}"
 
     subject = if @commits.many?

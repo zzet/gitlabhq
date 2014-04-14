@@ -1,5 +1,3 @@
-ActiveRecord::Base.observers.disable :all
-
 Gitlab::Seeder.quiet do
   (1..300).each  do |i|
     # Random Project
@@ -14,21 +12,22 @@ Gitlab::Seeder.quiet do
 
     begin
       RequestStore.store[:current_user] = user
-
-      Issue.seed(:id, [{
-        id: i,
-        project_id: project.id,
-        author_id: user_id,
-        assignee_id: user_id,
-        state: ['opened', 'closed'].sample,
-        milestone: project.milestones.sample,
-        title: Faker::Lorem.sentence(6),
-        description: Faker::Lorem.sentence
-      }])
+      Gitlab::Seeder.by_user(user) do
+        Issue.seed(:id, [{
+          id: i,
+          project_id: project.id,
+          author_id: user_id,
+          assignee_id: user_id,
+          state: ['opened', 'closed'].sample,
+          milestone: project.milestones.sample,
+          title: Faker::Lorem.sentence(6),
+          description: Faker::Lorem.sentence
+        }])
+        print('.')
+      end
     ensure
       RequestStore.store[:current_user] = nil
     end
-    print('.')
   end
 
   Issue.all.map do |issue|

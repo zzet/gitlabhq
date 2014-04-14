@@ -1,0 +1,28 @@
+.pull-right
+  .dropdown.inline
+    %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+      %span.light sort:
+      - if params[:order].present?
+        = params[:order].humanize
+      - else
+        Name
+      %b.caret
+    %ul.dropdown-menu
+      %li
+        = link_to search_filter_path(params[:search], type: :user, order: :name) do
+          Name
+        = link_to search_filter_path(params[:search], type: :user, order: :newest) do
+          Newest
+        = link_to search_filter_path(params[:search], type: :user, order: :oldest) do
+          Oldest
+        = link_to search_filter_path(params[:search], type: :user, order: :recently_updated) do
+          Recently updated
+        = link_to search_filter_path(params[:search], type: :user, order: :last_updated) do
+          Last updated
+%h4
+  #{@search_results[:users][:total_count]} results found
+%hr
+.search_results
+  %ul.bordered-list
+    = render partial: "search/results/user", collection: @search_results[:users][:records]
+  = paginate @search_results[:users][:results], theme: 'gitlab'

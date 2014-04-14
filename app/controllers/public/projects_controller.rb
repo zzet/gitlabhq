@@ -14,6 +14,6 @@ class Public::ProjectsController < ApplicationController
                                options: { visibility_levels: visibility_levels,
                                           order: @sort },
                                page: params[:page],
-                               per: 20)
+                               per: 20).records
   end
 end

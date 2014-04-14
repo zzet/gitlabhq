@@ -44,12 +44,13 @@
       %ul.well-list
         - @projects.each do |project|
           %li
-            %span{ class: visibility_level_color(project.visibility_level) }
-              = visibility_level_icon(project.visibility_level)
-            - if @git_protocol_enabled
-              %span.cblue
-                = git_protocol_icon(project.git_protocol_enabled)
-            = link_to project.name_with_namespace, [:admin, project]
+            .list-item-name
+              %span{ class: visibility_level_color(project.visibility_level) }
+                = visibility_level_icon(project.visibility_level)
+              - if @git_protocol_enabled
+                %span.cblue
+                  = git_protocol_icon(project.git_protocol_enabled)
+              = link_to project.name_with_namespace, [:admin, project]
             .pull-right
               %span.label.label-gray
                 = repository_size(project)
@@ -59,5 +60,5 @@
               = link_to 'Edit', edit_project_path(project), id: "edit_#{dom_id(project)}", class: "btn btn-small"
               = link_to 'Destroy', [project], data: { confirm: remove_project_message(project) }, method: :delete, class: "btn btn-small btn-remove"
         - if @projects.blank?
-          %p.nothing_here_message 0 projects matches
+          .nothing-here-block 0 projects matches
     = paginate @projects, theme: "gitlab"

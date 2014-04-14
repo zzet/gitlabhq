@@ -23,6 +23,8 @@ class DashboardController < ApplicationController
 
     @last_push = current_user.recent_push
 
+    @publicish_project_count = Project.publicish(current_user).count
+
     respond_to do |format|
       format.html
       format.json { pager_json("events/_events", @events.count) }
@@ -68,14 +70,13 @@ class DashboardController < ApplicationController
     @projects = @projects.where(namespace_id: Group.find_by(name: params[:group])) if params[:group].present?
     @projects = @projects.where(id: Team.find_by(name: params[:team]).projects) if params[:team].present?
     @projects = @projects.where(visibility_level: params[:visibility_level]) if params[:visibility_level].present?
+    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
+    @projects = @projects.page(params[:page]).per(30)
     @projects = @projects.includes(:namespace)
     #@projects = @projects.includes(:namespace).sorted_by_activity
-    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
-    @projects = @projects.page(params[:page]).per(30)
+    @sort = params[:sort]
+    @projects = @projects.sort(@sort)
 
-    @projects = @projects.tagged_with(params[:label]) if params[:label].present?
-    @projects = @projects.sort(@sort = params[:sort])
-    @projects = @projects.page(params[:page]).per(30)
 
     @labels = current_user.authorized_projects.tags_on(:labels)
     @groups = current_user.groups
@@ -84,14 +85,15 @@ class DashboardController < ApplicationController
 
 
   def merge_requests
-    @merge_requests = FilteringService.new.execute(current_user, MergeRequest, params)
+    @merge_requests = MergeRequestsFinder.new.execute(current_user, params)
     @merge_requests = @merge_requests.page(params[:page]).per(20)
+    @merge_requests = @merge_requests.preload(:author, :target_project)
   end
 
   def issues
-    @issues = FilteringService.new.execute(current_user, Issue, params)
+    @issues = IssuesFinder.new.execute(current_user, params)
     @issues = @issues.page(params[:page]).per(20)
-    @issues = @issues.includes(:author, :project)
+    @issues = @issues.preload(:author, :project)
 
     respond_to do |format|
       format.html
@@ -109,5 +111,6 @@ class DashboardController < ApplicationController
   def default_filter
     params[:scope] = 'assigned-to-me' if params[:scope].blank?
     params[:state] = 'opened' if params[:state].blank?
+    params[:authorized_only] = true
   end
 end

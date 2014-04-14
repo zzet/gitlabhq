@@ -3,7 +3,7 @@ class Admin::UsersController < Admin::ApplicationController
 
   def index
     @uids   = User.filter(params[:filter]).pluck(:id)
-    @users  = User.search(params[:name], page: params[:page], options: {uids: @uids})
+    @users  = User.search(params[:name], page: params[:page], options: {uids: @uids}).records
   end
 
   def show
@@ -69,7 +69,9 @@ class Admin::UsersController < Admin::ApplicationController
       params[:user].delete(:password_confirmation)
     end
 
-    user.admin = (admin && admin.to_i > 0)
+    if admin.present?
+      user.admin = !admin.to_i.zero?
+    end
 
     respond_to do |format|
       if user.update_attributes(params[:user], as: :admin)

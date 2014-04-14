@@ -161,7 +161,7 @@ header {
     }
 
     .search-input {
-      background-image: url("icon-search.png");
+      background-image: image-url("icon-search.png");
       background-repeat: no-repeat;
       background-position: 10px;
       height: inherit;
@@ -271,5 +271,11 @@ header {
     &:focus {
       width: 300px;
     }
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  #nprogress .spinner {
+    right: 35px !important;
   }
 }

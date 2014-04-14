@@ -17,9 +17,7 @@ class Milestone < ActiveRecord::Base
   include InternalId
   include Watchable
 
-  attr_accessible :title, :description, :due_date, :state_event, :author_id_of_changes
-
-  attr_accessor :author_id_of_changes
+  attr_accessible :title, :description, :due_date, :state_event
 
   belongs_to :project
   has_many :issues
@@ -99,6 +97,6 @@ class Milestone < ActiveRecord::Base
   end
 
   def author_id
-    author_id_of_changes
+    nil
   end
 end

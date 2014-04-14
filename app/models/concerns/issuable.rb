@@ -30,6 +30,8 @@ module Issuable
     scope :assigned, -> { where.not(assignee_id: nil) }
     scope :unassigned, -> { where(assignee_id: nil) }
     scope :of_projects, ->(ids) { where(project_id: ids) }
+    scope :opened, -> { with_state(:opened, :reopened) }
+    scope :closed, -> { with_state(:closed) }
 
     delegate :name,
              :email,
@@ -41,8 +43,6 @@ module Issuable
              to: :assignee,
              allow_nil: true,
              prefix: true
-
-    attr_accessor :author_id_of_changes
 
     attr_mentionable :title, :description
   end

@@ -70,7 +70,8 @@
         - @group.users_groups.order('group_access DESC').each do |member|
           - user = member.user
           %li{class: dom_class(user)}
-            %strong
-              = link_to user.name, admin_user_path(user)
+            .list-item-name
+              %strong
+                = link_to user.name, admin_user_path(user)
             %span.pull-right.light
               = member.human_access

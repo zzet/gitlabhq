@@ -33,7 +33,7 @@ module ApplicationSearch
             type: "NGram",
             min_gram: 1,
             max_gram: 20,
-            token_chars: %w(letter digit)
+            token_chars: %w(letter digit connector_punctuation punctuation)
           }
         },
         filter: {

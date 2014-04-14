@@ -104,17 +104,11 @@ class Push < ActiveRecord::Base
   #
   def load_push_data(limit)
     begin
-      # Total commits count
-      commits_count = all_commits_count
-
-      # Get latest 20 commits ASC
-      push_commits_limited = commits.last(limit)
-
       # Hash to be passed as post_receive_data
       data = {
+        ref: ref,
         before: revbefore,
         after: revafter,
-        ref: ref,
         user_id: user.id,
         user_name: user.name,
         project_id: project.id,
@@ -123,25 +117,34 @@ class Push < ActiveRecord::Base
           url: project.url_to_repo,
           description: project.description,
           homepage: project.web_url,
-        },
-        commits: [],
-        total_commits_count: commits_count
+        }
       }
 
-      # For performance purposes maximum 20 latest commits
-      # will be passed as post receive hook data.
-      #
-      push_commits_limited.each do |commit|
-        data[:commits] << {
-          id: commit.id,
-          message: commit.safe_message,
-          timestamp: commit.committed_date.xmlschema,
-          url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{commit.id}",
-          author: {
-            name: commit.author_name,
-            email: commit.author_email
+      unless tag?
+        # Total commits count
+        commits_count = all_commits_count
+
+        # Get latest 20 commits ASC
+        push_commits_limited = commits.last(limit)
+
+        data[:commits] = []
+        data[:total_commits_count] = commits_count
+
+        # For performance purposes maximum 20 latest commits
+        # will be passed as post receive hook data.
+        #
+        push_commits_limited.each do |commit|
+          data[:commits] << {
+            id: commit.id,
+            message: commit.safe_message,
+            timestamp: commit.committed_date.xmlschema,
+            url: "#{Gitlab.config.gitlab.url}/#{project.path_with_namespace}/commit/#{commit.id}",
+            author: {
+              name: commit.author_name,
+              email: commit.author_email
+            }
           }
-        }
+        end
       end
 
       data

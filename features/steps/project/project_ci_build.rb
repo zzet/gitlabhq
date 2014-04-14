@@ -27,5 +27,6 @@ class ProjectCiBuild < Spinach::FeatureSteps
 
   Then 'I rebuild' do
     page.find('.popover .icon-repeat', visible: false).click
+    sleep 2
   end
 end

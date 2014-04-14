@@ -15,7 +15,7 @@ module API
     end
 
     class UserSafe < Grape::Entity
-      expose :name
+      expose :name, :username
     end
 
     class UserBasic < Grape::Entity
@@ -44,7 +44,7 @@ module API
       expose :id, :description, :default_branch
       expose :public?, as: :public
       expose :visibility_level, :ssh_url_to_repo, :http_url_to_repo, :web_url
-      expose :owner, using: Entities::UserBasic
+      expose :owner, using: Entities::UserBasic, unless: ->(project, options) { project.group }
       expose :name, :name_with_namespace
       expose :path, :path_with_namespace
       expose :issues_enabled, :merge_requests_enabled, :wall_enabled, :wiki_enabled, :snippets_enabled, :created_at, :last_activity_at
@@ -218,7 +218,7 @@ module API
     end
 
     class MergeRequest < ProjectEntity
-      expose :target_branch, :source_branch, :title, :state, :upvotes, :downvotes
+      expose :target_branch, :source_branch, :title, :state, :upvotes, :downvotes, :description
       expose :author, :assignee, using: Entities::UserBasic
       expose :source_project_id, :target_project_id
     end
@@ -252,6 +252,34 @@ module API
 
     class Subscription < Grape::Entity
       expose :id
+    end
+
+    class ProjectAccess < Grape::Entity
+      expose :project_access, as: :access_level
+      expose :notification_level
+    end
+
+    class GroupAccess < Grape::Entity
+      expose :group_access, as: :access_level
+      expose :notification_level
+    end
+
+    class ProjectWithAccess < Project
+      expose :permissions do
+        expose :project_access, using: Entities::ProjectAccess do |project, options|
+          project.users_projects.find_by(user_id: options[:user].id)
+        end
+
+        expose :group_access, using: Entities::GroupAccess do |project, options|
+          if project.group
+            project.group.users_groups.find_by(user_id: options[:user].id)
+          end
+        end
+      end
+    end
+
+    class Label < Grape::Entity
+      expose :name
     end
   end
 end
