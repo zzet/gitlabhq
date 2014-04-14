@@ -13,7 +13,8 @@
             = "..."
           %td{style: "font-size:12px;border:none;margin:0px;padding:0px;min-height:18px;color:#888;background:#fafafa"}
             %pre{style: "border:none; margin:0px;padding:0px"}
-              = " #{html_escape(line.content.force_encoding('UTF-8'))}"
+              :preserve
+                #{html_escape(line.content.force_encoding('UTF-8'))}
         - else
           %td{style: "font-size:12px;color:#666;border:none;background:#eee;margin:0px;padding:0px 5px;border-right:1px solid #ccc;text-align:right;min-width:35px;max-width:35px;width:35px"}<
             = raw(line.addition? ? "&nbsp;" : line.old_lineno)
@@ -23,14 +24,14 @@
             %td.new{style: "background:#CFD;font-size:12px;min-height:18px;margin:0px;padding:0px;border:none"}
               %pre{style: "border:none; margin:0px;padding:0px"}
                 :preserve
-                  = "#{html_escape(line.content.force_encoding('UTF-8'))}"
+                  #{html_escape(line.content.force_encoding('UTF-8'))}
           - elsif line.deletion?
             %td.old{style: "background:#FDD;font-size:12px;border:none;margin:0px;padding:0px;min-height:18px"}
               %pre{style: "border:none; margin:0px;padding:0px"}
                 :preserve
-                  = "#{html_escape(line.content.force_encoding('UTF-8'))}"
+                  #{html_escape(line.content.force_encoding('UTF-8'))}
           - else
             %td{style: "line-height:18px;font-size:12px;min-height:18px;margin:0px;padding:0px;border:none"}
               %pre{style: "border:none; margin:0px;padding:0px"}
                 :preserve
-                  = "#{html_escape(line.content.force_encoding('UTF-8'))}"
+                  #{html_escape(line.content.force_encoding('UTF-8'))}
