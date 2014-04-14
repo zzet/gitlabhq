@@ -17,7 +17,7 @@ module Repositories::BranchesActions
     new_branch = project.repository.find_branch(branch)
     if new_branch
       oldrev = "0000000000000000000000000000000000000000"
-      newrev = new_branch.commit.id
+      newrev = new_branch.target
       ref = "refs/heads/" << new_branch.name
 
       GitPushService.new(current_user, project, oldrev, newrev, ref).execute
@@ -27,7 +27,7 @@ module Repositories::BranchesActions
   def delete_branch_action(branch)
     branch = project.repository.find_branch(branch)
     if branch && project.repository.rm_branch(branch.name)
-      oldrev = branch.commit.id
+      oldrev = branch.target
       newrev = "0000000000000000000000000000000000000000"
       ref = "refs/heads/" << branch.name
 

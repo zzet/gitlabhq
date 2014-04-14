@@ -12,8 +12,8 @@
   .col-md-4.project-side.hidden-sm
     .clearfix
       - if @project.archived?
-        .alert
-          %h5
+        .alert.alert-warning
+          %h4
             %i.icon-warning-sign
             Archived project!
           %p Repository is read-only

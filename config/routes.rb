@@ -216,7 +216,7 @@ Gitlab::Application.routes.draw do
 
   resources :projects, constraints: { id: /[^\/]+/ }, only: [:new, :create]
 
-  devise_for :users, controllers: { omniauth_callbacks: :omniauth_callbacks, registrations: :registrations }
+  devise_for :users, controllers: { omniauth_callbacks: :omniauth_callbacks, registrations: :registrations , passwords: :passwords}
 
   #
   # Project Area
@@ -228,6 +228,8 @@ Gitlab::Application.routes.draw do
       post :archive
       post :unarchive
       get :autocomplete_sources
+      get :import
+      put :retry_import
     end
 
     scope module: :projects do

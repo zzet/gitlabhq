@@ -30,7 +30,7 @@ module SharedPaths
   end
 
   step 'I visit group "Owned" members page' do
-    visit members_group_path(Group.find_by(name:"Owned"))
+    visit group_members_path(Group.find_by(name:"Owned"))
   end
 
   step 'I visit group "Owned" settings page' do

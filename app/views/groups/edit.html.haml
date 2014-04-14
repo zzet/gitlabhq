@@ -42,22 +42,23 @@
         .form-actions
           = f.submit 'Save group', class: "btn btn-save"
 
-  %center.light.prepend-top-20.padded
-    %h3
-      %i.icon-warning-sign
-      Dangerous settings
-    %p Group settings below may result in data loss!
-    = link_to '#', class: 'btn js-toggle-visibility-link' do
-      Show it to me
-      %i.icon-chevron-down
+  .danger-settings.js-toggle-container
+    .centered-light-block
+      %h3
+        %i.icon-warning-sign
+        Dangerous settings
+      %p Group settings below may result in data loss!
+      = link_to '#', class: 'btn js-toggle-button' do
+        Show it to me
+        %i.icon-chevron-down
 
-  .js-toggle-visibility-container.hide
-    .ui-box.ui-box-danger
-      .title Remove group
-      .body
-        %p
-          Removing group will cause all child projects and resources to be removed.
-        %p
-          %strong Removed group can not be restored!
+    .js-toggle-content.hide
+      .ui-box.ui-box-danger
+        .title Remove group
+        .body
+          %p
+            Removing group will cause all child projects and resources to be removed.
+          %p
+            %strong Removed group can not be restored!
 
-        = link_to 'Remove Group', @group, data: {confirm: 'Removed group can not be restored! Are you sure?'}, method: :delete, class: "btn btn-remove"
+          = link_to 'Remove Group', @group, data: {confirm: 'Removed group can not be restored! Are you sure?'}, method: :delete, class: "btn btn-remove"

@@ -80,6 +80,12 @@ production: &base
       snippets: false
       visibility_level: "private"  # can be "private" | "internal" | "public"
 
+    ## Repository downloads directory
+    # When a user clicks e.g. 'Download zip' on a project, a temporary zip file is created in the following directory.
+    # The default is 'tmp/repositories' relative to the root of the Rails app.
+    # repository_downloads_path: tmp/repositories
+    repository_downloads_path: /rest/u/apps/gitlab/shared/repositories
+
   ## External issues trackers
   issues_tracker:
     # redmine:
@@ -125,7 +131,6 @@ production: &base
   ldap:
     enabled: false
     host: '_your_ldap_server'
-    base: '_the_base_where_you_search_for_users'
     port: 636
     uid: 'sAMAccountName'
     method: 'ssl' # "tls" or "ssl" or "plain"
@@ -141,6 +146,20 @@ production: &base
     # If you are using "uid: 'userPrincipalName'" on ActiveDirectory you need to
     # disable this setting, because the userPrincipalName contains an '@'.
     allow_username_or_email_login: true
+
+    # Base where we can search for users
+    #
+    #   Ex. ou=People,dc=gitlab,dc=example
+    #
+    base: ''
+
+    # Filter LDAP users
+    #
+    #   Format: RFC 4515
+    #   Ex. (employeeType=developer)
+    #
+    user_filter: ''
+
 
   ## OmniAuth settings
   omniauth:
@@ -221,6 +240,10 @@ production: &base
     ## Google analytics. Uncomment if you want it
     # google_analytics_id: '_your_tracking_id'
 
+    ## Piwik analytics.
+    # piwik_url: '_your_piwik_url'
+    # piwik_site_id: '_your_piwik_site_id'
+
     ## Text under sign-in page (Markdown enabled)
     # sign_in_text: |
     #   ![Company Logo](http://www.companydomain.com/logo.png)
@@ -231,6 +254,11 @@ development:
 
 test:
   <<: *base
+  gravatar:
+    enabled: true
+  gitlab:
+    host: localhost
+    port: 80
   issues_tracker:
     redmine:
       title: "Redmine"

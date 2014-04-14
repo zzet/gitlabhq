@@ -22,21 +22,18 @@ class Issue < ActiveRecord::Base
   include InternalId
   include IssuesSearch
 
-  ActsAsTaggableOn.strict_case_match = true
+  attr_accessible :title, :assignee_id, :position, :description,
+                  :milestone_id, :label_list, :state_event
 
   belongs_to :project
   validates :project, presence: true
 
   scope :of_group, ->(group) { where(project_id: group.project_ids) }
   scope :of_team, ->(team) { where(project_id: team.project_ids, assignee_id: team.member_ids) }
-  scope :opened, -> { with_state([:opened, :reopened]) }
-  scope :closed, -> { with_state(:closed) }
   scope :cared, ->(user) { where(assignee_id: user) }
   scope :open_for, ->(user) { opened.assigned_to(user) }
 
-  attr_accessible :title, :assignee_id, :position, :description,
-                  :milestone_id, :label_list, :author_id_of_changes,
-                  :state_event
+  ActsAsTaggableOn.strict_case_match = true
 
   acts_as_taggable_on :labels
 

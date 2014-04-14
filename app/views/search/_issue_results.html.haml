@@ -1,0 +1,28 @@
+.pull-right
+  .dropdown.inline
+    %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+      %span.light sort:
+      - if params[:order].present?
+        = params[:order].humanize
+      - else
+        Title
+      %b.caret
+    %ul.dropdown-menu
+      %li
+        = link_to search_filter_path(params[:search], type: :issue, order: :title) do
+          Title
+        = link_to search_filter_path(params[:search], type: :issue, order: :newest) do
+          Newest
+        = link_to search_filter_path(params[:search], type: :issue, order: :oldest) do
+          Oldest
+        = link_to search_filter_path(params[:search], type: :issue, order: :recently_updated) do
+          Recently updated
+        = link_to search_filter_path(params[:search], type: :issue, order: :last_updated) do
+          Last updated
+%h4
+  #{@search_results[:issues][:total_count]} results found
+%hr
+.search_results
+  %ul.bordered-list
+    = render partial: "search/results/issue", collection: @search_results[:issues][:records]
+  = paginate @search_results[:issues][:results], theme: 'gitlab'

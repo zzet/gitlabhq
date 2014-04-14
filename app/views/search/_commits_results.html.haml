@@ -1,0 +1,35 @@
+.pull-right
+  .dropdown.inline
+    %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+      %span.light sort:
+      - if params[:order].present?
+        = params[:order].humanize
+      - else
+        Best match
+      %b.caret
+    %ul.dropdown-menu
+      %li
+        = link_to search_filter_path(params[:search], type: :commits, order: :best_match) do
+          Best match
+        = link_to search_filter_path(params[:search], type: :commits, order: :recently_indexed) do
+          Recently indexed
+        = link_to search_filter_path(params[:search], type: :commits, order: :last_indexed) do
+          Least recently indexed
+
+= render "search/facets/repository/project", projects: @search_results[:repositories][:commits][:projects], type: :commits
+
+%h4
+  - if @search_results[:repositories][:commits][:total_count] > 0
+    #{@search_results[:repositories][:commits][:total_count]} results found in
+    - if @search_results[:repositories][:commits][:projects].many?
+      #{ @search_results[:repositories][:commits][:projects].count } projects
+    - else
+      #{ @search_results[:repositories][:commits][:projects].first[:name] } project
+  - else
+    No matches found
+
+%hr
+.search_results
+  %ul.bordered-list
+    = render partial: "search/results/commit", collection: @search_results[:repositories][:commits][:results]
+  = paginate @search_results[:repositories][:commits][:results], theme: 'gitlab'

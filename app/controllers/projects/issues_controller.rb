@@ -76,7 +76,7 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def update
-    @issue.update_attributes(params[:issue].merge(author_id_of_changes: current_user.id))
+    @issue.update_attributes(params[:issue])
     @issue.reset_events_cache
 
     respond_to do |format|
@@ -121,7 +121,7 @@ class Projects::IssuesController < Projects::ApplicationController
   def issues_filtered
     params[:scope] = 'all' if params[:scope].blank?
     params[:state] = 'opened' if params[:state].blank?
-    @issues = FilteringService.new.execute(current_user, Issue, params.merge(project_id: @project.id))
+    @issues = IssuesFinder.new.execute(current_user, params.merge(project_id: @project.id))
   end
 
   # Since iids are implemented only in 6.1

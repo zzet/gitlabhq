@@ -1,7 +1,7 @@
 class Admin::TeamsController < Admin::ApplicationController
   def index
     @teams_count = Team.count
-    @teams = Team.search(params[:name], options: params, page: params[:page])
+    @teams = Team.search(params[:name], options: params, page: params[:page]).records
   end
 
   def show

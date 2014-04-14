@@ -2,7 +2,7 @@ class Admin::GroupsController < Admin::ApplicationController
   before_filter :group, only: [:edit, :show, :update, :destroy, :project_update, :project_teams_update]
 
   def index
-    @groups = Group.search(params[:name], page: params[:page])
+    @groups = Group.search(params[:name], page: params[:page]).records
   end
 
   def show

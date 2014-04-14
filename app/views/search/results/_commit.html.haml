@@ -1,0 +1,22 @@
+%li
+  - commit = commit["_source"]["commit"]
+  - project = Project.find_by(id: commit["rid"])
+  - if project
+    = link_to project do
+      %strong.term= project.name_with_namespace
+    &ndash;
+    = link_to project_commit_path(project.path_with_namespace, commit["sha"]) do
+      %strong.term
+        = commit[:sha]
+    %div.prepend-top-10.commit.term
+      %strong Author:
+      = "#{commit["author"]["name"]} (#{commit["author"]["email"]}) at #{l DateTime.parse(commit["author"]["time"])}"
+      %br
+
+      - if commit["author"]["name"] != commit["committer"]["name"]
+        %strong Commiter:
+        = "#{commit["committer"]["name"]} (#{commit["committer"]["email"]}) at #{l DateTime.parse(commit["committer"]["time"])}"
+        %br
+
+      %strong Message:
+      %div= commit["message"].gsub("\n", "<br \>").html_safe

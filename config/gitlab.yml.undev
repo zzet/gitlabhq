@@ -50,6 +50,8 @@ production: &base
       snippets: false
       visibility_level: "public"
 
+    repository_downloads_path: /rest/u/apps/gitlab/shared/repositories
+
     ## Automatic issue closing
     # If a commit message matches this regular express, all issues referenced from the matched text will be closed
     # if it's pushed to a project's default branch.
@@ -188,6 +190,9 @@ test:
     port: 80
     https: false
     signup_enabled: true
+
+    repository_downloads_path: tmp/repositories
+
   issues_tracker:
     redmine:
       project_url: "http://redmine/projects/:issues_tracker_id"
@@ -214,6 +219,8 @@ staging:
       wall: false
       snippets: false
       public: true
+
+    repository_downloads_path: /rest/u/apps/gitlab/shared/repositories
 
   ## External issues trackers
   default_issues_tracker: redmine

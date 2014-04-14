@@ -34,7 +34,7 @@ describe SearchHelper do
 
       it "includes the user's groups" do
         create(:group).add_owner(user)
-        sleep 1
+        #sleep 1
         search_autocomplete_opts("gro").size.should == 1
       end
 
@@ -42,7 +42,7 @@ describe SearchHelper do
         group = create(:group)
         group.add_owner(user)
         project = create(:project, namespace: group)
-        sleep 1
+        #sleep 1
         search_autocomplete_opts(project.name).size.should == 1
       end
 

@@ -5,8 +5,7 @@ module SearchHelper
     resources_results = [
       groups_autocomplete(term),
       teams_autocomplete(term),
-      projects_autocomplete(term),
-      public_projects_autocomplete(term),
+      projects_autocomplete(term)
     ].flatten
 
     generic_results = project_autocomplete + default_autocomplete + help_autocomplete
@@ -17,6 +16,27 @@ module SearchHelper
       generic_results
     ].flatten.uniq do |item|
       item[:label]
+    end
+  end
+
+  def search_filter_path(query, type: :project, order: :created_at)
+    case type.to_sym
+    when :project
+      search_path(type: :project, search: query, order: order)
+    when :group
+      search_path(type: :group, search: query, order: order)
+    when :team
+      search_path(type: :team, search: query, order: order)
+    when :user
+      search_path(type: :user, search: query, order: order)
+    when :merge_request
+      search_path(type: :merge_request, search: query, order: order)
+    when :issue
+      search_path(type: :issue, search: query, order: order)
+    when :code
+      search_path(type: :code, search: query, order: order)
+    when :commit
+      search_path(type: :commit, search: query, order: order)
     end
   end
 
@@ -73,7 +93,7 @@ module SearchHelper
 
   # Autocomplete results for the current user's groups
   def groups_autocomplete(term, limit = 10)
-    Group.search(term, options: { gids: current_user.authorized_groups.pluck(:id)}, per: limit).map do |group|
+    Group.search(term, options: { gids: current_user.authorized_groups.pluck(:id)}, per: limit).records.map do |group|
       {
         label: "group: #{search_result_sanitize(group.name)}",
         url: group_path(group)
@@ -83,7 +103,7 @@ module SearchHelper
 
   # Autocomplete results for the current user's groups
   def teams_autocomplete(term, limit = 10)
-    Team.search(term, options: { tids: current_user.known_teams.pluck(:id)}, per: limit).map do |team|
+    Team.search(term, options: { tids: current_user.known_teams.pluck(:id)}, per: limit).records.map do |team|
       {
         label: "team: #{search_result_sanitize(team.name)}",
         url: team_path(team)
@@ -93,17 +113,7 @@ module SearchHelper
 
   # Autocomplete results for the current user's projects
   def projects_autocomplete(term, limit = 10)
-    Project.search(term, options: { pids: current_user.known_projects.pluck(:id), non_archived: true }, per: limit).map do |p|
-      {
-        label: "project: #{search_result_sanitize(p.name_with_namespace)}",
-        url: project_path(p)
-      }
-    end
-  end
-
-  # Autocomplete results for the current user's projects
-  def public_projects_autocomplete(term, limit = 10)
-    Project.search(term, options: { pids: Project.public_or_internal_only(current_user).pluck(:id), non_archived: true }, per: limit).map do |p|
+    Project.search(term, options: { pids: current_user.known_projects.pluck(:id), non_archived: true }, per: limit).records.map do |p|
       {
         label: "project: #{search_result_sanitize(p.name_with_namespace)}",
         url: project_path(p)

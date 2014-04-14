@@ -1,0 +1,17 @@
+- args = { search: params[:search], type: type }
+- args[:language] = params[:language] if params[:language].present?
+
+- if projects.many?
+  .pull-right
+    .dropdown.inline
+      %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+        %span.light filter by project
+        %b.caret
+
+      %ul.dropdown-menu
+        - projects.each do |project|
+          %li{class: "#{'active' if params[:project] == project[:path]}"}
+            = link_to search_path(args.merge({ project: project[:path] })) do
+              = project[:name]
+              %small.pull-right= project[:count]
+    &nbsp;

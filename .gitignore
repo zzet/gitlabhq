@@ -39,3 +39,4 @@ doc/code/*
 public/uploads.*
 public/system/
 public/assets/
+.envrc
