@@ -97,19 +97,25 @@ module Gitlab
       # This ensures we have no name clashes or issues updating branches when
       # working with the satellite.
       def delete_heads!
-        heads = repo.heads.map(&:name)
+        begin
+          heads = repo.heads.map(&:name)
 
-        # update or create the parking branch
-        if heads.include? PARKING_BRANCH
-          repo.git.checkout({}, PARKING_BRANCH)
-        else
-          repo.git.checkout(default_options({b: true}), PARKING_BRANCH)
+          # update or create the parking branch
+          if heads.include? PARKING_BRANCH
+            repo.git.checkout({}, PARKING_BRANCH)
+          else
+            repo.git.checkout(default_options({b: true}), PARKING_BRANCH)
+          end
+
+          # remove the parking branch from the list of heads ...
+          heads.delete(PARKING_BRANCH)
+          # ... and delete all others
+          heads.each { |head| repo.git.branch(default_options({D: true}), head) }
+        rescue
+          destroy
+          create
+          clear_and_update!
         end
-
-        # remove the parking branch from the list of heads ...
-        heads.delete(PARKING_BRANCH)
-        # ... and delete all others
-        heads.each { |head| repo.git.branch(default_options({D: true}), head) }
       end
 
       # Deletes all remotes except origin
