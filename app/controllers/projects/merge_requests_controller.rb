@@ -103,14 +103,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
         opts = { notice: 'Merge request was successfully updated.' }
       end
 
-      respond_to do |format|
-        format.js
-        format.html do
-          redirect_to [@merge_request.target_project, @merge_request], opts
-        end
-
-        return
-      end
+      redirect_to [@merge_request.target_project, @merge_request], opts
+      return
     else
       if params[:merge_request].has_key?(:state_event)
         opts = { alert: "Failed to #{params[:merge_request][:state_event]} merge request." }

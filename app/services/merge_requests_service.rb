@@ -45,7 +45,7 @@ class MergeRequestsService < BaseService
     params[:merge_request].delete(:source_project_id)
     params[:merge_request].delete(:target_project_id)
 
-    if @merge_request.update(@params[:merge_request])
+    if @merge_request.update_attributes(@params[:merge_request])
       @merge_request.reset_events_cache
 
       receive_delayed_notifications
