@@ -31,23 +31,24 @@
           .form-actions
             = f.submit 'Save team', class: "btn btn-save"
 
-    %center.light.prepend-top-20.padded
+  .danger-settings.js-toggle-container
+    .centered-light-block
       %h3
         %i.icon-warning-sign
         Dangerous settings
       %p Team settings below may result in data loss!
-      = link_to '#', class: 'btn js-toggle-visibility-link' do
+      = link_to '#', class: 'btn js-toggle-button' do
         Show it to me
         %i.icon-chevron-down
 
-    .js-toggle-visibility-container.hide
+    .js-toggle-content.hide
       - if can?(current_user, :remove_team, @team)
         .ui-box.ui-box-danger
           .title Remove team
-          .ui-box-body
+          .body
             %p
               Removing the team will delete all related resources.
-              %br
+            %p
               %strong Removed team cannot be restored!
 
             = link_to 'Remove team', @team, date: { confirm: remove_team_message(@team) }, method: :delete, class: "btn btn-remove"
