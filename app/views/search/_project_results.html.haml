@@ -23,7 +23,15 @@
 = render "search/facets/project/group", namespaces: @search_results[:projects][:namespaces], type: :project
 
 %h4
-  #{@search_results[:projects][:total_count]} results found
+  - if @search_results[:projects][:namespaces].count > 0
+    #{ @search_results[:projects][:total_count] } results found in
+    - if @search_results[:projects][:namespaces].many?
+      #{ @search_results[:projects][:namespaces].count } Namespaces
+    - else
+      #{ @search_results[:projects][:namespaces].first[:namespace].name } #{ @search_results[:projects][:namespaces].first[:namespace].class.name.underscore}
+  - else
+    No matches found
+
 %hr
 .search_results
   %ul.bordered-list
