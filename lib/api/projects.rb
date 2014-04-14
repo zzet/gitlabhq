@@ -5,13 +5,6 @@ module API
 
     resource :projects do
       helpers do
-        def handle_project_member_errors(errors)
-          if errors[:project_access].any?
-            error!(errors[:project_access], 422)
-          end
-          not_found!
-        end
-
         def map_public_to_visibility_level(attrs)
           publik = attrs.delete(:public)
           publik = [ true, 1, '1', 't', 'T', 'true', 'TRUE', 'on', 'ON' ].include?(publik)
@@ -27,7 +20,7 @@ module API
       get do
         search_options = { page: params[:page] }
         search_options[:pids] = current_user.known_projects.pluck(:id) unless current_user.admin?
-        @projects = Project.search(params[:search], options: search_options)
+        @projects = Project.search(params[:search], options: search_options).records
         present @projects, with: Entities::Project
       end
 
@@ -42,7 +35,7 @@ module API
                                    current_user.created_projects.pluck(:id) +
                                    current_user.owned_projects.pluck(:id))
         end
-        @projects = Project.search(params[:search], options: search_options)
+        @projects = Project.search(params[:search], options: search_options).records
         present @projects, with: Entities::Project
       end
 
@@ -72,7 +65,7 @@ module API
       # Example Request:
       #   GET /projects/:id
       get ":id" do
-        present user_project, with: Entities::Project
+        present user_project, with: Entities::ProjectWithAccess, user: current_user
       end
 
       # Get a single project events
@@ -213,104 +206,6 @@ module API
           user_project.forked_project_link.destroy
         end
       end
-
-      # Get a project team members
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   query         - Query string
-      # Example Request:
-      #   GET /projects/:id/members
-      get ":id/members" do
-        if params[:query].present?
-          @members = paginate user_project.users.where("username LIKE ?", "%#{params[:query]}%")
-        else
-          @members = paginate user_project.users
-        end
-        present @members, with: Entities::ProjectMember, project: user_project
-      end
-
-      # Get a project team members
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   user_id (required) - The ID of a user
-      # Example Request:
-      #   GET /projects/:id/members/:user_id
-      get ":id/members/:user_id" do
-        @member = user_project.users.find params[:user_id]
-        present @member, with: Entities::ProjectMember, project: user_project
-      end
-
-      # Add a new project team member
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   user_id (required) - The ID of a user
-      #   access_level (required) - Project access level
-      # Example Request:
-      #   POST /projects/:id/members
-      post ":id/members" do
-        authorize! :admin_project, user_project
-        required_attributes! [:user_id, :access_level]
-
-        # either the user is already a team member or a new one
-        team_member = user_project.team_member_by_id(params[:user_id])
-        if team_member.nil?
-          team_member = user_project.users_projects.new(
-            user_id: params[:user_id],
-            project_access: params[:access_level]
-          )
-        end
-
-        if team_member.save
-          @member = team_member.user
-          present @member, with: Entities::ProjectMember, project: user_project
-        else
-          handle_project_member_errors team_member.errors
-        end
-      end
-
-      # Update project team member
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   user_id (required) - The ID of a team member
-      #   access_level (required) - Project access level
-      # Example Request:
-      #   PUT /projects/:id/members/:user_id
-      put ":id/members/:user_id" do
-        authorize! :admin_project, user_project
-        required_attributes! [:access_level]
-
-        team_member = user_project.users_projects.find_by(user_id: params[:user_id])
-        not_found!("User can not be found") if team_member.nil?
-
-        if team_member.update_attributes(project_access: params[:access_level])
-          @member = team_member.user
-          present @member, with: Entities::ProjectMember, project: user_project
-        else
-          handle_project_member_errors team_member.errors
-        end
-      end
-
-      # Remove a team member from project
-      #
-      # Parameters:
-      #   id (required) - The ID of a project
-      #   user_id (required) - The ID of a team member
-      # Example Request:
-      #   DELETE /projects/:id/members/:user_id
-      delete ":id/members/:user_id" do
-        authorize! :admin_project, user_project
-        team_member = user_project.users_projects.find_by(user_id: params[:user_id])
-        unless team_member.nil?
-          team_member.destroy
-        else
-          {message: "Access revoked", id: params[:user_id].to_i}
-        end
-      end
-
       # search for projects current_user has access to
       #
       # Parameters:
@@ -321,7 +216,7 @@ module API
       #   GET /projects/search/:query
       get "/search/:query" do
         ids = current_user.known_projects.pluck(:id)
-        projects = Project.search(params[:query], options: { pids: ids, page: params[:page] })
+        projects = Project.search(params[:query], options: { pids: ids, page: params[:page] }).records
         present projects, with: Entities::Project
       end
 
@@ -339,8 +234,19 @@ module API
         uids = user_project.team.users.pluck(:id)
 
         @users = User.search(params[:search], page: params[:page],
-                             per: params[:per_page], options: {uids: uids})
+                             per: params[:per_page], options: {uids: uids}).records
         present @users, with: Entities::User
+      end
+
+      # Get a project labels
+      #
+      # Parameters:
+      #   id (required) - The ID of a project
+      # Example Request:
+      #   GET /projects/:id/labels
+      get ':id/labels' do
+        @labels = user_project.issues_labels
+        present @labels, with: Entities::Label
       end
     end
   end

@@ -1,6 +1,6 @@
 class Groups::MembersController < Groups::ApplicationController
 
-  before_filter :authorize_admin_group!, only: [:new, :edit, :create, :update, :destroy]
+  before_filter :authorize_admin_group! #, only: [:new, :edit, :create, :update, :destroy]
 
   def index
     @members = group.users_groups.order("group_access DESC")

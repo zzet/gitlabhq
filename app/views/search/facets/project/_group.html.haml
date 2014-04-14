@@ -1,0 +1,16 @@
+- args = { search: params[:search], type: type }
+
+- if namespaces.many?
+  .pull-right
+    .dropdown.inline
+      %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+        %span.light filter by Namespace
+        %b.caret
+
+      %ul.dropdown-menu
+        - namespaces.each do |namespace|
+          %li{class: "#{'active' if params[:namespace] == namespace[:namespace].path}"}
+            = link_to search_path(args.merge({ namespace: namespace[:namespace].path })) do
+              = namespace[:namespace].name
+              %small.pull-right= namespace[:count]
+    &nbsp;

@@ -1,0 +1,27 @@
+.pull-right
+  .dropdown.inline
+    %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+      %span.light sort:
+      - if params[:order].present?
+        = params[:order].humanize
+      - else
+        Best match
+      %b.caret
+    %ul.dropdown-menu
+      %li
+        = link_to search_filter_path(params[:search], type: :code, order: :best_match) do
+          Best match
+        = link_to search_filter_path(params[:search], type: :code, order: :recently_indexed) do
+          Recently indexed
+        = link_to search_filter_path(params[:search], type: :code, order: :last_indexed) do
+          Least recently indexed
+
+= render "search/facets/repository/project", projects: @search_results[:repositories][:blobs][:projects], type: :code
+
+%h4
+  #{@search_results[:repositories][:blobs][:total_count]} results found
+%hr
+.search_results
+  %ul.bordered-list
+    = render partial: "search/results/blob", collection: @search_results[:repositories][:blobs][:results]
+  = paginate @search_results[:repositories][:blobs][:results], theme: 'gitlab'

@@ -13,6 +13,8 @@ module ProjectsSearch
       indexes :path_with_namespace, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
       indexes :description,         type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
 
+      indexes :namespace_id,        type: :integer, index: 'not_analyzed'
+
       indexes :created_at,          type: :date
       indexes :archived,            type: :boolean
       indexes :visibility_level,    type: :integer, index: 'not_analyzed'
@@ -41,8 +43,10 @@ module ProjectsSearch
         }
       ).merge({
         name_with_namespace: name_with_namespace,
-        name_with_namespace_sort: name_with_namespace,
-        path_with_namespace: path_with_namespace
+        name_with_namespace_sort: name_with_namespace.downcase,
+        path_with_namespace: path_with_namespace,
+        updated_at_sort: updated_at,
+        created_at_sort: created_at
       })
     end
 
@@ -51,9 +55,9 @@ module ProjectsSearch
       page ||= 1
 
       if options[:in].blank?
-        options[:in] = %w(name^3 name_with_namespace^2 path_with_namespace^2 path)
+        options[:in] = %w(name^10 name_with_namespace^2 path_with_namespace path^9)
       else
-        options[:in].push(%w(name^3 name_with_namespace^2 path_with_namespace^2 path) - options[:in])
+        options[:in].push(%w(name^10 name_with_namespace^2 path_with_namespace path^9) - options[:in])
       end
 
       query_hash = {
@@ -67,6 +71,14 @@ module ProjectsSearch
               }
             },
           },
+        },
+        facets: {
+          namespaceFacet: {
+            terms: {
+              field: :namespace_id,
+              all_term: true
+            }
+          }
         },
         size: per,
         from: per * (page.to_i - 1)
@@ -172,7 +184,7 @@ module ProjectsSearch
         query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
       end
 
-      self.__elasticsearch__.search(query_hash).records
+      self.__elasticsearch__.search(query_hash)
     end
   end
 end

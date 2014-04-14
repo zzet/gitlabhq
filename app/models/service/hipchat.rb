@@ -2,7 +2,6 @@
 #
 # Table name: services
 #
-#  id                 :integer          not null, primary key
 #  type               :string(255)
 #  title              :string(255)
 #  project_id         :integer

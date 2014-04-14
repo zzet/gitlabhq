@@ -139,6 +139,7 @@ class Repository
     Rails.cache.delete(cache_key(:commit_count))
     Rails.cache.delete(cache_key(:graph_log))
     Rails.cache.delete(cache_key(:readme))
+    Rails.cache.delete(cache_key(:contribution_guide))
   end
 
   def graph_log
@@ -172,6 +173,12 @@ class Repository
     end
   end
 
+  def contribution_guide
+    Rails.cache.fetch(cache_key(:contribution_guide)) do
+      tree(:head).contribution_guide
+    end
+  end
+
   def head_commit
     commit(self.root_ref)
   end
@@ -201,7 +208,7 @@ class Repository
   #   # => git@localhost:rack.git
   #
   def submodule_url_for(ref, path)
-    if submodules.any?
+    if submodules(ref).any?
       submodule = submodules(ref)[path]
 
       if submodule

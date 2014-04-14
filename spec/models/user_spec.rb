@@ -314,7 +314,7 @@ describe User do
       user.all_ssh_keys.should include(key.key)
     end
   end
-    
+
   describe :avatar_type do
     let(:user) { create(:user) }
 

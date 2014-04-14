@@ -102,6 +102,7 @@ Settings.gitlab.default_projects_features['wall']           = false if Settings.
 Settings.gitlab.default_projects_features['snippets']       = false if Settings.gitlab.default_projects_features['snippets'].nil?
 Settings.gitlab.default_projects_features['visibility_level']    = Settings.send(:verify_constant, Gitlab::VisibilityLevel, Settings.gitlab.default_projects_features['visibility_level'], Gitlab::VisibilityLevel::PRIVATE)
 Settings.gitlab.default_projects_features['git_daemon_enabled'] = false if Settings.gitlab.default_projects_features['git_daemon_enabled'].nil?
+Settings.gitlab['repository_downloads_path'] = File.absolute_path(Settings.gitlab['repository_downloads_path'] || 'tmp/repositories', Rails.root)
 
 #
 # Gravatar

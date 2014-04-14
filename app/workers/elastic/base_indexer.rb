@@ -14,7 +14,14 @@ class Elastic::BaseIndexer
     when /index|update/
       record = cklass.find(record_id)
       record.__elasticsearch__.client = Client
-      record.__elasticsearch__.__send__ "#{operation}_document"
+      # While we have not ability to set default options for index/update methods
+      # https://github.com/elasticsearch/elasticsearch-rails/issues/66
+      # TODO NOTE FIXME
+      if Rails.env.to_sym == :test
+        record.__elasticsearch__.__send__ "#{operation}_document", refresh: true
+      else
+        record.__elasticsearch__.__send__ "#{operation}_document"
+      end
     when /delete/
       Client.delete index: cklass.index_name, type: cklass.document_type, id: record_id
     else raise ArgumentError, "Unknown operation '#{operation}'"

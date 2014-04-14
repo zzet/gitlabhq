@@ -45,7 +45,19 @@ class Ability
           :download_code
         ]
       else
-        []
+        group = if subject.kind_of?(Group)
+                  subject
+                elsif subject.respond_to?(:group)
+                  subject.group
+                else
+                  nil
+                end
+
+        if group && group.has_projects_accessible_to?(nil)
+          [:read_group]
+        else
+          []
+        end
       end
     end
 
@@ -178,7 +190,8 @@ class Ability
     def group_abilities user, group
       rules = []
 
-      if group.users.include?(user) || group.projects.inject(false) { |res, pr| res || pr.team.members.include?(user) } || user.admin?
+      #if group.users.include?(user) || group.projects.inject(false) { |res, pr| res || pr.team.members.include?(user) } || user.admin?
+      if user.admin? || group.users.include?(user) || ProjectsFinder.new.execute(user, group: group).any?
         rules << :read_group
       end
 
@@ -273,6 +286,7 @@ class Ability
       can_manage = group_abilities(user, group).include?(:manage_group)
       if can_manage && (user != target_user)
         rules << :modify
+        rules << :destroy
       end
       if !group.last_owner?(user) && (can_manage || (user == target_user))
         rules << :destroy

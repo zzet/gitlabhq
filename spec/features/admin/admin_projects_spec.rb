@@ -5,7 +5,7 @@ describe "Admin::Projects" do
   before do
     Project.__elasticsearch__.create_index! force: true
     @project = create(:project)
-    sleep 1
+    #sleep 1
     login_as :admin
   end
 

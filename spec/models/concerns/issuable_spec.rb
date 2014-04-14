@@ -25,18 +25,13 @@ describe Issue, "Issuable" do
     it { described_class.should respond_to(:assigned) }
   end
 
-  it "has an :author_id_of_changes accessor" do
-    issue.should respond_to(:author_id_of_changes)
-    issue.should respond_to(:author_id_of_changes=)
-  end
-
   describe ".search" do
     let!(:searchable_issue) { create(:issue, title: "Searchable issue") }
 
     it "matches by title" do
       searchable_issue.__elasticsearch__.index_document
       sleep 1
-      described_class.search('able').to_a.should == [searchable_issue]
+      described_class.search('able').records.to_a.should == [searchable_issue]
     end
   end
 

@@ -45,7 +45,7 @@ class MergeRequestsService < BaseService
     params[:merge_request].delete(:source_project_id)
     params[:merge_request].delete(:target_project_id)
 
-    if @merge_request.update(@params[:merge_request].merge(author_id_of_changes: @current_user.id))
+    if @merge_request.update_attributes(@params[:merge_request])
       @merge_request.reset_events_cache
 
       receive_delayed_notifications
@@ -60,7 +60,6 @@ class MergeRequestsService < BaseService
   # Called when you do merge via command line and push code
   # to target branch
   def merge
-    merge_request.author_id_of_changes = current_user.id
     merge_request.merge
 
     create_merge_event(merge_request)
@@ -80,7 +79,6 @@ class MergeRequestsService < BaseService
     merge_request.lock
 
     if Gitlab::Satellite::MergeAction.new(current_user, merge_request).merge!(commit_message)
-      merge_request.author_id_of_changes = current_user.id
       merge_request.merge
 
       create_merge_event(merge_request)
@@ -101,9 +99,6 @@ class MergeRequestsService < BaseService
 
   private
 
-  def notification
-    NotificationService.new
-  end
 
   def create_merge_event(merge_request)
     OldEvent.create(
@@ -111,7 +106,7 @@ class MergeRequestsService < BaseService
       target_id: merge_request.id,
       target_type: merge_request.class.name,
       action: OldEvent::MERGED,
-      author_id: merge_request.author_id_of_changes
+      author_id: current_user.id
     )
   end
 

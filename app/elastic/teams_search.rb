@@ -21,6 +21,8 @@ module TeamsSearch
       indexes :groups,      type: :nested
 
       indexes :name_sort,   type: :string, index: 'not_analyzed'
+      indexes :created_at_sort, type: :string, index: 'not_analyzed'
+      indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
     def as_indexed_json(options = {})
@@ -36,7 +38,9 @@ module TeamsSearch
           groups:     { only: :id },
         }
       ).merge({
-        name_sort: name
+        name_sort: name.downcase,
+        updated_at_sort: updated_at,
+        created_at_sort: created_at
       })
     end
 
@@ -45,9 +49,9 @@ module TeamsSearch
       page ||= 1
 
       if options[:in].blank?
-        options[:in] = %w(name^2 path)
+        options[:in] = %w(name^10 path^5)
       else
-        options[:in].push(%w(name^2 path) - options[:in])
+        options[:in].push(%w(name^10 path^5) - options[:in])
       end
 
       query_hash = {
@@ -128,8 +132,23 @@ module TeamsSearch
         }
       end
 
+      options[:order] = :default if options[:order].blank?
+      order = case options[:order].to_sym
+              when :newest
+                { created_at_sort: { order: :asc, mode: :min } }
+              when :oldest
+                { created_at_sort: { order: :desc, mode: :min } }
+              when :recently_updated
+                { updated_at_sort: { order: :asc, mode: :min } }
+              when :last_updated
+                { updated_at_sort: { order: :desc, mode: :min } }
+              else
+                { name_sort: { order: :asc, mode: :min } }
+              end
+
+
       query_hash[:sort] = [
-        { name_sort: { order: :asc, mode: :min }},
+        order,
         :_score
       ]
 
@@ -137,7 +156,7 @@ module TeamsSearch
         query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
       end
 
-      self.__elasticsearch__.search(query_hash).records
+      self.__elasticsearch__.search(query_hash)
     end
   end
 end
