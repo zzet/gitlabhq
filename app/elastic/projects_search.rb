@@ -76,7 +76,8 @@ module ProjectsSearch
           namespaceFacet: {
             terms: {
               field: :namespace_id,
-              all_term: true
+              all_term: true,
+              size: Namespace.count
             }
           }
         },

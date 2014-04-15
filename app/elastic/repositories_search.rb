@@ -10,6 +10,14 @@ module RepositoriesSearch
       project.id
     end
 
+    def self.repositories_count
+      Project.count
+    end
+
+    def client_for_indexing
+      self.__elasticsearch__.client
+    end
+
     def self.import
       Repository.__elasticsearch__.create_index! force: true
 
