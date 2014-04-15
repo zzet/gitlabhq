@@ -56,8 +56,9 @@ class GitPushService
       project.execute_hooks(@push_data.dup, :tag_push_hooks)
     else
       project.execute_hooks(@push_data.dup, :push_hooks)
-      project.execute_services(@push_data.dup)
     end
+
+    project.execute_services(@push_data.dup)
 
     if push.created_branch?
       # Re-find the pushed commits.
