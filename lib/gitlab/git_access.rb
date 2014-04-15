@@ -15,7 +15,7 @@ module Gitlab
           actor.projects.include?(project)
         when ServiceKey
           service = actor.services.with_project(project).first
-          service.allowed_clone?(key)
+          service.allowed_clone?(actor)
         when Key
           download_allowed?(actor.user, project)
         else
@@ -31,9 +31,9 @@ module Gitlab
         when ServiceKey
           service = actor.services.with_project(project).first
           if project.protected_branch?(ref)
-            services.allowed_protected_push?(key)
+            services.allowed_protected_push?(actor)
           else
-            service.allowed_push?(key)
+            service.allowed_push?(actor)
           end
         when Key
           push_allowed?(actor.user, project, ref, oldrev, newrev)
