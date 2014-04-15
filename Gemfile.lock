@@ -23,6 +23,20 @@ GIT
     rugged (0.19.0)
 
 GIT
+  remote: git://github.com/zzet/elasticsearch-git.git
+  revision: d895faeb6a96cfa9e8b7478f78b53abcd1fc9c86
+  ref: d895faeb6a96cfa9e8b7478f78b53abcd1fc9c86
+  specs:
+    elasticsearch-git (0.0.4)
+      activemodel (~> 4.0.0)
+      activesupport (~> 4.0.0)
+      charlock_holmes (~> 0.6.9)
+      elasticsearch-api (> 0.4.0)
+      elasticsearch-model
+      gitlab-linguist (> 2.9.0)
+      rugged (~> 0.19.0)
+
+GIT
   remote: https://github.com/gitlabhq/markup.git
   revision: 61ade389c1e1c159359338f570d18464a44ddbc4
   ref: 61ade389c1e1c159359338f570d18464a44ddbc4
@@ -175,14 +189,6 @@ GEM
       elasticsearch-transport (= 0.4.8)
     elasticsearch-api (0.4.8)
       multi_json
-    elasticsearch-git (0.0.4)
-      activemodel (~> 4.0.0)
-      activesupport (~> 4.0.0)
-      charlock_holmes (~> 0.6.9)
-      elasticsearch-api (> 0.4.0)
-      elasticsearch-model
-      gitlab-linguist (> 2.9.0)
-      rugged (~> 0.19.0)
     elasticsearch-transport (0.4.8)
       faraday
       multi_json
@@ -680,7 +686,7 @@ DEPENDENCIES
   devise (= 3.0.4)
   devise-async (= 0.8.0)
   diffy
-  elasticsearch-git (~> 0.0.4)
+  elasticsearch-git!
   elasticsearch-model!
   elasticsearch-rails!
   email_spec
