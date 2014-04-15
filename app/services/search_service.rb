@@ -33,15 +33,19 @@ class SearchService < BaseService
     group = Group.find_by(id: params[:group_id]) if params[:group_id].present?
     opt[:namespace_id] = group.id if group
 
-    response = Project.search(query, options: opt, page: page)
+    begin
+      response = Project.search(query, options: opt, page: page)
 
-    {
-      records: response.records,
-      results: response.results,
-      response: response.response,
-      total_count: response.total_count,
-      namespaces: response.response["facets"]["namespaceFacet"]["terms"].map {|term| { namespace: Namespace.find(term["term"]), count: term["count"] } }
-    }
+      {
+        records: response.records,
+        results: response.results,
+        response: response.response,
+        total_count: response.total_count,
+        namespaces: response.response["facets"]["namespaceFacet"]["terms"].map {|term| { namespace: Namespace.find(term["term"]), count: term["count"] } }
+      }
+    rescue
+      []
+    end
   end
 
   def search_in_groups(query)
@@ -51,14 +55,18 @@ class SearchService < BaseService
       in: %w(name^10 path^5 description),
     }
 
-    response = Group.search(query, options: opt, page: page)
+    begin
+      response = Group.search(query, options: opt, page: page)
 
-    {
-      records: response.records,
-      results: response.results,
-      response: response.response,
-      total_count: response.total_count
-    }
+      {
+        records: response.records,
+        results: response.results,
+        response: response.response,
+        total_count: response.total_count
+      }
+    rescue
+      []
+    end
   end
 
   def search_in_teams(query)
@@ -68,14 +76,18 @@ class SearchService < BaseService
       in: %w(name^10 path^5 description),
     }
 
-    response = Team.search(query, options: opt, page: page)
+    begin
+      response = Team.search(query, options: opt, page: page)
 
-    {
-      records: response.records,
-      results: response.results,
-      response: response.response,
-      total_count: response.total_count
-    }
+      {
+        records: response.records,
+        results: response.results,
+        response: response.response,
+        total_count: response.total_count
+      }
+    rescue
+      []
+    end
   end
 
   def search_in_users(query)
@@ -84,14 +96,18 @@ class SearchService < BaseService
       order: params[:order]
     }
 
-    response = User.search(query, options: opt, page: page)
+    begin
+      response = User.search(query, options: opt, page: page)
 
-    {
-      records: response.records,
-      results: response.results,
-      response: response.response,
-      total_count: response.total_count
-    }
+      {
+        records: response.records,
+        results: response.results,
+        response: response.response,
+        total_count: response.total_count
+      }
+    rescue
+      []
+    end
   end
 
   def search_in_merge_requests(query)
@@ -100,14 +116,18 @@ class SearchService < BaseService
       order: params[:order]
     }
 
-    response = MergeRequest.search(query, options: opt, page: page)
+    begin
+      response = MergeRequest.search(query, options: opt, page: page)
 
-    {
-      records: response.records,
-      results: response.results,
-      response: response.response,
-      total_count: response.total_count
-    }
+      {
+        records: response.records,
+        results: response.results,
+        response: response.response,
+        total_count: response.total_count
+      }
+    rescue
+      []
+    end
   end
 
   def search_in_issues(query)
@@ -116,14 +136,18 @@ class SearchService < BaseService
       order: params[:order]
     }
 
-    response = Issue.search(query, options: opt, page: page)
+    begin
+      response = Issue.search(query, options: opt, page: page)
 
-    {
-      records: response.records,
-      results: response.results,
-      response: response.response,
-      total_count: response.total_count
-    }
+      {
+        records: response.records,
+        results: response.results,
+        response: response.response,
+        total_count: response.total_count
+      }
+    rescue
+      []
+    end
   end
 
   def search_in_repository(query)
@@ -134,10 +158,14 @@ class SearchService < BaseService
     }
     opt.merge!({ language: params[:language] }) if params[:language].present? && params[:language] != "All"
 
-    res = Repository.search(query, options: opt, page: page)
-    res[:blobs][:projects]    = res[:blobs][:repositories].map   { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
-    res[:commits][:projects]  = res[:commits][:repositories].map { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
-    res
+    begin
+      res = Repository.search(query, options: opt, page: page)
+      res[:blobs][:projects]    = res[:blobs][:repositories].map   { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
+      res[:commits][:projects]  = res[:commits][:repositories].map { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
+      res
+    rescue
+      []
+    end
   end
 
   def projects_ids
