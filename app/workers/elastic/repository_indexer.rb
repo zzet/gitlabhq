@@ -3,7 +3,6 @@ class Elastic::RepositoryIndexer
   sidekiq_options queue: 'elasticsearch', retry: false, backtrace: true
 
   def perform(record_id, options={})
-    return true # while we do not start user search on repo
     push = Push.find(record_id)
     repo = push.project.repository
 
