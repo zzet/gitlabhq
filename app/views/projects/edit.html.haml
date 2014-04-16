@@ -183,6 +183,27 @@
         - else
           .nothing-here-block Only the project owner can transfer a project
 
+        .ui-box.ui-box-danger
+          .title Rename repository
+          .errors-holder
+          .form-holder
+            = form_for(@project, html: { class: 'form-horizontal' }) do |f|
+              .form-group
+                = f.label :path, class: 'control-label' do
+                  %span Path
+                .col-sm-9
+                  .form-group
+                    .input-group
+                      = f.text_field :path, class: 'form-control'
+                      %span.input-group-addon .git
+
+                  %ul
+                    %li Be careful. Renaming a project's repository can have unintended side effects.
+                    %li You will need to update your local repositories to point to the new location.
+
+              .form-actions
+                = f.submit 'Rename', class: "btn btn-remove"
+
         - if can?(current_user, :remove_project, @project)
           .ui-box.ui-box-danger
             .title Remove project
