@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 class AttachmentUploader < CarrierWave::Uploader::Base
+  permissions 0775
+
   storage :file
 
   after :store, :reset_events_cache
