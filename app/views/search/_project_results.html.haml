@@ -20,7 +20,8 @@
         = link_to search_filter_path(params[:search], type: :project, order: :last_updated) do
           Last updated
 
-= render "search/facets/project/group", namespaces: @search_results[:projects][:namespaces], type: :project
+- if @search_results[:projects]
+  = render "search/facets/project/group", namespaces: @search_results[:projects][:namespaces], type: :project
 
 %h4
   - if @search_results[:projects][:namespaces].count > 0
