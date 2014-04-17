@@ -27,7 +27,7 @@ class Admin::Settings::EmailDomainsController < Admin::Settings::ApplicationCont
     if @domain.update(params[:global_settings_email_domains])
       redirect_to admin_settings_path
     else
-      render :edit
+      render :index
     end
   end
 
