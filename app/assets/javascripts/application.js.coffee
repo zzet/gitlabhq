@@ -32,6 +32,7 @@
 #= require underscore.string.min
 #= require nprogress
 #= require nprogress-turbolinks
+#= require private_pub
 #= require_directory ./api
 #= require_tree .
 
