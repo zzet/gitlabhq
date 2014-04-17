@@ -30,7 +30,15 @@
             %span.help-block.light
               Email is read-only for LDAP user
           - else
-            = f.text_field :email, class: "form-control", required: true
+            - email = @user.email
+            - @user.email = email.split("@").first
+            .col-sm-6.no_padding
+              = f.text_field :email, class: "form-control", placeholder: "Email", required: true
+            .col-sm-6.no_padding
+              = select_tag :email_domain, options_for_select(Gitlab.config.corporate_email_domains.map { |e| ["@" + e, e]},  email.split("@").last || Gitlab.config.corporate_email_domains.first),
+                           class: "form-control middle",
+                           placeholder: "Email",
+                           required: true
             - if @user.unconfirmed_email.present?
               %span.help-block
                 We sent confirmation email to

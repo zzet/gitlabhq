@@ -7,7 +7,14 @@
   %div
     = f.text_field :username, class: "form-control middle", placeholder: "Username", required: true
   %div
-    = f.email_field :email, class: "form-control middle", placeholder: "Email", required: true
+    .col-sm-6.no_padding
+      = f.text_field :email, class: "form-control middle", placeholder: "Email", required: true
+    .col-sm-6.no_padding
+      = select_tag :email_domain, options_for_select(Gitlab.config.corporate_email_domains.map {|e| ["@" + e, e]}),
+                           class: "form-control middle",
+                           style: "height: 51px;",
+                           placeholder: "Email",
+                           required: true
   %div
     = f.password_field :password, class: "form-control middle", placeholder: "Password", required: true
   %div
