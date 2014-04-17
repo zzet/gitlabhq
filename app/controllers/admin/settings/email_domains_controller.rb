@@ -32,5 +32,6 @@ class Admin::Settings::EmailDomainsController < Admin::Settings::ApplicationCont
 
   def destroy
     settings.email_domains.find(params[:id]).destroy
+    redirect_to admin_settings_path
   end
 end
