@@ -31,6 +31,6 @@ class Admin::Settings::EmailDomainsController < Admin::Settings::ApplicationCont
   end
 
   def destroy
-    settings.email_domain.find(params[:id]).destroy
+    settings.email_domains.find(params[:id]).destroy
   end
 end
