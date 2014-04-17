@@ -2,8 +2,11 @@
   %h4.append-bottom-20
     New domain
 
-  %p 1. Choose users you want in the group
   %div.form-holder
+    - if @domain.errors.any?
+      .alert.alert-danger
+        - @domain.errors.full_messages.each do |error|
+          %div= error
     .form-group
       = f.label :domain, "Domain address", class: 'control-label'
       .col-sm-10= f.text_field :domain, class: "form-control left"

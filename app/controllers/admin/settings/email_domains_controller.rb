@@ -1,7 +1,7 @@
 class Admin::Settings::EmailDomainsController < Admin::Settings::ApplicationController
   def index
     @email_domains = settings.email_domains
-    @domain = settings.email_domains.build
+    @domain ||= settings.email_domains.build
   end
 
   def new
@@ -9,11 +9,12 @@ class Admin::Settings::EmailDomainsController < Admin::Settings::ApplicationCont
   end
 
   def create
+    @email_domains = settings.email_domains
     @domain = settings.email_domains.new(params[:global_settings_email_domains])
     if @domain.save
       redirect_to admin_settings_path
     else
-      render :new
+      render :index
     end
   end
 
