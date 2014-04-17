@@ -10,8 +10,11 @@ class Admin::Settings::EmailDomainsController < Admin::Settings::ApplicationCont
 
   def create
     @domain = settings.email_domains.new(params[:global_settings_email_domains])
-    @domain.save
-    redirect_to admin_settings_path
+    if @domain.save
+      redirect_to admin_settings_path
+    else
+      render :new
+    end
   end
 
   def edit
