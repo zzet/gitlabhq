@@ -1,0 +1,7 @@
+---
+port: 4443
+ssl: true
+ssl_key_file: /etc/nginx/ssl/git.undev.cc.key
+ssl_cert_file: /etc/nginx/ssl/git.undev.cc.pem
+environment: production
+rackup: private_pub.ru
