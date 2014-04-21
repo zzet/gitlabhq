@@ -191,7 +191,7 @@ gem 'react-rails', '~> 0.8.0.0'
 gem "activerecord-import", "~> 0.4.1"
 
 gem "private_pub"
-gem 'thin'
+gem 'thin', '~> 1.6.2'
 
 group :development do
   gem "annotate", "~> 2.6.0.beta2"

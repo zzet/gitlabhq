@@ -616,7 +616,7 @@ GEM
     therubyracer (0.12.0)
       libv8 (~> 3.16.14.0)
       ref
-    thin (1.6.1)
+    thin (1.6.2)
       daemons (>= 1.0.9)
       eventmachine (>= 1.0.0)
       rack (>= 1.0.0)
@@ -800,7 +800,7 @@ DEPENDENCIES
   state_machine
   test_after_commit
   therubyracer
-  thin
+  thin (~> 1.6.2)
   tinder (~> 1.9.2)
   turbolinks
   uglifier
