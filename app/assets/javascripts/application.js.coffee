@@ -15,6 +15,7 @@
 #= require jquery.atwho
 #= require jquery.scrollto
 #= require jquery.blockUI
+#= require jquery.customSelect.min
 #= require turbolinks
 #= require jquery.turbolinks
 #= require bootstrap
@@ -95,6 +96,9 @@ $ ->
 
   # Initialize select2 selects
   $('select.select2').select2(width: 'resolve', dropdownAutoWidth: true)
+
+  # Initialize custom select at SignUp form
+  $('.signUpCustomSelect').customSelect();
 
   # Initialize tooltips
   $('.has_tooltip').tooltip()
