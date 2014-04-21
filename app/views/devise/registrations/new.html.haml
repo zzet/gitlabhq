@@ -11,8 +11,7 @@
       = f.text_field :email, class: "form-control middle", placeholder: "Email", required: true
     .col-sm-6.no_padding
       = select_tag :email_domain, options_for_select(Gitlab.config.corporate_email_domains.map {|e| ["@" + e, e]}),
-                           class: "form-control middle",
-                           style: "height: 51px;",
+                           class: "form-control middle signUpCustomSelect",
                            placeholder: "Email",
                            required: true
   %div
