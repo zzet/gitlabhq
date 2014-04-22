@@ -32,6 +32,7 @@ class BaseFinder
     items = by_milestone(items)
     items = by_assignee(items)
     items = by_label(items)
+    items = by_discussion(items)
     items = sort(items)
   end
 
@@ -126,6 +127,19 @@ class BaseFinder
   def by_label(items)
     if params[:label_name].present?
       items = items.tagged_with(params[:label_name])
+    end
+
+    items
+  end
+
+  def by_discussion(items)
+    case params[:discussion]
+    when 'empty'
+      items = items.includes(:notes).where(notes: { id: nil }).uniq
+    when 'without_me'
+      items = items.where.not(id: items.joins(:notes).where(notes: { author_id: current_user })).uniq
+    when 'with_me'
+      items = items.joins(:notes).where(notes: { author_id: current_user }).uniq
     end
 
     items

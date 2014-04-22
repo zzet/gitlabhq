@@ -26,6 +26,24 @@
           = link_to filter_path(entity, state: 'all') do
             All
 
+    - if current_user
+      %fieldset.discussion-filter
+        %legend Discussion
+        %ul.nav.nav-pills.nav-stacked
+          %li{class: ("active" if params[:discussion].blank? || params[:discussion] == 'all')}
+            = link_to filter_path(entity, discussion: 'all') do
+              Everyone's
+          %li{class: ("active" if params[:discussion] == 'empty')}
+            = link_to filter_path(entity, discussion: 'empty') do
+              Without notes
+          %li{class: ("active" if params[:discussion] == 'with_me')}
+            = link_to filter_path(entity, discussion: 'with_me') do
+              With my notes
+          %li{class: ("active" if params[:discussion] == 'without_me')}
+            = link_to filter_path(entity, discussion: 'without_me') do
+              Without my notes
+
+
     %fieldset
       %legend Projects
       %ul.nav.nav-pills.nav-stacked.nav-small
