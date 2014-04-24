@@ -7,6 +7,12 @@ class Settings < Settingslogic
       gitlab.port.to_i == (gitlab.https ? 443 : 80)
     end
 
+    def corporate_email_domains
+      GlobalSettings.allowed_email_domains.map do |domain|
+        domain.strip
+      end
+    end
+
     private
 
     def build_gitlab_shell_ssh_path_prefix

@@ -1,6 +1,11 @@
 class RegistrationsController < Devise::RegistrationsController
   before_filter :signup_enabled?
 
+  def create
+    params[:user][:email] += "@#{params[:email_domain]}"
+    super
+  end
+
   def destroy
     current_user.destroy
 

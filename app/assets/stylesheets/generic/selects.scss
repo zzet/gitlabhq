@@ -124,3 +124,22 @@ select {
     font-weight: bolder;
   }
 }
+
+
+select.signUpCustomSelect{
+  cursor: pointer !important;
+}
+span.signUpCustomSelect{
+  border-left: none;
+  cursor: pointer !important;
+  padding-bottom: 9px !important;
+  background-image: url('data:image/gif;base64,R0lGODlhEAAQANUAAGVmYmNkYH5/e3N0cHFzam5wZ4SGfWlsXnR2bGNkX25vam1uaWxtaIKDfmNlWmttYnJ0aXFzaGVnW2psYGhqXmVmYGRlX2FiXGtsZmlqZGZnYYKDfICBeoSFfXR1aXBxZmlqYGhpX2tsYm5vYnR0aWZmYmxsav///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACcALAAAAAAQABAAAAY8wJNwSCwaj8ikcslsHh2ShCWkAWkmJQqlWOmISKPDByHIHC+GB8QT2SSSC06B0AAsGYpBoIkxOf+AgUlBADs=');
+  background-repeat: no-repeat;
+  background-position: 128px 17px
+}
+span.signUpCustomSelect .customSelectInner{
+  padding-right: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer !important;
+}

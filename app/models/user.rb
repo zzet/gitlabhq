@@ -146,7 +146,7 @@ class User < ActiveRecord::Base
   # Validations
   #
   validates :name, presence: true
-  validates :email, presence: true, email: {strict_mode: true}, uniqueness: true
+  validates :email, presence: true, email: { strict_mode: true }, uniqueness: true
   validates :bio, length: { maximum: 255 }, allow_blank: true
   validates :extern_uid, allow_blank: true, uniqueness: {scope: :provider}
   validates :projects_limit, presence: true, numericality: {greater_than_or_equal_to: 0}
@@ -158,6 +158,7 @@ class User < ActiveRecord::Base
   validate :namespace_uniq, if: ->(user) { user.username_changed? }
   validate :avatar_type, if: ->(user) { user.avatar_changed? }
   validate :unique_email, if: ->(user) { user.email_changed? }
+  validate :corporate_email, if: ->(user) { user.email_changed? }
   validates :avatar, file_size: { maximum: 100.kilobytes.to_i }
 
   before_validation :generate_password, on: :create
@@ -338,6 +339,11 @@ class User < ActiveRecord::Base
 
   def unique_email
     self.errors.add(:email, 'has already been taken') if Email.exists?(email: self.email)
+  end
+
+  def corporate_email
+    mail_domain = self.email.split("@").last
+    self.errors.add(:email, 'email rejected. Invalid domain.') unless Gitlab.config.corporate_email_domains.include?(mail_domain)
   end
 
   # Groups user has access to
