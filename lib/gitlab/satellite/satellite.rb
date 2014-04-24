@@ -112,9 +112,13 @@ module Gitlab
           # ... and delete all others
           heads.each { |head| repo.git.branch(default_options({D: true}), head) }
         rescue
-          destroy
-          create
-          clear_and_update!
+          begin
+            destroy
+            create
+            clear_and_update!
+          rescue
+            log("FATAL in satellite for #{project.name_with_namespace}")
+          end
         end
       end
 
