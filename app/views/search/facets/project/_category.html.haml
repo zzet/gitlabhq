@@ -1,0 +1,20 @@
+- args = { search: params[:search], type: type }
+
+- if categories.many?
+  .pull-right
+    .dropdown.inline
+      %a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
+        %span.light
+          - if params[:category].present?
+            filtered by category: #{params[:category]}
+          - else
+            filter by category
+        %b.caret
+
+      %ul.dropdown-menu
+        - categories.each do |category|
+          %li{class: "#{'active' if params[:category] == category[:category].name}"}
+            = link_to search_path(args.merge({ category: category[:category].name })) do
+              = category[:category].name
+              %small.pull-right= category[:count]
+    &nbsp;
