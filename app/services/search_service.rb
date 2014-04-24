@@ -33,6 +33,8 @@ class SearchService < BaseService
     group = Group.find_by(id: params[:group_id]) if params[:group_id].present?
     opt[:namespace_id] = group.id if group
 
+    opt[:category] = params[:category] if params[:category].present?
+
     begin
       response = Project.search(query, options: opt, page: page)
 
@@ -41,7 +43,8 @@ class SearchService < BaseService
         results: response.results,
         response: response.response,
         total_count: response.total_count,
-        namespaces: response.response["facets"]["namespaceFacet"]["terms"].map {|term| { namespace: Namespace.find(term["term"]), count: term["count"] } }
+        namespaces: response.response["facets"]["namespaceFacet"]["terms"].map {|term| { namespace: Namespace.find(term["term"]), count: term["count"] } },
+        categories: Project.category_counts.map { |category| { category: category, count: category.count } }
       }
     rescue
       []

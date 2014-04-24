@@ -22,6 +22,7 @@
 
 - if @search_results[:projects]
   = render "search/facets/project/group", namespaces: @search_results[:projects][:namespaces], type: :project
+  = render "search/facets/project/category", categories: @search_results[:projects][:categories], type: :project
 
 %h4
   - if @search_results[:projects][:namespaces].count > 0
