@@ -15,5 +15,4 @@
           = submit_tag 'Search', class: "btn btn-create"
 
     .results.prepend-top-10
-      - if params[:search].present?
-        = render 'results'
+      = render 'results'

@@ -27,6 +27,8 @@ module ProjectsSearch
       indexes :reporters,           type: :nested
       indexes :guests,              type: :nested
 
+      indexes :categories,          type: :nested
+
       indexes :name_with_namespace_sort, type: :string, index: 'not_analyzed'
       indexes :created_at_sort, type: :string, index: 'not_analyzed'
       indexes :updated_at_sort, type: :string, index: 'not_analyzed'
@@ -39,7 +41,9 @@ module ProjectsSearch
           masters: { only: :id },
           developers: { only: :id },
           reporters: { only: :id },
-          guests: { only: :id }
+          guests: { only: :id },
+
+          categories: { only: :name}
         }
       ).merge({
         name_with_namespace: name_with_namespace,
@@ -79,6 +83,13 @@ module ProjectsSearch
               all_term: true,
               size: Namespace.count
             }
+          },
+          categoryFacet: {
+            terms: {
+              field: "categories.name",
+              all_term: true,
+              size: Project.category_counts.count
+            }
           }
         },
         size: per,
@@ -86,7 +97,7 @@ module ProjectsSearch
       }
 
       if query.blank?
-        query_hash[:query][:filtered][:query] = { match_all: {}}
+        query_hash[:query][:filtered][:query] = { match_all: {} }
         query_hash[:track_scores] = true
       end
 
@@ -119,6 +130,18 @@ module ProjectsSearch
         query_hash[:query][:filtered][:filter][:and] << {
           terms: {
             namespace_id: [options[:namespace_id]].flatten
+          }
+        }
+      end
+
+      if options[:category]
+        query_hash[:query][:filtered][:filter] ||= { and: [] }
+        query_hash[:query][:filtered][:filter][:and] << {
+          nested: {
+            path: :categories,
+            filter: {
+              term: { "categories.name" => options[:category] }
+            }
           }
         }
       end
