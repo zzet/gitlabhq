@@ -136,6 +136,7 @@ module ProjectsHelper
     exist_opts = {
       state: params[:state],
       scope: params[:scope],
+      discussion: params[:discussion],
       label_name: params[:label_name],
       milestone_id: params[:milestone_id],
       assignee_id: params[:assignee_id],
