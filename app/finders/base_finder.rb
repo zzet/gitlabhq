@@ -137,7 +137,8 @@ class BaseFinder
     when 'empty'
       items = items.includes(:notes).where(notes: { id: nil }).uniq
     when 'without_me'
-      items = items.where.not(id: items.joins(:notes).where(notes: { author_id: current_user })).uniq
+      items_with_my_comments_ids = items.joins(:notes).where(notes: { author_id: current_user }).pluck(:id)
+      items = items.where.not(id: items_with_my_comments_ids).uniq
     when 'with_me'
       items = items.joins(:notes).where(notes: { author_id: current_user }).uniq
     end
