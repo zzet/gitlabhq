@@ -38,13 +38,23 @@ class SearchService < BaseService
     begin
       response = Project.search(query, options: opt, page: page)
 
+      categories_list = if query.blank?
+                          Project.category_counts.map do |category|
+                            { category: category.name, count: category.count }
+                          end
+                        else
+                          response.response["facets"]["categoryFacet"]["terms"].map do |term|
+                            { category: term["term"], count: term["count"] }
+                          end
+                        end
+
       {
         records: response.records,
         results: response.results,
         response: response.response,
         total_count: response.total_count,
         namespaces: response.response["facets"]["namespaceFacet"]["terms"].map {|term| { namespace: Namespace.find(term["term"]), count: term["count"] } },
-        categories: Project.category_counts.map { |category| { category: category, count: category.count } }
+        categories: categories_list
       }
     rescue
       []
