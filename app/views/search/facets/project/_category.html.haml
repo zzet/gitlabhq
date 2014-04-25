@@ -13,8 +13,8 @@
 
       %ul.dropdown-menu
         - categories.each do |category|
-          %li{class: "#{'active' if params[:category] == category[:category].name}"}
-            = link_to search_path(args.merge({ category: category[:category].name })) do
-              = category[:category].name
+          %li{class: "#{'active' if params[:category] == category[:category]}"}
+            = link_to search_path(args.merge({ category: category[:category] })) do
+              = category[:category]
               %small.pull-right= category[:count]
     &nbsp;
