@@ -64,8 +64,8 @@
               or #{link_to 'generate', generate_project_labels_path(@project), method: :post} default set of labels
 
     %fieldset
-      - if %w(state scope milestone_id assignee_id label_name).select { |k| params[k].present? }.any?
-        = link_to project_entities_path, class: 'cgray pull-right' do
+      - if %w(state scope milestone_id assignee_id label_name discussion).select { |k| params[k].present? }.any?
+        = link_to project_filter_path(state: nil, scope: nil, discussion: nil), class: 'cgray pull-right' do
           %i.icon-remove
           %strong Clear filter
 

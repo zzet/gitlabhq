@@ -55,7 +55,7 @@
 
     %fieldset
       - if params[:state].present? || params[:project_id].present?
-        = link_to filter_path(entity, state: nil, project_id: nil), class: 'pull-right cgray' do
+        = link_to filter_path(entity, state: nil, scope: nil, discussion: nil, project_id: nil), class: 'pull-right cgray' do
           %i.icon-remove
           %strong Clear filter
 
