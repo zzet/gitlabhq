@@ -91,6 +91,11 @@
           - else
             #{link_to @project.owner_name, @project.owner}
 
+        - if @project.categories.any?
+          %p
+            %span.light Categories
+            = @project.categories.join(", ")
+
       - if @project.gitlab_ci?
         %hr
         = link_to @gitlab_ci_service.builds_path do

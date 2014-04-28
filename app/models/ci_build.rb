@@ -78,12 +78,15 @@ class CiBuild < ActiveRecord::Base
   def run
     configuration = service.configuration
 
-    if merge_request_build?
-      url = configuration.host + configuration.merge_request_path
-      WebHook.post(url, body: data_to_merge_requst_build.to_json, headers: { "Content-Type" => "application/json" })
-    else
-      url = configuration.host + configuration.push_path
-      WebHook.post(url, body: data_to_push_build.to_json, headers: { "Content-Type" => "application/json" })
+    begin
+      if merge_request_build?
+        url = configuration.host + configuration.merge_request_path
+        WebHook.post(url, body: data_to_merge_requst_build.to_json, headers: { "Content-Type" => "application/json" })
+      else
+        url = configuration.host + configuration.push_path
+        WebHook.post(url, body: data_to_push_build.to_json, headers: { "Content-Type" => "application/json" })
+      end
+    rescue
     end
 
     true

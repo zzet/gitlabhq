@@ -1,0 +1,15 @@
+= form_for @domain, url: admin_settings_email_domains_path, method: :post, html: { class: 'form-horizontal' } do |f|
+  %h4.append-bottom-20
+    New domain
+
+  %div.form-holder
+    .form-group
+      = f.label :domain, "Domain address", class: 'control-label'
+      .col-sm-10= f.text_field :domain, class: "form-control left"
+
+    .form-group
+      = f.label :description, "Domain description", class: 'control-label'
+      .col-sm-10= f.text_field :description, class: "form-control left"
+
+    .form-actions
+      = f.submit 'Add domain', class: 'btn btn-create'

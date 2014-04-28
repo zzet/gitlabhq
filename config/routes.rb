@@ -115,6 +115,12 @@ Gitlab::Application.routes.draw do
       end
     end
 
+    resource :settings, only: [:show, :edit, :update] do
+      scope module: :settings do
+        resources :email_domains
+      end
+    end
+
     root to: "dashboard#index"
   end
 

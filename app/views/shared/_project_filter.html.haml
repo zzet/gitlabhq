@@ -26,6 +26,23 @@
           = link_to project_filter_path(state: 'all') do
             All
 
+    - if current_user
+      %fieldset.discussion-filter
+        %legend Discussion
+        %ul.nav.nav-pills.nav-stacked
+          %li{class: ("active" if params[:discussion].blank? || params[:discussion] == 'all')}
+            = link_to project_filter_path(discussion: 'all') do
+              Everyone's
+          %li{class: ("active" if params[:discussion] == 'empty')}
+            = link_to project_filter_path(discussion: 'empty') do
+              Without notes
+          %li{class: ("active" if params[:discussion] == 'with_me')}
+            = link_to project_filter_path(discussion: 'with_me') do
+              With my notes
+          %li{class: ("active" if params[:discussion] == 'without_me')}
+            = link_to project_filter_path(discussion: 'without_me') do
+              Without my notes
+
     - if defined?(labels)
       %fieldset
         %legend Labels
@@ -47,8 +64,8 @@
               or #{link_to 'generate', generate_project_labels_path(@project), method: :post} default set of labels
 
     %fieldset
-      - if %w(state scope milestone_id assignee_id label_name).select { |k| params[k].present? }.any?
-        = link_to project_entities_path, class: 'cgray pull-right' do
+      - if %w(state scope milestone_id assignee_id label_name discussion).select { |k| params[k].present? }.any?
+        = link_to project_filter_path(state: nil, scope: nil, discussion: nil), class: 'cgray pull-right' do
           %i.icon-remove
           %strong Clear filter
 

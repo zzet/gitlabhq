@@ -15,6 +15,7 @@
 #= require jquery.atwho
 #= require jquery.scrollto
 #= require jquery.blockUI
+#= require jquery.customSelect.min
 #= require turbolinks
 #= require jquery.turbolinks
 #= require bootstrap
@@ -32,6 +33,7 @@
 #= require underscore.string.min
 #= require nprogress
 #= require nprogress-turbolinks
+#= require private_pub
 #= require_directory ./api
 #= require_tree .
 
@@ -95,6 +97,9 @@ $ ->
 
   # Initialize select2 selects
   $('select.select2').select2(width: 'resolve', dropdownAutoWidth: true)
+
+  # Initialize custom select at SignUp form
+  $('.signUpCustomSelect').customSelect();
 
   # Initialize tooltips
   $('.has_tooltip').tooltip()
