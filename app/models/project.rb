@@ -566,7 +566,11 @@ class Project < ActiveRecord::Base
     services.each do |service|
 
       # Call service hook only if it is active
-      service.execute(data) if service.enabled?
+      begin
+        service.execute(data) if service.enabled?
+      rescue
+        # TODO. Add logging
+      end
     end
   end
 
