@@ -6,11 +6,11 @@ class UsersService < BaseService
   end
 
   def block
-    projects_ids = (user.projects.select("projects.id") +
-                    user.personal_projects.select("projects.id") +
+    projects_ids = (user.projects.pluck(:id) +
+                    user.personal_projects.pluck(:id) +
                     Project.where(namespace_id: user.groups.pluck(:id)).pluck(:id) +
                     TeamProjectRelationship.where(team_id: user.teams.pluck(:id)).pluck(:project_id)).uniq
-    teams_ids = user.teams.select("teams.id")
+    teams_ids = user.teams.pluck(:id)
 
     User.transaction do
       if user.block
@@ -50,11 +50,11 @@ class UsersService < BaseService
   end
 
   def delete
-    projects_ids = (user.projects.select("projects.id") +
-                    user.personal_projects.select("projects.id") +
+    projects_ids = (user.projects.pluck(:id) +
+                    user.personal_projects.pluck(:id) +
                     Project.where(namespace_id: user.groups.pluck(:id)).pluck(:id) +
                     TeamProjectRelationship.where(team_id: user.teams.pluck(:id)).pluck(:project_id)).uniq
-    teams_ids = user.teams.select("teams.id")
+    teams_ids = user.teams.pluck(:id)
 
     # 1. Remove groups where user is the only owner
     user.solo_owned_groups.map(&:destroy)

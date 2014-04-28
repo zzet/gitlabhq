@@ -16,7 +16,8 @@ module Groups::BaseActions
   end
 
   def delete_action
-    team_ids = group.teams.select("teams.id")
+    teams = group.teams
+    team_ids = teams.pluck(:id)
 
     group.destroy
 

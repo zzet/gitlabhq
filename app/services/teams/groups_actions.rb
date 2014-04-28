@@ -3,7 +3,7 @@ module Teams::GroupsActions
 
   def assign_on_groups_action(groups = nil)
     unless current_user.admin?
-      allowed_group_ids = (current_user.created_groups.select("namespaces.id") + current_user.owned_groups.select("namespaces.id")).uniq
+      allowed_group_ids = (current_user.created_groups.pluck(:id) + current_user.owned_groups.pluck(:id)).uniq
       groups = groups.where(id: allowed_group_ids)
     end
 
