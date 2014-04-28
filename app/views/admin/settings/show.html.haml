@@ -1,0 +1,15 @@
+%ul.nav.nav-tabs.log-tabs
+  %li.active
+    = link_to "Email domains", "#allowed_email_domains", 'data-toggle' => 'tab'
+
+.tab-content
+  .tab-pane.active#allowed_email_domains
+    .col-md-6.no_margin
+      .title
+      %ul.well-list
+        - @email_domains.each do |domain|
+          - if domain.persisted?
+            = render 'domain', domain: domain
+
+    .col-md-6.pull-right
+      = render "new_domain"

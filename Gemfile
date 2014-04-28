@@ -190,6 +190,9 @@ gem "js-routes"
 gem 'react-rails', '~> 0.8.0.0'
 gem "activerecord-import", "~> 0.4.1"
 
+gem "private_pub"
+gem 'thin', '~> 1.6.2'
+
 group :development do
   gem "annotate", "~> 2.6.0.beta2"
   gem "letter_opener"
@@ -204,9 +207,6 @@ group :development do
 
   # Docs generator
   gem "sdoc"
-
-  # thin instead webrick
-  gem 'thin'
 end
 
 group :undev do

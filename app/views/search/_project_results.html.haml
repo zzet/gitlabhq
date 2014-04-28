@@ -20,21 +20,25 @@
         = link_to search_filter_path(params[:search], type: :project, order: :last_updated) do
           Last updated
 
-- if @search_results[:projects]
+- if @search_results[:projects].present? && @search_results[:projects].any?
   = render "search/facets/project/group", namespaces: @search_results[:projects][:namespaces], type: :project
+  = render "search/facets/project/category", categories: @search_results[:projects][:categories], type: :project
 
-%h4
-  - if @search_results[:projects][:namespaces].count > 0
-    #{ @search_results[:projects][:total_count] } results found in
-    - if @search_results[:projects][:namespaces].many?
-      #{ @search_results[:projects][:namespaces].count } Namespaces
+  %h4
+    - if @search_results[:projects][:namespaces].count > 0
+      #{ @search_results[:projects][:total_count] } results found in
+      - if @search_results[:projects][:namespaces].many?
+        #{ @search_results[:projects][:namespaces].count } Namespaces
+      - else
+        #{ @search_results[:projects][:namespaces].first[:namespace].name } #{ @search_results[:projects][:namespaces].first[:namespace].class.name.underscore}
     - else
-      #{ @search_results[:projects][:namespaces].first[:namespace].name } #{ @search_results[:projects][:namespaces].first[:namespace].class.name.underscore}
-  - else
-    No matches found
+      No matches found
 
-%hr
-.search_results
-  %ul.bordered-list
-    = render partial: "search/results/project", collection: @search_results[:projects][:records]
-  = paginate @search_results[:projects][:results], theme: 'gitlab'
+  %hr
+  .search_results
+    %ul.bordered-list
+      = render partial: "search/results/project", collection: @search_results[:projects][:records]
+    = paginate @search_results[:projects][:results], theme: 'gitlab'
+
+- else
+  %h4 No matches found

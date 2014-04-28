@@ -1,0 +1,18 @@
+%h3.page-title
+  Allowed email domains
+%p.light
+  domains count:
+  %small
+    (#{@email_domains.count})
+
+%hr
+
+.col-md-6.no_margin
+  .title
+  %ul.well-list
+    - @email_domains.each do |domain|
+      - if domain.persisted?
+        = render 'domain', domain: domain
+
+.col-md-6.pull-right
+  = render "new_domain"

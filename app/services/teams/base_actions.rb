@@ -14,7 +14,7 @@ module Teams::BaseActions
   end
 
   def remove_action
-    project_ids = (team.projects.select("projects.id") + team.accessed_projects).uniq
+    project_ids = (team.projects.pluck(:id) + team.accessed_projects.pluck(:id)).uniq
 
     team.destroy
 

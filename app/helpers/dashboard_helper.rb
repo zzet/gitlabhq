@@ -3,6 +3,7 @@ module DashboardHelper
     exist_opts = {
       state: params[:state],
       scope: params[:scope],
+      discussion: params[:discussion],
       project_id: params[:project_id],
     }
 
