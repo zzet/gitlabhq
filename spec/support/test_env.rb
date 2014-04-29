@@ -68,6 +68,10 @@ module TestEnv
 
     Gitlab.config.gitlab_shell.stub(repos_path: repos_path)
 
+    domain_stub = double('domain_stub')
+    domain_stub.stub(:include?) { true }
+    Gitlab.config.stub(:corporate_email_domains) { domain_stub }
+
     Gitlab.config.satellites.stub(path: satellite_path)
 
     Gitlab::Git::Repository.stub(repos_path: repos_path)
