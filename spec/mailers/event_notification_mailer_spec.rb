@@ -53,7 +53,11 @@ describe EventNotificationMailer do
 
     context "when event source - project " do
       context "when create project" do
-        before { collect_mails_data { @project = ProjectsService.new(@another_user, attributes_for(:project)).create } }
+        before do
+          collect_mails_data do
+            @project = ProjectsService.new(@another_user, attributes_for(:project)).create
+          end
+        end
 
         it "only one message" do
           @mails_count.should == 1

@@ -1,6 +1,6 @@
 class Event::Action
   GENERAL = [
-    :all,
+    :all, # NOTE WTF???
     :created,
     :updated,
     :commented,
@@ -53,6 +53,18 @@ class Event::Action
     :activate, # TODO
   ]
 
+  # NOTE actions which can be parent
+  BASE = [
+      :create,
+      :update,
+      :delete,
+      :open,
+      :close,
+      :reopen,
+      :merge,
+      :block,
+      :activate
+  ]
 
   class << self
     def available_actions

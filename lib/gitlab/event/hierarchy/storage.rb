@@ -11,10 +11,14 @@ class Gitlab::Event::Hierarchy::Storage
     events.clear
   end
 
+  def find(action)
+    find_recursive(events.last, action)
+  end
+
   # Put current event in events tree
   def put args
     if events.blank?
-      events << { name: args[:name], data: args[:data], childrens: [] }
+      events << {name: args[:name], data: args[:data], childrens: []}
     else
       find_place_and_put(events, args)
     end
@@ -34,12 +38,12 @@ class Gitlab::Event::Hierarchy::Storage
   #
   def find_place_and_put(event_list, arg)
     if lvl_to_put?(event_list, arg)
-      event_list << { name: arg[:name], data: arg[:data], childrens: [] }
+      event_list << {name: arg[:name], data: arg[:data], childrens: []}
     else
       if event_list.last[:childrens].any?
         find_place_and_put(event_list.last[:childrens], arg)
       else
-        event_list.last[:childrens] << { name: arg[:name], data: arg[:data], childrens: [] }
+        event_list.last[:childrens] << {name: arg[:name], data: arg[:data], childrens: []}
       end
     end
   end
@@ -55,21 +59,36 @@ class Gitlab::Event::Hierarchy::Storage
   def parent(action, data)
     return nil if events.blank?
 
-    parent_event = if events.first[:name] == events.last[:name]
-                     events.last[:name].include?(action) ? events.last : find_event(events.last, action, data)
-                   else
-                     events.first[:name].include?(action) ? events.first : find_event(events.last, action, data)
-                   end
-    parent_event
+    if events.first[:name] == events.last[:name]
+      if events.last[:name].include?(action) && events.last[:childrens].blank?
+        events.last
+      else
+        find_parent_event(events.last, action)
+      end
+    else
+      events.first[:name].include?(action) ? events.first : find_parent_event(events.last, action)
+    end
   end
 
-  def find_event(event, action, data)
+  def find_parent_event(event, action)
     parent_event = nil
 
     if event[:childrens].any?
-      parent_event = event[:childrens].last[:name].include?(action) ? event : find_event(event[:childrens].last, action, data)
+      parent_event = event[:childrens].last[:name].include?(action) ? event : find_parent_event(event[:childrens].last, action)
     end
 
     parent_event
+  end
+
+  private
+
+  def find_recursive(event, action)
+    return event if event[:name] == action
+
+    if event[:childrens].any?
+      find_recursive(event[:childrens].last, action)
+    else
+      nil
+    end
   end
 end

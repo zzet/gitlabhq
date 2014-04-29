@@ -56,10 +56,18 @@ class Issue < ActiveRecord::Base
   watch do
     source watchable_name do
       from :create,   to: :created
-      from :update,   to: :assigned,   conditions: -> { @source.assignee_id_changed? && @changes['assignee_id'].first.nil? }
-      from :update,   to: :reassigned, conditions: -> { @source.assignee_id_changed? && @changes['assignee_id'].first.present? && @changes['assignee_id'].last.present? }
-      from :update,   to: :unassigned, conditions: -> { @source.assignee_id_changed? && @changes['assignee_id'].first.present? && @changes['assignee_id'].last.nil? }
-      from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
+      from :update,   to: :assigned,   conditions: -> do
+        @source.assignee_id_changed? && @changes['assignee_id'].first.nil?
+      end
+      from :update,   to: :reassigned, conditions: -> do
+        @source.assignee_id_changed? && @changes['assignee_id'].first.present? && @changes['assignee_id'].last.present?
+      end
+      from :update,   to: :unassigned, conditions: -> do
+        @source.assignee_id_changed? && @changes['assignee_id'].first.present? && @changes['assignee_id'].last.nil?
+      end
+      from :update,   to: :updated, conditions: -> do
+        @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) }
+      end
       from :close,    to: :closed
       from :reopen,   to: :reopened
       from :destroy,  to: :deleted
