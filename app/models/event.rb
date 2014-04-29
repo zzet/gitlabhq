@@ -21,7 +21,7 @@ class Event < ActiveRecord::Base
   attr_accessible :action,    :system_action, :data,
                   :source_id, :source_type, :source,
                   :target_id, :target_type, :target,
-                  :author_id, :author
+                  :author_id, :author, :uniq_hash
 
   belongs_to :target, polymorphic: true
   belongs_to :source, polymorphic: true

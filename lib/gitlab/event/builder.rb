@@ -14,11 +14,20 @@ class Gitlab::Event::Builder
       if watchers.present?
         watchers.each do |watcher|
           @target       = @source
-          @actions      = []
           watcher_class = watcher.to_s.camelize.constantize
 
           before_condition = begin
-                               watcher_class.before_actions_for(source_key)[:conditions].inject(true) { |mem, condition| mem && (condition.is_a?(Hash) ? (condition.inject(true) { |hmem, hval| cnd = hval.last; hres = !!(cnd.is_a?(Proc) ? instance_exec(&cnd) : cnd ); hmem && (hval.first == :if ? hres : !(hres))}) : !!(condition.is_a?(Proc) ? instance_exec(&condition) : condition ))}
+                               watcher_class.before_actions_for(source_key)[:conditions].inject(true) do |mem, condition|
+                                 if mem && condition.is_a?(Hash)
+                                   condition.inject(true) do |hmem, hval|
+                                     cnd = hval.last
+                                     hres = !!(cnd.is_a?(Proc) ? instance_exec(&cnd) : cnd)
+                                     hmem && (hval.first == :if ? hres : !(hres))
+                                   end
+                                 else
+                                   !!(condition.is_a?(Proc) ? instance_exec(&condition) : condition )
+                                 end
+                               end
                              rescue
                                false
                              end
@@ -38,7 +47,17 @@ class Gitlab::Event::Builder
 
 
               conditions_result = begin
-                                    action[:conditions].inject(true) { |mem, condition| mem && (condition.is_a?(Hash) ? (condition.inject(true) { |hmem, hval| cnd = hval.last; hres = !!(cnd.is_a?(Proc) ? instance_exec(&cnd) : cnd ); hmem && (hval.first == :if ? hres : !(hres))}) : !!(condition.is_a?(Proc) ? instance_exec(&condition) : condition ))}
+                                    action[:conditions].inject(true) do |mem, condition|
+                                      if mem && condition.is_a?(Hash)
+                                        condition.inject(true) do |hmem, hval|
+                                          cnd = hval.last
+                                          hres = !!(cnd.is_a?(Proc) ? instance_exec(&cnd) : cnd )
+                                          hmem && (hval.first == :if ? hres : !(hres))
+                                        end
+                                      else
+                                        !!(condition.is_a?(Proc) ? instance_exec(&condition) : condition )
+                                      end
+                                    end
                                   rescue
                                     false
                                   end
@@ -46,11 +65,19 @@ class Gitlab::Event::Builder
               if conditions_result
                 instance_exec(&action[:yield])
 
-                @actions << action[:name]
-                @events << ::Event.new(action: action[:name], data: @event_data, author: data[:user],
-                                       source_id: @source.id, source_type: @source.class.name,
-                                       target_id: @target.id, target_type: @target.class.name,
-                                       system_action: meta[:action])
+                hierarchy_event = EventHierarchyWorker.collector.events.find(event_action)
+
+                @events << ::Event.new(
+                  action: action[:name],
+                  data: @event_data,
+                  author: data[:user],
+                  source_id: @source.id,
+                  source_type: @source.class.name,
+                  target_id: @target.id,
+                  target_type: @target.class.name,
+                  system_action: meta[:action],
+                  uniq_hash: hierarchy_event[:data][:uniq_hash]
+                )
               end
 
             end
@@ -58,73 +85,21 @@ class Gitlab::Event::Builder
         end
       end
 
-      @events
+      @events.flatten
     end
 
     def find_parent_event(action, data)
       collector = EventHierarchyWorker.collector
       parent_event = collector.events.parent(action, data)
 
-      if parent_event.present?
-        action_meta = Gitlab::Event::Action.parse(parent_event[:name])
-        event_info  = parent_event[:data]
-        source      = event_info[:source]  if event_info[:source].present?
-        user        = event_info[:user]    if event_info[:user].present?
+      Event.find_by(uniq_hash: parent_event[:data][:uniq_hash])
+    end
 
-        level = 0
+    def find_persisted_event(action)
+      collector = EventHierarchyWorker.collector
+      parent_event = collector.events.find(action)
 
-        # NOTE not sure that this condition is sensibly, but it works now
-        if action_meta[:action].to_s.in?(::Gitlab::Event::SyntheticActions::ALL)
-          return nil
-        end
-
-        if source.present? && user.present? && source.respond_to?(:id)
-          candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
-                                   target_id: source.try(:id), target_type: source.class.name,
-                                   author_id: user.id, system_action: action_meta[:action])
-          if candidates.blank? && (action_meta[:details].count == 3)
-            candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
-                                     target_id: source.try(:id), target_type: source.class.name,
-                                     author_id: user.id, system_action: action_meta[:details].second)
-          end
-
-
-
-          if candidates.blank? && (source.is_a?(::Project) && action_meta[:action] == :updated)
-            candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
-                                     target_id: source.try(:id), target_type: source.class.name,
-                                     author_id: user.id, action: :transfer)
-          end
-
-          level = 1
-
-          if candidates.blank?
-            candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
-                                     author_id: user.id, system_action: action_meta[:action])
-            level = 2
-            if candidates.blank?
-              # TODO
-              # Make base_actions method to watchable classes
-              base_actions = [:create, :update, :delete, :open, :close, :reopen, :merge, :block, :activate]
-
-              candidates = Event.where(source_id: source.try(:id), source_type: source.class.name,
-                                       target_id: source.try(:id), target_type: source.class.name,
-                                       author_id: user.id).
-                                       where("system_action not in (?)", base_actions)
-              level = 3
-            end
-          end
-
-          candidate = candidates.last
-
-          if candidate
-            return nil if candidate.notifications.where(notification_state: [:delivered, :new]).any?
-            return candidate.parent_event if candidate.parent_event.present? && level > 1
-            return candidate
-          end
-        end
-      end
-      nil
+      Event.find_by(uniq_hash: parent_event[:data][:uniq_hash])
     end
 
   end

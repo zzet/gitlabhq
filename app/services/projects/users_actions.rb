@@ -11,6 +11,8 @@ module Projects::UsersActions
     end
 
     reindex_with_elastic(Project, project.id)
+
+    receive_delayed_notifications
   end
 
   def update_membership_action(member)
