@@ -2,6 +2,5 @@
 
 FactoryGirl.define do
   factory :global_setting, :class => 'GlobalSettings' do
-    allowed_email_domains "MyText"
   end
 end

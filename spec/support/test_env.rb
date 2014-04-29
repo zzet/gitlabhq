@@ -102,6 +102,10 @@ module TestEnv
       size: 12.45
     )
 
+    User.any_instance.stub(
+      corporate_email: true
+    )
+
     # Fucking stub
     #BaseObserver.any_instance.stub(
       #current_user: double("current_user", id: 1)

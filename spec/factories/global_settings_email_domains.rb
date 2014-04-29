@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :global_settings_email_domain, :class => 'GlobalSettings::EmailDomains' do
-    domain "MyString"
-    description "MyString"
+    domain "test_domain.com"
+    description "domain description"
   end
 end
