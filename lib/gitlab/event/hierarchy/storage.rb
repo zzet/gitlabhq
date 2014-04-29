@@ -74,7 +74,11 @@ class Gitlab::Event::Hierarchy::Storage
     parent_event = nil
 
     if event[:childrens].any?
-      parent_event = event[:childrens].last[:name].include?(action) ? event : find_parent_event(event[:childrens].last, action)
+      parent_event = if event[:childrens].last[:name].include?(action)
+                       event[:name].include?(action) ? event[:childrens].last : event
+                     else
+                       find_parent_event(event[:childrens].last, action)
+                     end
     end
 
     parent_event

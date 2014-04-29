@@ -1133,7 +1133,6 @@ describe EventNotificationMailer do
           @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
           @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
           @ref = 'refs/heads/master'
-          #project.save
         end
 
         context "when pushed code" do
