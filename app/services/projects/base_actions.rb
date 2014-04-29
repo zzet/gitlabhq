@@ -144,7 +144,7 @@ module Projects::BaseActions
         old_project_teams = project.teams
         old_project_teams_ids = old_project_teams.pluck(:id)
 
-        old_group_teams = project.group.present? ? project.teams : []
+        old_group_teams = project.group.present? ? project.teams : Team.none
         old_group_teams_ids = old_group_teams.pluck(:id)
 
         old_teams_ids = (old_group_teams_ids + old_project_teams_ids).flatten
