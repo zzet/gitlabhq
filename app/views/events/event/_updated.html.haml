@@ -1,3 +1,5 @@
+= image_tag avatar_icon(event.author.email, 24), class: "avatar s24", alt:''
+
 .event-title
   %span.author_name= link_to_author event
   - if lookup_context.exists?("events/event/updated/_#{event.source_type.underscore}")

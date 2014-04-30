@@ -1,3 +1,5 @@
+= image_tag avatar_icon(event.author.email, 24), class: "avatar s24", alt:''
+
 .event-title
   %span.author_name= link_to_author event
   %span.event_label{class: event.action_name}= event_action_name(event)

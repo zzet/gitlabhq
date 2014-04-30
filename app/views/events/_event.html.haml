@@ -2,8 +2,6 @@
   %span.cgray.pull-right
     #{time_ago_with_tooltip(event.created_at)}
 
-  = image_tag avatar_icon(event.author.email, 24), class: "avatar s24", alt:''
-
   - if lookup_context.exists?("events/event/_#{event.action}")
     = render "events/event/#{event.action}", event: event
   - else
