@@ -13,13 +13,13 @@ class Profiles::SubscriptionsController < Profiles::ApplicationController
 
     @subscriptions = @current_user.personal_subscriptions
 
-    @subscriptions.select(:target_type).uniq.each do |res|
-      count = @subscriptions.where(target_type: res[:target_type]).count
+    Gitlab::Watchable::MODELS.each do |model|
+      count = @subscriptions.where(target_type: model).count
       gon.push({
-       "#{res.target_type.underscore.pluralize}" => {
+       "#{model.to_s.underscore.pluralize}" => {
          count: count,
-         titles: res.target_type.constantize.watched_titles,
-         descriptions: res.target_type.constantize.watched_descriptions
+         titles: model.watched_titles,
+         descriptions: model.watched_descriptions
        }
       })
     end
