@@ -4,6 +4,7 @@ class Gitlab::Event::Builder
       meta = Gitlab::Event::Action.parse(event_action)
 
       @source  = data[:source]
+      @actions      = []
       @changes = (meta[:action] == :update ? @source.changes : nil)
 
       source_class = @source.class
@@ -64,6 +65,7 @@ class Gitlab::Event::Builder
 
               if conditions_result
                 instance_exec(&action[:yield])
+                @actions << action[:name]
 
                 hierarchy_event = EventHierarchyWorker.collector.events.find(event_action)
 

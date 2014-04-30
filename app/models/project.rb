@@ -145,7 +145,7 @@ class Project < ActiveRecord::Base
       from :create,   to: :created_tag,     conditions: -> { @source.created_tag? }
       from :create,   to: :deleted_branch,  conditions: -> { @source.deleted_branch? }
       from :create,   to: :deleted_tag,     conditions: -> { @source.deleted_tag? }
-      from :create,   to: :pushed,          conditions: -> { @actions.blank? }
+      from :create,   to: :pushed,          conditions: -> { @actions.count == 1 }
     end
 
     source :issue do
