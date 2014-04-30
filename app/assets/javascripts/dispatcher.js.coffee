@@ -28,6 +28,7 @@ class Dispatcher
         new Activities()
         new DashboardTooltips()
         new SidebarSort()
+        new Events()
       when 'projects:commit:show'
         new Commit()
       when 'projects:compare:show', 'projects:compare:index'
@@ -44,13 +45,14 @@ class Dispatcher
         new Activities()
         new SidebarFilter()
         new SidebarTabs('projects')
-        new Events()
+        new Events('Project')
       when 'teams:show'
         new Activities()
         new DashboardTooltips()
         new SidebarFilter()
         new SidebarSort()
         new SidebarTabs('teams')
+        new Events('Team')
       when 'projects:new', 'projects:edit'
         new Project()
       when 'projects:walls:show'
