@@ -31,13 +31,13 @@ class Event::Action
 
   MASS = [
     :imported,
-    :members_added, # TODO
-    :members_updated, # TODO
-    :members_removed, # TODO
-    :teams_added, # TODO
-    :teams_removed, # TODO
-    :groups_added, # TODO
-    :projects_added # TODO
+    :members_added,
+    :members_updated,
+    :members_removed,
+    :teams_added,
+    :teams_removed,
+    :groups_added,
+    :projects_added
   ]
 
   GIT = [
