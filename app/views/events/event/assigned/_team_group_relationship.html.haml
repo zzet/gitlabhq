@@ -1,3 +1,6 @@
-= link_to_or_deleted(event.try(:source).try(:team), 'team')
+- team = Team.find_by(id: event.data['team_id'])
+- group = Group.find_by(id: event.data['group_id'])
+
+= link_to_or_deleted(team, 'team')
 to
-= link_to_or_deleted(event.try(:source).try(:group), 'group')
+= link_to_or_deleted(group, 'group')
