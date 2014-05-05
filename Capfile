@@ -11,8 +11,6 @@ require 'undev/capistrano'
 # Maintance page with deploy
 require 'capistrano/maintenance'
 
-require 'capi/unicorn'
-
 # Uncomment if you will use Airbrake notifications
 require 'airbrake/capistrano'
 
