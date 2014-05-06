@@ -2,40 +2,43 @@ class Migration::Event::CachePush
   def self.migrate
     ActiveRecord::Base.observers.disable(:all)
 
-    fixed_new = 0
-    fixed_old = 0
-    strange_events = []
+    ActiveRecord::Base.uncached do
 
-    events_without_commits = Event.where(action: 'pushed', target_type: 'Project')
+      fixed_new = 0
+      fixed_old = 0
+      strange_events = []
 
-    events_without_commits.find_each do |event|
-      if new_broken_event?(event)
+      events_without_commits = Event.where(action: 'pushed', target_type: 'Project')
 
-        push = Push.find(event.data['id'])
-        push.fill_push_data
-        push.save
+      events_without_commits.find_each do |event|
+        if new_broken_event?(event)
 
-        event.source = push
-        event.data = push.attributes
-        event.save
+          push = Push.find(event.data['id'])
+          push.fill_push_data
+          push.save
 
-        fixed_new += 1
-      elsif old_without_push_event?(event) && event.target
+          event.source = push
+          event.data = push.attributes
+          event.save
 
-        push = Push.new(project_id: event.target_id, user_id: event.author_id,
-                        revbefore: event.data["before"], revafter: event.data["after"],
-                        ref: event.data["ref"])
+          fixed_new += 1
+        elsif old_without_push_event?(event) && event.target
 
-        push.data = event.data
-        push.save
+          push = Push.new(project_id: event.target_id, user_id: event.author_id,
+                          revbefore: event.data["before"], revafter: event.data["after"],
+                          ref: event.data["ref"])
 
-        event.source = push
-        event.data = push.attributes
-        event.save
+          push.data = event.data
+          push.save
 
-        fixed_old += 1
-      else
-        strange_events << event.id
+          event.source = push
+          event.data = push.attributes
+          event.save
+
+          fixed_old += 1
+        else
+          strange_events << event.id
+        end
       end
     end
 
