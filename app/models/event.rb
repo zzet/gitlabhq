@@ -57,17 +57,21 @@ class Event < ActiveRecord::Base
     groups_ids = user.authorized_groups.pluck(:id)
     teams_ids = user.only_authorized_teams_ids
 
-    where(parent_event_id: nil).where(
-        table[:target_type].eq(Project).and(table[:target_id].in(projects_ids))
-        .or(table[:target_type].eq(Group).and(table[:target_id].in(groups_ids)))
-        .or(table[:target_type].eq(Team).and(table[:target_id].in(teams_ids)))
-        .or(table[:first_domain_type].eq(Project).and(table[:first_domain_id].in(projects_ids)))
-        .or(table[:second_domain_type].eq(Project).and(table[:second_domain_id].in(projects_ids)))
-        .or(table[:first_domain_type].eq(Group).and(table[:first_domain_id].in(groups_ids)))
-        .or(table[:second_domain_type].eq(Group).and(table[:second_domain_id].in(groups_ids)))
-        .or(table[:first_domain_type].eq(Team).and(table[:first_domain_id].in(teams_ids)))
-        .or(table[:second_domain_type].eq(Team).and(table[:second_domain_id].in(teams_ids)))
+    where(
+        table[:parent_event_id].eq(nil).and(
+            table[:target_type].eq(Project).and(table[:target_id].in(projects_ids))
+            .or(table[:target_type].eq(Group).and(table[:target_id].in(groups_ids)))
+            .or(table[:target_type].eq(Team).and(table[:target_id].in(teams_ids)))
+            .or(table[:first_domain_type].eq(Project).and(table[:first_domain_id].in(projects_ids)))
+            .or(table[:second_domain_type].eq(Project).and(table[:second_domain_id].in(projects_ids)))
+            .or(table[:first_domain_type].eq(Group).and(table[:first_domain_id].in(groups_ids)))
+            .or(table[:second_domain_type].eq(Group).and(table[:second_domain_id].in(groups_ids)))
+            .or(table[:first_domain_type].eq(Team).and(table[:first_domain_id].in(teams_ids)))
+            .or(table[:second_domain_type].eq(Team).and(table[:second_domain_id].in(teams_ids)))
+        )
+        .or(table[:target_type].eq(Project).and(table[:target_id].in(projects_ids)).and(table[:source_type].eq(Push)))
     )
+
   end
 
   scope :for_dashboard, -> (target) do
