@@ -1,5 +1,7 @@
 class Migration::Event::CachePush
   def self.migrate
+    ActiveRecord::Base.observers.disable(:all)
+
     fixed_new = 0
     fixed_old = 0
     strange_events = []
