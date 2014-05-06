@@ -57,6 +57,7 @@ class Event < ActiveRecord::Base
     groups_ids = user.authorized_groups.pluck(:id)
     teams_ids = user.only_authorized_teams_ids
 
+    project_related = [Push, Note, MergeRequest]
     where(
         table[:parent_event_id].eq(nil).and(
             table[:target_type].eq(Project).and(table[:target_id].in(projects_ids))
@@ -69,7 +70,8 @@ class Event < ActiveRecord::Base
             .or(table[:first_domain_type].eq(Team).and(table[:first_domain_id].in(teams_ids)))
             .or(table[:second_domain_type].eq(Team).and(table[:second_domain_id].in(teams_ids)))
         )
-        .or(table[:target_type].eq(Project).and(table[:target_id].in(projects_ids)).and(table[:source_type].eq(Push)))
+        .or(table[:target_type].eq(Project).and(table[:target_id]
+              .in(projects_ids)).and(table[:source_type].in(project_related)))
     )
 
   end
