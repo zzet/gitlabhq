@@ -6,7 +6,7 @@ class Migration::Event::CachePush
 
     events_without_commits = Event.where(action: 'pushed', target_type: 'Project')
 
-    events_without_commits.find_each(batch_size: 100) do |event|
+    events_without_commits.find_each do |event|
       if new_broken_event?(event)
 
         push = Push.find(event.data['id'])
