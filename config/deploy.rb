@@ -56,10 +56,8 @@ namespace :deploy do
       runit expects 2 to tell it to send the USR2 signal to the process.
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
-    #FIX react-rails generate js in each rails start up
-    #rake tasks generate js with 664 and gitlab owner
-    #unicorn start under git user, which can't overwrite js
-    run "chmod 664 #{release_path}/tmp/react-rails/*"
+    # make tmp available for gitlab
+    run "chmod -R 0775 #{release_path}/tmp/"
     run "sudo sv restart /etc/service/gitlab-sidekiq-*"
     run "sudo sv restart /etc/service/gitlab-web-*"
   end
