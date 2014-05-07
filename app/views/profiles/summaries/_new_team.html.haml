@@ -1,0 +1,8 @@
+= form_for relation, url: profile_summary_teams_path(summary), html: { class: 'form-horizontal'} do |f|
+  %p 1. Choose teams you want add to the summary
+  .form-group
+    = f.label :team_ids, "Teams", class: 'control-label'
+    .col-sm-10= teams_select_tag(:team_ids, multiple: true, class: 'input-large input-clamp')
+
+  .form-actions
+    = f.submit 'Add selected teams', class: "btn btn-create"

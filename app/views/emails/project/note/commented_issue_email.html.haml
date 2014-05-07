@@ -1,0 +1,9 @@
+%br
+%cite{style: 'color: #666'}
+  = markdown(@note.note)
+%br
+= "---"
+%br
+Click
+= link_to "here", project_issue_url(@issue.project, @issue.iid, anchor: "note_#{@note.id}")
+to view it on Gitlab

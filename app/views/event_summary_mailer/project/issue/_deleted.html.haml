@@ -1,0 +1,13 @@
+- issue   = source || find_entity(Issue, data["id"])
+- project = target || find_entity(Project, data["project_id"])
+
+Issue
+= mailer_issue_link(issue)
+was
+%b
+  %i
+    deleted
+from
+= mailer_project_link(project)
+project by
+= mailer_user_link(author)

@@ -1,0 +1,19 @@
+.pull-right
+  = link_to send_now_profile_summary_path(summary.id), class: "btn-tiny btn btn-primary", data: { confirm: "You are shure wont send now digest?" } do
+    Send now
+
+  = link_to profile_summary_path(summary.id), class: "btn-tiny btn btn-danger", data: { confirm: "You are shure?" }, method: :delete do
+    Remove
+%span
+  = link_to summary.title, edit_profile_summary_path(summary.id)
+
+  .label{class: "label-#{summary.enabled? ? "success" : "primary"}"}
+    = summary.state
+%br
+%span.last-activity
+  %span Last sended at:
+  %span.date= summary.last_send_date.present? ? time_ago_with_tooltip(summary.last_send_date) : "Never"
+%br
+%span.last-activity
+  %span Next generation in:
+  %span.date= distance_of_time_in_words(Time.now, (summary.last_send_date || Time.now) + period)

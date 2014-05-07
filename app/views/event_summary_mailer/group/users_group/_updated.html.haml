@@ -1,0 +1,21 @@
+- member   = source.user  || find_entity(User, source.user_id)
+- group    = source.group || find_entity(Group, source.group_id)
+- changes  = data["previous_changes"]
+
+- if changes.any?
+  = mailer_user_link(member)
+  membership was
+  %b
+    %i
+      - if changes["group_access"].first.to_i < changes['group_access'].last.to_i
+        upgraded
+      - else
+        downgraded
+  (
+  %b= mailer_permission_name(changes["group_access"].first)
+  &rarr;
+  %b= mailer_permission_name(changes["group_access"].last)
+  ) in
+  = mailer_group_link(group)
+  group of projects by
+  = mailer_user_link(author)

@@ -1,0 +1,24 @@
+!!! 5
+%html{ lang: "en"}
+  %head
+    %meta{charset: "utf-8"}
+    %title
+      = "#{title} | " if defined?(title)
+      GitLab
+    :css
+      #{Diffy::CSS}
+  %body{style: 'font-family:sans-serif; font-size:1em'}
+
+    = yield
+
+    %br
+    =========================
+    %br
+    .footer
+      %span You are receiving this email because you have chosen to be notified by email whenever this favorite has new activity.
+      %br
+      %span
+        You can manage your favorite subscriptions at
+        = link_to "Manage digests page", profile_summaries_url
+      %br
+      %span [gitlab undev mail]
