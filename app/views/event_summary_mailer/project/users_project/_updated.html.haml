@@ -1,0 +1,22 @@
+- member  = source.user || find_entity(User, source.user_id)
+- project = source.project || find_entity(Project, source.project_id)
+- changes = data["previous_changes"]
+
+- if changes.any?
+  - previous_permission = Gitlab::Access.options.key(changes["project_access"].first)
+  - current_permission  = Gitlab::Access.options.key(changes["project_access"].last)
+
+Permissions for
+= mailer_user_link(member)
+user in project
+= mailer_project_link(project)
+was
+%b
+  %i
+    updated
+(
+%b= previous_permission
+&rarr;
+%b= current_permission
+) by
+= mailer_user_link(author)

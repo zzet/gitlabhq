@@ -1,0 +1,10 @@
+- event        = event
+- project      = target
+- branch       = data["ref"]
+- branch.slice!("refs/heads/")
+
+New branch
+%b= branch
+was pushed to
+= mailer_project_link(project)
+project repository

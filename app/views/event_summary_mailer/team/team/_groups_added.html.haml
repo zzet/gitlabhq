@@ -1,0 +1,17 @@
+- team = source
+- events = Event.where(parent_event_id: event.id, target_type: Group)
+
+= mailer_team_link(team)
+team was
+%b
+  %i
+    assigned
+on
+= events.count
+groups by
+= mailer_user_link(author)
+%br
+%ul
+  - events.find_each do |child_event|
+    - group = find_entity(Group, child_event.target_id)
+    %li= mailer_group_link(group)

@@ -1,0 +1,20 @@
+- team = source
+- events = Event.where(parent_event_id: event.id, target_type: TeamUserRelationship)
+
+In
+= mailer_team_link(team)
+team were
+%b
+  %i
+    added
+members by
+= mailer_user_link(author)
+%br
+%ul
+  - events.find_each do |child_event|
+    - member = find_entity(User, child_event.data["user_id"])
+    %li
+      = mailer_user_link(member)
+      with
+      %b= mailer_permission_name(child_event.data["team_access"])
+      access

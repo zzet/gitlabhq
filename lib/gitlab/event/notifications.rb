@@ -10,12 +10,11 @@ class Gitlab::Event::Notifications
         source = stored_notification.event.source_type.underscore
 
         mail_sender = "Emails::#{target.camelize}::#{source.camelize}"
-        mail_sender = begin
-                        mail_sender.constantize
-                      rescue
-                        EventNotificationMailer
-                      end
-        mail_method = "#{action}_email"
+        mail_sender, mail_method = begin
+                                     [mail_sender.constantize, "#{action}_email"]
+                                   rescue
+                                     [EventNotificationMailer, "default_email"]
+                                   end
 
         if stored_notification.process
           begin

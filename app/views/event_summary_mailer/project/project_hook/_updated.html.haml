@@ -1,0 +1,31 @@
+- project = target
+- project_hook = source
+- changes  = data["previous_changes"]
+
+In
+= mailer_project_link(project)
+was
+%b
+  %i
+    updated
+project hook:
+%br
+- if changes["url"].present?
+  %b Url:
+  = diff(changes["url"].first, changes["url"].last)
+  %br
+- if changes["push_events"].present?
+  %b On push event:
+  = diff(changes["push_events"].first, changes["push_events"].last)
+  %br
+- if changes["merge_requests_events"].present?
+  %b On merge request event:
+  = diff(changes["merge_requests_events"].first, changes["merge_requests_events"].last)
+  %br
+- if changes["issues_events"].present?
+  %b On issue event:
+  = diff(changes["issues_events"].first, changes["issues_events"].last)
+  %br
+- if changes["tag_push_events"].present?
+  %b On tag event:
+  = diff(changes["tag_push_events"].first, changes["tag_push_events"].last)

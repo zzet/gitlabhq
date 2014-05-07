@@ -1,0 +1,10 @@
+- branch       = source || find_entity(ProtectedBranch, event.source_id)
+- project      = target || find_entity(Project, event.target_id)
+
+%b= branch.name
+branch status was switched to
+%b protected
+in
+= mailer_project_link(project)
+by
+= mailer_user_link(author)

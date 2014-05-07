@@ -1,0 +1,27 @@
+- group = target
+- events = Event.where(parent_event_id: event.id, target_type: User)
+
+= events.count
+members was
+%b
+  %i
+    added
+to
+= mailer_group_link(group)
+group by
+= mailer_user_link(author)
+%br
+%table
+  %caption Added members
+  %tr
+    %th Name
+    %td Group access
+  - events.each do |ge|
+    - member = find_entity(ge.target_type, ge.target_id)
+    - ug = group.users_groups.find_by(user_id: ge.target_id)
+    %tr
+      %td= mailer_user_link(member)
+      - if ug.present?
+        %td= ug.human_access
+      - else
+        %td No available information

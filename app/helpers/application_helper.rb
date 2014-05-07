@@ -314,5 +314,4 @@ module ApplicationHelper
       "(deleted #{name})"
     end
   end
-
 end

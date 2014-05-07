@@ -1,0 +1,12 @@
+- team   = target
+- member = find_entity(User, data["user_id"])
+
+= mailer_user_link(member)
+was
+%b
+  %i
+    removed
+from
+= mailer_team_link(team)
+by
+= mailer_user_link(author)

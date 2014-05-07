@@ -3,20 +3,21 @@
     %th{colspan: 5}
       Commits in push (#{@commits.count})
   %tr{style: 'margin: 1px; background: #efefef;'}
-    %th{ width: '78px' }
+    %th{ style: "width: 78px" }
       Sha
-    %th{ width: '78px' }
+    %th{ style: "width: 220px" }
       Branches
     %th
       Message
-    %th{ width: '118px' }
+    %th{ style: "width: 118px" }
       Date
       = "(#{@commits.first.committer[:time].strftime('%Z')})"
     %th
       Author
   = render partial: "emails/project/push/commit", collection: @commits
 
+%h4 Diff
 - unless @diffs.blank?
-  %h4 Diff
   = render "emails/project/push/diffs", diffs: @diffs
-
+- else
+  Diff is empty
