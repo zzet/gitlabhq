@@ -20,7 +20,7 @@ class UsersGroup < ActiveRecord::Base
     Gitlab::Access.options_with_owner
   end
 
-  attr_accessible :group_access, :user_id
+  attr_accessible :group_access, :user_id, :group_id
 
   belongs_to :user
   belongs_to :group

@@ -1,0 +1,14 @@
+- group   = source
+- changes = data["previous_changes"]
+
+= mailer_group_link(group)
+was updated by
+= mailer_user_link(author)
+with changes:
+%br
+%table
+  - changes.each do |key, values|
+    %tr
+      %th= key.camelize
+      %td= diff(values.last, values.first)
+%br

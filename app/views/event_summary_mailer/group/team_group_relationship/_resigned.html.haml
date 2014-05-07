@@ -1,0 +1,12 @@
+- team  = source.team || find_entity(Team, source.team_id)
+- group = source.group || find_entity(Group, source.group_id)
+
+= mailer_team_link(team)
+team was
+%b
+  %i
+    resigned
+from
+= mailer_group_link(group)
+group of projects by
+= mailer_user_link(author)

@@ -1,0 +1,24 @@
+- note           = source
+-# Do not send system note notifications
+- unless data['system']
+  - project        = target
+  - merge_request  = note.try(:noteable) || find_entity(MergeRequest, data['noteable_id'])
+
+  = mailer_user_link(author)
+  write in merge request
+  - if merge_request
+    - if merge_request.persisted? && note
+      - if note.for_diff_line?
+        = link_to merge_request.title, diffs_project_merge_request_url(merge_request.project, merge_request.iid, anchor: "note_#{note.id}")
+      - else
+        = link_to merge_request.title, project_merge_request_url(merge_request.project, merge_request.iid, anchor: "note_#{note.id}")
+    - else
+      %b= merge_request.title
+  - else
+    Merge Request id:
+    %b= data['noteable_id']
+  in
+  = mailer_project_link(project)
+  project note:
+  %br
+  = markdown(note.try(:note) || data['note'])

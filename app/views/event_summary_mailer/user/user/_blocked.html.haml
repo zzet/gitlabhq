@@ -1,0 +1,36 @@
+- user = source
+- group_events   = Event.where(parent_event_id: event.id, target_type: Group)
+- team_events    = Event.where(parent_event_id: event.id, target_type: Team)
+- project_events = Event.where(parent_event_id: event.id, target_type: Project)
+
+= mailer_user_link(user)
+was
+%b
+  %i
+    blocked
+by
+= mailer_user_link(author)
+- if group_events.any? || team_events.any? || project_events.any?
+  %br
+  User was removed from:
+  %br
+  - if group_events.any?
+    %b Groups
+    %ul
+      - group_events.find_each do |child_event|
+        - group = find_entity(Group, child_event.target_id)
+        %li= mailer_group_link(group)
+    %br
+  - if team_events.any?
+    %b Teams
+    %ul
+      - team_events.find_each do |child_event|
+        - team = find_entity(Team, child_event.target_id)
+        %li= mailer_team_link(team)
+    %br
+  - if project_events.any?
+    %b Projects
+    %ul
+      - project_events.find_each do |child_event|
+        - project = find_entity(Project, child_event.target_id)
+        %li= mailer_project_link(project)

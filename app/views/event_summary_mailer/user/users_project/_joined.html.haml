@@ -1,0 +1,17 @@
+- if source
+  - project = source.project || find_entity(Project, data["project_id"])
+  - member  = source.user    || find_entity(User, data["user_id"])
+
+  = mailer_user_link(member)
+  was
+  %b
+    %i
+      added
+  to
+  = mailer_project_link(project)
+  with
+  %b= Gitlab::Access.options.key(data["project_access"])
+  permision by
+  = mailer_user_link(author)
+- else
+  Sorry, No available information for correct render.

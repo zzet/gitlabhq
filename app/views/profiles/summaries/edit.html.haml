@@ -1,0 +1,39 @@
+%h3.page-title
+  = @summary.title
+%p.light
+  = @summary.description
+
+%hr
+
+.sb.col-xs-12
+  %ul.nav.nav-tabs
+    %li.active
+      = link_to "#summaries_list", 'data-toggle' => 'tab', id: "summaries-list-tab" do
+        Entities
+    %li.dropdown
+      = link_to "#summaries_new", 'data-toggle' => 'dropdown', id: "summaries-new-tab", class: 'dropdown-toggle' do
+        Add entity
+        %span.caret
+      %ul.dropdown-menu
+        - Event::Subscription.global_entity_to_subscription.each_with_index do |entity, index|
+          %li
+            = link_to "#add-#{entity}-tab", 'data-toggle' => 'tab', id: "add-#{entity}" do
+              #{entity.to_s.camelize}
+    %li
+      = link_to "#summaries_settings", 'data-toggle' => 'tab', id: "summaries-settings-tab" do
+        Settings
+
+  .tab-content
+    .tab-pane.active#summaries_list
+      = render "summary_entities", summary: @summary, grouped_entities: @summary_entities
+
+    - Event::Subscription.global_entity_to_subscription.each_with_index do |entity, index|
+      .tab-pane{id: "add-#{entity}-tab"}
+        .prepend-top-20
+          = render "new_#{entity}", summary: @summary, relation: @summary.summary_entity_relationships.new
+
+    .tab-pane#summaries_settings
+      .prepend-top-20
+        = form_for @summary, url: profile_summary_path(@summary.id), method: :put, html: { class: 'form-horizontal' } do |f|
+          = render "form", f: f
+

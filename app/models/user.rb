@@ -141,6 +141,7 @@ class User < ActiveRecord::Base
   has_many :notifications,            dependent: :destroy, class_name: Event::Subscription::Notification, foreign_key: :subscriber_id
   has_one  :notification_setting,     dependent: :destroy, class_name: Event::Subscription::NotificationSetting
 
+  has_many :summaries, class_name: Event::Summary, dependent: :destroy
   has_many :file_tokens
 
   #

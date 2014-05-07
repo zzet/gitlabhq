@@ -1,0 +1,19 @@
+- group        = target
+- member       = find_entity(User, source.user_id)
+- group        = source.group if group.is_a?(UsersGroup)
+
+= mailer_user_link(member)
+was
+%b
+  %i
+    added
+to
+= mailer_group_link(group)
+group of projects
+
+with
+%b= mailer_permission_name(source["group_access"])
+permission
+
+by
+= mailer_user_link(author)

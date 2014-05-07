@@ -1,0 +1,13 @@
+- member  = target
+- project = find_entity(Project, data["project_id"])
+- member  = find_entity(User, data["user_id"]) if @member.nil? || @member.is_a?(UsersProject)
+
+= mailer_user_link(member)
+was
+%b
+  %i
+    removed
+from
+= mailer_project_link(project)
+project by
+= mailer_user_link(author)

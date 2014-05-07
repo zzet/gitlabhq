@@ -1,0 +1,39 @@
+- if source
+  - group        = source.group || find_entity("Group", source.group_id)
+  - member       = source.user || find_entity("User", source.user.id)
+
+  = mailer_user_link(member)
+  was
+  %b
+    %i
+      added
+  to
+  = mailer_group_link(group)
+  group with
+  %b= Gitlab::Access.options.key(data["group_access"])
+  permission by
+  = mailer_user_link(author)
+
+  -#- if group && member
+    -#= link_to member.name, user_url(member.username)
+    -#was added to
+    -#= link_to group.path, group_url(group.path)
+    -#group with
+    -#%b= Gitlab::Access.options.key(data["group_access"])
+    -#permission by
+    -#= link_to author.name, user_url(author.username)
+  -#- else
+    -#User was added to group.
+
+    -#Group id:
+    -#%b= source.group_id
+
+    -#User id:
+    -#%b= source.user_id
+
+    -#Sorry, No more available information for correct render.
+    -#%br
+    -#Please, contact with Administrator.
+
+- else
+  Sorry, No available information for correct render.

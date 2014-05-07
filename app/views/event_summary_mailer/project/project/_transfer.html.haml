@@ -1,0 +1,25 @@
+- project = source
+- namespace_before = find_entity(Group, data["owner_changes"]["namespace_id"].first) || find_entity(User, data["owner_changes"]["namespace_id"].first)
+- namespace_after  = find_entity(Group, data["owner_changes"]["namespace_id"].last) || find_entity(User, data["owner_changes"]["namespace_id"].last)
+
+= mailer_project_link(project)
+was
+%b
+  %i
+    transfered
+from
+- if namespace_before.is_a?(Group)
+  = mailer_group_link(namespace_before)
+  group
+- else
+  = mailer_user_link(namespace_before)
+  user
+to
+- if namespace_after.is_a?(Group)
+  = mailer_group_link(namespace_after)
+  group
+- else
+  = mailer_user_link(namespace_after)
+  user
+by
+= mailer_user_link(author)

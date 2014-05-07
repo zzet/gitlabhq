@@ -1,0 +1,13 @@
+- member  = target
+- group   = find_entity(Group, data["group_id"])
+- member  = find_entity(User, data["user_id"]) if member.nil? || member.is_a?(UsersGroup)
+
+= mailer_user_link(member)
+was
+%b
+  %i
+    removed
+from
+= mailer_group_link(group)
+group by
+= mailer_user_link(author)
