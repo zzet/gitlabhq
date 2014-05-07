@@ -85,7 +85,11 @@ class Event < ActiveRecord::Base
 
       q = q.where(
         (table[:target_type].eq(target.class.name).and(table[:target_id].eq(target.id)))
-        .or(table[:target_type].eq('Project').and(table[:target_id].in(projects_ids)))
+        .or(
+            table[:target_type].eq('Project')
+              .and(table[:target_id].in(projects_ids))
+              .and(table[:source_type].not_eq(TeamProjectRelationship))
+        )
       )
 
     else
