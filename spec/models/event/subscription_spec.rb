@@ -15,6 +15,8 @@
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  target_category       :string(255)
+#  auto_subscription_id  :integer
+#  options               :string(255)      default([])
 #
 
 require 'spec_helper'

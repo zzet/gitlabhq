@@ -12,6 +12,7 @@
 #  push_events           :boolean          default(TRUE), not null
 #  issues_events         :boolean          default(FALSE), not null
 #  merge_requests_events :boolean          default(FALSE), not null
+#  tag_push_events       :boolean          default(FALSE)
 #
 
 class ProjectHook < WebHook
