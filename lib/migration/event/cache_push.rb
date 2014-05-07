@@ -14,8 +14,10 @@ class Migration::Event::CachePush
         if new_broken_event?(event)
 
           push = Push.find(event.data['id'])
-          push.fill_push_data
-          push.save
+          if push.project
+            push.fill_push_data
+            push.save
+          end
 
           event.source = push
           event.data = push.attributes
