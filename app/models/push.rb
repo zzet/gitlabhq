@@ -106,7 +106,7 @@ class Push < ActiveRecord::Base
         after: revafter,
         user_id: user.id,
         user_name: user.name,
-        project_id: project.id,
+        project_id: project_id,
         project_name_with_namespace: project.name_with_namespace,
         repository: {
           namespace: project.namespace.name,
