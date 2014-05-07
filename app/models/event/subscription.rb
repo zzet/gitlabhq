@@ -7,14 +7,16 @@
 #  action                :string(255)
 #  target_id             :integer
 #  target_type           :string(255)
-#  source_id             :integer      NOTE DEPRECATED TODO remove
-#  source_type           :string(255)  NOTE DEPRECATED TODO remove
-#  source_category       :string(255)  NOTE DEPRECATED TODO remove
-#  notification_interval :integer      NOTE DEPRECATED TODO remove
-#  last_notified_at      :datetime     NOTE DEPRECATED TODO remove
+#  source_id             :integer
+#  source_type           :string(255)
+#  source_category       :string(255)
+#  notification_interval :integer
+#  last_notified_at      :datetime
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  target_category       :string(255)
+#  auto_subscription_id  :integer
+#  options               :string(255)      default([])
 #
 
 class Event::Subscription < ActiveRecord::Base

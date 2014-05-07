@@ -2,6 +2,7 @@
 #
 # Table name: services
 #
+#  id                 :integer          not null, primary key
 #  type               :string(255)
 #  title              :string(255)
 #  project_id         :integer
@@ -12,6 +13,8 @@
 #  public_state       :string(255)
 #  active_state       :string(255)
 #  description        :text
+#  recipients         :text
+#  api_key            :string(255)
 #
 
 class Service::Hipchat < Service
