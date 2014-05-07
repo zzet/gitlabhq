@@ -2,12 +2,11 @@ class Migration::Event::CachePush
   def self.migrate
     ActiveRecord::Base.observers.disable(:all)
 
+    fixed_new = 0
+    fixed_old = 0
+    strange_events = []
+
     ActiveRecord::Base.uncached do
-
-      fixed_new = 0
-      fixed_old = 0
-      strange_events = []
-
       events_without_commits = Event.where(action: 'pushed', target_type: 'Project')
 
       events_without_commits.find_each do |event|
