@@ -144,8 +144,12 @@ module EventsHelper
   end
 
   def real_event_changes(event)
-    event.data['previous_changes'].keys
-      .select{ |key| !key.in?(%w(updated_at created_at)) }
+    if event.data['previous_changes'].present?
+      event.data['previous_changes'].keys
+        .select{ |key| !key.in?(%w(updated_at created_at)) }
+    else
+      []
+    end
   end
 
   def link_to_event_source(event)
