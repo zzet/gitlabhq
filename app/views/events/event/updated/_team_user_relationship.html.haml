@@ -1,0 +1,9 @@
+- user = User.find_by(id: event.data['user_id'])
+- team = Team.find_by(id: event.data['team_id'])
+
+updated
+= humanized_event_changes(event)
+for
+= link_to_or_deleted(user, 'user')
+at
+= link_to_or_deleted(team, 'team')

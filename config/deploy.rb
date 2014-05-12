@@ -14,13 +14,6 @@ set :deploy_to,      "/home/#{user}/apps/#{application}"
 set :bundle_without, %w[development test] + (%w[mysql postgres] - [db_adapter])
 set :asset_env,      "RAILS_GROUPS=assets RAILS_RELATIVE_URL_ROOT=#{mount_point.sub(/\/+\Z/, '')}"
 
-#set :sidekiq_cmd, "#{bundle_cmd} exec sidekiq"
-#set :sidekiqctl_cmd, "#{bundle_cmd} exec sidekiqctl"
-#set :sidekiq_timeout, 10
-#set :sidekiq_role, :app
-#set :sidekiq_pid, "#{current_path}/tmp/pids/sidekiq.pid"
-#set :sidekiq_processes, 1
-
 set :application, "gitlab"
 set :undev_ruby_version, '2.0.0-p247'
 
@@ -63,10 +56,8 @@ namespace :deploy do
       runit expects 2 to tell it to send the USR2 signal to the process.
   DESC
   task :restart, :roles => :app, :except => { :no_release => true } do
-    #FIX react-rails generate js in each rails start up
-    #rake tasks generate js with 664 and gitlab owner
-    #unicorn start under git user, which can't overwrite js
-    run "chmod 664 #{release_path}/tmp/react-rails/*"
+    # make tmp available for gitlab
+    run "chmod -R 0775 #{release_path}/tmp/"
     run "sudo sv restart /etc/service/gitlab-sidekiq-*"
     run "sudo sv restart /etc/service/gitlab-web-*"
   end

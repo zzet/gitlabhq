@@ -1,0 +1,13 @@
+= image_tag avatar_icon(event.author.email, 24), class: "avatar s24", alt:''
+
+.event-title
+  %span.author_name= link_to_author event
+  %span.event_label added teams
+  at
+  = link_to_event_target(event)
+
+.event-body
+  .event-note.js-toggle-container
+    Click to see them
+    %a.text-expander.js-toggle-button ...
+    .js-toggle-content.nested-container.hide

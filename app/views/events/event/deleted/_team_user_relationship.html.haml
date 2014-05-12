@@ -1,0 +1,7 @@
+- user = User.find_by(id: event.data['user_id'])
+- team = Team.find_by(id: event.data['team_id'])
+
+deleted
+= link_to_or_deleted(user, 'user')
+from
+= link_to_or_deleted(team, 'team')

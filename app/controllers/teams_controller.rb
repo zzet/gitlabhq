@@ -6,6 +6,7 @@ class TeamsController < ApplicationController
   before_filter :authorize_remove_team!, only: [:destroy]
 
   before_filter :team, except: [:index, :new, :create]
+  before_filter :event_filter, only: :show
 
   layout :determine_layout
 
@@ -19,9 +20,9 @@ class TeamsController < ApplicationController
     projects
     groups
     members
-    @events = OldEvent.in_projects(team.projects.pluck(:id) + team.accessed_projects.pluck(:id))
-    @events = event_filter.apply_filter(@events)
-    @events = @events.limit(20).offset(params[:offset] || 0)
+    @events = Event.for_dashboard(@team)
+    @events = event_filter.apply_filter(@events) if (@event_filter.params - %w(group)).any?
+    @events = @events.limit(20).offset(params[:offset] || 0).recent
 
     respond_to do |format|
       format.html

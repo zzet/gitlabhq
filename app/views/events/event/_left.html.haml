@@ -1,0 +1,10 @@
+- user = User.find_by(id: event.data['user_id'])
+
+- if user.present?
+  = image_tag avatar_icon(user.email, 24), class: "avatar s24", alt:''
+
+  .event-title
+    %span.author_name= link_to_or_deleted(user, 'user')
+
+    - if lookup_context.exists?("events/event/left/_#{event.source_type.underscore}")
+      = render "events/event/left/#{event.source_type.underscore}", event: event

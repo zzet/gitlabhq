@@ -1,0 +1,13 @@
+- data = event.data
+-# TODO query remove from view
+- user = User.find_by(id: data['user_id'])
+
+- if user.present?
+  = image_tag avatar_icon(user.email, 24), class: "avatar s24", alt:''
+
+  .event-title
+    %span.author_name
+      = link_to user.name, user_path(user)
+
+    - if lookup_context.exists?("events/event/joined/_#{event.source_type.underscore}")
+      = render "events/event/joined/#{event.source_type.underscore}", event: event

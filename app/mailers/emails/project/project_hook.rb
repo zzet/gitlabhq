@@ -20,7 +20,7 @@ class Emails::Project::ProjectHook < Emails::Project::Base
     @user         = @event.author
     @project_hook = @event.source
     @project      = @project_hook.project
-    @changes      = JSON.load(@event.data).to_hash["previous_changes"]
+    @changes      = @event.data["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'updated',
@@ -33,7 +33,7 @@ class Emails::Project::ProjectHook < Emails::Project::Base
   def deleted_email(notification)
     @notification = notification
     @event        = @notification.event
-    data          = JSON.load(@event.data).to_hash
+    data          = @event.data
     @user         = @event.author
     @project      = @event.target
     @project_hook = data

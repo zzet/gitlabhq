@@ -14,6 +14,7 @@
 class UsersGroup < ActiveRecord::Base
   include Watchable
   include Gitlab::Access
+  include RelationTable
 
   def self.group_access_roles
     Gitlab::Access.options_with_owner
@@ -27,6 +28,8 @@ class UsersGroup < ActiveRecord::Base
   validates :user_id, presence: true
   validates :group_id, presence: true
   validates :user_id, uniqueness: { scope: [:group_id], message: "already exists in group" }
+
+  relations(:user, :group)
 
   watch do
     source watchable_name do

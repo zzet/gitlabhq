@@ -7,7 +7,7 @@ class Gitlab::Event::Notification::Creator::User::UserBlocked < Gitlab::Event::N
     subscriptions = ::Event::Subscription.by_target(user).by_source_type(event.source_type)
     notifications << create_by_subscriptions(event, subscriptions, :delayed)
 
-    data = JSON.load(event.data)
+    data = event.data
 
     # Subscriptions on Teams
     teams = data["teams"]

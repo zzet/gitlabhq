@@ -18,7 +18,7 @@ class Emails::User::User < Emails::User::Base
     @event        = @notification.event
     @user         = @event.author
     @banned_user  = @event.source
-    data          = JSON.load(@event.data)
+    data          = @event.data
     @teams        = data["teams"].map { |t| Team.find_by_id(t["id"]) }.reject { |t| t.nil? }
     @projects     = data["projects"].map { |pr| Project.find_by_id(pr["id"]) }.reject { |pr| pr.nil? }
 
@@ -49,7 +49,7 @@ class Emails::User::User < Emails::User::Base
     @event        = @notification.event
     @user         = @event.author
     @updated_user = @event.source
-    @changes      = JSON.load(@event.data).to_hash["previous_changes"]
+    @changes      = @event.data["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'user',
             'X-Gitlab-Action' => 'updated',
@@ -63,7 +63,7 @@ class Emails::User::User < Emails::User::Base
   def deleted_email(notification)
     @notification = notification
     @event        = @notification.event
-    data          = JSON.load(@event.data).to_hash
+    data          = @event.data
     @user         = @event.author
     @deleted_user = data
 

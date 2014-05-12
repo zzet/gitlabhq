@@ -293,4 +293,26 @@ module ApplicationHelper
       content_tag(:i, nil, class: 'icon-spinner icon-spin') + text
     end
   end
+
+  def link_to_target(target)
+    link_to target do
+      title = content_tag(:span, target.name)
+
+      if target.instance_of?(Project)
+        namespace = content_tag(:span, "#{target.namespace.human_name} / ", class: 'namespace-name')
+        title = namespace + title
+      end
+
+      title
+    end
+  end
+
+  def link_to_or_deleted(target, name)
+    if target.present?
+      link_to_target target
+    else
+      "(deleted #{name})"
+    end
+  end
+
 end

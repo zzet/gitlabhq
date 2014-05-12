@@ -144,7 +144,7 @@ module Projects::BaseActions
         old_project_teams = project.teams
         old_project_teams_ids = old_project_teams.pluck(:id)
 
-        old_group_teams = project.group.present? ? project.teams : []
+        old_group_teams = project.group.present? ? project.teams : Team.none
         old_group_teams_ids = old_group_teams.pluck(:id)
 
         old_teams_ids = (old_group_teams_ids + old_project_teams_ids).flatten
@@ -223,7 +223,7 @@ module Projects::BaseActions
       new_path = File.join(new_namespace.try(:path) || '', project.path)
 
       if Project.where(path: project.path, namespace_id: new_namespace.try(:id)).present?
-        raise Projects::TransferError.new("Project with same path in target namespace already exists")
+        raise TransferError.new("Project with same path in target namespace already exists")
       end
 
       # Remove old satellite
@@ -236,7 +236,7 @@ module Projects::BaseActions
       if project.save
         # Move main repository
         unless gitlab_shell.mv_repository(old_path, new_path)
-          raise Projects::TransferError.new('Cannot move project')
+          raise TransferError.new('Cannot move project')
         end
 
         # Move wiki repo also if present
@@ -252,7 +252,7 @@ module Projects::BaseActions
       else
         raise TransferError.new("Cannot update project namespace")
       end
-    rescue Projects::TransferError => ex
+    rescue TransferError => ex
       project.reload
       project.errors.add(:namespace_id, ex.message)
       false

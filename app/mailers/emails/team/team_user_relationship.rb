@@ -24,7 +24,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
     @utur         = @event.source
     @team         = @utur.team
     @member       = @utur.user
-    @changes      = JSON.load(@event.data).to_hash["previous_changes"]
+    @changes      = @event.data["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'team',
             'X-Gitlab-Action' => 'updated',
@@ -37,7 +37,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
   def left_email(notification)
     @notification = notification
     @event        = @notification.event
-    @up           = JSON.load(@event.data)
+    @up           = @event.data
     @user         = @event.author
     @team         = Team.find_by_id(@up["team_id"])
     @member       = User.find_by_id(@up["user_id"])

@@ -23,7 +23,7 @@ class Emails::User::UsersProject < Emails::User::Base
     @upr                 = @event.source
     @member              = @upr.user
     @project             = @upr.project
-    data                 = JSON.load(@event.data)
+    data                 = @event.data
     @changes             = data["previous_changes"]
     unless @changes.blank?
       @previous_permission = UsersProject.access_roles.key(@changes["project_access"].first)
@@ -42,7 +42,7 @@ class Emails::User::UsersProject < Emails::User::Base
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
-    @up           = JSON.load(@event.data)
+    @up           = @event.data
     @member       = @event.target
     @project      = Project.find_by_id(@up["project_id"])
     @member       = User.find_by_id(@up["user_id"]) if @member.nil? || @member.is_a?(UsersProject)
