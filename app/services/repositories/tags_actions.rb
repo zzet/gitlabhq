@@ -14,7 +14,7 @@ module Repositories::TagsActions
   end
 
   def delete_tag_action(tag)
-    tag = @repository.find_tag(tag)
+    tag = project.repository.find_tag(tag)
     if tag && project.repository.rm_tag(tag.name)
       oldrev = tag.target
       newrev = "0000000000000000000000000000000000000000"

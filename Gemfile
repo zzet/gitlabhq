@@ -121,7 +121,7 @@ gem "acts-as-taggable-on"
 # Background jobs
 gem 'slim'
 gem 'sinatra', require: nil
-gem 'sidekiq'
+gem 'sidekiq', '~> 3.0.1'
 
 # HTTP requests
 gem "httparty"
@@ -238,10 +238,10 @@ group :development, :test do
   gem "capybara"
   gem "pry"
   gem 'pry-rails'
-  #gem 'pry-rescue'
-  #gem 'pry-remote'
-  #gem 'pry-stack_explorer'
-  #gem 'pry-debugger'
+  # gem 'pry-rescue'
+  # gem 'pry-remote'
+  # gem 'pry-stack_explorer'
+  # gem 'pry-debugger'
   gem "awesome_print"
   gem "database_cleaner"
   gem "launchy"

@@ -2,4 +2,8 @@
   = event_filter_link EventFilter.push, 'Push events'
   = event_filter_link EventFilter.merged, 'Merge events'
   = event_filter_link EventFilter.comments, 'Comments'
-  = event_filter_link EventFilter.team, 'Team'
+
+  - if @dashboard.nil? or @dashboard == Team
+    = event_filter_link EventFilter.team, 'Team'
+  - if @dashboard.nil? or @dashboard == Group
+    = event_filter_link EventFilter.group, 'Group'

@@ -40,6 +40,7 @@ module EventsHelper
       EventFilter.merged   => "icon-check",
       EventFilter.comments => "icon-comments",
       EventFilter.team     => "icon-user",
+      EventFilter.group    => "icon-user",
     }
   end
 
@@ -129,4 +130,43 @@ module EventsHelper
   rescue
     "--broken encoding"
   end
+
+  def dom_id_if_record(record)
+    (record) ? dom_id(record) : ''
+  end
+
+  def humanized_event_changes(event)
+    real_event_changes(event).map do |key|
+        key = key.gsub('enabled', '')
+        key.gsub('_', ' ')
+      end
+      .join(', ')
+  end
+
+  def real_event_changes(event)
+    if event.data['previous_changes'].present?
+      event.data['previous_changes'].keys
+        .select{ |key| !key.in?(%w(updated_at created_at)) }
+    else
+      []
+    end
+  end
+
+  def link_to_event_source(event)
+    if event.source
+      # NOTE rescue for source without path. For ex. ssh keys.
+      link_to_target(event.source) rescue ''
+    else
+      "(deleted #{event.source_type.downcase})"
+    end
+  end
+
+  def link_to_event_target(event)
+    if event.target
+      link_to_target event.target
+    else
+      "(deleted #{event.target_type.downcase})"
+    end
+  end
+
 end

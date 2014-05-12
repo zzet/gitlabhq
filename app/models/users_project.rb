@@ -15,6 +15,7 @@ class UsersProject < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
   include Gitlab::Access
+  include RelationTable
 
   attr_accessible :user, :user_id, :project_access, :source_id, :source_type, :source
   attr_accessor :skip_git
@@ -26,6 +27,8 @@ class UsersProject < ActiveRecord::Base
   validates :user_id, uniqueness: { scope: [:project_id], message: "already exists in project" }
   validates :project_access, inclusion: { in: Gitlab::Access.values_with_owner }, presence: true
   validates :project, presence: true
+
+  relations(:user, :project)
 
   watch do
     source watchable_name do

@@ -65,13 +65,15 @@ describe GitPushService do
     before do
       @service = GitPushService.new(user, project, @oldrev, @newrev, @ref)
       @service.execute
-      @event = OldEvent.last
+      @event = Event.last
     end
 
-    it { @event.should_not be_nil }
-    it { @event.project.should == project }
-    it { @event.action.should == OldEvent::PUSHED }
-    it { @event.data.should == @service.push_data }
+    it 'creates event' do
+      @event.should_not be_nil
+      @event.target.should == project
+      @event.action.should == 'pushed'
+      @event.data['data']['commits'].first['id'].should == @newrev
+    end
   end
 
   describe "Web Hooks" do

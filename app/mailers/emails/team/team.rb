@@ -18,7 +18,7 @@ class Emails::Team::Team < Emails::Team::Base
     @event        = @notification.event
     @user         = @event.author
     @team         = @event.source
-    @changes      = JSON.load(@event.data).to_hash["previous_changes"]
+    @changes      = @event.data["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'team',
             'X-Gitlab-Action' => 'updated',
@@ -31,7 +31,7 @@ class Emails::Team::Team < Emails::Team::Base
   def deleted_email(notification)
     @notification = notification
     @event        = @notification.event
-    data          = JSON.load(@event.data).to_hash
+    data          = @event.data
     @user         = @event.author
     @team         = data
 

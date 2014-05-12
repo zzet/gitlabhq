@@ -66,6 +66,8 @@ Gitlab::Application.routes.draw do
     root to: "projects#index"
   end
 
+  resources :events, only: [:index]
+
   #
   # Attachments serving
   #

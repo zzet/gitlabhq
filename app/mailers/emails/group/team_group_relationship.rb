@@ -19,7 +19,7 @@ class Emails::Group::TeamGroupRelationship < Emails::Group::Base
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
-    @source       = JSON.load(@event.data).to_hash
+    @source       = @event.data
     @team         = Team.find(@source["team_id"])
     @group        = Group.find(@source["group_id"])
 

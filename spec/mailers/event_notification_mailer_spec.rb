@@ -5,10 +5,10 @@ describe EventNotificationMailer do
   include EmailSpec::Matchers
 
   def clear_prepare_data
-    Event.destroy_all
-    Event::Subscription::Notification.destroy_all;
-    ActionMailer::Base.deliveries.clear;
-    EventHierarchyWorker.reset;
+    Event.delete_all
+    Event::Subscription::Notification.delete_all
+    ActionMailer::Base.deliveries.clear
+    EventHierarchyWorker.reset
     RequestStore.store[:borders] = []
   end
 
@@ -53,7 +53,11 @@ describe EventNotificationMailer do
 
     context "when event source - project " do
       context "when create project" do
-        before { collect_mails_data { @project = ProjectsService.new(@another_user, attributes_for(:project)).create } }
+        before do
+          collect_mails_data do
+            @project = ProjectsService.new(@another_user, attributes_for(:project)).create
+          end
+        end
 
         it "only one message" do
           @mails_count.should == 1
@@ -634,7 +638,10 @@ describe EventNotificationMailer do
           context "when merge MR" do
             before do
               @merge_request = ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
+
               params = { merge_request: { state_event: :merge } }
+
+              clear_prepare_data
 
               collect_mails_data do
                 ProjectsService.new(@another_user, project, params).merge_request(@merge_request).update
@@ -1129,7 +1136,6 @@ describe EventNotificationMailer do
           @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
           @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
           @ref = 'refs/heads/master'
-          #project.save
         end
 
         context "when pushed code" do

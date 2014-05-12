@@ -1,0 +1,7 @@
+- user = User.find_by(id: event.data['user_id'])
+- project = Project.find_by(id: event.data['project_id'])
+
+added
+= link_to_or_deleted(user, 'user')
+to
+= link_to_or_deleted(project, 'project')
