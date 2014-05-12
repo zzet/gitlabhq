@@ -26,7 +26,7 @@ class SearchService < BaseService
     opt = {
       pids: projects_ids,
       order: params[:order],
-      in: %w(name^10 path^9 description^5
+      fields: %w(name^10 path^9 description^5
              name_with_namespace^2 path_with_namespace),
     }
 
@@ -56,7 +56,7 @@ class SearchService < BaseService
         namespaces: response.response["facets"]["namespaceFacet"]["terms"].map {|term| { namespace: Namespace.find(term["term"]), count: term["count"] } },
         categories: categories_list
       }
-    rescue
+    rescue Exception => e
       []
     end
   end
@@ -65,7 +65,7 @@ class SearchService < BaseService
     opt = {
       gids: current_user.authorized_groups.ids,
       order: params[:order],
-      in: %w(name^10 path^5 description),
+      fields: %w(name^10 path^5 description),
     }
 
     begin
@@ -77,7 +77,7 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue
+    rescue Exception => e
       []
     end
   end
@@ -86,7 +86,7 @@ class SearchService < BaseService
     opt = {
       tids: current_user.known_teams.ids,
       order: params[:order],
-      in: %w(name^10 path^5 description),
+      fields: %w(name^10 path^5 description),
     }
 
     begin
@@ -98,7 +98,7 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue
+    rescue Exception => e
       []
     end
   end
@@ -118,7 +118,7 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue
+    rescue Exception => e
       []
     end
   end
@@ -138,7 +138,7 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue
+    rescue Exception => e
       []
     end
   end
@@ -158,7 +158,7 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue
+    rescue Exception => e
       []
     end
   end
@@ -176,7 +176,7 @@ class SearchService < BaseService
       res[:blobs][:projects]    = res[:blobs][:repositories].map   { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
       res[:commits][:projects]  = res[:commits][:repositories].map { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
       res
-    rescue
+    rescue Exception => e
       []
     end
   end
@@ -209,7 +209,7 @@ class SearchService < BaseService
                               else
                                 known_projects_ids
                               end
-                            rescue
+                            rescue Exception => e
                               []
                             end
   end
