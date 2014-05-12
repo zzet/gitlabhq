@@ -72,4 +72,19 @@ class Emails::MergeRequest::MergeRequest < Emails::Base
       end
     end
   end
+
+  def merged_email(notification)
+    case notification.subscription
+      when NilClass
+        Emails::Project::MergeRequest.merged_email(notification).deliver!
+      else
+        case notification.subscription.target
+          when Project
+            Emails::Project::MergeRequest.merged_email(notification).deliver!
+          when MergeRequest
+            # Send notification
+        end
+    end
+  end
+
 end

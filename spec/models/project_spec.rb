@@ -38,7 +38,6 @@ describe Project do
     it { should belong_to(:creator).class_name('User') }
     it { should have_many(:users) }
     it { should have_many(:events) }
-    it { should have_many(:old_events).dependent(:destroy) }
     it { should have_many(:merge_requests).dependent(:destroy) }
     it { should have_many(:issues).dependent(:destroy) }
     it { should have_many(:milestones).dependent(:destroy) }
