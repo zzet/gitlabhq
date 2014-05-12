@@ -41,6 +41,7 @@ class Dispatcher
         new SidebarFilter()
         new SidebarSort()
         new SidebarTabs('groups')
+        new Events('Group')
       when 'projects:show'
         new Activities()
         new SidebarFilter()
