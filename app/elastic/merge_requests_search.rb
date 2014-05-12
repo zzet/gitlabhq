@@ -73,7 +73,7 @@ module MergeRequestsSearch
           targetProjectFacet: {
             terms: {
               field: :target_project_id,
-              all_term: true,
+              all_terms: true,
               size: Project.count
             }
           }
