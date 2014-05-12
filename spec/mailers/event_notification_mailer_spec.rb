@@ -638,7 +638,10 @@ describe EventNotificationMailer do
           context "when merge MR" do
             before do
               @merge_request = ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
+
               params = { merge_request: { state_event: :merge } }
+
+              clear_prepare_data
 
               collect_mails_data do
                 ProjectsService.new(@another_user, project, params).merge_request(@merge_request).update
