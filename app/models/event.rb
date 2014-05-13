@@ -76,10 +76,11 @@ class Event < ActiveRecord::Base
 
   end
 
+  #TODO split method
   scope :for_dashboard, -> (target) do
     q = joins('LEFT JOIN events as e2 on events.parent_event_id = e2.id')
 
-    if target.class.in?([Group, Team, User])
+    if target.class.in?([Group, Team])
       projects_ids = target.projects.pluck(:id)
       table = self.arel_table
 
@@ -91,7 +92,18 @@ class Event < ActiveRecord::Base
               .and(table[:source_type].not_eq(TeamProjectRelationship))
         )
       )
+    elsif target.class == User
+      projects_ids = target.projects.pluck(:id)
+      table = self.arel_table
 
+      q = q.where(
+          (table[:target_type].eq(target.class.name).and(table[:target_id].eq(target.id)))
+          .or(
+              table[:target_type].eq('Project')
+              .and(table[:target_id].in(projects_ids))
+              .and(table[:author_id].eq(target.id))
+          )
+      )
     else
       #TODO remove, unused
       q = q.where(target_type: target.class, target_id: target.id)
