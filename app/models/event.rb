@@ -79,7 +79,7 @@ class Event < ActiveRecord::Base
   scope :for_dashboard, -> (target) do
     q = joins('LEFT JOIN events as e2 on events.parent_event_id = e2.id')
 
-    if target.class.in?([Group, Team])
+    if target.class.in?([Group, Team, User])
       projects_ids = target.projects.pluck(:id)
       table = self.arel_table
 
@@ -93,6 +93,7 @@ class Event < ActiveRecord::Base
       )
 
     else
+      #TODO remove, unused
       q = q.where(target_type: target.class, target_id: target.id)
     end
 
