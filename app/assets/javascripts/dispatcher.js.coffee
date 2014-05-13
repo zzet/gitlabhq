@@ -73,6 +73,7 @@ class Dispatcher
         new DashboardTooltips()
         new SidebarFilter()
         new SidebarTabs('users')
+        new Events('User')
       when 'profiles:subscriptions:index'
         new ProfileSubscriptions()
 
