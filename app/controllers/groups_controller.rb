@@ -72,7 +72,10 @@ class GroupsController < ApplicationController
     respond_to do |format|
       format.html
       format.json { pager_json("events/_events", @events.count) }
-      format.atom { render layout: false }
+      format.atom do
+        @events = old_events
+        render layout: false
+      end
     end
   end
 
@@ -186,4 +189,12 @@ class GroupsController < ApplicationController
     params[:state] = 'opened' if params[:state].blank?
     params[:group_id] = @group.id
   end
+
+  def old_events
+    @old_events ||= begin
+      events = OldEvent.in_projects(project_ids)
+      events.limit(20).offset(params[:offset] || 0)
+    end
+  end
+
 end
