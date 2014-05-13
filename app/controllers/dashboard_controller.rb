@@ -28,7 +28,10 @@ class DashboardController < ApplicationController
     respond_to do |format|
       format.html
       format.json { pager_json("events/_events", @events.count) }
-      format.atom { render layout: false }
+      format.atom do
+        @events = old_events
+        render layout: false
+      end
     end
   end
 
@@ -112,5 +115,12 @@ class DashboardController < ApplicationController
     params[:scope] = 'assigned-to-me' if params[:scope].blank?
     params[:state] = 'opened' if params[:state].blank?
     params[:authorized_only] = true
+  end
+
+  def old_events
+    @old_events ||= begin
+      events = OldEvent.in_projects(current_user.authorized_projects.pluck(:id))
+      events.limit(20).offset(params[:offset] || 0)
+    end
   end
 end
