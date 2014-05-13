@@ -58,8 +58,8 @@ namespace :deploy do
   task :restart, :roles => :app, :except => { :no_release => true } do
     # make tmp available for gitlab
     run "chmod -R 0775 #{release_path}/tmp/"
-    run "sudo sv restart /etc/service/gitlab-sidekiq-*"
-    run "sudo sv restart /etc/service/gitlab-web-*"
+    run "sudo sv -w 30 restart /etc/service/gitlab-sidekiq-*"
+    run "sudo sv -w 30 restart /etc/service/gitlab-web-*"
   end
 end
 
