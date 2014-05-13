@@ -5,11 +5,12 @@
 .event-title
   %span.author_name= link_to_author event
   %span.event_label commented on merge request
-  = link_to "##{event.source.noteable.iid}",
-    project_merge_request_path(event.target, event.source.noteable, anchor: dom_id_if_record(note)),
-    class: "commit_short_id"
-  at
-  = link_to_event_target(event)
+  - if note
+    = link_to "##{note.noteable.iid}",
+      project_merge_request_path(event.target, note.noteable, anchor: dom_id_if_record(note)),
+      class: "commit_short_id"
+    at
+    = link_to_event_target(event)
 
 .event-body
   .event-note
