@@ -59,7 +59,9 @@ namespace :deploy do
     # make tmp available for gitlab
     run "chmod -R 0775 #{release_path}/tmp/"
     run "sudo sv -w 30 restart /etc/service/gitlab-sidekiq-*"
-    run "sudo sv -w 30 restart /etc/service/gitlab-web-*"
+    run "sudo sv -w 30 restart /etc/service/gitlab-web-unicorn"
+    run "sudo sv -w 30 restart /etc/service/gitlab-web-unicorn-api"
+    run "sudo sv force-restart /etc/service/gitlab-web-faye"
   end
 end
 
