@@ -11,7 +11,7 @@ class CiBuildResultWorker
     parser = Gitlab::Ci::Jenkins.new(data)
     parser.parse
 
-    builds = CiBuild.where(source_sha: parser.commits).where.not(id: source_build.id)
+    builds = CiBuild.where(source_sha: parser.commits, source_project_id: source_build.source_project_id).where.not(id: source_build.id)
 
     CiBuild.where(id: [builds.ids, source_build.id].flatten.compact).find_each do |build|
       if build.source_sha != parser.last_sha
