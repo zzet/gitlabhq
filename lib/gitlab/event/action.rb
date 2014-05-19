@@ -16,7 +16,13 @@ class Gitlab::Event::Action
         end
       end
 
-      ActiveSupport::Notifications.instrument event, {source: source, user: user, data: data}
+      uniq_hash = Time.now.to_i.to_s + rand.to_s
+      ActiveSupport::Notifications.instrument event, {
+          source: source,
+          user: user,
+          data: data,
+          uniq_hash: uniq_hash
+      }
     end
 
     def current_user

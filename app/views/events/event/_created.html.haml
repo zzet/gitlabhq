@@ -1,0 +1,12 @@
+= image_tag avatar_icon(event.author.email, 24), class: "avatar s24", alt:''
+
+.event-title
+  %span.author_name= link_to_author event
+  %span.event_label
+  - if lookup_context.exists?("events/event/created/_#{event.source_type.underscore}")
+    = render "events/event/created/#{event.source_type.underscore}", event: event
+  - else
+    created
+
+    = event.target_type.downcase
+    = link_to_event_target(event)

@@ -7,6 +7,7 @@ class GroupsController < ApplicationController
   before_filter :authorize_read_group!, except: [:new, :create, :index]
   before_filter :authorize_admin_group!, only: [:edit, :update, :destroy]
   before_filter :authorize_create_group!, only: [:new, :create]
+  before_filter :event_filter, only: :show
 
   # Load group projects
   before_filter :projects, except: [:new, :create, :index]
@@ -36,10 +37,12 @@ class GroupsController < ApplicationController
   end
 
   def show
-    @events = OldEvent.in_projects(project_ids)
-    @events = event_filter.apply_filter(@events)
-    @events = @events.limit(20).offset(params[:offset] || 0)
-    @last_push = current_user.recent_push if current_user
+    @dashboard = @group.class
+    @events = Event.for_dashboard(@group)
+    @events = @event_filter.apply_filter(@events) if (@event_filter.params - %w(team)).any?
+    @events = @events.limit(20).offset(params[:offset] || 0).recent
+
+    @last_push = current_user.recent_push
 
     @teams = @group.teams
     @projects = @group.projects.sorted_by_push_date
@@ -69,7 +72,10 @@ class GroupsController < ApplicationController
     respond_to do |format|
       format.html
       format.json { pager_json("events/_events", @events.count) }
-      format.atom { render layout: false }
+      format.atom do
+        @events = old_events
+        render layout: false
+      end
     end
   end
 
@@ -183,4 +189,12 @@ class GroupsController < ApplicationController
     params[:state] = 'opened' if params[:state].blank?
     params[:group_id] = @group.id
   end
+
+  def old_events
+    @old_events ||= begin
+      events = OldEvent.in_projects(project_ids)
+      events.limit(20).offset(params[:offset] || 0)
+    end
+  end
+
 end

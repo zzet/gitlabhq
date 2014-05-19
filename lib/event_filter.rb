@@ -21,6 +21,10 @@ class EventFilter
     def team
       'team'
     end
+
+    def group
+      'group'
+    end
   end
 
   def initialize params
@@ -34,20 +38,23 @@ class EventFilter
   def apply_filter events
     return events unless params.present?
 
+    table = Event.arel_table
+
     filter = params.dup
 
     actions = []
-    actions << OldEvent::PUSHED if filter.include? 'push'
-    actions << OldEvent::MERGED if filter.include? 'merged'
+    actions << :pushed if filter.include? 'push'
+    actions += Event::Action::MERGE_REQUESTS if filter.include? 'merged'
+    actions += Event::Action::COMMENTS if filter.include? 'comments'
 
-    if filter.include? 'team'
-      actions << OldEvent::JOINED
-      actions << OldEvent::LEFT
-    end
+    target_types = []
+    target_types << Team if filter.include? 'team'
+    target_types << Group if filter.include? 'group'
 
-    actions << OldEvent::COMMENTED if filter.include? 'comments'
-
-    events = events.where(action: actions)
+    events.where(
+      table[:action].in(actions)
+      .or(table[:target_type].in(target_types))
+    )
   end
 
   def options key

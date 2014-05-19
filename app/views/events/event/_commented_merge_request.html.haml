@@ -1,0 +1,30 @@
+= image_tag avatar_icon(event.author.email, 24), class: "avatar s24", alt:''
+
+- note = event.source
+
+.event-title
+  %span.author_name= link_to_author event
+  %span.event_label commented on merge request
+  - if note
+    = link_to "##{note.noteable.iid}",
+      project_merge_request_path(event.target, note.noteable, anchor: dom_id_if_record(note)),
+      class: "commit_short_id"
+    at
+    = link_to_event_target(event)
+
+.event-body
+  .event-note
+    - if note
+      .md
+        %i.icon-comment-alt.event-note-icon
+        = event_note(note.note)
+      - if note.attachment.url
+        - if note.attachment.image?
+          = link_to note.attachment.url, target: '_blank' do
+            = image_tag note.attachment.url, class: 'note-image-attach'
+        - else
+          = link_to note.attachment.secure_url, target: "_blank", class: 'note-file-attach' do
+            %i.icon-paper-clip
+            = note.attachment_identifier
+    - else
+      %i Note was deleted

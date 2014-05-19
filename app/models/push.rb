@@ -3,11 +3,8 @@ class Push < ActiveRecord::Base
 
   DEFAULT_COMMITS_COUNT = 20
 
-  attr_accessible :revafter,:revbefore,
-                  :ref,     :data,
-                  :commits, :commits_count,
-                  :project, :project_id,
-                  :user,    :user_id
+  attr_accessible :revafter, :revbefore, :ref, :data, :commits_count,
+                  :project, :project_id, :user, :user_id
 
   belongs_to :project
   belongs_to :user
@@ -24,6 +21,7 @@ class Push < ActiveRecord::Base
     end
   end
 
+  # Prepared push data for sending to external services
   serialize :data #, ActiveRecord::Serializers::MessagePackSerializer
 
   def refs_action?;         revafter =~ /^00000/ || revbefore =~ /^00000/; end
@@ -54,34 +52,31 @@ class Push < ActiveRecord::Base
     @tag_name ||= ref.gsub("refs/tags/", "")
   end
 
-  def data(limit = DEFAULT_COMMITS_COUNT)
-    @data = begin
-              limit = all_commits_count unless limit.is_a?(Fixnum)
-              #write_attribute(:data, load_push_data(limit))
-              load_push_data(limit)
-            end if @data.blank?
-    @data
+  def fill_push_data
+    write_attribute(:data, load_push_data(DEFAULT_COMMITS_COUNT))
   end
 
   def commits(limit = DEFAULT_COMMITS_COUNT)
-    limit = all_commits_count unless limit.is_a?(Fixnum)
-    @commits ||= project.repository.commits_between(revbefore, revafter).last(limit).reverse
+    # select all committs if symbol :all received
+    limit = commits_count unless limit.is_a?(Fixnum)
+
+    load_commits_from_repository(limit)
   end
 
-  def commits_count(limit = DEFAULT_COMMITS_COUNT)
-    limit = all_commits_count unless limit.is_a?(Fixnum)
-    commits.count
+  def commits_count
+    @commits_count ||= begin
+                         if data.present? && data[:total_commits_count]
+                           data[:total_commits_count]
+                         else
+                           load_commits_from_repository.count
+                         end
+                       end
   end
 
-  def all_commits_count
-    project.repository.commits_between(revbefore, revafter).count
+  def load_commits_from_repository(limit = :all)
+    @commits_from_repository ||= project.repository.commits_between(revbefore, revafter)
+    limit.is_a?(Fixnum) ? @commits_from_repository.first(limit) : @commits_from_repository
   end
-
-  def fill_push_data
-    data(all_commits_count)
-  end
-
-  protected
 
   # Produce a hash of post-receive data
   #
@@ -111,8 +106,10 @@ class Push < ActiveRecord::Base
         after: revafter,
         user_id: user.id,
         user_name: user.name,
-        project_id: project.id,
+        project_id: project_id,
+        project_name_with_namespace: project.name_with_namespace,
         repository: {
+          namespace: project.namespace.name,
           name: project.name,
           url: project.url_to_repo,
           description: project.description,
@@ -122,13 +119,12 @@ class Push < ActiveRecord::Base
 
       unless tag?
         # Total commits count
-        commits_count = all_commits_count
+        data[:total_commits_count] = commits_count
 
         # Get latest 20 commits ASC
         push_commits_limited = commits.last(limit)
 
         data[:commits] = []
-        data[:total_commits_count] = commits_count
 
         # For performance purposes maximum 20 latest commits
         # will be passed as post receive hook data.

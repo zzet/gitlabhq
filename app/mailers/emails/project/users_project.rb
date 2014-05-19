@@ -21,7 +21,7 @@ class Emails::Project::UsersProject < Emails::Project::Base
     @event                = @notification.event
     @user                 = @event.author
     @upr                  = @event.source
-    data                  = JSON.load(@event.data)
+    data                  = @event.data
     @project              = Project.find(data["project_id"])
     @member               = User.find(data["user_id"])
     @changes              = data["previous_changes"]
@@ -43,7 +43,7 @@ class Emails::Project::UsersProject < Emails::Project::Base
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
-    @up           = JSON.load(@event.data)
+    @up           = @event.data
     @project      = @event.target
     @member       = User.find_by_id(@up["user_id"])
     @project      = Project.find_by_id(@up["project_id"]) if @project.nil? || @project.is_a?(UsersProject)

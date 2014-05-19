@@ -113,11 +113,16 @@ module Gitlab
           heads.each { |head| repo.git.branch(default_options({D: true}), head) }
         rescue
           begin
+            log("ERROR in satellite for #{project.name_with_namespace}. Destroy satellite.")
             destroy
+            log("ERROR in satellite for #{project.name_with_namespace}. Create satellite.")
             create
+            log("ERROR in satellite for #{project.name_with_namespace}. Update satellite")
             clear_and_update!
+            log("ERROR in satellite for #{project.name_with_namespace}. Repair finished.")
           rescue
             log("FATAL in satellite for #{project.name_with_namespace}")
+            false
           end
         end
       end

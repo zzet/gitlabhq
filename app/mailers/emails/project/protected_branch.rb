@@ -17,7 +17,7 @@ class Emails::Project::ProtectedBranch < Emails::Project::Base
   def unprotected_email(notification)
     @notification = notification
     @event        = @notification.event
-    data          = JSON.load(@event.data).to_hash
+    data          = @event.data
     @user         = @event.author
     @project      = @event.target
     @branch       = data

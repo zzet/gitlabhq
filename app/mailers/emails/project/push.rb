@@ -8,7 +8,7 @@ class Emails::Project::Push < Emails::Project::Base
     @source       = @event.source_type
     @project      = @event.target
     @repository   = @project.repository
-    @push_data    = JSON.load(@event.data).to_hash
+    @push_data    = @event.data
     @branch       = @push_data["ref"]
     @branch.slice!("refs/heads/")
 
@@ -40,7 +40,7 @@ class Emails::Project::Push < Emails::Project::Base
     @source   = @event.source_type
     @project  = @event.target
 
-    @push_data = JSON.load(@event.data).to_hash
+    @push_data = @event.data
 
     @branch = @push_data["ref"]
     @branch.slice!("refs/heads/")
@@ -59,7 +59,7 @@ class Emails::Project::Push < Emails::Project::Base
     @user         = @event.author
     @source       = @event.source_type
     @project      = @event.target
-    @push_data    = JSON.load(@event.data).to_hash
+    @push_data    = @event.data
     @tag          = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
@@ -77,7 +77,7 @@ class Emails::Project::Push < Emails::Project::Base
     @user         = @event.author
     @source       = @event.source_type
     @project      = @event.target
-    @push_data    = JSON.load(@event.data).to_hash
+    @push_data    = @event.data
     @tag          = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
@@ -99,7 +99,7 @@ class Emails::Project::Push < Emails::Project::Base
     @source       = @event.source_type
     @project      = @event.target
     @repository   = @project.repository
-    @push_data    = JSON.load(@event.data).to_hash
+    @push_data    = @event.data
 
     @branch = @push_data["ref"]
     @branch.slice!("refs/heads/")

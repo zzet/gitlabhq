@@ -394,8 +394,17 @@ class User < ActiveRecord::Base
   end
 
   def known_teams
-    @known_teams_ids ||= (personal_teams.pluck(:id) + owned_teams.pluck(:id) + master_teams.pluck(:id) + teams.pluck(:id) + Team.where(public: true).pluck(:id)).uniq
+    @known_teams_ids ||= (personal_teams.pluck(:id) + owned_teams.pluck(:id) +
+                          master_teams.pluck(:id) + teams.pluck(:id) +
+                          Team.where(public: true).pluck(:id)).uniq
+
     Team.where(id: @known_teams_ids)
+  end
+
+  def only_authorized_teams_ids
+    ids = personal_teams.pluck(:id) + owned_teams.pluck(:id) +
+        master_teams.pluck(:id) + teams.pluck(:id)
+    ids.uniq
   end
 
   # Team membership in authorized projects

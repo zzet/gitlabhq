@@ -110,6 +110,7 @@ class MergeRequest < ActiveRecord::Base
       from :update,   to: :reassigned, conditions: -> { @source.assignee_id_changed? && @changes['assignee_id'].first.present? && @changes['assignee_id'].last.present? }
       from :update,   to: :unassigned, conditions: -> { @source.assignee_id_changed? && @changes['assignee_id'].first.present? && @changes['assignee_id'].last.nil? }
       from :update,   to: :updated,    conditions: -> { @actions.count == 1 && [:title, :description, :branch_name].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
+      from :merge,    to: :merged
       from :close,    to: :closed
       from :reopen,   to: :reopened
       from :destroy,  to: :deleted
@@ -170,11 +171,11 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def merge_event
-    self.target_project.old_events.where(target_id: self.id, target_type: MergeRequest, action: OldEvent::MERGED).last
+    self.events.where(action: :merged).last
   end
 
   def closed_event
-    self.target_project.old_events.where(target_id: self.id, target_type: MergeRequest, action: OldEvent::CLOSED).last
+    self.events.where(action: :closed).last
   end
 
   def automerge!(current_user, commit_message = nil)

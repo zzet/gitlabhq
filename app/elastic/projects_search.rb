@@ -80,14 +80,14 @@ module ProjectsSearch
           namespaceFacet: {
             terms: {
               field: :namespace_id,
-              all_term: true,
+              all_terms: true,
               size: Namespace.count
             }
           },
           categoryFacet: {
             terms: {
               field: "categories.name",
-              all_term: true,
+              all_terms: true,
               size: Project.category_counts.count
             }
           }

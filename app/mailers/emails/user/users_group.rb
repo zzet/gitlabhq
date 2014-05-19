@@ -23,7 +23,7 @@ class Emails::User::UsersGroup < Emails::User::Base
     @upr                 = @event.source
     @group               = @upr.group
     @member              = @upr.user
-    data                 = JSON.load(@event.data)
+    data                 = @event.data
     @changes             = data["previous_changes"]
     unless @changes.blank?
       @previous_permission = Gitlab::Access.options_with_owner.key(@changes["group_access"].first)
@@ -42,7 +42,7 @@ class Emails::User::UsersGroup < Emails::User::Base
     @notification = notification
     @event        = @notification.event
     @user         = @event.author
-    @up           = JSON.load(@event.data)
+    @up           = @event.data
     @member       = @event.target
     @group        = Group.find_by_id(@up["group_id"])
     @member       = User.find_by_id(@up["user_id"]) if @member.nil? || @member.is_a?(UsersGroup)

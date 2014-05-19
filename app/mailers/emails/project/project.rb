@@ -18,7 +18,7 @@ class Emails::Project::Project < Emails::Project::Base
     @event        = @notification.event
     @user         = @event.author
     @project      = @event.source
-    @changes      = JSON.load(@event.data).to_hash["previous_changes"]
+    @changes      = @event.data["previous_changes"]
 
     headers 'X-Gitlab-Entity' => 'project',
             'X-Gitlab-Action' => 'updated',
@@ -31,7 +31,7 @@ class Emails::Project::Project < Emails::Project::Base
   def deleted_email(notification)
     @notification = notification
     @event        = @notification.event
-    data          = JSON.load(@event.data).to_hash
+    data          = @event.data
     @user         = @event.author
     @project      = data
     @namespace    = Namespace.find_by_id(@project["namespace_id"])
@@ -51,7 +51,7 @@ class Emails::Project::Project < Emails::Project::Base
     @event          = @notification.event
     @user           = @event.author
     @project        = @event.source
-    @owner_changes  = JSON.load(@event.data).to_hash["owner_changes"]["namespace_id"]
+    @owner_changes  = @event.data["owner_changes"]["namespace_id"]
     @old_owner      = Namespace.find(@owner_changes.first)
     @new_owner      = Namespace.find(@owner_changes.last)
 
