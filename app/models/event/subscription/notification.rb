@@ -15,6 +15,8 @@
 class Event::Subscription::Notification < ActiveRecord::Base
   attr_accessible :event_id, :event, :notification_state, :notified_at, :subscription_id, :subscriber, :subscriber_id
 
+  after_commit :async_send_notification, on: :create
+
   belongs_to :event
   belongs_to :subscriber,   class_name: User
   belongs_to :subscription, class_name: Event::Subscription
@@ -47,6 +49,15 @@ class Event::Subscription::Notification < ActiveRecord::Base
 
     event :failing do
       transition [:processing] => :failed
+    end
+  end
+
+  def async_send_notification
+    begin
+      unless notification_state == :delayed
+        Sidekiq::Client.enqueue_to(:mail_notifications, MailNotificationWorker, self.id)
+      end
+    rescue
     end
   end
 
