@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 describe 'SearchService' do
-  let(:user) { create(:user, namespace: found_namespace) }
-  let(:public_user) { create(:user, namespace: public_namespace) }
-  let(:internal_user) { create(:user, namespace: internal_namespace) }
+  let!(:user) { create(:user, namespace: found_namespace) }
+  let!(:public_user) { create(:user, namespace: public_namespace) }
+  let!(:internal_user) { create(:user, namespace: internal_namespace) }
 
-  let(:found_namespace) { create(:namespace, name: 'searchable namespace', path:'another_thing') }
-  let(:unfound_namespace) { create(:namespace, name: 'unfound namespace', path: 'yet_something_else') }
-  let(:internal_namespace) { create(:namespace, name: 'searchable internal namespace', path: 'something_internal') }
-  let(:public_namespace) { create(:namespace, name: 'searchable public namespace', path: 'something_public') }
+  let!(:found_namespace) { create(:namespace, name: 'searchable namespace', path:'another_thing') }
+  let!(:unfound_namespace) { create(:namespace, name: 'unfound namespace', path: 'yet_something_else') }
+  let!(:internal_namespace) { create(:namespace, name: 'searchable internal namespace', path: 'something_internal') }
+  let!(:public_namespace) { create(:namespace, name: 'searchable public namespace', path: 'something_public') }
 
   let!(:found_project) { create(:project, :private, name: 'searchable_project', creator_id: user.id, namespace: found_namespace) }
   let!(:unfound_project) { create(:project, :private, name: 'unfound_project', creator_id: user.id, namespace: unfound_namespace) }
@@ -18,33 +18,34 @@ describe 'SearchService' do
   describe '#execute' do
     context 'unauthenticated' do
       it 'should return public projects only' do
-        #sleep 1
         context = SearchService.new(nil, search: "searchable")
-        results = context.global_search
-        results[:projects].should have(1).items
-        results[:projects].should include(public_project)
+        projects = context.global_search[:projects][:results]
+        projects.should have(1).items
+        es_result_ids(projects).should include(public_project.id)
       end
     end
 
     context 'authenticated' do
       it 'should return public, internal and private projects' do
-        #sleep 1
         context = SearchService.new(user, search: "searchable")
-        results = context.global_search
-        results[:projects].should have(3).items
-        results[:projects].should include(public_project)
-        results[:projects].should include(found_project)
-        results[:projects].should include(internal_project)
+        projects = context.global_search[:projects][:results]
+        projects.should have(3).items
+        es_result_ids(projects).should include(public_project.id)
+        es_result_ids(projects).should include(found_project.id)
+        es_result_ids(projects).should include(internal_project.id)
       end
 
       it 'should return only public & internal projects' do
-        #sleep 1
         context = SearchService.new(internal_user, search: "searchable")
-        results = context.global_search
-        results[:projects].should have(2).items
-        results[:projects].should include(internal_project)
-        results[:projects].should include(public_project)
+        projects = context.global_search[:projects][:results]
+        projects.should have(2).items
+        es_result_ids(projects).should include(internal_project.id)
+        es_result_ids(projects).should include(public_project.id)
       end
     end
+  end
+
+  def es_result_ids(results)
+    results.map(&:_source).map(&:id)
   end
 end

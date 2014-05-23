@@ -35,7 +35,7 @@ class SearchService < BaseService
 
     opt[:category] = params[:category] if params[:category].present?
 
-    begin
+    safe_search do
       response = Project.search(query, options: opt, page: page)
 
       categories_list = if query.blank?
@@ -49,26 +49,28 @@ class SearchService < BaseService
                         end
 
       {
-        records: response.records,
-        results: response.results,
-        response: response.response,
-        total_count: response.total_count,
-        namespaces: response.response["facets"]["namespaceFacet"]["terms"].map {|term| { namespace: Namespace.find(term["term"]), count: term["count"] } },
-        categories: categories_list
+          records: response.records,
+          results: response.results,
+          response: response.response,
+          total_count: response.total_count,
+          namespaces: response.response["facets"]["namespaceFacet"]["terms"]
+            .select { |term| term["count"] > 0 }
+            .map do |term|
+              { namespace: Namespace.find(term["term"]), count: term["count"] }
+            end,
+          categories: categories_list
       }
-    rescue Exception => e
-      []
     end
   end
 
   def search_in_groups(query)
     opt = {
-      gids: current_user.authorized_groups.ids,
+      gids: current_user ? current_user.authorized_groups.ids : [],
       order: params[:order],
       fields: %w(name^10 path^5 description),
     }
 
-    begin
+    safe_search do
       response = Group.search(query, options: opt, page: page)
 
       {
@@ -77,19 +79,17 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue Exception => e
-      []
     end
   end
 
   def search_in_teams(query)
     opt = {
-      tids: current_user.known_teams.ids,
+      tids: current_user ? current_user.known_teams.ids : [],
       order: params[:order],
       fields: %w(name^10 path^5 description),
     }
 
-    begin
+    safe_search do
       response = Team.search(query, options: opt, page: page)
 
       {
@@ -98,8 +98,6 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue Exception => e
-      []
     end
   end
 
@@ -109,7 +107,7 @@ class SearchService < BaseService
       order: params[:order]
     }
 
-    begin
+    safe_search do
       response = User.search(query, options: opt, page: page)
 
       {
@@ -118,8 +116,6 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue Exception => e
-      []
     end
   end
 
@@ -129,7 +125,7 @@ class SearchService < BaseService
       order: params[:order]
     }
 
-    begin
+    safe_search do
       response = MergeRequest.search(query, options: opt, page: page)
 
       {
@@ -138,8 +134,6 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue Exception => e
-      []
     end
   end
 
@@ -149,7 +143,7 @@ class SearchService < BaseService
       order: params[:order]
     }
 
-    begin
+    safe_search do
       response = Issue.search(query, options: opt, page: page)
 
       {
@@ -158,8 +152,6 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
-    rescue Exception => e
-      []
     end
   end
 
@@ -171,13 +163,11 @@ class SearchService < BaseService
     }
     opt.merge!({ language: params[:language] }) if params[:language].present? && params[:language] != "All"
 
-    begin
+    safe_search do
       res = Repository.search(query, options: opt, page: page)
       res[:blobs][:projects]    = res[:blobs][:repositories].map   { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
       res[:commits][:projects]  = res[:commits][:repositories].map { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
       res
-    rescue Exception => e
-      []
     end
   end
 
@@ -226,6 +216,14 @@ class SearchService < BaseService
     known_projects_ids = []
     known_projects_ids += current_user.known_projects.pluck(:id) if current_user
     known_projects_ids += Project.public_or_internal_only(current_user).pluck(:id)
+  end
+
+  def safe_search
+    begin
+      yield
+    rescue Exception => e
+      Hash.new({})
+    end
   end
 
   def global_search_result
