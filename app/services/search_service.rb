@@ -189,8 +189,18 @@ class SearchService < BaseService
 
     begin
       res = Repository.search(query, options: opt, page: page)
-      res[:blobs][:projects]    = res[:blobs][:repositories].map   { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
-      res[:commits][:projects]  = res[:commits][:repositories].map { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
+
+      project_result_params = Proc.new do |r|
+        pr = Project.find(r["term"])
+        {
+            name: pr.name_with_namespace,
+            path: pr.path_with_namespace,
+            count: r["count"]
+        }
+      end
+
+      res[:blobs][:projects] = res[:blobs][:repositories].map(&project_result_params)
+      res[:commits][:projects] = res[:commits][:repositories].map(&project_result_params)
       res
     rescue Exception => e
       {}

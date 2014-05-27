@@ -7,7 +7,6 @@ class SearchController < ApplicationController
     if project
       return access_denied! unless can?(current_user, :download_code, project)
       @search_results = SearchService.new(current_user, params).project_search(project)
-      #@search_results = SearchService.new(current_user, params).project_search(@project)
     else
       @search_results = SearchService.new(current_user, params).global_search
     end
