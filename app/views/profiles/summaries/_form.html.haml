@@ -13,11 +13,13 @@
   = f.label :description, class: 'control-label'
   .col-sm-10
     = f.text_field :description, class: 'form-control'
-    %span.help-inline * required
 .form-group
   = f.label :period, class: 'control-label'
   .col-sm-10
-    = f.select :period, (Event::Summary.period.values - [@summary.period]).map {|period| [period.camelize, period]}, {include_blank: @summary.period }, { class: 'form-control'}
+    - if @summary.persisted?
+      = f.select :period, (Event::Summary.period.values - [@summary.period]).map { |period| [period.camelize, period] }, { include_blank: @summary.period }, { class: 'form-control' }
+    - else
+      = f.select :period, (Event::Summary.period.values).map { |period| [period.camelize, period] }, { include_blank: "Select period" }, { class: 'form-control' }
     %span.help-inline * required
 .form-group
   = f.label :state_event, class: 'control-label'
