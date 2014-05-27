@@ -4,6 +4,8 @@
     = render "project_results"
   - elsif @search_results[:repositories][:blobs][:results].any?
     = render "code_results"
+  - else
+    %h4 No matches found
 
 - when "project"
   = render "project_results"
