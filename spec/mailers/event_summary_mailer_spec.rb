@@ -26,7 +26,7 @@ describe EventSummaryMailer do
   def add_retry
     EVENTS_SUMMARY_PERIODS.each do |period, detail|
       Timecop.travel(detail[0]) do
-        Sidekiq::Client.enqueue_to(:default, detail[1])
+        Sidekiq::Client.enqueue_to(:mail_notifications, detail[1])
       end
     end
   end
