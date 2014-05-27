@@ -2,6 +2,7 @@
   %li{ class: "#{dom_class(relation)} js-toggle-container", id: dom_id(relation) }
     - group = relation.entity
     - available_options = Group.watched_titles
+    - source_descriptions = Group.watched_descriptions
     - options = relation.options.any? ? (Group.watched_sources & relation.options.map {|o| o.to_sym }) : Group.watched_sources
     .summary-entity-actions.pull-right
       = link_to "#", class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
@@ -15,8 +16,9 @@
       .edit-member.hide.js-toggle-content
         = form_for relation, url: profile_summary_group_path(summary, relation), method: :put do |f|
           - available_options.each do |key, val|
-            = f.check_box :options, { multiple: true, checked: (options.include?(key) || options.empty?) }, key
-            = val
+            %span.has_bottom_tooltip{"data-original-title" => source_descriptions[key] }
+              = f.check_box :options, { multiple: true, checked: (options.include?(key) || options.empty?) }, key
+              = val
             %br
           = f.submit 'Save', class: 'btn btn-save'
           %br
