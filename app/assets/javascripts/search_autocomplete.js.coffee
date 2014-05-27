@@ -10,7 +10,7 @@ class SearchAutocomplete
     $("#search").autocomplete
       source: (request, response) ->
         $.get("#{search_autocomplete_path}#{query}&term=#{request.term}", (items) ->
-          items.push({label: PROJECT}, {label: GLOBAL})
+          items.push({label: PROJECT}, {label: GLOBAL}) if project_id
           response(items)
         )
       minLength: 1
