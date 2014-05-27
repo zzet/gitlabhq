@@ -1,0 +1,5 @@
+- user         = event.author
+- snippet      = event.source
+- project      = event.target
+
+= raw "#{ link_to user.name, user.username } updated #{ link_to snippet.title, project_snippet_url(project.path_with_namespace, snippet) } snippet in #{ link_to project.path_with_namespace, project_url(project.path_with_namespace)} project."

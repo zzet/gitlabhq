@@ -1,0 +1,10 @@
+- event        = event
+- project      = target
+- branch       = data["ref"]
+- branch.slice!("refs/heads/")
+
+Branch
+%b= branch
+was deleted from
+= mailer_project_link(project)
+project repository

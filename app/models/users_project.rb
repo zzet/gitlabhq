@@ -17,7 +17,7 @@ class UsersProject < ActiveRecord::Base
   include Gitlab::Access
   include RelationTable
 
-  attr_accessible :user, :user_id, :project_access, :source_id, :source_type, :source
+  attr_accessible :user, :user_id, :project_id, :project_access, :source_id, :source_type, :source
   attr_accessor :skip_git
 
   belongs_to :user

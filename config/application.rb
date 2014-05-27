@@ -21,7 +21,6 @@ module Gitlab
     # Activate observers that should always be running.
     config.active_record.observers = :activity_observer,
                                      :event_observer,
-                                     :notification_observer,
                                      :milestone_observer,
                                      :project_activity_cache_observer,
                                      :issue_observer,

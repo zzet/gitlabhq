@@ -11,8 +11,6 @@
 #  title             :string(255)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  st_commits        :text
-#  st_diffs          :text
 #  milestone_id      :integer
 #  state             :string(255)
 #  merge_status      :string(255)
@@ -171,11 +169,11 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def merge_event
-    self.events.where(target_id: self.id, target_type: MergeRequest, action: :merged).last
+    self.events.where(action: :merged).last
   end
 
   def closed_event
-    self.events.where(target_id: self.id, target_type: MergeRequest, action: :closed).last
+    self.events.where(action: :closed).last
   end
 
   def automerge!(current_user, commit_message = nil)

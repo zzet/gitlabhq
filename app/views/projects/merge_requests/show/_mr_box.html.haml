@@ -24,13 +24,13 @@
     %cite.cgray
       = render partial: 'projects/merge_requests/show/context', locals: { merge_request: @merge_request }
 
-- if @merge_request.closed?
+- if @merge_request.closed? && @merge_request.closed_event.present?
   .alert.alert-info
     %span
       %i.icon-remove
       Closed by #{link_to_member(@project, @merge_request.closed_event.author)}
       #{time_ago_with_tooltip(@merge_request.closed_event.created_at)}
-- if @merge_request.merged?
+- if @merge_request.merged? && @merge_request.merge_event.present?
   .alert.alert-info
     %span
       %i.icon-ok

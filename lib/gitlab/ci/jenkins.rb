@@ -62,7 +62,11 @@ module Gitlab
     end
 
     def last_sha
-      commits.last
+      begin
+        return commits.last || build_result["actions"][3]["buildsByBranchName"]["detached"]["marked"]["branch"].first["SHA1"]
+      rescue
+        return nil
+      end
     end
 
     def commits

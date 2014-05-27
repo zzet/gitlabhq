@@ -1,0 +1,25 @@
+- note    = source
+-# Do not send system note notifications
+- unless data['system']
+  - project = target
+  - issue   = note.noteable || find_entity(Issue, data['noteable_id'])
+
+  = mailer_user_link(author)
+  write in issue
+  - if issue
+    - if issue.persisted?
+      - if note.for_diff_line?
+        = link_to issue.title, diffs_project_issue_url(issue.project, issue.iid, anchor: "note_#{note.id}")
+      - else
+        = link_to issue.title, project_issue_url(issue.project, issue.iid, anchor: "note_#{note.id}")
+    - else
+      %b= issue.title
+  - else
+    Issue id:
+    %b= data['noteable_id']
+  in
+  = mailer_project_link(project)
+  project note:
+  %br
+  = markdown(note.note)
+

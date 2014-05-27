@@ -53,6 +53,7 @@ RSpec.configure do |config|
   config.before(:suite) do
     TestEnv.init(observers: false, init_repos: true, repos: false)
   end
+
   config.before(:each) do
     TestEnv.setup_stubs
   end

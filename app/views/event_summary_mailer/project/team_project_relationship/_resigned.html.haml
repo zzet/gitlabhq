@@ -1,0 +1,12 @@
+- project      = target
+- team         = find_entity(Team, data['team_id'])
+
+= mailer_team_link(team)
+was
+%b
+  %i
+    resigned
+from
+= mailer_project_link(project)
+project by
+= mailer_user_link(author)

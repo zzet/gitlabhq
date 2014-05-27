@@ -13,6 +13,8 @@
 #  public_state       :string(255)
 #  active_state       :string(255)
 #  description        :text
+#  recipients         :text
+#  api_key            :string(255)
 #
 
 # To add new service you should build a class inherited from Service

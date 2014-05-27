@@ -1,0 +1,10 @@
+- event        = event
+- project      = target
+- tag          = data["ref"]
+- tag.slice!("refs/heads/")
+
+New tag
+%b= tag
+was pushed to
+= mailer_project_link(project)
+project repository

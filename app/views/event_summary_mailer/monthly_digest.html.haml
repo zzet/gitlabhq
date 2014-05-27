@@ -1,0 +1,11 @@
+%h1= @events_summary.title
+%p= @events_summary.description
+%p
+  Monthly digest with changes from
+  %span{ style: "color: #999; font-size: 12px; background-color: #eee; border-radius: 10px; padding: 5px;"}
+    = @events_summary.last_send_date.stamp('Aug 22, 2013')
+  to
+  %span{ style: "color: #999; font-size: 12px; background-color: #eee; border-radius: 10px; padding: 5px;"}
+    = @current_time.stamp('Aug 22, 2013')
+
+= render 'events'

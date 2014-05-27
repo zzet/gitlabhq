@@ -1,0 +1,37 @@
+- if source
+  - team  = source.team  || find_entity("Team", source.team_id)
+  - group = source.group || find_entity("Group", source.group_id)
+
+  = mailer_team_link(team)
+  team was
+  %b
+    %i
+      resigned
+  from
+  = mailer_group_link(group)
+  by
+  = mailer_user_link(author)
+
+  -#- if team && group
+    -#= link_to team.path, team_url(team.path)
+    -#team was resigned from
+    -#= link_to group.name, group_url(group.path)
+    -#group
+    -#by
+    -#= link_to author.name, user_url(author.username)
+  -#- else
+    -#Team was resigned from group.
+
+    -#Team id:
+    -#%b= source.team_id
+
+    -#Group id:
+    -#%b= source.group_id
+
+    -#Sorry, No more available information for correct render.
+
+    -#%br
+    -#Please, contact with Administrator.
+
+- else
+  Sorry, No available information for correct render.

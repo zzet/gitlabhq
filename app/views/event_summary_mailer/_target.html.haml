@@ -1,0 +1,11 @@
+- target = find_entity(target_type, target_id)
+
+- case target
+- when Project
+  = target.path_with_namespace
+- when Group
+  = target.name
+- when Team
+  = target.name
+- when User
+  = target.name

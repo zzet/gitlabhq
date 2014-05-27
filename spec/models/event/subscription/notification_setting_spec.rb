@@ -11,6 +11,7 @@
 #  brave                  :boolean
 #  subscribe_if_owner     :boolean          default(TRUE)
 #  subscribe_if_developer :boolean          default(TRUE)
+#  system_notifications   :boolean
 #
 
 require 'spec_helper'

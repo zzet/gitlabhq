@@ -42,7 +42,7 @@ class GroupsController < ApplicationController
     @events = @event_filter.apply_filter(@events) if (@event_filter.params - %w(team)).any?
     @events = @events.limit(20).offset(params[:offset] || 0).recent
 
-    @last_push = current_user.recent_push
+    @last_push = current_user.recent_push if current_user.present?
 
     @teams = @group.teams
     @projects = @group.projects.sorted_by_push_date

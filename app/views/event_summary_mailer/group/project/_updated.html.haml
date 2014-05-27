@@ -1,0 +1,17 @@
+- project      = source
+- changes      = data["previous_changes"]
+
+= mailer_project_link(project)
+project was
+%b
+  %i
+    updated
+%br
+%table
+  - changes.each do |key, values|
+    %tr
+      %th= key
+      %td= diff(values.last, values.first)
+%br
+by
+= mailer_user_link(author)

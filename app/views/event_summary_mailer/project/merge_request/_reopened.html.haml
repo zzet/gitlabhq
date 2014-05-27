@@ -1,0 +1,19 @@
+- merge_request = source
+- project       = target
+
+Merge Request
+= mailer_merge_request_link(merge_request)
+was
+%b
+  %i
+    reopened
+in
+= mailer_project_link(project)
+project by
+= mailer_user_link(author)
+
+%br
+%br
+Branches: #{merge_request.source_branch} &rarr; #{merge_request.target_branch}
+%br
+Assignee: #{merge_request.assignee.present? ? merge_request.assignee_name : "-"}

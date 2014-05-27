@@ -1,0 +1,22 @@
+- user         = event.author
+- team         = event.source
+- changes      = data["previous_changes"]
+
+= mailer_team_link(team)
+team was
+%b
+  %i
+    updated
+by
+= mailer_user_link(author)
+with changes:
+%br
+%table
+  - changes.each do |key, values|
+    %tr
+      %th= key
+      - if permission_key?(key.to_s)
+        %td= diff(UsersProject.access_roles.key(values.last), UsersProject.access_roles.key(values.first))
+      - else
+        %td= diff(values.last, values.first)
+%br

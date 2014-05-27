@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: pushes
+#
+#  id            :integer          not null, primary key
+#  ref           :string(255)
+#  revbefore     :string(255)
+#  revafter      :string(255)
+#  data          :text
+#  project_id    :integer
+#  user_id       :integer
+#  commits_count :integer
+#  created_at    :datetime
+#  updated_at    :datetime
+#
+
 class Push < ActiveRecord::Base
   include Watchable
 
