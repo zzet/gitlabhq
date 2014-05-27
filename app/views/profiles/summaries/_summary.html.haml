@@ -10,6 +10,7 @@
   .label{class: "label-#{summary.enabled? ? "success" : "primary"}"}
     = summary.state
 %br
+.light= summary.description
 %span.last-activity
   %span Last sended at:
   %span.date= summary.last_send_date.present? ? time_ago_with_tooltip(summary.last_send_date) : "Never"
