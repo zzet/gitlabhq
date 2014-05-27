@@ -17,24 +17,24 @@ class Profiles::SummariesController < Profiles::ApplicationController
   end
 
   def edit
-    @summary = Event::Summary.find(params[:id])
+    @summary = current_user.summaries.find(params[:id])
     @summary_entities = @summary.summary_entity_relationships.order(created_at: :asc).group_by(&:entity_type)
   end
 
   def show
-    @summary = Event::Summary.find(params[:id])
+    @summary = current_user.summaries.find(params[:id])
   end
 
   def destroy
-    @summary = Event::Summary.find(params[:id])
+    @summary = current_user.summaries.find(params[:id])
     @summary.destroy
     redirect_to profile_summaries_path
   end
 
   def update
-    @summary = Event::Summary.find(params[:id])
+    @summary = current_user.summaries.find(params[:id])
     @summary.update_attributes(params[:event_summary])
-    redirect_to profile_summaries_path
+    redirect_to edit_profile_summary_path(@summary)
   end
 
   def send_now
