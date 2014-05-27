@@ -2,6 +2,8 @@ class Summaries::DailyWorker
   include Sidekiq::Worker
   include Sidetiq::Schedulable
 
+  sidekiq_options queue: :mail_notifications
+
   recurrence { daily }
 
   def perform
