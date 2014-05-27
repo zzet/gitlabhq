@@ -1,6 +1,6 @@
 class Profiles::SummariesController < Profiles::ApplicationController
   def index
-    @summaries = Event::Summary.order(created_at: :asc)
+    @summaries = current_user.summaries.order(created_at: :asc)
   end
 
   def new
