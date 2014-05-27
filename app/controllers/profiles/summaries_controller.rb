@@ -38,7 +38,7 @@ class Profiles::SummariesController < Profiles::ApplicationController
   end
 
   def send_now
-    current_user.summaries.find_each do |summary|
+    current_user.summaries.find(params[:id]) do |summary|
       current_time = Time.zone.now
 
       subscriber = summary.user
