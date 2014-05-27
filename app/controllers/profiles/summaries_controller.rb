@@ -41,20 +41,14 @@ class Profiles::SummariesController < Profiles::ApplicationController
     summary = current_user.summaries.find(params[:id])
     current_time = Time.zone.now
 
-    subscriber = summary.user
-    settings = subscriber.notification_setting
+    events = summary.events_for(current_time)
 
-    if settings.present? && settings.brave
+    if events.any?
 
-      events = summary.events_for(current_time)
+      EventSummaryMailer.daily_digest(summary.user.id, events.map(&:id), summary.id, current_time).deliver!
 
-      if events.any?
-
-        EventSummaryMailer.daily_digest(summary.user.id, events.map(&:id), summary.id, current_time).deliver!
-
-        summary.last_send_date = current_time
-        summary.save
-      end
+      summary.last_send_date = current_time
+      summary.save
     end
 
     redirect_to profile_summaries_path
