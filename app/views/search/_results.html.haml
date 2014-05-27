@@ -1,6 +1,6 @@
 - case params[:type]
 - when NilClass
-  - if @search_results[:projects][:records].any?
+  - if @search_results[:projects][:records].present?
     = render "project_results"
   - elsif @search_results[:repositories][:blobs][:results].any?
     = render "code_results"
