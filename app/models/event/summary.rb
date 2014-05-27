@@ -49,17 +49,17 @@ class Event::Summary < ActiveRecord::Base
 
   scope :current_daily, -> {
     date = Time.zone.now - 1.day
-    where(period: :daily).where('last_send_date <= ?', date)
+    where(period: :daily).where('last_send_date IS NULL OR last_send_date <= ?', date)
   }
 
   scope :current_weekly, -> {
     date = Time.zone.now - 1.week
-    where(period: :weekly).where('last_send_date <= ?', date)
+    where(period: :weekly).where('last_send_date IS NULL OR last_send_date <= ?', date)
   }
 
   scope :current_monthly, -> {
     date = Time.zone.now - 1.month
-    where(period: :monthly).where('last_send_date <= ?', date)
+    where(period: :monthly).where('last_send_date IS NULL OR last_send_date <= ?', date)
   }
 
   scope :by_subscription, ->(subscription) {
