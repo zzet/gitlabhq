@@ -14,7 +14,7 @@ class Profiles::Summaries::UsersController < Profiles::Summaries::ApplicationCon
     relation = summary.summary_entity_relationships.find(params[:id])
     options = begin
                 params[:event_summary_entity_relationship][:options].keep_if do |option|
-                  Project.watched_sources.include?(option.to_sym)
+                  User.watched_sources.include?(option.to_sym)
                 end
               rescue
                 []
