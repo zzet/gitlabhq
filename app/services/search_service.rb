@@ -57,7 +57,10 @@ class SearchService < BaseService
       namespace_terms = response.response["facets"]["namespaceFacet"]["terms"].
           map{ |term| term['term'] }
       namespaces = Namespace.where(id: namespace_terms)
-      grouped_namespaces = namespaces.to_a.group_by(&:id)
+      grouped_namespaces = namespaces.to_a.inject({}) do |memo, namespace|
+        memo[namespace.id] = namespace
+        memo
+      end
 
       {
         records: response.records,

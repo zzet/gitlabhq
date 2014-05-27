@@ -2,55 +2,55 @@
   - if @search_results[:projects].present?
     - if @search_results[:projects][:total_count] > 0
       %li{class: "#{'active' if params[:type].blank? || params[:type] == "project"}"}
-        = link_to search_path(type: :project, search: params[:search]) do
+        = link_to search_path_with_project(:project, params) do
           Projects
           %small.pull-right= @search_results[:projects][:total_count]
 
   - if @search_results[:groups].present?
     - if @search_results[:groups][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "group"}"}
-        = link_to search_path(type: :group, search: params[:search]) do
+        = link_to search_path_with_project(:group, params) do
           Groups
           %small.pull-right= @search_results[:groups][:total_count]
 
   - if @search_results[:teams].present?
     - if @search_results[:teams][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "team"}"}
-        = link_to search_path(type: :team, search: params[:search]) do
+        = link_to search_path_with_project(:team, params) do
           Teams
           %small.pull-right= @search_results[:teams][:total_count]
 
   - if @search_results[:merge_requests].present?
     - if @search_results[:merge_requests][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "merge_request"}"}
-        = link_to search_path(type: :merge_request, search: params[:search]) do
+        = link_to search_path_with_project(:merge_request, params) do
           Merge Requests
           %small.pull-right= @search_results[:merge_requests][:total_count]
 
   - if @search_results[:issues].present?
     - if @search_results[:issues][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "issue"}"}
-        = link_to search_path(type: :issue, search: params[:search]) do
+        = link_to search_path_with_project(:issue, params) do
           Issues
           %small.pull-right= @search_results[:issues][:total_count]
 
   - if @search_results[:repositories].present?
     - if @search_results[:repositories][:blobs][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "code" || (params[:type].blank? && @search_results[:projects][:records].blank?)}"}
-        = link_to search_path(type: "code", search: params[:search]) do
+        = link_to search_path_with_project('code', params) do
           Code
           %small.pull-right= @search_results[:repositories][:blobs][:total_count]
 
     - if @search_results[:repositories][:commits][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "commits"}"}
-        = link_to search_path(type: :commits, search: params[:search]) do
+        = link_to search_path_with_project(:commits, params) do
           Commits
           %small.pull-right= @search_results[:repositories][:commits][:total_count]
 
   - if @search_results[:users].present?
     - if @search_results[:users][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "user"}"}
-        = link_to search_path(type: :user, search: params[:search]) do
+        = link_to search_path_with_project(:user, params) do
           Users
           %small.pull-right= @search_results[:users][:total_count]
 
