@@ -45,7 +45,14 @@ class Profiles::SummariesController < Profiles::ApplicationController
 
     if events.any?
 
-      EventSummaryMailer.daily_digest(summary.user.id, events.map(&:id), summary.id, current_time).deliver!
+      case summary.period.to_sym
+      when :daily
+        EventSummaryMailer.daily_digest(summary.user.id, events.map(&:id), summary.id, current_time).deliver!
+      when :weekly
+        EventSummaryMailer.weekly_digest(summary.user.id, events.map(&:id), summary.id, current_time).deliver!
+      when :monthly
+        EventSummaryMailer.monthly_digest(summary.user.id, events.map(&:id), summary.id, current_time).deliver!
+      end
 
       summary.last_send_date = current_time
       summary.save
