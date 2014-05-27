@@ -1,42 +1,42 @@
 %ul.nav.nav-pills.nav-stacked
-  - if @search_results[:projects].any?
+  - if @search_results[:projects].present?
     - if @search_results[:projects][:total_count] > 0
       %li{class: "#{'active' if params[:type].blank? || params[:type] == "project"}"}
         = link_to search_path(type: :project, search: params[:search]) do
           Projects
           %small.pull-right= @search_results[:projects][:total_count]
 
-  - if @search_results[:groups].any?
+  - if @search_results[:groups].present?
     - if @search_results[:groups][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "group"}"}
         = link_to search_path(type: :group, search: params[:search]) do
           Groups
           %small.pull-right= @search_results[:groups][:total_count]
 
-  - if @search_results[:teams].any?
+  - if @search_results[:teams].present?
     - if @search_results[:teams][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "team"}"}
         = link_to search_path(type: :team, search: params[:search]) do
           Teams
           %small.pull-right= @search_results[:teams][:total_count]
 
-  - if @search_results[:merge_requests].any?
+  - if @search_results[:merge_requests].present?
     - if @search_results[:merge_requests][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "merge_request"}"}
         = link_to search_path(type: :merge_request, search: params[:search]) do
           Merge Requests
           %small.pull-right= @search_results[:merge_requests][:total_count]
 
-  - if @search_results[:issues].any?
+  - if @search_results[:issues].present?
     - if @search_results[:issues][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "issue"}"}
         = link_to search_path(type: :issue, search: params[:search]) do
           Issues
           %small.pull-right= @search_results[:issues][:total_count]
 
-  - if @search_results[:repositories].any?
+  - if @search_results[:repositories].present?
     - if @search_results[:repositories][:blobs][:total_count] > 0
-      %li{class: "#{'active' if params[:type] == "code" || (params[:type].blank? && @search_results[:projects][:records].empty?)}"}
+      %li{class: "#{'active' if params[:type] == "code" || (params[:type].blank? && @search_results[:projects][:records].blank?)}"}
         = link_to search_path(type: "code", search: params[:search]) do
           Code
           %small.pull-right= @search_results[:repositories][:blobs][:total_count]
@@ -47,7 +47,7 @@
           Commits
           %small.pull-right= @search_results[:repositories][:commits][:total_count]
 
-  - if @search_results[:users].any?
+  - if @search_results[:users].present?
     - if @search_results[:users][:total_count] > 0
       %li{class: "#{'active' if params[:type] == "user"}"}
         = link_to search_path(type: :user, search: params[:search]) do
@@ -56,6 +56,6 @@
 
   %hr
 
-- if @search_results[:repositories].any?
+- if @search_results[:repositories].present?
   - if @search_results[:repositories][:blobs][:total_count] > 0 && params[:type] == "code"
     = render "search/facets/repository/language", languages: @search_results[:repositories][:blobs][:languages]
