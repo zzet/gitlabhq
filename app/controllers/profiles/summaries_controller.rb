@@ -9,7 +9,6 @@ class Profiles::SummariesController < Profiles::ApplicationController
 
   def create
     @summary = current_user.summaries.new(params[:event_summary])
-    binding.pry
     if @summary.save
       redirect_to profile_summaries_path
     else
