@@ -1,4 +1,5 @@
 - file = blob["_source"]["blob"]
+
 - project = Project.find_by(id: file["rid"])
 - if project
   .blob-result
@@ -10,22 +11,11 @@
             = file["path"]
           .pull-right= project.name_with_namespace
       .file-content.code.term
-        -#- lines = file["content"].split("\n")
         - content_lines = []
         %div.highlighted-data{class: user_color_scheme_class}
           .line-numbers
             - blob["highlight"]["blob.content"].each do |content|
-              -#- counter = 0
               - content_lines = content.split("\n")
-              -#- first_line = content_lines[0].blank? ? content_lines[1] : content_lines[0]
-              -#- lines.each_with_index do |line, i|
-                -#- if line != first_line
-                  -#- next
-                -#- if counter < (content_lines.count - 2)
-                  -#- countr =+ 1
-                  -#= link_to "#L#{i}", id: "L#{i}", rel: "#L#{i}" do
-                    -#%i.icon-link
-                    -#= i
           .highlight
             %pre
               %code

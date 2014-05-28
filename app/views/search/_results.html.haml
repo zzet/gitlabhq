@@ -30,7 +30,3 @@
 
 - when "commits"
   = render "commits_results"
-
-- if params[:search].present?
-  :javascript
-    $(".search_results .term").highlight("#{escape_javascript(params[:search])}");
