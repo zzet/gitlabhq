@@ -1,0 +1,33 @@
+-#:css
+  -#pre {border: none;}
+  -#td.new pre span {background-color: #AFA;}
+  -#td.old pre span {background-color: #FAA;}
+
+%table{style: "margin:0px;padding:0px;width:100%;font-size:12px;"}
+  %tr
+    %th{style: "max-width:35px;width:35px;"}
+    %th{style: "max-width:35px;width:35px;"}
+    %th{style: "width:*"}
+  - diff.each_hunk do |hunk|
+    - hunk.each_line do |line|
+      %tr
+        - if line.context?
+          %td= "..."
+          %td= "..."
+          %td{style: "background:#fafafa"}
+            %pre{style: "margin:0;"}
+              :preserve
+                #{html_escape(line.content.force_encoding('UTF-8'))}
+        - else
+          %td= raw(line.addition? ? "&nbsp;" : line.old_lineno)
+          %td= raw(line.deletion? ? "&nbsp;" : line.new_lineno)
+          - if line.addition?
+            %td.new{style: "background:#CFD;"}
+              %pre{style: "margin:0;"}
+                :preserve
+                  #{html_escape(line.content.force_encoding('UTF-8'))}
+          - elsif line.deletion?
+            %td.old{style: "background:#FDD;"}
+              %pre{style: "margin:0;"}
+                :preserve
+                  #{html_escape(line.content.force_encoding('UTF-8'))}
