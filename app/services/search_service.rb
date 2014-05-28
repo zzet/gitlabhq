@@ -185,7 +185,10 @@ class SearchService < BaseService
       highlight: true,
       order: params[:order]
     }
-    opt.merge!({ language: params[:language] }) if params[:language].present? && params[:language] != "All"
+
+    if params[:language].present? && params[:language] != 'All'
+      opt.merge!({ language: params[:language] })
+    end
 
     begin
       res = Repository.search(query, options: opt, page: page)
