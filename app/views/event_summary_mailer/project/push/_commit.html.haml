@@ -1,0 +1,14 @@
+- color = commit_counter.odd? ? '#efefef' : '#f7f7f7'
+%tr{style: "background: #{color}"}
+  %td
+    = link_to commit.oid[0..10], project_commit_url(@project.path_with_namespace, commit.oid)
+  %td
+    %div{style: "word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;"}
+      = raw @project.repository.branch_names_contains(commit.oid).each {|br| "#{ link_to br, project_commits_url(@project.path_with_namespace, br) }" }.join(", ")
+  %td{title: commit.message.truncate(100)}
+    %div{style: "word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;"}
+      = simple_format(commit.message)
+  %td
+    = commit.committer[:time].strftime("%Y-%d-%m %H:%M:%S")
+  %td
+    = commit.author[:name] #commit_author_link(commit, avatar: false, type: :url, size: 24)
