@@ -5,3 +5,5 @@ deleted
 = link_to_or_deleted(user, 'user')
 from
 = link_to_or_deleted(project, 'project')
+by
+= link_to event.author.name, user_path(event.author.username)
