@@ -1,0 +1,38 @@
+- if target.persisted?
+  - @project      = target
+  - @repository   = @project.repository
+  - @push_data    = data
+
+  - @branch = @push_data["ref"]
+  - @branch.slice!("refs/heads/")
+
+  - diff_data = load_diff_data(@push_data['revbefore'], @push_data['revafter'], @branch, @project, author)
+
+  - @before_commit = diff_data[:before_commit]
+  - @after_commit  = diff_data[:after_commit]
+  - @commits       = diff_data[:commits]
+  - @commit        = diff_data[:commit]
+  - @diffs         = diff_data[:diffs]
+  - @refs_are_same = diff_data[:same]
+  - @suppress_diff = diff_data[:suppress_diff]
+
+  Pushed by
+  = link_to author.name, user_url(author.username)
+  to
+  = link_to @branch, project_tree_url(@project.path_with_namespace, @branch)
+  branch at
+  = event.created_at
+  %br
+  Parent commit:
+  = link_to project_commit_url(@project, @before_commit.oid) do
+    = "(#{@before_commit.oid[0..10]})"
+    = simple_format(@before_commit.message)
+  %br
+  = link_to 'Compare it', project_compare_url(event.target, from: @before_commit.oid, to: @after_commit.oid)
+  %br
+
+  - if @commits.present?
+    %br
+    = render "event_summary_mailer/project/push/commits"
+- else
+  Sorry, repository was removed. We can't send summary diff.

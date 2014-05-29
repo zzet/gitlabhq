@@ -1,0 +1,13 @@
+- group  = target
+- member = find_entity(User, source.user_id)
+- group  = find_entity(Group, source.group_id) if group.nil? || group.is_a?(UsersGroup)
+
+= mailer_user_link(member)
+was
+%b
+  %i
+    removed
+from
+= mailer_group_link(group)
+group of projects by
+= mailer_user_link(author)

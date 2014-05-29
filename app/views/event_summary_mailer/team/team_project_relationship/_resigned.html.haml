@@ -1,0 +1,36 @@
+- if source
+  - team    = source.team    || find_entity("Team", source.team_id)
+  - project = source.project || find_entity("Project", source.project_id)
+
+  = mailer_team_link(team)
+  team was
+  %b
+    %i
+      resigned
+  from
+  = mailer_project_link(project)
+  by
+  = mailer_user_link(author)
+
+  -#- if team && project
+    -#= link_to team.path, team_url(team.path)
+    -#team was resigned from
+    -#= link_to project.name_with_namespace, project_url(project.path_with_namespace)
+    -#project
+    -#by
+    -#= link_to author.name, user_url(author.username)
+  -#- else
+    -#Team was resigned from project.
+
+    -#Team id:
+    -#%b= source.team_id
+
+    -#Project id:
+    -#%b= source.project_id
+
+    -#Sorry, No more available information for correct render.
+    -#%br
+    -#Please, contact with Administrator.
+
+- else
+  Sorry, No available information for correct render.

@@ -1,5 +1,7 @@
 - team = Team.find_by(id: event.data['team_id'])
 
 %span.event_label{class: event.action}
-  left
+  was removed from
   = link_to_or_deleted(team, 'team')
+  by
+  = link_to event.author.name, user_path(event.author.username)

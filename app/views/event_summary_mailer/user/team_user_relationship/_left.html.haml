@@ -1,0 +1,32 @@
+- member  = target
+- team    = find_entity(Team, data["team_id"])
+- member  = find_entity(User, data["user_id"]) if member.nil? || member.is_a?(TeamUserRelationship)
+
+= mailer_user_link(member)
+was
+%b
+  %i
+    removed
+from
+= mailer_team_link(team)
+team by
+= mailer_user_link(author)
+
+-#- if team && member
+  -#= link_to member.name, user_url(member.username)
+  -#was removed from
+  -#= link_to team.name, team_url(team.path)
+  -#team by
+  -#= link_to author.name, user_url(author.username)
+-#- else
+  -#User permission was updated in team.
+
+  -#Team id:
+  -#%b= source.team_id
+
+  -#User id:
+  -#%b= source.user_id
+
+  -#Sorry, No more available information for correct render.
+  -#%br
+  -#Please, contact with Administrator.

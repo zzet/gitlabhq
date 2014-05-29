@@ -1,0 +1,25 @@
+- project = target
+- project_hook = source
+
+From
+= mailer_project_link(project)
+was
+%b
+  %i
+    removed
+project hook:
+%br
+%b Url:
+= project_hook.url
+%br
+%b On push event:
+= project_hook.push_events
+%br
+%b On merge request event:
+= project_hook.merge_requests_events
+%br
+%b On issue event:
+= project_hook.issues_events
+%br
+%b On tag event:
+= project_hook.tag_push_events

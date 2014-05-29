@@ -94,7 +94,7 @@ gem "redcarpet",     "~> 2.2.2"
 gem "github-markup", "~> 0.7.4", require: 'github/markup', git: 'https://github.com/gitlabhq/markup.git', ref: '61ade389c1e1c159359338f570d18464a44ddbc4' 
 
 # Diffs
-gem 'diffy'
+gem "diffy"
 
 # Asciidoc to HTML
 gem "asciidoctor"
@@ -122,6 +122,7 @@ gem "acts-as-taggable-on"
 gem 'slim'
 gem 'sinatra', require: nil
 gem 'sidekiq', '~> 3.0.1'
+gem 'sidetiq', github: 'tobiassvn/sidetiq'
 
 # HTTP requests
 gem "httparty"
@@ -276,6 +277,7 @@ group :test do
   gem "shoulda-matchers", "~> 2.1.0"
   gem 'email_spec'
   gem "webmock"
+  gem 'timecop'
   gem 'test_after_commit'
 end
 

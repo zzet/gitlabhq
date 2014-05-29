@@ -1,0 +1,13 @@
+- web_hook     = event.data
+- user         = event.author
+- project      = event.target
+
+= raw "#{ link_to user.name, user_url(user.username)} deleted web hook from project:"
+%br
+%table
+  %tr
+    %td Name
+    %td= project.name
+  %tr
+    %td Description
+    %td= project.description

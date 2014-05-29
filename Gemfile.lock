@@ -23,6 +23,15 @@ GIT
     rugged (0.19.0)
 
 GIT
+  remote: git://github.com/tobiassvn/sidetiq.git
+  revision: 4f7d7daea3873443b17bf2f3da61619532bbeba2
+  specs:
+    sidetiq (0.5.0)
+      celluloid (>= 0.14.1)
+      ice_cube (~> 0.11.0)
+      sidekiq (>= 2.16.0)
+
+GIT
   remote: git://github.com/zzet/elasticsearch-git.git
   revision: c861d5d98c7bf44d82e148a091e438f1c9d5f9ab
   ref: c861d5d98c7bf44d82e148a091e438f1c9d5f9ab
@@ -339,6 +348,7 @@ GEM
       multi_xml (>= 0.5.2)
     httpauth (0.2.0)
     i18n (0.6.9)
+    ice_cube (0.11.3)
     ice_nine (0.10.0)
     jasmine (2.0.0.rc5)
       jasmine-core (~> 2.0.0.rc5)
@@ -500,7 +510,7 @@ GEM
       react-source (= 0.8.0)
     react-source (0.8.0)
     redcarpet (2.2.2)
-    redis (3.0.6)
+    redis (3.0.7)
     redis-actionpack (4.0.0)
       actionpack (~> 4)
       redis-rack (~> 1.5.0)
@@ -624,6 +634,7 @@ GEM
     thread_safe (0.1.3)
       atomic
     tilt (1.4.1)
+    timecop (0.6.3)
     timers (1.1.0)
     tinder (1.9.3)
       eventmachine (~> 1.0)
@@ -786,6 +797,7 @@ DEPENDENCIES
   settingslogic
   shoulda-matchers (~> 2.1.0)
   sidekiq (~> 3.0.1)
+  sidetiq!
   simplecov
   simplecov-vim
   sinatra
@@ -801,6 +813,7 @@ DEPENDENCIES
   test_after_commit
   therubyracer
   thin (~> 1.6.2)
+  timecop
   tinder (~> 1.9.2)
   turbolinks
   uglifier

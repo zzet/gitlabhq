@@ -3,7 +3,7 @@
 # Table name: broadcast_messages
 #
 #  id         :integer          not null, primary key
-#  message    :text             default(""), not null
+#  message    :text             not null
 #  starts_at  :datetime
 #  ends_at    :datetime
 #  alert_type :integer

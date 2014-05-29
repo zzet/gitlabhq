@@ -139,11 +139,11 @@ class Team < ActiveRecord::Base
     begin
       case entity
       when User
-        team_user_relationships.find_by_user_id(entity).team_access
+        team_user_relationships.find_by(user_id: entity).team_access
       when Project
-        team_project_relationships.find_by_project_id(entity).greatest_access
+        team_project_relationships.find_by(project_id: entity).greatest_access
       when Group
-        team_group_relationships.find_by_group_id(entity).greatest_access
+        team_group_relationships.find_by(group_id: entity).greatest_access
       end
     rescue
       0
@@ -154,11 +154,11 @@ class Team < ActiveRecord::Base
     begin
       case entity
       when User
-        team_user_relationships.find_by_user_id(entity).human_access
+        team_user_relationships.find_by(user_id: entity).human_access
       when Project
-        team_project_relationships.find_by_project_id(entity).human_access
+        team_project_relationships.find_by(project_id: entity).human_access
       when Group
-        team_group_relationships.find_by_group_id(entity).human_access
+        team_group_relationships.find_by(group_id: entity).human_access
       else
         "None"
       end

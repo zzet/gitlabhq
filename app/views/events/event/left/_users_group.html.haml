@@ -1,5 +1,8 @@
 - group = Group.find_by(id: event.data['group_id'])
 
 %span.event_label{class: event.action}
-  left
+  = event.author_id == event.data['user_id'] ? "left" : "was removed from"
   = link_to_or_deleted(group, 'group')
+  - if event.author_id != event.data['user_id']
+    by
+    = link_to event.author.name, user_path(event.author.username)
