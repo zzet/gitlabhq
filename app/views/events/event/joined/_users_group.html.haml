@@ -1,5 +1,6 @@
 - group = Group.find_by(id: event.data['group_id'])
-
 %span.event_label{class: event.action}
-  joined to
+  added to
   = link_to_or_deleted(group, 'group')
+  by
+  = link_to event.author.name, user_url(event.author.username)
