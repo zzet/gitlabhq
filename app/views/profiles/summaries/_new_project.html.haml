@@ -1,0 +1,8 @@
+= form_for relation, url: profile_summary_projects_path(summary), html: { class: 'form-horizontal'} do |f|
+  %p 1. Choose projects you want add to the summary
+  .form-group
+    = f.label :project_ids, "Projects", class: 'control-label'
+    .col-sm-10= projects_select_tag(:project_ids, multiple: true, class: 'input-large input-clamp')
+
+  .form-actions
+    = f.submit 'Add selected projects', class: "btn btn-create"

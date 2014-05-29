@@ -1,0 +1,26 @@
+.ui-box.col-md-4.no_padding
+  .title
+    %strong Daily digests
+    (#{ @summaries.daily.count })
+  %ul.well-list
+    - @summaries.daily.find_each do |summary|
+      %li{id: "daily-summary-#{summary.id}"}
+        = render 'summary', summary: summary, period: 1.day
+
+.ui-box.col-md-4.no_padding
+  .title
+    %strong Weekly digests
+    (#{ @summaries.weekly.count })
+  %ul.well-list
+    - @summaries.weekly.find_each do |summary|
+      %li{id: "weekly-summary-#{summary.id}"}
+        = render 'summary', summary: summary, period: 1.week
+
+.ui-box.col-md-4.no_padding
+  .title
+    %strong Monthly digests
+    (#{ @summaries.monthly.count })
+  %ul.well-list
+    - @summaries.monthly.find_each do |summary|
+      %li{id: "monthly-summary-#{summary.id}"}
+        = render 'summary', summary: summary, period: 1.month

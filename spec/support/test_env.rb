@@ -103,6 +103,7 @@ module TestEnv
     MergeRequest.any_instance.stub(
       check_if_can_be_merged: true
     )
+
     Repository.any_instance.stub(
       size: 12.45
     )

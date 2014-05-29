@@ -1,0 +1,18 @@
+- project  = target
+- project  = source.project if project.is_a?(UsersProject)
+- member   = (source.present? ? source.user : find_entity(User, data["user_id"]))
+
+= mailer_user_link(member)
+was
+%b
+  %i
+    added
+to
+= mailer_project_link(project)
+project team of
+- if project.users_projects.where(user_id: member).first
+  with
+  = project.users_projects.where(user_id: member).first.human_access
+  permision
+by
+= mailer_user_link(author)

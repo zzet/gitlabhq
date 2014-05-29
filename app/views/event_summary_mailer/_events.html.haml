@@ -1,0 +1,61 @@
+%dl
+  - @events.group_by(&:target_type).each do |target_type, events_by_target_type|
+    %dt
+      = "#{ target_type.pluralize } (#{ events_by_target_type.count }):"
+      %ul
+      - events_by_target_type.group_by(&:target_id).each do |target_id, events_by_target|
+        %li
+          %a(href="##{target_id}")
+            = render 'target', target_type: target_type, target_id: target_id, last_event: events_by_target.last
+          = "(#{ pluralize(events_by_target.count, "event") })"
+          %ul
+            - events_by_target.group_by(&:source_type).each do |source_type, events_by_source_type|
+              %li
+                = link_to "##{target_id}_#{source_type}" do
+                  = mailer_source_type_human(source_type)
+                = "(#{ pluralize(events_by_source_type.count, "event") })"
+      %br
+
+- @events.group_by(&:target_type).each do |target_type, events_by_target_type|
+  %h2= "#{target_type.pluralize} events"
+
+  - events_by_target_type.group_by(&:target_id).each do |target_id, events_by_target|
+
+    %a(name="#{target_id}")
+    %h3= render 'target', target_type: target_type, target_id: target_id
+
+    - events_by_target.group_by(&:source_type).each do |source_type, events_by_source_type|
+
+      %a(name="#{target_id}_#{source_type}")
+      %h4= "#{mailer_source_type_human(source_type)} events"
+
+      %dl
+        - if source_type == "Push"
+          = render "push_events", events_by_source_type: events_by_source_type
+        - else
+          - events_by_source_type.group_by(&:source_id).each do |source_id, events_by_source|
+            - events_by_source.each do |event|
+              - if event.source_type == "Note" && event.data['system']
+                -# Skip system notes
+              - else
+                - if template_exists?(template_name(event))
+                  - begin
+                    %dd
+                      %table
+                        %tr
+                          %td{ style: "width:180px"}
+                            %span{ style: "color:#999;font-size:12px;background-color:#eee;"}
+                              = event.created_at
+                            &rarr;
+                          %td
+                            = render template_name(event), template_arguments(event)
+                  - rescue Exception => e
+                    %dd
+                      Relation deleted
+                      %br
+                      = e.message
+                      %br
+                      = raw e.backtrace.join("<br />")
+                - else
+                  %dd= render 'default', data: template_arguments(event)
+                %hr

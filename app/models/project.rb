@@ -19,10 +19,13 @@
 #  snippets_enabled       :boolean          default(TRUE), not null
 #  git_protocol_enabled   :boolean
 #  last_activity_at       :datetime
-#  imported               :boolean          default(FALSE), not null
 #  last_pushed_at         :datetime
 #  import_url             :string(255)
 #  visibility_level       :integer          default(0), not null
+#  archived               :boolean          default(FALSE), not null
+#  wiki_engine            :string(255)
+#  wiki_external_id       :string(255)
+#  import_status          :string(255)
 #
 
 class Project < ActiveRecord::Base

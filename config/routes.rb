@@ -2,6 +2,14 @@ require 'sidekiq/web'
 require 'api/api'
 
 Gitlab::Application.routes.draw do
+  get "users/create"
+  get "users/destroy"
+  get "teams/create"
+  get "teams/destroy"
+  get "groups/create"
+  get "groups/destroy"
+  get "projects/create"
+  get "projects/destroy"
   #
   # Search
   #
@@ -151,8 +159,19 @@ Gitlab::Application.routes.draw do
 
     scope module: :profiles do
       resources :subscriptions
+      resources :summaries do
+        member do
+          get :send_now
+        end
+        scope module: :summaries do
+          resources :projects, only: [:create, :update, :destroy]
+          resources :groups, only: [:create, :update, :destroy]
+          resources :teams, only: [:create, :update, :destroy]
+          resources :users, only: [:create, :update, :destroy]
+        end
+      end
       resources :tokens,  only: [:index, :destroy]
-      resources  :auto_subscriptions, only: [:create, :destroy]
+      resources :auto_subscriptions, only: [:create, :destroy]
       resource :notification_settings, only: [:update]
     end
 

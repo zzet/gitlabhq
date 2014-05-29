@@ -4,7 +4,7 @@ class Gitlab::Event::Builder
       meta = Gitlab::Event::Action.parse(event_action)
 
       @source  = data[:source]
-      @actions      = []
+      @actions = []
       @changes = (meta[:action] == :update ? @source.changes : nil)
 
       source_class = @source.class

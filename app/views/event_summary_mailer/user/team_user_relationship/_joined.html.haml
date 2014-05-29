@@ -1,0 +1,39 @@
+- if source
+  - team   = source.team || find_entity(Team, source.team_id)
+  - member = source.user || find_entity(User, source.user.id)
+
+  = mailer_user_link(member)
+  was
+  %b
+    %i
+      added
+  to
+  = mailer_team_link(team)
+  team with
+  %b= Gitlab::Access.options.key(data["team_access"])
+  permission by
+  = mailer_user_link(author)
+
+  -#- if team && member
+    -#= link_to member.name, user_url(member.username)
+    -#was added to
+    -#= link_to team.path, team_url(team.path)
+    -#team with
+    -#%b= Gitlab::Access.options.key(data["team_access"])
+    -#permission by
+    -#= link_to author.name, user_url(author.username)
+  -#- else
+    -#User was added to team.
+
+    -#Team id:
+    -#%b= source.team_id
+
+    -#User id:
+    -#%b= source.user_id
+
+    -#Sorry, No more available information for correct render.
+    -#%br
+    -#Please, contact with Administrator.
+
+- else
+  Sorry, No available information for correct render.
