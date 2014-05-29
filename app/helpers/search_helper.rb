@@ -69,7 +69,10 @@ module SearchHelper
   end
 
   def file_names_autocomplete(term, project, limit = 5)
-    Repository.search_file_names(term, per: limit).results.map do |file_name|
+    options = {repository_id: project.try(:id)}
+    response = Repository.search_file_names(term, per: limit, options: options)
+
+    response.results.map do |file_name|
       {
         label: file_name.fields['blob.path'],
         url: project_blob_path(project, ['master', file_name.fields['blob.path']].join('/'))
