@@ -35,8 +35,6 @@
         - else
           - events_by_source_type.group_by(&:source_id).each do |source_id, events_by_source|
             - events_by_source.each do |event|
-              -#%hr
-              -#%i render #{template_name(event)}
               - if event.source_type == "Note" && event.data['system']
                 -# Skip system notes
               - else
@@ -45,8 +43,8 @@
                     %dd
                       %table
                         %tr
-                          %td{ style: "width: 180px"}
-                            %span{ style: "color: #999; font-size: 12px; background-color: #eee; border-radius: 10px; padding: 5px;"}
+                          %td{ style: "width:180px"}
+                            %span{ style: "color:#999;font-size:12px;background-color:#eee;"}
                               = event.created_at
                             &rarr;
                           %td
@@ -60,4 +58,4 @@
                       = raw e.backtrace.join("<br />")
                 - else
                   %dd= render 'default', data: template_arguments(event)
-              %hr
+                %hr

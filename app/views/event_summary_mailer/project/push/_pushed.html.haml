@@ -16,33 +16,23 @@
   - @refs_are_same = diff_data[:same]
   - @suppress_diff = diff_data[:suppress_diff]
 
-  %table{width: "100%", cellspacing: '1px', cellpadding: '3px', style: "color: #333; font-size:0.8em; width: 100%;"}
-    %tr{style: 'margin: 1px; background: #efefef;'}
-      %th Pushed by
-      %td= link_to author.name, user_url(author.username)
-    %tr{style: 'margin: 1px; background: #efefef;'}
-      %th Date
-      %td= event.created_at
-    %tr{style: 'margin: 1px; background: #efefef;'}
-      %th Project
-      %td= link_to @project.path_with_namespace, project_url(@project.path_with_namespace)
-    %tr{style: 'margin: 1px; background: #efefef;'}
-      %th Branch
-      %td= link_to @branch, project_tree_url(@project.path_with_namespace, @branch)
-    - if @before_commit
-      %tr{style: 'margin: 1px; background: #efefef;'}
-        %th Commit before push
-        %td
-          = link_to @before_commit.oid[0..10], project_commit_url(@project, @before_commit.oid)
-          %br
-          %div{style: "word-wrap: break-word; word-break: break-all; overflow-wrap: break-word;"}
-            = simple_format(@before_commit.message)
-      %tr{style: 'margin: 1px; background: #efefef;'}
-        %th{align: :left, colspan:2}
-          = link_to 'Compare it', project_compare_url(event.target, from: @before_commit.oid, to: @after_commit.oid)
+  Pushed by
+  = link_to author.name, user_url(author.username)
+  to
+  = link_to @branch, project_tree_url(@project.path_with_namespace, @branch)
+  branch at
+  = event.created_at
+  %br
+  Parent commit:
+  = link_to project_commit_url(@project, @before_commit.oid) do
+    = "(#{@before_commit.oid[0..10]})"
+    = simple_format(@before_commit.message)
+  %br
+  = link_to 'Compare it', project_compare_url(event.target, from: @before_commit.oid, to: @after_commit.oid)
+  %br
 
   - if @commits.present?
     %br
-    = render "emails/project/push/commits"
+    = render "event_summary_mailer/project/push/commits"
 - else
   Sorry, repository was removed. We can't send summary diff.
