@@ -5,6 +5,7 @@
 .col-sm-9
   = form_tag search_path, method: :get, class: 'form-horizontal' do |f|
     = hidden_field_tag :type, params[:type] if params[:type].present?
+    = hidden_field_tag :project, params[:project]
     .search-holder.clearfix
       .form-group
         = label_tag :search, class: 'control-label' do

@@ -1,4 +1,10 @@
 module SearchHelper
+
+  def search_path_with_project(type, params, options = {})
+    options.merge!(type: type, search: params[:search], project: params[:project])
+    search_path(options)
+  end
+
   def search_autocomplete_opts(term, project = nil)
     return unless current_user
 

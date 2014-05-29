@@ -4,6 +4,7 @@ $ ->
 class Dispatcher
   constructor: () ->
     @initSearch()
+    new SearchResultHighlight() if $('body').attr('data-page') == "search:show"
     @initHighlight()
     @initPageScripts()
 
