@@ -19,7 +19,7 @@
     %ul.bordered-list
       - if @enabled_keys.blank?
         .light-well
-          %p.nothing_here_message Create a #{link_to 'new service key', new_admin_service_key_path(@service.id)} or add an existing one
+          .nothing-here-block Create a #{link_to 'new service key', new_admin_service_key_path(@service.id)} or add an existing one
       - else
         = render "keys", keys: @enabled_keys
   .col-md-6.available-keys
@@ -29,6 +29,6 @@
     %ul.bordered-list
       - if @available_keys.blank?
         .light-well
-          %p.nothing_here_message Service keys from another services you have access to will be displayed here
+          .nothing-here-block Service keys from another services you have access to will be displayed here
       - else
         = render "keys", keys: @available_keys
