@@ -30,7 +30,7 @@
             %span.date.js-last-push{'data-sort-by-last-push' => project.last_pushed_at}= project_last_push(project)
     - if projects.blank?
       %li
-        %h3.nothing_here_message There are no projects here.
+        .nothing-here-block There are no projects here.
     - if @projects.count > 20
       %li.bottom
         %strong= link_to "show all projects", projects_dashboard_path
