@@ -2,6 +2,9 @@
   = link_to send_now_profile_summary_path(summary.id), class: "btn-tiny btn btn-primary", data: { confirm: "You are shure wont send now digest?" } do
     Send now
 
+  = link_to edit_profile_summary_path(summary.id), class: "btn-tiny btn" do
+    Edit
+
   = link_to profile_summary_path(summary.id), class: "btn-tiny btn btn-danger", data: { confirm: "You are shure?" }, method: :delete do
     Remove
 %span
