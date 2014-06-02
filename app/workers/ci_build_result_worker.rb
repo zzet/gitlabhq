@@ -20,13 +20,13 @@ class CiBuildResultWorker
         if build.source_sha != parser.last_sha
           build.to_skipped
         else
-          fill_build_data(build, parser)
+          fill_build_data(build, parser, data)
         end
       end
     end
   end
 
-  def fill_build_data(build, parser)
+  def fill_build_data(build, parser, data = nil)
     case parser.status
     when "aborted"
       build.to_abort
@@ -40,7 +40,7 @@ class CiBuildResultWorker
       build.to_unstable
     end
 
-    build.data     = data
+    build.data     = data if data
     build.trace    = parser.build_log
     build.coverage = parser.coverage if parser.coverage.present?
     build.build_time = parser.build_time
