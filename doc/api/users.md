@@ -1,3 +1,5 @@
+# Users
+
 ## List users
 
 Get a list of users.
@@ -51,6 +53,10 @@ GET /users
 ]
 ```
 
+You can search for a users by email or username with:
+`/users?search=John`
+
+Also see `def search query` in `app/models/user.rb`.
 
 ## Single user
 
@@ -183,8 +189,8 @@ GET /user
   "theme_id": 1,
   "color_scheme_id": 2,
   "is_admin": false,
-  "can_create_group" : true,
-  "can_create_project" : true
+  "can_create_group": true,
+  "can_create_project": true
 }
 ```
 
@@ -201,17 +207,13 @@ GET /user/keys
 [
   {
     "id": 1,
-    "title" : "Public key",
-    "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4
-      596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4
-      soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0=",
+    "title": "Public key",
+    "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="
   },
   {
     "id": 3,
-    "title" : "Another Public key",
-    "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4
-      596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4
-      soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="
+    "title": "Another Public key",
+    "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="
   }
 ]
 ```
@@ -219,6 +221,18 @@ GET /user/keys
 Parameters:
 
 + **none**
+
+## List SSH keys for user
+
+Get a list of a specified user's SSH keys. Available only for admin
+
+```
+GET /users/:uid/keys
+```
+
+Parameters:
+
++ `uid` (required) - id of specified user
 
 
 ## Single SSH key
@@ -236,10 +250,8 @@ Parameters:
 ```json
 {
   "id": 1,
-  "title" : "Public key",
-  "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4
-      596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4
-      soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="
+  "title": "Public key",
+  "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfDzpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="
 }
 ```
 
@@ -287,4 +299,19 @@ DELETE /user/keys/:id
 Parameters:
 
 + `id` (required) - SSH key ID
+
+## Delete SSH key
+
+Deletes key owned by a specified user. Available only for admin.
+
+```
+DELETE /users/:uid/keys/:id
+```
+
+Parameters:
+
++ `uid` (required) - id of specified user
++ `id` (required) - SSH key ID
+
+Will return `200 Ok` on success, or `404 Not found` if either user or key cannot be found.
 

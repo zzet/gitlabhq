@@ -1,6 +1,6 @@
 # GitLab API
 
-## End-points
+## Resources
 
 + [Users](users.md)
 + [Session](session.md)
@@ -9,10 +9,11 @@
 + [Repositories](repositories.md)
 + [Repository Files](repository_files.md)
 + [Commits](commits.md)
++ [Branches](branches.md)
 + [Merge Requests](merge_requests.md)
 + [Issues](issues.md)
 + [Milestones](milestones.md)
-+ [Notes](notes.md)
++ [Notes](notes.md) (comments)
 + [Deploy Keys](deploy_keys.md)
 + [System Hooks](system_hooks.md)
 + [Groups](groups.md)
@@ -20,9 +21,12 @@
 ## Clients
 
 + [php-gitlab-api](https://github.com/m4tthumphrey/php-gitlab-api) - PHP
++ [Laravel API Wrapper for GitLab CE](https://github.com/adamgoose/gitlab) - PHP / [Laravel](http://laravel.com)
 + [Ruby Wrapper](https://github.com/NARKOZ/gitlab) - Ruby
 + [python-gitlab](https://github.com/Itxaka/python-gitlab) - Python
 + [java-gitlab-api](https://github.com/timols/java-gitlab-api) - Java
++ [node-gitlab](https://github.com/moul/node-gitlab) - Node.js
++ [NGitLab](https://github.com/Scooletz/NGitLab) - .NET
 
 ## Introduction
 
@@ -128,6 +132,10 @@ When listing resources you can pass the following parameters:
 
 + `page` (default: `1`) - page number
 + `per_page` (default: `20`, max: `100`) - number of items to list per page
+
+[Link headers](http://www.w3.org/wiki/LinkHeader) are send back with each response.
+These have `rel` prev/next/first/last and contain the relevant url.
+Please use these instead of generating your own urls.
 
 ## id vs iid
 

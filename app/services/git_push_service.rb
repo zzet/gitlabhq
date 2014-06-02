@@ -46,6 +46,7 @@ class GitPushService
 
     project.ensure_satellite_exists
     project.repository.expire_cache
+    project.update_repository_size
 
     if push.to_existing_branch?
       project.update_merge_requests(oldrev, newrev, ref, @current_user)
@@ -119,6 +120,10 @@ class GitPushService
         RequestStore.store[:current_commit] = commit
 
         issues_to_close.each { |i| i.close && i.save }
+        # FIXME. Add Issue close service
+        #issues_to_close.each do |issue|
+          #Issues::CloseService.new(project, author, {}).execute(issue, commit)
+        #end
       end
 
       # Create cross-reference notes for any other references. Omit any issues that were referenced in an

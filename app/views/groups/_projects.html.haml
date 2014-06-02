@@ -1,8 +1,11 @@
-.ui-box
-  .title.clearfix
+.panel.panel-default
+  .panel-heading
     = search_field_tag :filter_project, nil, placeholder: 'Filter by name', class: 'form-control js-sidebar-filter'
     - if can? current_user, :manage_group, @group
       %span.pull-right
+    Projects (#{projects.count})
+    - if can? current_user, :create_projects, @group
+      .panel-head-actions
         = link_to new_project_path(namespace_id: @group.id), class: "btn btn-new" do
           %i.icon-plus
           New project
@@ -10,7 +13,7 @@
 
   %ul.well-list.js-sidebar-list
     - if projects.blank?
-      .nothing-here-block This groups has no projects yet
+      .nothing-here-block This group has no projects yet
     - projects.each do |project|
       %li.project-row.js-description-tooltip{"data-title" => "#{project.description}"}
         = link_to project_path(project), class: dom_class(project) do

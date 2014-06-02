@@ -13,8 +13,6 @@ gem "rails", "~> 4.0.0"
 
 gem "protected_attributes"
 gem 'rails-observers'
-gem 'actionpack-page_caching'
-gem 'actionpack-action_caching'
 
 # Default values for AR models
 gem "default_value_for", "~> 3.0.0"
@@ -37,7 +35,7 @@ gem 'elasticsearch-git', github: 'zzet/elasticsearch-git', ref: 'c861d5d98c7bf44
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
-gem "gitlab_git", '~> 5.7.1'
+gem "gitlab_git", '~> 5.8'
 gem 'rugged', git: 'git://github.com/libgit2/rugged.git', branch: 'development', submodules: true
 
 # Ruby/Rack Git Smart-HTTP Server Handler
@@ -47,7 +45,7 @@ gem 'gitlab-grack', '~> 2.0.0.pre', require: 'grack'
 gem 'gitlab_omniauth-ldap', '1.0.4', require: "omniauth-ldap"
 
 # Git Wiki
-gem "gitlab-gollum-lib", "~> 1.1.0", require: 'gollum-lib'
+gem 'gollum-lib', '~> 3.0.0'
 
 # Language detection
 gem "gitlab-linguist", "~> 3.0.0", require: "linguist"
@@ -55,7 +53,7 @@ gem "gitlab-linguist", "~> 3.0.0", require: "linguist"
 # API
 gem "grape", "~> 0.6.1"
 # Replace with rubygems when nesteted entities get released
-gem "grape-entity", "~> 0.4.1", ref: 'd904381c951e86250c3f44213b349a3dd8e83fb1', git: 'https://github.com/intridea/grape-entity.git' 
+gem "grape-entity", "~> 0.4.2"
 gem 'rack-cors', require: 'rack/cors'
 
 # Email validation
@@ -80,8 +78,12 @@ gem "haml-rails"
 # Files attachments
 gem "carrierwave"
 
+# Drag and Drop UI
+gem 'dropzonejs-rails'
+
 # for aws storage
-gem "fog", "~> 1.3.1", group: :aws
+gem "fog", "~> 1.14", group: :aws
+gem "unf", group: :aws
 
 # Authorization
 gem "six"
@@ -91,10 +93,11 @@ gem "seed-fu"
 
 # Markdown to HTML
 gem "redcarpet",     "~> 2.2.2"
-gem "github-markup", "~> 0.7.4", require: 'github/markup', git: 'https://github.com/gitlabhq/markup.git', ref: '61ade389c1e1c159359338f570d18464a44ddbc4' 
+gem "github-markup"
+gem "org-ruby" # For rendering .org files
 
 # Diffs
-gem "diffy"
+gem 'diffy', '~> 3.0.3'
 
 # Asciidoc to HTML
 gem "asciidoctor"
@@ -153,7 +156,7 @@ gem "gitlab-flowdock-git-hook", "~> 0.4.2"
 gem "gemnasium-gitlab-service", "~> 0.2"
 
 # Slack integration
-gem "slack-notifier", "~> 0.2.0"
+gem "slack-notifier", "~> 0.3.2"
 
 # d3
 gem "d3_rails", "~> 3.1.4"
@@ -162,7 +165,7 @@ gem "d3_rails", "~> 3.1.4"
 gem "underscore-rails", "~> 1.4.4"
 
 # Sanitize user input
-gem "sanitize"
+gem "sanitize", '~> 2.0'
 
 # Protect against bruteforcing
 gem "rack-attack"
@@ -170,7 +173,7 @@ gem "rack-attack"
 # Ace editor
 gem 'ace-rails-ap'
 
-gem "sass-rails"
+gem "sass-rails", '~> 4.0.2'
 gem "coffee-rails"
 gem "uglifier"
 gem "therubyracer"
@@ -179,8 +182,9 @@ gem 'jquery-turbolinks'
 
 gem 'select2-rails'
 gem 'jquery-atwho-rails', "~> 0.3.3"
-gem "jquery-rails",     "2.1.3"
-gem "jquery-ui-rails",  "2.0.2"
+gem "jquery-rails"
+gem "jquery-ui-rails"
+gem "jquery-scrollto-rails"
 gem "raphael-rails", "~> 2.1.2"
 gem 'bootstrap-sass', '~> 3.0'
 gem "font-awesome-rails", '~> 3.2'

@@ -1,3 +1,5 @@
+# Issues
+
 ## List issues
 
 Get all issues created by authenticated user. This function takes pagination parameters
@@ -15,7 +17,7 @@ GET /issues
     "project_id": 8,
     "title": "4xx/5xx pages",
     "description": "",
-    "labels": [ ],
+    "labels": [],
     "milestone": null,
     "assignee": null,
     "author": {
@@ -193,3 +195,7 @@ Parameters:
 
 + `id` (required) - The project ID
 + `issue_id` (required) - The ID of the issue
+
+## Comments on issues
+
+Comments are done via the notes resource.

@@ -342,6 +342,7 @@ namespace :gitlab do
       check_repo_base_is_not_symlink
       check_repo_base_user_and_group
       check_repo_base_permissions
+      check_satellites_permissions
       check_update_hook_is_up_to_date
       check_repos_update_hooks_is_link
       check_gitlab_shell_self_test
@@ -438,6 +439,29 @@ namespace :gitlab do
         )
         for_more_information(
           see_installation_guide_section "GitLab Shell"
+        )
+        fix_and_rerun
+      end
+    end
+
+    def check_satellites_permissions
+      print "Satellites access is drwxr-x---? ... "
+
+      satellites_path = Gitlab.config.satellites.path
+      unless File.exists?(satellites_path)
+        puts "can't check because of previous errors".magenta
+        return
+      end
+
+      if File.stat(satellites_path).mode.to_s(8).ends_with?("0750")
+        puts "yes".green
+      else
+        puts "no".red
+        try_fixing_it(
+          "sudo chmod u+rwx,g+rx,o-rwx #{satellites_path}",
+        )
+        for_more_information(
+          see_installation_guide_section "GitLab"
         )
         fix_and_rerun
       end
@@ -613,7 +637,7 @@ namespace :gitlab do
       else
         puts "no".red
         try_fixing_it(
-          sudo_gitlab("RAILS_ENV=production script/background_jobs start")
+          sudo_gitlab("RAILS_ENV=production bin/background_jobs start")
         )
         for_more_information(
           see_installation_guide_section("Install Init Script"),
@@ -755,7 +779,7 @@ namespace :gitlab do
   end
 
   def check_gitlab_shell
-    required_version = Gitlab::VersionInfo.new(1, 9, 1)
+    required_version = Gitlab::VersionInfo.new(1, 9, 4)
     current_version = Gitlab::VersionInfo.parse(gitlab_shell_version)
 
     print "GitLab Shell version >= #{required_version} ? ... "

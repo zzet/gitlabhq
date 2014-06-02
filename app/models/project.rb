@@ -6,8 +6,8 @@
 #  name                   :string(255)
 #  path                   :string(255)
 #  description            :text
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
+#  created_at             :datetime
+#  updated_at             :datetime
 #  creator_id             :integer
 #  issues_enabled         :boolean          default(TRUE), not null
 #  wall_enabled           :boolean          default(TRUE), not null
@@ -36,6 +36,11 @@ class Project < ActiveRecord::Base
   extend Enumerize
 
   default_value_for :archived, false
+  default_value_for :issues_enabled, true
+  default_value_for :wall_enabled, true
+  default_value_for :merge_requests_enabled, true
+  default_value_for :wiki_enabled, true
+  default_value_for :snippets_enabled, true
 
   ActsAsTaggableOn.strict_case_match = true
 
@@ -58,7 +63,7 @@ class Project < ActiveRecord::Base
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
-  has_one :last_event, -> {order 'events.created_at DESC'}, class_name: Event, as: :target
+  has_one :last_event, -> { events.order(created_at: :desc) }, class_name: Event, as: :target
   has_many :events, class_name: Event, as: :target
 
   has_many :services,           dependent: :destroy
@@ -348,6 +353,7 @@ class Project < ActiveRecord::Base
       when 'oldest' then reorder('projects.created_at ASC')
       when 'recently_updated' then reorder('projects.updated_at DESC')
       when 'last_updated' then reorder('projects.updated_at ASC')
+      when 'largest_repository' then reorder('projects.repository_size DESC')
       else reorder("namespaces.path, projects.name ASC")
       end
     end
@@ -411,7 +417,7 @@ class Project < ActiveRecord::Base
 
   def check_limit
     unless creator.can_create_project?
-      errors[:limit_reached] << ("Your own projects limit is #{creator.projects_limit}! Please contact administrator to increase it")
+      errors[:limit_reached] << ("Your project limit is #{creator.projects_limit} projects! Please contact your administrator to increase it")
     end
   rescue
     errors[:base] << ("Can't check your ability to create project")
@@ -453,8 +459,11 @@ class Project < ActiveRecord::Base
     self.id
   end
 
+  # Tags are shared by issues and merge requests
   def issues_labels
-    @issues_labels ||= (issues_default_labels + issues.tags_on(:labels)).uniq.sort_by(&:name)
+    @issues_labels ||= (issues_default_labels +
+                        merge_requests.tags_on(:labels) +
+                        issues.tags_on(:labels)).uniq.sort_by(&:name)
   end
 
   def issue_exists?(issue_id)
@@ -505,6 +514,14 @@ class Project < ActiveRecord::Base
     jenkins_ci? && jenkins_ci.configuration && jenkins_ci.configuration.merge_request_enabled
   end
 
+  def ci_services
+    services.select { |service| service.category == :ci }
+  end
+
+  def ci_service
+    @ci_service ||= services.select(&:activated?).first
+  end
+
   # For compatibility with old code
   def code
     path
@@ -553,10 +570,6 @@ class Project < ActiveRecord::Base
     else
       path
     end
-  end
-
-  def transfer(new_namespace)
-    ProjectTransferService.new.transfer(self, new_namespace)
   end
 
   def execute_hooks(data, hooks_scope = :push_hooks)
@@ -747,5 +760,13 @@ class Project < ActiveRecord::Base
   def change_head(branch)
     gitlab_shell.update_repository_head(self.path_with_namespace, branch)
     reload_default_branch
+  end
+
+  def forked_from?(project)
+    forked? && project == forked_from_project
+  end
+
+  def update_repository_size
+    update_attribute(:repository_size, repository.size)
   end
 end

@@ -6,8 +6,6 @@ class Redcarpet::Render::GitlabHTML < Redcarpet::Render::HTML
   def initialize(template, options = {})
     @template = template
     @project = @template.instance_variable_get("@project")
-    @ref = @template.instance_variable_get("@ref")
-    @request_path = @template.instance_variable_get("@path")
     @options = options.dup
     super options
   end
@@ -54,22 +52,13 @@ class Redcarpet::Render::GitlabHTML < Redcarpet::Render::HTML
     end
   end
 
-  def preprocess(full_document)
-    parse_jsduck_images(full_document)
-    if is_wiki?
-      full_document
-    elsif @project
-      h.create_relative_links(full_document, @project, @ref, @request_path)
-    else
-      full_document
-    end
-  end
-
   def postprocess(full_document)
-    h.gfm(full_document)
-  end
+    parse_jsduck_images(full_document)
 
-  def is_wiki?
-    @template.instance_variable_get("@wiki")
+    unless @template.instance_variable_get("@project_wiki") || @project.nil?
+      full_document = h.create_relative_links(full_document)
+    end
+
+    h.gfm(full_document)
   end
 end

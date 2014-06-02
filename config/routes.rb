@@ -41,19 +41,10 @@ Gitlab::Application.routes.draw do
   #
   # Help
   #
-  get 'help'                => 'help#index'
-  get 'help/api'            => 'help#api'
-  get 'help/api/:category'  => 'help#api', as: 'help_api_file'
-  get 'help/markdown'       => 'help#markdown'
-  get 'help/permissions'    => 'help#permissions'
-  get 'help/public_access'  => 'help#public_access'
-  get 'help/raketasks'      => 'help#raketasks'
-  get 'help/ssh'            => 'help#ssh'
-  get 'help/system_hooks'   => 'help#system_hooks'
-  get 'help/web_hooks'      => 'help#web_hooks'
-  get 'help/workflow'       => 'help#workflow'
+
+  get 'help'                  => 'help#index'
+  get 'help/:category/:file'  => 'help#show', as: :help_page
   get 'help/shortcuts'
-  get 'help/security'
 
   #
   # Global snippets
@@ -226,7 +217,6 @@ Gitlab::Application.routes.draw do
     member do
       get :issues
       get :merge_requests
-      #get :members
     end
 
     scope module: :groups do
@@ -254,6 +244,7 @@ Gitlab::Application.routes.draw do
       post :fork
       post :archive
       post :unarchive
+      post :upload_image
       get :autocomplete_sources
       get :import
       put :retry_import
@@ -263,7 +254,7 @@ Gitlab::Application.routes.draw do
       resources :blob,      only: [:show, :destroy], constraints: {id: /.+/}
       resources :raw,       only: [:show], constraints: {id: /.+/}
       resources :tree,      only: [:show], constraints: {id: /.+/, format: /(html|js)/ }
-      resources :edit_tree, only: [:show, :update], constraints: {id: /.+/}, path: 'edit' do
+      resources :edit_tree, only: [:show, :update], constraints: { id: /.+/ }, path: 'edit' do
         post :preview, on: :member
       end
       resources :new_tree,  only: [:show, :update], constraints: {id: /.+/}, path: 'new'
@@ -287,7 +278,7 @@ Gitlab::Application.routes.draw do
         end
       end
 
-      resources :wikis, only: [:show, :edit, :destroy, :create], constraints: {id: /[a-zA-Z.0-9_\-]+/} do
+      resources :wikis, only: [:show, :edit, :destroy, :create], constraints: {id: /[a-zA-Z.0-9_\-\/]+/} do
         collection do
           get :pages
           put ':id' => 'wikis#update'
@@ -325,12 +316,7 @@ Gitlab::Application.routes.draw do
         end
       end
 
-      resources :branches, only: [:index, :new, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex } do
-        collection do
-          get :recent, constraints: { id: Gitlab::Regex.git_reference_regex }
-        end
-      end
-
+      resources :branches, only: [:index, :new, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
       resources :tags, only: [:index, :new, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
       resources :protected_branches, only: [:index, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
 
@@ -354,7 +340,7 @@ Gitlab::Application.routes.draw do
       resources :merge_requests, constraints: {id: /\d+/}, except: [:destroy] do
         member do
           get :diffs
-          get :automerge
+          post :automerge
           get :automerge_check
           get :ci_status
         end
@@ -414,6 +400,8 @@ Gitlab::Application.routes.draw do
       resources :tokens,  only: [:index, :show, :create, :destroy], constraints: {id: /\d+/}
     end
   end
+
+  get ':id' => "groups#show", constraints: {id: /(?:[^.]|\.(?!atom$))+/, format: /atom/}
 
   root to: "dashboard#show"
 end

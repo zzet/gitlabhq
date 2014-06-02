@@ -8,6 +8,11 @@ module API
     def current_user
       private_token = (params[PRIVATE_TOKEN_PARAM] || env[PRIVATE_TOKEN_HEADER]).to_s
       @current_user ||= User.find_by(authentication_token: private_token)
+
+      unless @current_user && Gitlab::UserAccess.allowed?(@current_user)
+        return nil
+      end
+
       identifier = sudo_identifier()
 
       # If the sudo is the current user do nothing
@@ -75,6 +80,10 @@ module API
       unless abilities.allowed?(current_user, action, subject)
         forbidden!
       end
+    end
+
+    def authorize_push_project
+      authorize! :push_code, user_project
     end
 
     def authorize_admin_project

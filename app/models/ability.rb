@@ -195,6 +195,13 @@ class Ability
         rules << :read_group
       end
 
+      # Only group masters and group owners can create new projects in group
+      if group.has_master?(user) || group.has_owner?(user) || user.admin?
+        rules += [
+          :create_projects,
+        ]
+      end
+
       # Only group owner and administrators can manage group
       if group.has_owner?(user) || user.admin?
         rules += [
@@ -243,6 +250,7 @@ class Ability
       # Only namespace owner and administrators can manage it
       if namespace.owner == user || user.admin?
         rules += [
+          :create_projects,
           :manage_namespace
         ]
       end

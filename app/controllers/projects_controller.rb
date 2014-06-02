@@ -12,6 +12,8 @@ class ProjectsController < ApplicationController
   before_filter :set_title, only: [:new, :create]
   before_filter :event_filter, only: :show
 
+  rescue_from CarrierWave::IntegrityError, with: :invalid_file
+
   def new
     @project = Project.new
   end
@@ -187,7 +189,32 @@ class ProjectsController < ApplicationController
     @git_protocol_enabled ||= Gitlab.config.gitlab.git_daemon_enabled
   end
 
+  def upload_image
+    link_to_image = ::Projects::ImageService.new(repository, params, root_url).execute
+
+    respond_to do |format|
+      if link_to_image
+        format.json { render json: { link: link_to_image } }
+      else
+        format.json { render json: "Invalid file.", status: :unprocessable_entity }
+      end
+    end
+  end
+
   private
+
+  def upload_path
+    base_dir = FileUploader.generate_dir
+    File.join(repository.path_with_namespace, base_dir)
+  end
+
+  def accepted_images
+    %w(png jpg jpeg gif)
+  end
+
+  def invalid_file(error)
+    render json: { message: error.message }, status: :internal_server_error
+  end
 
   def set_title
     @title = 'New Project'
@@ -215,6 +242,6 @@ class ProjectsController < ApplicationController
   end
 
   def sorted(users)
-    users.uniq.sort_by(&:username).map { |user| { username: user.username, name: user.name } }
+    users.uniq.compact.sort_by(&:username).map { |user| { username: user.username, name: user.name } }
   end
 end

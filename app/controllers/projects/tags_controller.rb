@@ -10,11 +10,13 @@ class Projects::TagsController < Projects::ApplicationController
   rescue_from Errno::EISDIR, with: :gc_in_repository
 
   def index
-    @tags = Kaminari.paginate_array(@repository.tags.reverse).page(params[:page]).per(30)
+    sorted = VersionSorter.rsort(@repository.tag_names)
+    @tags = Kaminari.paginate_array(sorted).page(params[:page]).per(30)
   end
 
   def create
-    ProjectsService.new(current_user, @project, params).repository.create_tag(params[:tag_name], params[:ref])
+    service = ProjectsService.new(current_user, @project, params)
+    service.repository.create_tag(params[:tag_name], params[:ref])
 
     redirect_to project_tags_path(@project)
   end

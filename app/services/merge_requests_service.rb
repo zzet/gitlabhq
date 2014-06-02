@@ -33,11 +33,18 @@ class MergeRequestsService < BaseService
   def update
     # If we close MergeRequest we want to ignore validation
     # so we can close broken one (Ex. fork project removed)
-    if params[:merge_request] == {"state_event"=>"close"}
+    state = params.delete('state_event')
+    case state
+    when 'reopen'
+      #MergeRequests::ReopenService.new(project, current_user, {}).execute(merge_request)
+    when 'close'
+      #MergeRequests::CloseService.new(project, current_user, {}).execute(merge_request)
+
       @merge_request.allow_broken = true
       result = @merge_request.close
       receive_delayed_notifications if result
       return result
+
     end
 
     # We dont allow change of source/target projects
@@ -45,14 +52,25 @@ class MergeRequestsService < BaseService
     params[:merge_request].delete(:source_project_id)
     params[:merge_request].delete(:target_project_id)
 
-    if @merge_request.update_attributes(@params[:merge_request])
+    if params[:merge_request].any? &&
+      @merge_request.update_attributes(@params[:merge_request])
+
       @merge_request.reset_events_cache
 
+      if @merge_request.previous_changes.include?('assignee_id')
+        create_assignee_note(@merge_request)
+      end
+
+      @merge_request.notice_added_references(@merge_request.project, current_user)
+
+      execute_hooks(@merge_request)
+
+      @merge_request.reload
+
       receive_delayed_notifications
-      return true
     end
 
-    return false
+    return @merge_request
   end
 
   # Mark existing merge request as merged

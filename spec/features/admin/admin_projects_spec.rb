@@ -1,7 +1,6 @@
 require 'spec_helper'
 
-describe "Admin::Projects" do
-
+describe "Admin::Projects", feature: true  do
   before do
     Project.__elasticsearch__.create_index! force: true
     @project = create(:project)

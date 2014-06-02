@@ -36,6 +36,7 @@
 #  notification_level       :integer          default(1), not null
 #  password_expires_at      :datetime
 #  created_by_id            :integer
+#  last_credential_check_at :datetime
 #  avatar                   :string(255)
 #  confirmation_token       :string(255)
 #  confirmed_at             :datetime
@@ -43,7 +44,6 @@
 #  unconfirmed_email        :string(255)
 #  hide_no_ssh_key          :boolean          default(FALSE)
 #  website_url              :string(255)      default(""), not null
-#  last_credential_check_at :datetime
 #
 
 require 'carrierwave/orm/activerecord'
@@ -52,6 +52,11 @@ require 'file_size_validator'
 class User < ActiveRecord::Base
   include Watchable
   include UsersSearch
+
+  default_value_for :admin, false
+  default_value_for :can_create_group, true
+  default_value_for :can_create_team, false
+  default_value_for :hide_no_ssh_key, false
 
   devise :database_authenticatable, :token_authenticatable, :lockable, :async,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :confirmable, :registerable
@@ -87,7 +92,8 @@ class User < ActiveRecord::Base
   has_many :users_groups,             dependent: :destroy
   has_many :groups,                   through: :users_groups
   has_many :owned_groups,             -> { where(users_groups: { group_access: UsersGroup::OWNER } )}, through: :users_groups, source: :group
-  has_many :created_groups,           class_name: Group, foreign_key: :owner_id
+  has_many :masters_groups,           -> { where users_groups: { group_access: UsersGroup::MASTER } }, through: :users_groups, source: :group
+  has_many :created_groups,          class_name: Group, foreign_key: :owner_id
 
   # Projects
   has_many :users_projects,           dependent: :destroy
@@ -587,5 +593,13 @@ class User < ActiveRecord::Base
 
   def all_ssh_keys
     keys.map(&:key)
+  end
+
+  def temp_oauth_email?
+    email =~ /\Atemp-email-for-oauth/
+  end
+
+  def generate_tmp_oauth_email
+    self.email = "temp-email-for-oauth-#{username}@gitlab.localhost"
   end
 end

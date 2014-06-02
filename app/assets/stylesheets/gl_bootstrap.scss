@@ -45,6 +45,7 @@ $pagination-active-bg: $bg_style_color;
 @import "bootstrap/list-group";
 @import "bootstrap/wells";
 @import "bootstrap/close";
+@import "bootstrap/panels";
 
 // Components w/ JavaScript
 @import "bootstrap/modals";
@@ -219,4 +220,32 @@ ul.breadcrumb {
 .navbar .nav > li {
   position: relative;
   white-space: nowrap;
+}
+
+/**
+ * Add some extra stuff to panels
+ *
+ */
+.panel {
+  .panel-heading {
+    font-size: 14px;
+    line-height: 18px;
+
+    .panel-head-actions {
+      position: relative;
+      top: -7px;
+      float: right;
+    }
+  }
+
+  .panel-body {
+    form {
+      margin: 0;
+    }
+
+    .form-actions {
+      margin-bottom: 0;
+      background: #FFF;
+    }
+  }
 }

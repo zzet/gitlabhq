@@ -47,4 +47,8 @@ class BaseService
 
     receive_delayed_notifications
   end
+
+  def log_info message
+    Gitlab::AppLogger.info message
+  end
 end

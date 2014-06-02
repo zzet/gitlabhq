@@ -45,6 +45,7 @@ module API
     mount Files
     mount Commits
     mount Namespaces
+    mount Branches
     mount Subscriptions
   end
 end

@@ -1,4 +1,6 @@
-# CRUD for repository files
+# Repository files
+
+## CRUD for repository files
 
 ## Create, read, update and delete repository files using this API
 
@@ -44,7 +46,7 @@ Example response:
 ```json
 {
   "file_name": "app/project.rb",
-  "branch_name": "master",
+  "branch_name": "master"
 }
 ```
 
@@ -67,7 +69,7 @@ Example response:
 ```json
 {
   "file_name": "app/project.rb",
-  "branch_name": "master",
+  "branch_name": "master"
 }
 ```
 
@@ -90,7 +92,7 @@ Example response:
 ```json
 {
   "file_name": "app/project.rb",
-  "branch_name": "master",
+  "branch_name": "master"
 }
 ```
 

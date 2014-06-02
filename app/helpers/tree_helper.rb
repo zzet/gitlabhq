@@ -93,6 +93,10 @@ module TreeHelper
   end
 
   def editing_preview_title(filename)
-    (gitlab_markdown?(filename) || markup?(filename)) ? 'Preview' : 'Diff'
+    if gitlab_markdown?(filename) || markup?(filename)
+      'Preview'
+    else
+      'Diff'
+    end
   end
 end

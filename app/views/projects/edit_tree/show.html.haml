@@ -1,5 +1,10 @@
-%h3.page-title Edit mode
 .file-editor
+  %ul.nav.nav-tabs.js-edit-mode
+    %li.active
+      = link_to 'Edit', '#editor'
+    %li
+      = link_to editing_preview_title(@blob.name), '#preview', 'data-preview-url' => preview_project_edit_tree_path(@project, @id)
+
   = form_tag(project_edit_tree_path(@project, @id), method: :put, class: "form-horizontal") do
     .file-holder.file
       .file-title
@@ -8,22 +13,24 @@
           = link_to editing_preview_title(@blob.name), '#preview', class: 'btn btn-tiny', 'data-preview-url' => preview_project_edit_tree_path(@project, @id)
         %i.icon-file
         %span.file_name
+          %span.monospace.light #{@ref}:
           = @path
-          %small
-            on
-            %strong= @ref
         %span.options
           .btn-group.tree-btn-group
             = link_to "Cancel", @after_edit_path, class: "btn btn-tiny btn-cancel", data: { confirm: leave_edit_message }
       .file-content.code
         %pre.js-edit-mode-pane#editor= @blob.data
         .js-edit-mode-pane#preview.hide
+          %center
+            %h2
+              %i.icon-spinner.icon-spin
 
     .form-group.commit_message-group
       = label_tag 'commit_message', class: "control-label" do
         Commit message
       .col-sm-10
-        = text_area_tag 'commit_message', '', placeholder: "Update #{@blob.name}", required: true, rows: 3, class: 'form-control'
+        = render 'shared/commit_message_container', {textarea: text_area_tag('commit_message', '',
+            placeholder: "Update #{@blob.name}", required: true, rows: 3, class: 'form-control')}
     .form-actions
       = hidden_field_tag 'last_commit', @last_commit
       = hidden_field_tag 'content', '', id: "file-content"
@@ -53,26 +60,24 @@
   var editModePanes = $('.js-edit-mode-pane'),
       editModeLinks = $('.js-edit-mode a');
 
-  editModeLinks.click(function(event){
-    event.stopPropagation();
+  editModeLinks.click(function(event) {
     event.preventDefault();
 
     var currentLink = $(this),
         paneId = currentLink.attr('href'),
-        currentPane = editModePanes.filter(paneId).show();
+        currentPane = editModePanes.filter(paneId);
 
-    editModeLinks.removeClass('active hover');
-    currentLink.addClass('active hover');
+    editModeLinks.parent().removeClass('active hover');
+    currentLink.parent().addClass('active hover');
+    editModePanes.hide();
 
     if (paneId == '#preview') {
+      currentPane.fadeIn(200);
       $.post(currentLink.data('preview-url'), { content: editor.getValue() }, function(response) {
-        editModePanes.hide();
-        currentPane.html(response);
-        currentPane.show();
+        currentPane.empty().append(response);
       })
     } else {
-      editModePanes.hide();
-      currentPane.show();
+      currentPane.fadeIn(200);
       editor.focus()
     }
   })

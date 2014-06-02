@@ -7,7 +7,8 @@ class Projects::NotesController < Projects::ApplicationController
   def index
     @notes = ProjectsService.new(current_user, project, params).notes.load
 
-    notes_json = { notes: [] }
+    current_fetched_at = Time.now.to_i
+    notes_json = { notes: [], last_fetched_at: current_fetched_at }
 
     @notes.each do |note|
       notes_json[:notes] << {

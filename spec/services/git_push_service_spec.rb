@@ -173,16 +173,10 @@ describe GitPushService do
       Issue.find(issue.id).should be_closed
     end
 
-    it "passes the closing commit as a thread-local" do
-      GitPushService.new(user, project, @oldrev, @newrev, @ref).execute
-
-      RequestStore.store[:current_commit].should == closing_commit
-    end
-
     it "doesn't create cross-reference notes for a closing reference" do
       expect {
         GitPushService.new(user, project, @oldrev, @newrev, @ref).execute
-      }.not_to change { Note.where(project_id: project.id, system: true).count }
+      }.not_to change { Note.where(project_id: project.id, system: true, commit_id: closing_commit.id).count }
     end
 
     it "doesn't close issues when pushed to non-default branches" do

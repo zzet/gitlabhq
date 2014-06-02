@@ -8,9 +8,13 @@ require 'securerandom'
 # no regular words or you'll be exposed to dictionary attacks.
 
 def find_secure_token
+  # TODO: Migrate to env secret key
   token_file = Rails.root.join('../../shared/.secret')
   token_file = Rails.root.join('./.secret') if Rails.env == 'test'
-  if File.exist? token_file
+
+  if ENV.key?('SECRET_KEY_BASE')
+    ENV['SECRET_KEY_BASE']
+  elsif File.exist? token_file
     # Use the existing token.
     File.read(token_file).chomp
   else

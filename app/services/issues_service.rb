@@ -18,6 +18,15 @@ class IssuesService < BaseService
     @issue
   end
 
+  def close(commit = nil)
+    if @issue.close
+      Note.create_status_change_note(@issue, @issue.project, current_user, @issue.state, commit)
+      execute_hooks(@issue)
+    end
+
+    @issue
+  end
+
   def update
     if issue.update(params)
       receive_delayed_notifications

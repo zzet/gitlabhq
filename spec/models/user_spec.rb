@@ -36,6 +36,7 @@
 #  notification_level       :integer          default(1), not null
 #  password_expires_at      :datetime
 #  created_by_id            :integer
+#  last_credential_check_at :datetime
 #  avatar                   :string(255)
 #  confirmation_token       :string(255)
 #  confirmed_at             :datetime
@@ -43,7 +44,6 @@
 #  unconfirmed_email        :string(255)
 #  hide_no_ssh_key          :boolean          default(FALSE)
 #  website_url              :string(255)      default(""), not null
-#  last_credential_check_at :datetime
 #
 
 require 'spec_helper'

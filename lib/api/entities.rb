@@ -43,6 +43,7 @@ module API
     class Project < Grape::Entity
       expose :id, :description, :default_branch
       expose :public?, as: :public
+      expose :archived?, as: :archived
       expose :visibility_level, :ssh_url_to_repo, :http_url_to_repo, :web_url
       expose :owner, using: Entities::UserBasic, unless: ->(project, options) { project.group }
       expose :name, :name_with_namespace
@@ -203,24 +204,25 @@ module API
     class ProjectEntity < Grape::Entity
       expose :id, :iid
       expose (:project_id) { |entity| entity.project.id }
+      expose :title, :description
+      expose :state, :created_at, :updated_at
     end
 
     class Milestone < ProjectEntity
-      expose :title, :description, :due_date, :state, :updated_at, :created_at
+      expose :due_date
     end
 
     class Issue < ProjectEntity
-      expose :title, :description
       expose :label_list, as: :labels
       expose :milestone, using: Entities::Milestone
       expose :assignee, :author, using: Entities::UserBasic
-      expose :state, :updated_at, :created_at
     end
 
     class MergeRequest < ProjectEntity
-      expose :target_branch, :source_branch, :title, :state, :upvotes, :downvotes, :description
+      expose :target_branch, :source_branch, :upvotes, :downvotes
       expose :author, :assignee, using: Entities::UserBasic
       expose :source_project_id, :target_project_id
+      expose :label_list, as: :labels
     end
 
     class SSHKey < Grape::Entity
@@ -244,6 +246,7 @@ module API
       expose :title, :project_id, :action_name
       expose :target_id, :target_type, :author_id
       expose :data, :target_title
+      expose :created_at
     end
 
     class Namespace < Grape::Entity
@@ -280,6 +283,31 @@ module API
 
     class Label < Grape::Entity
       expose :name
+    end
+
+    class RepoDiff < Grape::Entity
+      expose :old_path, :new_path, :a_mode, :b_mode, :diff
+      expose :new_file, :renamed_file, :deleted_file
+    end
+
+    class Compare < Grape::Entity
+      expose :commit, using: Entities::RepoCommit do |compare, options|
+        if compare.commit
+          Commit.new compare.commit
+        end
+      end
+      expose :commits, using: Entities::RepoCommit do |compare, options|
+        Commit.decorate compare.commits
+      end
+      expose :diffs, using: Entities::RepoDiff do |compare, options|
+        compare.diffs
+      end
+
+      expose :compare_timeout do |compare, options|
+        compare.timeout
+      end
+
+      expose :same, as: :compare_same_ref
     end
   end
 end
