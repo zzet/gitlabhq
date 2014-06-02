@@ -7,8 +7,9 @@
  */
 
 $font-size-base: 13px !default;
-$nav-pills-active-link-hover-bg: $bg_style_color;
-$pagination-active-bg: $bg_style_color;
+$nav-pills-active-link-hover-bg: $bg_primary;
+$pagination-active-bg: $bg_primary;
+$list-group-active-bg: $bg_style_color;
 
 // Core variables and mixins
 @import "bootstrap/variables";
@@ -227,7 +228,10 @@ ul.breadcrumb {
  *
  */
 .panel {
+  @include border-radius(0px);
+
   .panel-heading {
+    @include border-radius(0px);
     font-size: 14px;
     line-height: 18px;
 
@@ -246,6 +250,70 @@ ul.breadcrumb {
     .form-actions {
       margin-bottom: 0;
       background: #FFF;
+    }
+  }
+
+  &.panel-small {
+    .panel-heading {
+      padding: 6px 15px;
+    }
+  }
+}
+
+.panel-default {
+  .panel-heading {
+    background-color: #EEE;
+  }
+}
+
+.panel-danger {
+  border-color: $border_danger;
+  .panel-heading {
+    color: #ffffff;
+    background-color: $bg_danger;
+    border-color: $border_danger;
+    a {
+      color: #FFF;
+      text-decoration: underline;
+    }
+  }
+}
+
+.panel-success {
+  border-color: $border_success;
+  .panel-heading {
+    color: #ffffff;
+    background-color: $bg_success;
+    border-color: $border_success;
+    a {
+      color: #FFF;
+      text-decoration: underline;
+    }
+  }
+}
+
+.panel-primary {
+  border-color: $border_primary;
+  .panel-heading {
+    color: #ffffff;
+    background-color: $bg_primary;
+    border-color: $border_primary;
+    a {
+      color: #FFF;
+      text-decoration: underline;
+    }
+  }
+}
+
+.panel-warning {
+  border-color: $border_warning;
+  .panel-heading {
+    color: #ffffff;
+    background-color: $bg_warning;
+    border-color: $border_warning;
+    a {
+      color: #FFF;
+      text-decoration: underline;
     }
   }
 }

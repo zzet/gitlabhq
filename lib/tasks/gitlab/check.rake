@@ -458,7 +458,7 @@ namespace :gitlab do
       else
         puts "no".red
         try_fixing_it(
-          "sudo chmod u+rwx,g+rx,o-rwx #{satellites_path}",
+          "sudo chmod u+rwx,g=rx,o-rwx #{satellites_path}",
         )
         for_more_information(
           see_installation_guide_section "GitLab"
@@ -779,7 +779,7 @@ namespace :gitlab do
   end
 
   def check_gitlab_shell
-    required_version = Gitlab::VersionInfo.new(1, 9, 4)
+    required_version = Gitlab::VersionInfo.new(1, 9, 5)
     current_version = Gitlab::VersionInfo.parse(gitlab_shell_version)
 
     print "GitLab Shell version >= #{required_version} ? ... "

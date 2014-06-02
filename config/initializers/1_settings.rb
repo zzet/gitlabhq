@@ -87,7 +87,6 @@ Settings.gitlab['port']       ||= Settings.gitlab.https ? 443 : 80
 Settings.gitlab['relative_url_root'] ||= ENV['RAILS_RELATIVE_URL_ROOT'] || ''
 Settings.gitlab['protocol']   ||= Settings.gitlab.https ? "https" : "http"
 Settings.gitlab['email_from'] ||= "gitlab@#{Settings.gitlab.host}"
-Settings.gitlab['support_email']  ||= Settings.gitlab.email_from
 Settings.gitlab['url']        ||= Settings.send(:build_gitlab_url)
 Settings.gitlab['git_url']    ||= Settings.send(:build_gitlab_url, "git")
 Settings.gitlab['user']       ||= 'git'

@@ -14,7 +14,6 @@ class UsersController < ApplicationController
     @groups         = current_user.authorized_groups.where(id: @user.personal_groups)
     @teams          = current_user.authorized_teams.where(id: @user.personal_teams)
 
-    @event_projects = current_user.known_projects
     @events = Event.for_dashboard(@user)
                     .offset(params[:offset])
                     .limit(params[:limit] || 60)
