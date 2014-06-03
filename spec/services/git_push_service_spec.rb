@@ -64,7 +64,9 @@ describe GitPushService do
   describe "Push Event" do
     before do
       @service = GitPushService.new(user, project, @oldrev, @newrev, @ref)
+      Gitlab::Event::Factory.unstub(:call)
       @service.execute
+      Gitlab::Event::Factory.stub(call: true)
       @event = Event.last
     end
 

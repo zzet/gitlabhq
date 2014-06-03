@@ -27,6 +27,7 @@ module TestEnv
 
     # Disable mailer for spinach tests
     disable_mailer if opts[:mailer] == false
+
     setup_stubs
 
     create_indexes_in_es
@@ -60,8 +61,10 @@ module TestEnv
   end
 
   def setup_stubs()
+    Gitlab::Event::Factory.stub(call: true)
     # Use tmp dir for FS manipulations
     repos_path = testing_path()
+
     ProjectWiki.any_instance.stub(:init_repo) do |path|
       create_temp_repo(File.join(repos_path, "#{path}.git"))
     end
@@ -71,6 +74,7 @@ module TestEnv
     # TODO FIXME add map method
     domain_stub = double('domain_stub')
     domain_stub.stub(:include?) { true }
+    domain_stub.stub(:map) { [] }
     Gitlab.config.stub(:corporate_email_domains) { domain_stub }
 
     Gitlab.config.satellites.stub(path: satellite_path)
@@ -119,6 +123,7 @@ module TestEnv
 
     #Elastic::BaseIndexer.any_instance.stub(perform: true)
     #Elastic::RepositoryIndexer.any_instance.stub(perform: true)
+
     Service::GitCheckpoint.any_instance.stub(notify_git_checkpoint: true)
     Service::BuildFace.any_instance.stub(notify_build_face: true)
   end

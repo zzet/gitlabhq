@@ -14,7 +14,9 @@ describe EventNotificationMailer do
 
   def collect_mails_data
     clear_prepare_data
+    Gitlab::Event::Factory.unstub(:call)
     yield
+    Gitlab::Event::Factory.stub(call: true)
     @mails = ActionMailer::Base.deliveries
     @mails_count = @mails.count
     @email = @mails.first
@@ -40,13 +42,13 @@ describe EventNotificationMailer do
     ActiveRecord::Base.observers.enable :all
   end
 
-  #after do
+  after do
     #clean_destroy do
       #@commiter_user.destroy
       #@another_user.destroy
       #@user.destroy
     #end
-  #end
+  end
 
   describe "Project mails" do
     before { Gitlab::Event::Subscription.create_auto_subscription(@user, :project) }
@@ -649,7 +651,7 @@ describe EventNotificationMailer do
             end
 
             it "only one message" do
-              @mails_count.should == 1
+              binding.pry; @mails_count.should == 1
             end
 
             it "correct email" do
@@ -1248,6 +1250,31 @@ describe EventNotificationMailer do
             @email.bcc.first.should == @user.email
             @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-action-/
           end
+        end
+
+        context "when pushed revert" do
+          before do
+            @oldrev = 'c844723a2404f97421c14ed48bbb8fec9fa8f6b7'
+            @newrev  = 'aacbb9a9a5e317728a985674a61279781fb3ca26'
+
+            collect_mails_data do
+              GitPushService.new(@another_user, project, @oldrev, @newrev, @ref).execute
+            end
+          end
+
+          it "only one message" do
+            @mails_count.should == 1
+          end
+          #
+          # it "correct email" do
+          #   @email.from.first.should == @another_user.email
+          #   @email.to.should be_nil
+          #   @email.cc.should be_nil
+          #   @email.bcc.count.should == 1
+          #   @email.bcc.first.should == @user.email
+          #   @email.in_reply_to.should == "project-#{project.path_with_namespace}-#{@oldrev}"
+          #   @email.body.should_not be_empty
+          # end
         end
       end
     end

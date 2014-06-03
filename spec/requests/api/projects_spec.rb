@@ -320,15 +320,24 @@ describe API::API, api: true  do
   end
 
   describe "GET /projects/:id/events" do
-    before { users_project }
+    before do
+      users_project
+      Gitlab::Event::Factory.create_events("gitlab.create.users_project", {
+        source: users_project,
+        user: user,
+        data: users_project,
+        uniq_hash: "123"
+      })
+    end
 
     it "should return a project events" do
       get api("/projects/#{project.id}/events", user)
       response.status.should == 200
       json_event = json_response.first
 
-      json_event['action_name'].should == 'joined'
-      json_event['project_id'].to_i.should == project.id
+      json_event['action'].should == 'joined'
+      json_event['target_id'].to_i.should == project.id
+      json_event['target_type'].should == project.class.name
     end
 
     it "should return a 404 error if not found" do

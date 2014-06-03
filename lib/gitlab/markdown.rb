@@ -173,13 +173,14 @@ module Gitlab
     end
 
     def reference_issue(identifier)
-      if @project.used_default_issues_tracker? || !external_issues_tracker_enabled?
-        if @project.issue_exists? identifier
-          url = url_for_issue(identifier)
-          title = title_for_issue(identifier)
+      # Fix broken capability with Redmine
+      #if @project.used_default_issues_tracker? || !external_issues_tracker_enabled?
+      if @project.issue_exists? identifier
+        url = url_for_issue(identifier)
+        title = title_for_issue(identifier)
 
-          link_to("##{identifier}", url, html_options.merge(title: "Issue: #{title}", class: "gfm gfm-issue #{html_options[:class]}"))
-        end
+        link_to("##{identifier}", url, html_options.merge(title: "Issue: #{title}", class: "gfm gfm-issue #{html_options[:class]}"))
+        #end
       else
         reference_jira_issue(identifier) if @project.issues_tracker == "jira"
       end

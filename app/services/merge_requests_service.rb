@@ -17,12 +17,18 @@ class MergeRequestsService < BaseService
     @merge_request.author = @current_user
 
     if @merge_request.save
-      @merge_request.reload_code
+      #@merge_request.reload_code
+      @merge_request.create_cross_references!(@merge_request.project, @current_user)
+      execute_hooks(merge_request)
       receive_delayed_notifications
     end
 
     if @merge_request.target_project && @merge_request.target_project.jenkins_ci_with_mr?
-      type = (@merge_request.target_project == @merge_request.source_project ? :project : :fork)
+      type = if @merge_request.target_project == @merge_request.source_project
+               :project
+             else
+               :fork
+             end
       service = @merge_request.target_project.jenkins_ci
       service.build_merge_request(merge_request, current_user, type)
     end
@@ -30,21 +36,37 @@ class MergeRequestsService < BaseService
     @merge_request
   end
 
+  def close(commit = nil)
+    merge_request.allow_broken = true
+
+    if merge_request.close
+      create_note(merge_request)
+      execute_hooks(merge_request)
+    end
+
+    merge_request
+  end
+
+    def reopen
+      if merge_request.reopen
+        create_note(merge_request)
+        execute_hooks(merge_request)
+        merge_request.reload_code
+        merge_request.mark_as_unchecked
+      end
+
+      merge_request
+    end
+
   def update
     # If we close MergeRequest we want to ignore validation
     # so we can close broken one (Ex. fork project removed)
     state = params.delete('state_event')
     case state
     when 'reopen'
-      #MergeRequests::ReopenService.new(project, current_user, {}).execute(merge_request)
+      reopen
     when 'close'
-      #MergeRequests::CloseService.new(project, current_user, {}).execute(merge_request)
-
-      @merge_request.allow_broken = true
-      result = @merge_request.close
-      receive_delayed_notifications if result
-      return result
-
+      close
     end
 
     # We dont allow change of source/target projects
@@ -70,7 +92,7 @@ class MergeRequestsService < BaseService
       receive_delayed_notifications
     end
 
-    return @merge_request
+    @merge_request
   end
 
   # Mark existing merge request as merged
@@ -81,7 +103,7 @@ class MergeRequestsService < BaseService
     merge_request.merge
 
     create_merge_event(merge_request)
-    execute_project_hooks(merge_request)
+    execute_hooks(merge_request)
 
     receive_delayed_notifications
 
@@ -96,11 +118,12 @@ class MergeRequestsService < BaseService
   def auto_merge(commit_message)
     merge_request.lock
 
-    if Gitlab::Satellite::MergeAction.new(current_user, merge_request).merge!(commit_message)
+    if Gitlab::Satellite::MergeAction.new(current_user,
+                                          merge_request).merge!(commit_message)
       merge_request.merge
 
       create_merge_event(merge_request)
-      execute_project_hooks(merge_request)
+      execute_hooks(merge_request)
 
       receive_delayed_notifications
 
@@ -117,7 +140,6 @@ class MergeRequestsService < BaseService
 
   private
 
-
   def create_merge_event(merge_request)
     OldEvent.create(
       project: merge_request.target_project,
@@ -128,9 +150,25 @@ class MergeRequestsService < BaseService
     )
   end
 
-  def execute_project_hooks(merge_request)
+  def create_assignee_note(merge_request)
+    Note.create_assignee_change_note(merge_request,
+                                     merge_request.project,
+                                     current_user,
+                                     merge_request.assignee)
+  end
+
+  def create_note(merge_request)
+    Note.create_status_change_note(merge_request,
+                                   merge_request.target_project,
+                                   current_user,
+                                   merge_request.state,
+                                   nil)
+  end
+
+  def execute_hooks(merge_request)
     if merge_request.project
-      merge_request.project.execute_hooks(merge_request.to_hook_data, :merge_request_hooks)
+      merge_request.project.execute_hooks(merge_request.to_hook_data,
+                                          :merge_request_hooks)
     end
   end
 end

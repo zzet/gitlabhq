@@ -30,7 +30,7 @@ class Service::Assembla < Service
 
   def execute(push)
     url = "https://atlas.assembla.com/spaces/#{subdomain}/github_tool?secret_key=#{token}"
-    AssemblaService.post(url,
+    Service::Assembla.post(url,
                          body: { payload: push }.to_json,
                          headers: { 'Content-Type' => 'application/json' })
   end

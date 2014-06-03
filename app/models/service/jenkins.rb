@@ -17,7 +17,9 @@
 #  api_key            :string(255)
 #
 
-class Service::Jenkins < Service::CiService
+class Service::Jenkins < Service
+  include Service::CiService
+
   default_title       'Jenkins CI'
   default_description 'Continuous integration server from Jenkins'
   service_name        'jenkins'

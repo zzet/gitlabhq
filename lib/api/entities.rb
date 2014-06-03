@@ -243,9 +243,10 @@ module API
     end
 
     class Event < Grape::Entity
-      expose :title, :project_id, :action_name
-      expose :target_id, :target_type, :author_id
-      expose :data, :target_title
+      expose  :action, :author_id
+      expose :target_id, :target_type
+      expose :source_id, :source_type
+      expose :data
       expose :created_at
     end
 

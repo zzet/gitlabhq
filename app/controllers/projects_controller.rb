@@ -183,12 +183,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  protected
-
-  def check_git_protocol
-    @git_protocol_enabled ||= Gitlab.config.gitlab.git_daemon_enabled
-  end
-
   def upload_image
     link_to_image = ::Projects::ImageService.new(repository, params, root_url).execute
 
@@ -199,6 +193,12 @@ class ProjectsController < ApplicationController
         format.json { render json: "Invalid file.", status: :unprocessable_entity }
       end
     end
+  end
+
+  protected
+
+  def check_git_protocol
+    @git_protocol_enabled ||= Gitlab.config.gitlab.git_daemon_enabled
   end
 
   private

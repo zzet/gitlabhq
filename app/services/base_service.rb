@@ -51,4 +51,18 @@ class BaseService
   def log_info message
     Gitlab::AppLogger.info message
   end
+
+  def error(message)
+    {
+      message: message,
+      status: :error
+    }
+  end
+
+  def success(message = "")
+    {
+      message: message,
+      status: :success
+    }
+  end
 end

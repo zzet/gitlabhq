@@ -6,12 +6,12 @@ class SearchService < BaseService
 
     #return global_search_result unless query.present?
 
+    global_search_result[:projects]       = search_in_projects(query)
     global_search_result[:groups]         = search_in_groups(query)
     global_search_result[:teams]          = search_in_teams(query)
     global_search_result[:users]          = search_in_users(query)
-    global_search_result[:projects]       = search_in_projects(query)
-    global_search_result[:merge_requests] = search_in_merge_requests(query)
     global_search_result[:issues]         = search_in_issues(query)
+    global_search_result[:merge_requests] = search_in_merge_requests(query)
     global_search_result[:repositories]   = search_in_repository(query)
 
     # temp disabled
@@ -62,13 +62,13 @@ class SearchService < BaseService
   end
 
   def search_in_groups(query)
-    opt = {
-      gids: current_user.authorized_groups.ids,
-      order: params[:order],
-      in: %w(name^10 path^5 description),
-    }
-
     begin
+      opt = {
+        gids: current_user.authorized_groups.ids,
+        order: params[:order],
+        in: %w(name^10 path^5 description),
+      }
+
       response = Group.search(query, options: opt, page: page)
 
       {
@@ -83,13 +83,13 @@ class SearchService < BaseService
   end
 
   def search_in_teams(query)
-    opt = {
-      tids: current_user.known_teams.ids,
-      order: params[:order],
-      in: %w(name^10 path^5 description),
-    }
-
     begin
+      opt = {
+        tids: current_user.known_teams.ids,
+        order: params[:order],
+        in: %w(name^10 path^5 description),
+      }
+
       response = Team.search(query, options: opt, page: page)
 
       {
@@ -104,12 +104,12 @@ class SearchService < BaseService
   end
 
   def search_in_users(query)
-    opt = {
-      active: true,
-      order: params[:order]
-    }
-
     begin
+      opt = {
+        active: true,
+        order: params[:order]
+      }
+
       response = User.search(query, options: opt, page: page)
 
       {
@@ -124,12 +124,12 @@ class SearchService < BaseService
   end
 
   def search_in_merge_requests(query)
-    opt = {
-      projects_ids: projects_ids,
-      order: params[:order]
-    }
-
     begin
+      opt = {
+        projects_ids: projects_ids,
+        order: params[:order]
+      }
+
       response = MergeRequest.search(query, options: opt, page: page)
 
       {
@@ -144,12 +144,12 @@ class SearchService < BaseService
   end
 
   def search_in_issues(query)
-    opt = {
-      projects_ids: projects_ids,
-      order: params[:order]
-    }
-
     begin
+      opt = {
+        projects_ids: projects_ids,
+        order: params[:order]
+      }
+
       response = Issue.search(query, options: opt, page: page)
 
       {
@@ -164,14 +164,15 @@ class SearchService < BaseService
   end
 
   def search_in_repository(query)
-    opt = {
-      repository_id: projects_ids,
-      highlight: true,
-      order: params[:order]
-    }
-    opt.merge!({ language: params[:language] }) if params[:language].present? && params[:language] != "All"
-
     begin
+      opt = {
+        repository_id: projects_ids,
+        highlight: true,
+        order: params[:order]
+      }
+
+      opt.merge!({ language: params[:language] }) if params[:language].present? && params[:language] != "All"
+
       res = Repository.search(query, options: opt, page: page)
       res[:blobs][:projects]    = res[:blobs][:repositories].map   { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }
       res[:commits][:projects]  = res[:commits][:repositories].map { |r| pr = Project.find(r["term"]); { name: pr.name_with_namespace, path: pr.path_with_namespace, count: r["count"] } }

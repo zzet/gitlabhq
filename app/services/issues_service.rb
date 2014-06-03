@@ -28,12 +28,11 @@ class IssuesService < BaseService
   end
 
   def update
-    if issue.update(params)
+    if @issue.update_attributes(params)
       receive_delayed_notifications
-      return true
     end
 
-    return false
+    @issue
   end
 
   def bulk_update
@@ -67,5 +66,11 @@ class IssuesService < BaseService
       count: issues.count,
       success: !issues.count.zero?
     }
+  end
+
+  private
+
+  def execute_hooks(issue)
+    project.execute_hooks(issue.to_hook_data, :issue_hooks)
   end
 end

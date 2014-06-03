@@ -3,6 +3,7 @@ require 'spec_helper'
 describe "Search", feature: true  do
   before do
     ActiveRecord::Base.observers.enable(:user_observer)
+    create_indexes_in_es
     login_as :user
     @project = create(:project, namespace: @user.namespace)
     @project.team << [@user, :reporter]

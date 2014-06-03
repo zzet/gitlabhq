@@ -203,10 +203,6 @@ class Service < ActiveRecord::Base
     # implement inside child
   end
 
-  def to_param
-    # implement inside child
-  end
-
   def fields
     # implement inside child
     []

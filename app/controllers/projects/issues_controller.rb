@@ -59,7 +59,7 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def create
-    @issue = Issues::CreateService.new(project, current_user, params[:issue]).execute
+    @issue = ProjectsService.new(current_user, project, params).issue.create
 
     respond_to do |format|
       format.html do
@@ -69,14 +69,14 @@ class Projects::IssuesController < Projects::ApplicationController
           render :new
         end
       end
-      format.js do |format|
+      format.js do
         @link = @issue.attachment.url.to_js
       end
     end
   end
 
   def update
-    @issue = Issues::UpdateService.new(project, current_user, params[:issue]).execute(issue)
+    @issue = ProjectsService.new(current_user, project, params).issue(issue).update
 
     respond_to do |format|
       format.js

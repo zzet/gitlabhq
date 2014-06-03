@@ -36,8 +36,8 @@ module API
       #   POST /projects/:id/repository/tags
       post ':id/repository/tags' do
         authorize_push_project
-        @tag = CreateTagService.new.execute(user_project, params[:tag_name],
-                                            params[:ref], current_user)
+        repository_service = ProjectsService.new(current_user, user_project).repository
+        @tag = repository_service.create_tag(params[:tag_name], params[:ref])
 
         present @tag, with: Entities::RepoObject, project: user_project
       end

@@ -57,7 +57,6 @@ production: &base
     # default: true - If set to false, standard login form won't be shown on the sign-in page
     # signin_enabled: false
 
-
     ## Enable support cloning projects via git protocol (git://)
     # You need git daemon to use this feature!
     # git_daemon_enabled: true
@@ -122,6 +121,10 @@ production: &base
     # gravatar urls: possible placeholders: %{hash} %{size} %{email}
     # plain_url: "http://..."     # default: http://www.gravatar.com/avatar/%{hash}?s=%{size}&d=mm
     # ssl_url:   "https://..."    # default: https://secure.gravatar.com/avatar/%{hash}?s=%{size}&d=mm
+
+  elasticsearch:
+    host: 'localhost'
+    port: 9200
 
   #
   # 2. Auth settings

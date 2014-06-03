@@ -20,7 +20,7 @@ describe UsersGroup do
   end
 
   describe "Mass assignment" do
-    it { should_not allow_mass_assignment_of(:group_id) }
+    it { should allow_mass_assignment_of(:group_id) }
   end
 
   describe "Validation" do

@@ -6,6 +6,7 @@ describe "Profile account page", feature: true do
   let(:user) { create(:user) }
 
   before do
+    Gitlab.config.gitlab.stub(:signup_enabled).and_return(true)
     login_as :user
   end
 

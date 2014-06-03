@@ -1,7 +1,9 @@
 # Base class for CI services
 # List methods you need to implement to get your CI service
 # working with GitLab Merge Requests
-class Service::CiService < Service
+module Service::CiService
+  extend ActiveSupport::Concern
+
   def category
     :ci
   end

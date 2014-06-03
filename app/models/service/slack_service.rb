@@ -17,7 +17,7 @@
 #  api_key     :string(255)
 #
 
-class Service::Slack < Service
+class Service::SlackService < Service
   default_title       'Slack'
   default_description 'A team communication tool for the 21st century'
   service_name        'slack'

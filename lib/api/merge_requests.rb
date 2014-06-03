@@ -78,7 +78,10 @@ module API
         required_attributes! [:source_branch, :target_branch, :title]
         attrs = attributes_for_keys [:source_branch, :target_branch, :assignee_id, :title, :target_project_id, :description]
         attrs[:label_list] = params[:labels] if params[:labels].present?
-        merge_request = ::MergeRequests::CreateService.new(user_project, current_user, attrs).execute
+
+        merge_request = ProjectsService.new(current_user,
+                                            user_project,
+                                            attrs).merge_request.create
 
         if merge_request.valid?
           present merge_request, with: Entities::MergeRequest
@@ -107,7 +110,10 @@ module API
         attrs[:label_list] = params[:labels] if params[:labels].present?
         merge_request = user_project.merge_requests.find(params[:merge_request_id])
         authorize! :modify_merge_request, merge_request
-        merge_request = ::MergeRequests::UpdateService.new(user_project, current_user, attrs).execute(merge_request)
+
+        merge_request = ProjectsService.new(current_user,
+                                            user_project,
+                                            {merge_request: params}).merge_request(merge_request).update
 
         if merge_request.valid?
           present merge_request, with: Entities::MergeRequest

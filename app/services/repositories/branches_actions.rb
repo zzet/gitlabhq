@@ -23,6 +23,7 @@ module Repositories::BranchesActions
 
       GitPushService.new(current_user, project, oldrev, newrev, ref).execute
     end
+    new_branch
   end
 
   def delete_branch_action(branch)
@@ -34,12 +35,12 @@ module Repositories::BranchesActions
       return error('No such branch')
     end
 
-    if branch_name == repository.root_ref
+    if branch.name == repository.root_ref
       return error('Cannot remove HEAD branch')
     end
 
     # Dont allow remove of protected branch
-    if project.protected_branch?(branch_name)
+    if project.protected_branch?(branch.name)
       return error('Protected branch cant be removed')
     end
 
@@ -56,20 +57,8 @@ module Repositories::BranchesActions
       GitPushService.new(current_user, project, oldrev, newrev, ref).execute
 
       receive_delayed_notifications
+
+      return success("Branch '#{branch}' was removed")
     end
-  end
-
-  def error(message)
-    {
-      message: message,
-      state: :error
-    }
-  end
-
-  def success(message)
-    {
-      message: message,
-      state: :success
-    }
   end
 end

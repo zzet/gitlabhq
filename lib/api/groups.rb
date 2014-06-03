@@ -95,7 +95,7 @@ module API
         group = Group.find(params[:id])
         project = Project.find(params[:project_id])
 
-        result = ::ProjectsService.new(current_user, project, namespace_id: group.id).transfer
+        result = ProjectsService.new(current_user, project, namespace_id: group.id).transfer
 
         if result
           present group

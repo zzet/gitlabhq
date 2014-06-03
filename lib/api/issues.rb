@@ -52,7 +52,7 @@ module API
         required_attributes! [:title]
         attrs = attributes_for_keys [:title, :description, :assignee_id, :milestone_id]
         attrs[:label_list] = params[:labels] if params[:labels].present?
-        issue = ::Issues::CreateService.new(user_project, current_user, attrs).execute
+        issue = ProjectsService.new(current_user, user_project, attrs).issue.create
 
         if issue.valid?
           present issue, with: Entities::Issue
@@ -81,7 +81,8 @@ module API
         attrs = attributes_for_keys [:title, :description, :assignee_id, :milestone_id, :state_event]
         attrs[:label_list] = params[:labels] if params[:labels].present?
 
-        issue = ::Issues::UpdateService.new(user_project, current_user, attrs).execute(issue)
+        issue_service = ProjectsService.new(current_user, user_project, attrs).issue(issue)
+        issue = issue_service.update
 
         if issue.valid?
           present issue, with: Entities::Issue

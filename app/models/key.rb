@@ -59,7 +59,7 @@ class Key < ActiveRecord::Base
   end
 
   def notify_user
-    NotificationService.new.new_key(self)
+    #NotificationService.new.new_key(self)
   end
 
   def remove_from_shell

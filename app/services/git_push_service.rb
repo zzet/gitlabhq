@@ -56,6 +56,7 @@ class GitPushService
     if push.tag?
       project.execute_hooks(@push_data.dup, :tag_push_hooks)
     else
+      Elastic::RepositoryIndexer.perform_async(push.id)
       project.execute_hooks(@push_data.dup, :push_hooks)
     end
 
@@ -75,8 +76,6 @@ class GitPushService
 
       process_commit_messages(push)
     end
-
-    Elastic::RepositoryIndexer.perform_async(push.id)
   end
 
   # This method provide a sample data
