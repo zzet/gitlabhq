@@ -1249,6 +1249,31 @@ describe EventNotificationMailer do
             @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-action-/
           end
         end
+
+        context "when pushed revert" do
+          before do
+            @oldrev = 'c844723a2404f97421c14ed48bbb8fec9fa8f6b7'
+            @newrev  = 'aacbb9a9a5e317728a985674a61279781fb3ca26'
+
+            collect_mails_data do
+              GitPushService.new(@another_user, project, @oldrev, @newrev, @ref).execute
+            end
+          end
+
+          it "only one message" do
+            @mails_count.should == 1
+          end
+          #
+          # it "correct email" do
+          #   @email.from.first.should == @another_user.email
+          #   @email.to.should be_nil
+          #   @email.cc.should be_nil
+          #   @email.bcc.count.should == 1
+          #   @email.bcc.first.should == @user.email
+          #   @email.in_reply_to.should == "project-#{project.path_with_namespace}-#{@oldrev}"
+          #   @email.body.should_not be_empty
+          # end
+        end
       end
     end
   end
