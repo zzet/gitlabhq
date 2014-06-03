@@ -2,7 +2,7 @@ class Gitlab::Event::Notification::Creator::Note < Gitlab::Event::Notification::
   def create(event)
     notifications = []
 
-    return notifications if %(deleted updated).include?(event.action)
+    return notifications if %w(deleted updated).include?(event.action)
 
     notifications << create_notification_for_project_subscriptions(event)
     notifications << create_notification_for_commit_author(event)
