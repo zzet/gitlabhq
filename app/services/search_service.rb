@@ -34,6 +34,7 @@ class SearchService < BaseService
       order: params[:order],
       fields: %w(name^10 path^9 description^5
              name_with_namespace^2 path_with_namespace),
+      highlight: true
     }
 
     group = Group.find_by(id: params[:group_id]) if params[:group_id].present?
@@ -103,6 +104,7 @@ class SearchService < BaseService
       tids: current_user.known_teams.ids,
       order: params[:order],
       fields: %w(name^10 path^5 description),
+      highlight: true
     }
 
     begin
