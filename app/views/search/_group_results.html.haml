@@ -24,5 +24,7 @@
 %hr
 .search_results
   %ul.bordered-list
-    = render partial: "search/results/group", collection: @search_results[:groups][:records]
+    - @search_results[:groups][:records].each_with_index do |group, index|
+      = render partial: "search/results/group", locals: { group: group,
+       result: @search_results[:groups][:results][index] }
   = paginate @search_results[:groups][:results], theme: 'gitlab'

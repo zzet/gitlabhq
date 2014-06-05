@@ -1,5 +1,5 @@
 %li
   = link_to user do
-    %strong.term= user.name
+    %strong.term= result.highlight.name.try(:first)
     %span.light.term= user.username
     %span.light.term= "(#{user.email})"
