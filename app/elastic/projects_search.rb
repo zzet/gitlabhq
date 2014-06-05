@@ -205,15 +205,7 @@ module ProjectsSearch
       ]
 
       if options[:highlight]
-        fields = options[:in].map { |field| field.split('^').first }.inject({}) do |memo, field|
-          memo[field.to_sym] = {}
-          memo
-        end
-        query_hash[:highlight] = {
-            pre_tags: ["gitlabelasticsearch→"],
-            post_tags: ["←gitlabelasticsearch"],
-            fields: fields
-        }
+        query_hash[:highlight] = highlight_options(options[:in])
       end
 
       self.__elasticsearch__.search(query_hash)

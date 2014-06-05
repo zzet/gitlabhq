@@ -83,6 +83,7 @@ class SearchService < BaseService
       gids: current_user.authorized_groups.ids,
       order: params[:order],
       fields: %w(name^10 path^5 description),
+      highlight: true
     }
 
     begin
@@ -124,7 +125,8 @@ class SearchService < BaseService
   def search_in_users(query)
     opt = {
       active: true,
-      order: params[:order]
+      order: params[:order],
+      highlight: true
     }
 
     begin
@@ -144,7 +146,8 @@ class SearchService < BaseService
   def search_in_merge_requests(query, project = nil)
     opt = {
       projects_ids: project ? [project.id] : projects_ids,
-      order: params[:order]
+      order: params[:order],
+      highlight: true
     }
 
     begin
