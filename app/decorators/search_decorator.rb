@@ -47,6 +47,10 @@ class SearchDecorator
     @sr[:users].present? && @sr[:users][:total_count] > 0
   end
 
+  def founded_languages
+    @sr[:repositories][:blobs][:languages].select { |lang| lang['count'] > 0 }
+  end
+
   def [](key)
     @sr[key]
   end

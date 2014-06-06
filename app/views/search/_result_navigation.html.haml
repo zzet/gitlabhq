@@ -50,7 +50,9 @@
   %hr
 
 - if @search_results.code? && params[:type] == "code"
-  = render "search/facets/repository/language", languages: @search_results[:repositories][:blobs][:languages]
+  = render "search/facets/repository/language",
+    languages: @search_results.founded_languages
 
 - if params[:project]
+  %hr
   = link_to 'Global search', search_path(params.reject { |k, v| k == 'project'})
