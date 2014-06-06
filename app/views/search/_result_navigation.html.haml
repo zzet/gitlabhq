@@ -59,3 +59,6 @@
 - if @search_results[:repositories].present?
   - if @search_results[:repositories][:blobs][:total_count] > 0 && params[:type] == "code"
     = render "search/facets/repository/language", languages: @search_results[:repositories][:blobs][:languages]
+
+- if params[:project]
+  = link_to 'Global search', search_path(params.reject { |k, v| k == 'project'})
