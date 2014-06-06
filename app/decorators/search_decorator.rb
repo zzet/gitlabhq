@@ -40,7 +40,7 @@ class SearchDecorator
   end
 
   def commits?
-    @sr[:repositories][:commits][:total_count] > 0
+    @sr[:repositories].present? && @sr[:repositories][:commits][:total_count] > 0
   end
 
   def users?
