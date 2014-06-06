@@ -122,7 +122,7 @@ module MergeRequestsSearch
       ]
 
       if options[:highlight]
-        query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
+        query_hash[:highlight] = highlight_options(options[:in])
       end
 
       self.__elasticsearch__.search(query_hash)

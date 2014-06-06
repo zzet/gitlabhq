@@ -1,6 +1,6 @@
 %li
   = link_to team do
-    %strong.term= team.name
+    %strong.term= result.highlight.name.try(:first)
   - if team.description.present?
     &ndash;
     %span.light.term= team.description

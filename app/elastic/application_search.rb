@@ -51,4 +51,19 @@ module ApplicationSearch
     after_commit lambda { Elastic::BaseIndexer.perform_async(:delete, self.class.to_s, self.id) }, on: :destroy
     after_touch  lambda { Elastic::BaseIndexer.perform_async(:update, self.class.to_s, self.id) }
   end
+
+   module ClassMethods
+     def highlight_options(fields)
+       es_fields = fields.map { |field| field.split('^').first }.inject({}) do |memo, field|
+         memo[field.to_sym] = {}
+         memo
+       end
+
+       {
+           pre_tags: ["gitlabelasticsearch→"],
+           post_tags: ["←gitlabelasticsearch"],
+           fields: es_fields
+       }
+     end
+   end
 end

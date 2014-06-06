@@ -34,6 +34,7 @@ class SearchService < BaseService
       order: params[:order],
       fields: %w(name^10 path^9 description^5
              name_with_namespace^2 path_with_namespace),
+      highlight: true
     }
 
     group = Group.find_by(id: params[:group_id]) if params[:group_id].present?
@@ -82,6 +83,7 @@ class SearchService < BaseService
       gids: current_user.authorized_groups.ids,
       order: params[:order],
       fields: %w(name^10 path^5 description),
+      highlight: true
     }
 
     begin
@@ -103,6 +105,7 @@ class SearchService < BaseService
       tids: current_user.known_teams.ids,
       order: params[:order],
       fields: %w(name^10 path^5 description),
+      highlight: true
     }
 
     begin
@@ -122,7 +125,8 @@ class SearchService < BaseService
   def search_in_users(query)
     opt = {
       active: true,
-      order: params[:order]
+      order: params[:order],
+      highlight: true
     }
 
     begin
@@ -142,7 +146,8 @@ class SearchService < BaseService
   def search_in_merge_requests(query, project = nil)
     opt = {
       projects_ids: project ? [project.id] : projects_ids,
-      order: params[:order]
+      order: params[:order],
+      highlight: true
     }
 
     begin
