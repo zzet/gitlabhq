@@ -63,8 +63,9 @@ class Event::Summary < ActiveRecord::Base
   }
 
   scope :by_subscription, ->(subscription) {
-    joins(:summary_entity_relationships).
-    where(event_summary_entity_relationships: { entity_id: subscription.target_id, entity_type: subscription.target_type })
+    by_user(subscription.user).
+      joins(:summary_entity_relationships).
+      where(event_summary_entity_relationships: { entity_id: subscription.target_id, entity_type: subscription.target_type })
   }
 
   def events_for(to_time)
