@@ -55,8 +55,8 @@ class Gitlab::Event::Notification::Creator::Default
     subscription.user.active? &&
       no_notification_on_event?(event, subscription.user) &&
       check_event_for_brave(subscription, event) &&
-      (user_not_actor?(subscription.user, event) || user_subscribed_on_own_changes?(event)) &&
-      check_event_summary_subscriptions(subscription)
+      (user_not_actor?(subscription.user, event) || user_subscribed_on_own_changes?(event))
+    #&& check_event_summary_subscriptions(subscription)
     #has_access(event, subscription.user)
   end
 
