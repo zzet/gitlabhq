@@ -114,8 +114,7 @@ $list-group-active-bg: $bg_style_color;
 
   li {
     > a {
-      padding: 8px 13px;
-      margin-right: 4px;
+      margin-right: 5px;
       line-height: 20px;
       border-color: #EEE;
       color: #888;
@@ -253,9 +252,19 @@ ul.breadcrumb {
     }
   }
 
+  .panel-footer {
+    .pagination {
+      margin: 0;
+    }
+  }
+
   &.panel-small {
     .panel-heading {
       padding: 6px 15px;
+      font-size: 13px;
+      a {
+        color: #777;
+      }
     }
   }
 }

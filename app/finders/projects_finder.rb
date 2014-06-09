@@ -1,5 +1,5 @@
 class ProjectsFinder
-  def execute(current_user, options)
+  def execute(current_user, options = {})
     group = options[:group]
 
     projects = all_projects(current_user)

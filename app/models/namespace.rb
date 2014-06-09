@@ -50,14 +50,6 @@ class Namespace < ActiveRecord::Base
       namespace.nil? || (namespace == global_id)
     end
   end
-  
-  def projects_accessible_to(user)
-    projects.accessible_to(user)
-  end
-  
-  def has_projects_accessible_to?(user)
-    projects_accessible_to(user).present?
-  end
 
   def to_param
     path

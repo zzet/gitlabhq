@@ -315,12 +315,6 @@ class Project < ActiveRecord::Base
       where(visibility_level: visibility_levels)
     end
 
-    def accessible_to(user)
-      accessible_ids = publicish(user).pluck(:id)
-      accessible_ids += user.authorized_projects.pluck(:id) if user
-      where(id: accessible_ids)
-    end
-
     def with_push
       includes(:old_events).where('old_events.action = ?', OldEvent::PUSHED)
     end
@@ -519,7 +513,7 @@ class Project < ActiveRecord::Base
   end
 
   def ci_service
-    @ci_service ||= services.select(&:activated?).first
+    @ci_service ||= ci_services.select(&:activated?).first
   end
 
   # For compatibility with old code

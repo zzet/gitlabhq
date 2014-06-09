@@ -13,6 +13,19 @@ v 7.0.0
   - Group masters can create projects in group
   - Deprecate ruby 1.9.3 support
   - Only masters can rewrite/remove git tags
+  - Add X-Frame-Options SAMEORIGIN to Nginx config so Sidekiq admin is visible
+  - UI improvements
+  - Case-insensetive search for issues
+  - Update to rails 4.1
+  - Improve performance of application for projects and groups with a lot of members
+  - Formally support Ruby 2.1
+  - Include Nginx gitlab-ssl config
+  - Add manual language detection foir highlight.js
+  - Added example.com/:username routing
+  - Show notice if your profile is public
+  - UI improvements for mobile devices
+  - Improve diff rendering performance
+  - Drag-n-drop for issues and merge requests between states at milestone page 
 
 v 6.9.2
   - Revert the commit that broke the LDAP user filter

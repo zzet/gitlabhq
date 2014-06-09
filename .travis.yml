@@ -5,7 +5,8 @@ env:
     - DB=postgresql
     - TRAVIS=true
   matrix:
-    - TASK=spinach DB=postgresql
+    - TASK=spinach_project DB=postgresql
+    - TASK=spinach_other DB=postgresql
     - TASK=spec:api DB=postgresql
     - TASK=spec:feature DB=postgresql
     - TASK=spec:other DB=postgresql

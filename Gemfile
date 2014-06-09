@@ -9,7 +9,7 @@ def linux_only(require_as)
   RUBY_PLATFORM.include?('linux') && require_as
 end
 
-gem "rails", "~> 4.0.0"
+gem "rails", "~> 4.1.0"
 
 gem "protected_attributes"
 gem 'rails-observers'
@@ -240,7 +240,7 @@ group :development, :test do
   # gem 'rails-dev-tweaks'
   gem 'spinach-rails'
   gem "rspec-rails"
-  gem "capybara"
+  gem "capybara", '~> 2.2.1'
   gem "pry"
   gem 'pry-rails'
   # gem 'pry-rescue'
@@ -252,7 +252,7 @@ group :development, :test do
   gem "launchy"
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
-  gem 'minitest', '~> 4.7.0'
+  gem 'minitest', '~> 5.3.0'
 
   # Generate Fake data
   gem "ffaker"
@@ -266,9 +266,9 @@ group :development, :test do
   gem 'growl',      require: darwin_only('growl')
 
   # PhantomJS driver for Capybara
-  gem 'poltergeist', '~> 1.4.1'
+  gem 'poltergeist', '~> 1.5.1'
 
-  gem 'jasmine', '2.0.0.rc5'
+  gem 'jasmine', '2.0.2'
 
   gem "spring", '1.1.1'
   gem "spring-commands-rspec", '1.0.1'

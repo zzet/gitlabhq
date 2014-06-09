@@ -113,7 +113,12 @@ module SearchHelper
 
   # Autocomplete results for the current user's projects
   def projects_autocomplete(term, limit = 10)
-    Project.search(term, options: { pids: current_user.known_projects.pluck(:id), non_archived: true }, per: limit).records.map do |p|
+      Project.search(term,
+                     options: {
+                      pids: current_user.known_projects.pluck(:id),
+                      non_archived: true
+                    },
+                    per: limit).records.map do |p|
       {
         label: "project: #{search_result_sanitize(p.name_with_namespace)}",
         url: project_path(p)

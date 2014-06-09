@@ -12,8 +12,6 @@ class ProjectsController < ApplicationController
   before_filter :set_title, only: [:new, :create]
   before_filter :event_filter, only: :show
 
-  rescue_from CarrierWave::IntegrityError, with: :invalid_file
-
   def new
     @project = Project.new
   end
@@ -212,10 +210,6 @@ class ProjectsController < ApplicationController
     %w(png jpg jpeg gif)
   end
 
-  def invalid_file(error)
-    render json: { message: error.message }, status: :internal_server_error
-  end
-
   def set_title
     @title = 'New Project'
   end
@@ -242,6 +236,6 @@ class ProjectsController < ApplicationController
   end
 
   def sorted(users)
-    users.uniq.compact.sort_by(&:username).map { |user| { username: user.username, name: user.name } }
+    users.uniq.to_a.compact.sort_by(&:username).map { |user| { username: user.username, name: user.name } }
   end
 end

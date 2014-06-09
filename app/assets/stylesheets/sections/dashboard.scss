@@ -60,7 +60,7 @@
 }
 
 .project-row, .group-row {
-  padding: 8px 12px !important;
+  padding: 8px 15px !important;
   font-size: 14px;
   line-height: 24px;
 
@@ -77,6 +77,12 @@
 
   .project-name, .group-name {
     font-weight: 500;
+  }
+
+  .arrow {
+    float: right;
+    margin: 0;
+    font-size: 20px;
   }
 
   .last-activity {
@@ -118,6 +124,5 @@
 .dash-project-access-icon {
   float: left;
   margin-right: 3px;
-  color: #999;
   width: 16px;
 }
