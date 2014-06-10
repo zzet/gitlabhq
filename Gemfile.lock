@@ -24,12 +24,12 @@ GIT
 
 GIT
   remote: git://github.com/zzet/elasticsearch-git.git
-  revision: 9a05f9878b67b8a3913784a04b26e12ee6370f61
-  ref: 9a05f9878b67b8a3913784a04b26e12ee6370f61
+  revision: 36e791e60cd480f1af5f3478030265cb5d82b5c6
+  ref: 36e791e60cd480f1af5f3478030265cb5d82b5c6
   specs:
     elasticsearch-git (0.0.4)
-      activemodel (~> 4.0.0)
-      activesupport (~> 4.0.0)
+      activemodel (> 4.0.0)
+      activesupport (> 4.0.0)
       charlock_holmes (~> 0.6.9)
       elasticsearch-api (> 0.4.0)
       elasticsearch-model
