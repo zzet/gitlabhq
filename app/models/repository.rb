@@ -4,6 +4,9 @@ class Repository
 
   attr_accessor :raw_repository, :path_with_namespace
 
+  env = (Rails.env == 'staging') ? 'production' : Rails.env
+  index_name ['repository-index', env].join('-')
+
   def initialize(path_with_namespace, default_branch = nil)
     @path_with_namespace = path_with_namespace
     @raw_repository = Gitlab::Git::Repository.new(path_to_repo) if path_with_namespace
