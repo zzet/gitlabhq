@@ -1165,7 +1165,9 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      collect_events do
+        GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      end
 
       add_retry
 
@@ -1266,26 +1268,7 @@ describe EventSummaryMailer do
         mails.count.should == EVENTS_SUMMARY_PERIODS.count
         select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
       end
-      it "should update a few projects and send one summary email" do
-        projects
-        new_group = create :group, owner: @user
 
-        clear_prepare_data
-
-        create_events_summaries
-
-        collect_events do
-          projects.each do |project|
-            params = { project: { namespace_id: new_group.id }}
-            ProjectsService.new(@another_user, project, params).transfer
-          end
-        end
-
-        add_retry
-
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
-      end
       it "should delete a few projects and send one summary email" do
         projects
 

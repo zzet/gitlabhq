@@ -90,11 +90,23 @@ class Gitlab::Event::Builder
       @events.flatten
     end
 
-    def find_parent_event(action, data)
+    def find_parent_event(action, data, step = 0)
       collector = EventHierarchyWorker.collector
       parent_event = collector.events.parent(action, data)
 
-      Event.find_by(uniq_hash: parent_event[:data][:uniq_hash])
+      event = Event.find_by(uniq_hash: parent_event[:data][:uniq_hash])
+
+      if event.nil? &&
+                      (collector.events.parent(parent_event[:name],
+                                               parent_event[:data]).present? &&
+                      parent_event[:name] != action &&
+                      step < 3)
+
+        step += 1
+        event = find_parent_event(parent_event[:name], parent_event[:data], step)
+      end
+
+      event
     end
 
     def find_persisted_event(action)

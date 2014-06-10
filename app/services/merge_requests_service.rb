@@ -6,34 +6,34 @@ class MergeRequestsService < BaseService
     @current_user = user
     @merge_request = merge_request
     @params = params.dup
-    @source_project = source_project || @merge_request.source_project
-    @target_project = target_project || @merge_request.target_project
+    @source_project = source_project || merge_request.source_project
+    @target_project = target_project || merge_request.target_project
   end
 
   def create
-    @merge_request = MergeRequest.new(params)
-    @merge_request.target_project = target_project if @merge_request.target_project.blank?
-    @merge_request.source_project = source_project if @merge_request.source_project.blank?
-    @merge_request.author = @current_user
+    merge_request = MergeRequest.new(params)
+    merge_request.target_project = target_project if merge_request.target_project.blank?
+    merge_request.source_project = source_project if merge_request.source_project.blank?
+    merge_request.author = @current_user
 
-    if @merge_request.save
-      #@merge_request.reload_code
-      @merge_request.create_cross_references!(@merge_request.project, @current_user)
+    if merge_request.save
+      #merge_request.reload_code
+      merge_request.create_cross_references!(merge_request.project, @current_user)
       execute_hooks(merge_request)
       receive_delayed_notifications
     end
 
-    if @merge_request.target_project && @merge_request.target_project.jenkins_ci_with_mr?
-      type = if @merge_request.target_project == @merge_request.source_project
+    if merge_request.target_project && merge_request.target_project.jenkins_ci_with_mr?
+      type = if merge_request.target_project == merge_request.source_project
                :project
              else
                :fork
              end
-      service = @merge_request.target_project.jenkins_ci
+      service = merge_request.target_project.jenkins_ci
       service.build_merge_request(merge_request, current_user, type)
     end
 
-    @merge_request
+    merge_request
   end
 
   def close(commit = nil)
@@ -47,52 +47,15 @@ class MergeRequestsService < BaseService
     merge_request
   end
 
-    def reopen
-      if merge_request.reopen
-        create_note(merge_request)
-        execute_hooks(merge_request)
-        merge_request.reload_code
-        merge_request.mark_as_unchecked
-      end
-
-      merge_request
+  def reopen
+    if merge_request.reopen
+      create_note(merge_request)
+      execute_hooks(merge_request)
+      merge_request.reload_code
+      merge_request.mark_as_unchecked
     end
 
-  def update
-    # If we close MergeRequest we want to ignore validation
-    # so we can close broken one (Ex. fork project removed)
-    state = params.delete('state_event')
-    case state
-    when 'reopen'
-      reopen
-    when 'close'
-      close
-    end
-
-    # We dont allow change of source/target projects
-    # after merge request was created
-    params[:merge_request].delete(:source_project_id)
-    params[:merge_request].delete(:target_project_id)
-
-    if params[:merge_request].any? &&
-      @merge_request.update_attributes(@params[:merge_request])
-
-      @merge_request.reset_events_cache
-
-      if @merge_request.previous_changes.include?('assignee_id')
-        create_assignee_note(@merge_request)
-      end
-
-      @merge_request.notice_added_references(@merge_request.project, current_user)
-
-      execute_hooks(@merge_request)
-
-      @merge_request.reload
-
-      receive_delayed_notifications
-    end
-
-    @merge_request
+    merge_request
   end
 
   # Mark existing merge request as merged
@@ -105,11 +68,48 @@ class MergeRequestsService < BaseService
     create_merge_event(merge_request)
     execute_hooks(merge_request)
 
-    receive_delayed_notifications
-
     true
   rescue
     false
+  end
+
+  def update
+    # If we close MergeRequest we want to ignore validation
+    # so we can close broken one (Ex. fork project removed)
+    state = params[:merge_request].delete(:state_event)
+    case state.to_s
+    when 'reopen'
+      reopen
+    when 'close'
+      close
+    when 'merge'
+      merge
+    end
+
+    # We dont allow change of source/target projects
+    # after merge request was created
+    params[:merge_request].delete(:source_project_id)
+    params[:merge_request].delete(:target_project_id)
+
+    if params[:merge_request].any? &&
+      merge_request.update(params[:merge_request])
+
+      merge_request.reset_events_cache
+
+      if merge_request.previous_changes.include?('assignee_id')
+        create_assignee_note(merge_request)
+      end
+
+      merge_request.notice_added_references(merge_request.project, current_user)
+
+      execute_hooks(merge_request)
+
+      merge_request.reload
+
+    end
+    receive_delayed_notifications
+
+    merge_request
   end
 
   # Do git merge in satellite and in case of success

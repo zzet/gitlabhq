@@ -1,7 +1,7 @@
 class GitPushService
   attr_accessor :current_user, :project, :params,
-                :oldrev, :newrev, :ref,
-                :push_data, :push_commits
+    :oldrev, :newrev, :ref,
+    :push_data, :push_commits
 
   def initialize(user, project, oldrev = nil, newrev = nil, ref = nil, params = {})
     @current_user = user
@@ -121,7 +121,7 @@ class GitPushService
         issues_to_close.each { |i| i.close && i.save }
         # FIXME. Add Issue close service
         #issues_to_close.each do |issue|
-          #Issues::CloseService.new(project, author, {}).execute(issue, commit)
+        #Issues::CloseService.new(project, author, {}).execute(issue, commit)
         #end
       end
 
