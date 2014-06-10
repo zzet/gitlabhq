@@ -65,4 +65,8 @@ class BaseService
       status: :success
     }
   end
+
+  def create_milestone_note(issueable)
+    Note.create_milestone_change_note(issueable, issueable.project, current_user, issueable.milestone)
+  end
 end

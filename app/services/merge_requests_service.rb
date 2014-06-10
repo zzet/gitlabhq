@@ -91,10 +91,13 @@ class MergeRequestsService < BaseService
     params[:merge_request].delete(:source_project_id)
     params[:merge_request].delete(:target_project_id)
 
-    if params[:merge_request].any? &&
-      merge_request.update(params[:merge_request])
+    if params[:merge_request].any? && merge_request.update(params[:merge_request])
 
       merge_request.reset_events_cache
+
+      if merge_request.previous_changes.include?('milestone_id')
+        create_milestone_note(merge_request)
+      end
 
       if merge_request.previous_changes.include?('assignee_id')
         create_assignee_note(merge_request)
@@ -104,9 +107,9 @@ class MergeRequestsService < BaseService
 
       execute_hooks(merge_request)
 
-      merge_request.reload
-
+      #merge_request.reload
     end
+
     receive_delayed_notifications
 
     merge_request

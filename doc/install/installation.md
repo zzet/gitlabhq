@@ -49,7 +49,7 @@ up-to-date and install it.
 
 Install the required packages (needed to compile Ruby and native extensions to Ruby gems):
 
-    sudo apt-get install -y build-essential zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server redis-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate
+    sudo apt-get install -y build-essential zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server redis-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils
 
 Make sure you have the right version of Git installed
 
@@ -76,7 +76,7 @@ Is the system packaged Git too old? Remove it and compile from source.
     # Install into /usr/local/bin
     sudo make prefix=/usr/local install
 
-    # When editing config/gitlab.yml (Step 6), change the git bin_path to /usr/local/bin/git
+    # When editing config/gitlab.yml (Step 5), change the git bin_path to /usr/local/bin/git
 
 **Note:** In order to receive mail notifications, make sure to install a mail server. By default, Debian is shipped with exim4 whereas Ubuntu does not ship with one. The recommended mail server is postfix and you can install it with:
 
@@ -336,9 +336,7 @@ Visit YOUR_SERVER in your web browser for your first GitLab login. The setup has
 
 ### Additional markup styles
 
-Apart from the always supported markdown style there are other rich text files that GitLab can display. But you might have to install a dependency to do so. Please see the [github-markup gem readme](https://github.com/gitlabhq/markup#markups) for more information. For example, reStructuredText markup language support requires python-docutils:
-
-    sudo apt-get install -y python-docutils
+Apart from the always supported markdown style there are other rich text files that GitLab can display. But you might have to install a dependency to do so. Please see the [github-markup gem readme](https://github.com/gitlabhq/markup#markups) for more information.
 
 ### Custom Redis Connection
 
