@@ -1441,7 +1441,7 @@ describe EventNotificationMailer do
 
             it "only one message" do
               # Move mail into project creator
-              @mails_count.should == 2
+              @mails_count.should == 1
             end
 
             it "correct email" do

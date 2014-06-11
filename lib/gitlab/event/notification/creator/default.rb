@@ -36,6 +36,10 @@ class Gitlab::Event::Notification::Creator::Default
     notifications = ::Event::Subscription::Notification.where(event_id: event, subscriber_id: user)
     return false if notifications.any?
 
+    child_event_ids = ::Event.where(parent_event_id: event).pluck(:id)
+    child_notifications = ::Event::Subscription::Notification.where(event_id: child_event_ids, subscriber_id: user)
+    return false if child_notifications.any?
+
     parent_event = event.parent_event
     return true if parent_event.blank?
 
