@@ -19,9 +19,10 @@
     = f.select :period, (Event::Summary.period.values).map { |period| [period.camelize, period] }, { include_blank: "Select period" }, { class: 'form-control' }
     %span.help-inline * required
 .form-group
-  = f.label :state_event, class: 'control-label'
+  = f.label :state_event, "State", class: 'control-label'
   .col-sm-10
     = f.select(:state_event, @summary.state_transitions.map { |s| [s.human_event, s.event] }, { include_blank: @summary.human_state_name }, { class: 'form-control' })
     %span.help-inline * required
 .form-actions
   = f.submit 'Save', class: 'btn btn-save'
+  = link_to "Cancel", :back, class: 'btn'
