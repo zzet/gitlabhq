@@ -38,7 +38,7 @@
           %span.badge
             #{@group.projects.count}
       %ul.well-list
-        - @projects.each do |project|
+        - @group_projects.each do |project|
           %li
             %strong
               = link_to project.name_with_namespace, [:admin, project]
@@ -46,8 +46,8 @@
                 = repository_size(project)
             %span.pull-right.light
               %span.monospace= project.path_with_namespace + ".git"
-      .panel-footer
-        = paginate @projects, param_name: 'projects_page', theme: 'gitlab'
+      -#.panel-footer
+        -#= paginate @projects, param_name: 'projects_page', theme: 'gitlab'
 
   .col-md-6
     .panel.panel-default

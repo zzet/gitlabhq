@@ -41,11 +41,13 @@ DatabaseCleaner.strategy = :truncation
 Spinach.hooks.before_scenario do
   sleep 0.2
   TestEnv.setup_stubs
+  Gitlab::Event::Factory.unstub(:call)
   DatabaseCleaner.start
 end
 
 Spinach.hooks.after_scenario do
   sleep 0.2
+  Gitlab::Event::Factory.stub(call: true)
   DatabaseCleaner.clean
   sleep 1
 end

@@ -29,29 +29,32 @@ class Dashboard < Spinach::FeatureSteps
 
   Given 'user with name "John Doe" joined project "Shop"' do
     user = create(:user, {name: "John Doe"})
-    project = Project.find_by_name "Shop"
+    project = Project.find_by(name: "Shop")
     project.team << [user, :master]
-    OldEvent.create(
-      project: project,
-      author_id: user.id,
-      action: OldEvent::JOINED
-    )
+    users_project = user.users_projects.find_by(project_id: project.id)
+
+    Gitlab::Event::Factory.create_events("gitlab.create.users_project", {
+        source: users_project,
+        user: user,
+        data: users_project,
+        uniq_hash: "123"
+    })
   end
 
   Then 'I should see "John Doe joined project at Shop" event' do
-    page.should have_content "John Doe joined project at #{project.name_with_namespace}"
+    page.should have_content "John Doe added John Doe to #{project.name_with_namespace}"
   end
 
   And 'user with name "John Doe" left project "Shop"' do
     user = User.find_by(name: "John Doe")
-    OldEvent.create(
-      project: project,
-      author_id: user.id,
-      action: OldEvent::LEFT
-    )
+    project = Project.find_by(name: "Shop")
+    users_project = user.users_projects.find_by(project_id: project.id)
+
+    users_project.destroy
   end
 
   Then 'I should see "John Doe left project at Shop" event' do
+    page.save_screenshot("event_left.png")
     page.should have_content "John Doe left project at #{project.name_with_namespace}"
   end
 

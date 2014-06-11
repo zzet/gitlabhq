@@ -80,6 +80,8 @@ class Gitlab::Event::Builder
                   system_action: meta[:action],
                   uniq_hash: hierarchy_event[:data][:uniq_hash]
                 )
+
+                @events
               end
 
             end

@@ -12,6 +12,7 @@ class Groups < Spinach::FeatureSteps
   end
 
   And 'I should see projects activity feed' do
+    sleep 2
     page.should have_content 'closed issue'
   end
 

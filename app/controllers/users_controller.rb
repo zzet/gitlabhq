@@ -14,18 +14,18 @@ class UsersController < ApplicationController
       where(id: @user.authorized_projects.pluck(:id)).
       includes(:namespace)
 
-    @groups   = current_user.authorized_groups.
+    @groups = current_user.authorized_groups.
       where(id: @user.personal_groups)
 
-    @teams    = current_user.authorized_teams.
+    @teams = current_user.authorized_teams.
       where(id: @user.personal_teams)
 
-    @events   = Event.for_dashboard(@user)
+    @events = Event.for_dashboard(@user)
                     .offset(params[:offset])
                     .limit(params[:limit] || 60)
                     .recent
 
-    @title    = @user.name
+    @title = @user.name
   end
 
   def determine_layout

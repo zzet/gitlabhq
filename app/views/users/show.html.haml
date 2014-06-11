@@ -34,8 +34,8 @@
         = link_to 'Teams', '#teams', 'data-toggle' => 'tab', id: 'sidebar-teams-tab'
     .tab-content
       .tab-pane.active#projects
-        = render "projects", user: @user
+        = render "projects", user: @user, projects: @projects
       .tab-pane#groups
-        = render "groups",   user: @user
+        = render "groups",   user: @user, groups: @groups
       .tab-pane#teams
-        = render "teams",    user: @user
+        = render "teams",    user: @user, teams: @teams

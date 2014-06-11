@@ -7,9 +7,14 @@ class IssuesService < BaseService
   end
 
   def create
-    @issue = Issue.new(params)
+    @issue = Issue.new(params[:issue])
     @issue.author = @current_user
-    @issue.project = project if params[:project_id].blank? && project.present?
+    binding.pry
+    if params[:project_id].blank?
+      @issue.project = project
+    else
+      @issue.project = Project.find_with_namespace(params[:project_id])
+    end
 
     if @issue.save
       receive_delayed_notifications
@@ -28,7 +33,7 @@ class IssuesService < BaseService
   end
 
   def update
-    if @issue.update_attributes(params)
+    if @issue.update_attributes(params[:issue])
       receive_delayed_notifications
     end
 
