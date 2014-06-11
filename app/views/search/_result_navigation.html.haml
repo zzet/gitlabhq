@@ -35,11 +35,11 @@
         Code
         %small.pull-right= @search_results[:repositories][:blobs][:total_count]
 
-    - if @search_results.commits?
-      %li{class: "#{'active' if params[:type] == "commits"}"}
-        = link_to search_path_with_project(:commits, params) do
-          Commits
-          %small.pull-right= @search_results[:repositories][:commits][:total_count]
+  - if @search_results.commits?
+    %li{class: "#{'active' if params[:type] == "commits"}"}
+      = link_to search_path_with_project(:commits, params) do
+        Commits
+        %small.pull-right= @search_results[:repositories][:commits][:total_count]
 
   - if @search_results.users?
     %li{class: "#{'active' if params[:type] == "user"}"}
