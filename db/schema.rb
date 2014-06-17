@@ -21,8 +21,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.datetime "starts_at"
     t.datetime "ends_at"
     t.integer  "alert_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "color"
     t.string   "font"
   end
@@ -42,8 +42,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.text     "trace"
     t.text     "coverage"
     t.text     "data"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.datetime "build_time"
     t.time     "duration"
     t.integer  "skipped_count",     default: 0
@@ -54,8 +54,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
   create_table "deploy_keys_projects", force: true do |t|
     t.integer  "deploy_key_id", null: false
     t.integer  "project_id",    null: false
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "deploy_keys_projects", ["project_id"], name: "index_deploy_keys_projects_on_project_id", using: :btree
@@ -82,8 +82,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
   create_table "event_subscription_notification_settings", force: true do |t|
     t.integer  "user_id"
     t.boolean  "own_changes"
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "adjacent_changes"
     t.boolean  "brave"
     t.boolean  "subscribe_if_owner",     default: true
@@ -96,8 +96,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.integer  "subscription_id"
     t.string   "notification_state"
     t.datetime "notified_at"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "subscriber_id"
   end
 
@@ -118,22 +118,22 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "source_category"
     t.integer  "notification_interval"
     t.datetime "last_notified_at"
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "target_category"
     t.integer  "auto_subscription_id"
-    t.string   "options",               default: [],              array: true
+    t.string   "options",               default: [], array: true
   end
 
   create_table "event_summaries", force: true do |t|
     t.string   "title"
+    t.text     "description"
     t.integer  "user_id"
     t.string   "state"
     t.string   "period"
     t.datetime "last_send_date"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "description"
   end
 
   create_table "event_summary_entity_relationships", force: true do |t|
@@ -153,8 +153,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.integer  "target_id"
     t.string   "target_type"
     t.text     "data"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "parent_event_id"
     t.string   "system_action"
     t.integer  "first_domain_id"
@@ -176,16 +176,16 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "file"
     t.datetime "last_usage_at"
     t.integer  "usage_count",   default: 0
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "source_ref"
   end
 
   create_table "forked_project_links", force: true do |t|
     t.integer  "forked_to_project_id",   null: false
     t.integer  "forked_from_project_id", null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "forked_project_links", ["forked_to_project_id"], name: "index_forked_project_links_on_forked_to_project_id", unique: true, using: :btree
@@ -208,8 +208,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.integer  "assignee_id"
     t.integer  "author_id"
     t.integer  "project_id"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "position",     default: 0
     t.string   "branch_name"
     t.text     "description"
@@ -228,8 +228,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
 
   create_table "keys", force: true do |t|
     t.integer  "user_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "key"
     t.string   "title"
     t.string   "type"
@@ -256,8 +256,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.integer  "author_id"
     t.integer  "assignee_id"
     t.string   "title"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "milestone_id"
     t.string   "state"
     t.string   "merge_status"
@@ -272,7 +272,7 @@ ActiveRecord::Schema.define(version: 20140611135229) do
   add_index "merge_requests", ["created_at"], name: "index_merge_requests_on_created_at", using: :btree
   add_index "merge_requests", ["milestone_id"], name: "index_merge_requests_on_milestone_id", using: :btree
   add_index "merge_requests", ["source_branch"], name: "index_merge_requests_on_source_branch", using: :btree
-  add_index "merge_requests", ["source_project_id"], name: "index_merge_requests_on_project_id", using: :btree
+  add_index "merge_requests", ["source_project_id"], name: "index_merge_requests_on_source_project_id", using: :btree
   add_index "merge_requests", ["target_branch"], name: "index_merge_requests_on_target_branch", using: :btree
   add_index "merge_requests", ["target_project_id", "iid"], name: "index_merge_requests_on_target_project_id_and_iid", unique: true, using: :btree
   add_index "merge_requests", ["title"], name: "index_merge_requests_on_title", using: :btree
@@ -282,8 +282,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.integer  "project_id",  null: false
     t.text     "description"
     t.date     "due_date"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "state"
     t.integer  "iid"
   end
@@ -296,8 +296,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "name",                     null: false
     t.string   "path",                     null: false
     t.integer  "owner_id"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "type"
     t.string   "description", default: "", null: false
     t.string   "avatar"
@@ -312,8 +312,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.text     "note"
     t.string   "noteable_type"
     t.integer  "author_id"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "project_id"
     t.string   "attachment"
     t.string   "line_code"
@@ -338,8 +338,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "title"
     t.text     "data"
     t.integer  "project_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "action"
     t.integer  "author_id"
   end
@@ -355,8 +355,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "name"
     t.string   "path"
     t.text     "description"
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "creator_id"
     t.boolean  "issues_enabled",         default: true,     null: false
     t.boolean  "wall_enabled",           default: true,     null: false
@@ -378,7 +378,7 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.float    "repository_size",        default: 0.0
   end
 
-  add_index "projects", ["creator_id"], name: "index_projects_on_owner_id", using: :btree
+  add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree
   add_index "projects", ["last_activity_at"], name: "index_projects_on_last_activity_at", using: :btree
   add_index "projects", ["last_pushed_at"], name: "index_projects_on_last_pushed_at", using: :btree
   add_index "projects", ["namespace_id"], name: "index_projects_on_namespace_id", using: :btree
@@ -386,8 +386,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
   create_table "protected_branches", force: true do |t|
     t.integer  "project_id", null: false
     t.string   "name",       null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "protected_branches", ["project_id"], name: "index_protected_branches_on_project_id", using: :btree
@@ -408,8 +408,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "token"
     t.integer  "service_id"
     t.string   "service_type"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_configuration_build_faces", force: true do |t|
@@ -419,8 +419,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "domain"
     t.string   "system_hook_path"
     t.string   "web_hook_path"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_configuration_campfires", force: true do |t|
@@ -429,16 +429,16 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "token"
     t.string   "subdomain"
     t.string   "room"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_configuration_flowdocks", force: true do |t|
     t.integer  "service_id"
     t.string   "service_type"
     t.string   "token"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_configuration_gemnasia", force: true do |t|
@@ -466,8 +466,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "service_type"
     t.string   "token"
     t.string   "project_url"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_configuration_hipchats", force: true do |t|
@@ -475,8 +475,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "service_type"
     t.string   "token"
     t.string   "room"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_configuration_jenkins", force: true do |t|
@@ -487,16 +487,16 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "merge_request_path"
     t.text     "branches"
     t.boolean  "merge_request_enabled"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_configuration_pivotal_trackers", force: true do |t|
     t.integer  "service_id"
     t.string   "service_type"
     t.string   "token"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_configuration_slacks", force: true do |t|
@@ -522,23 +522,23 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.integer  "service_key_id",    null: false
     t.integer  "service_id",        null: false
     t.string   "code_access_state"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_user_relationships", force: true do |t|
     t.integer  "service_id"
     t.integer  "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "services", force: true do |t|
     t.string   "type"
     t.string   "title"
     t.integer  "project_id"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "state"
     t.integer  "service_pattern_id"
     t.string   "public_state"
@@ -555,8 +555,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.text     "content"
     t.integer  "author_id",                 null: false
     t.integer  "project_id"
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "file_name"
     t.datetime "expires_at"
     t.boolean  "private",    default: true, null: false
@@ -588,23 +588,23 @@ ActiveRecord::Schema.define(version: 20140611135229) do
   create_table "team_group_relationships", force: true do |t|
     t.integer  "team_id"
     t.integer  "group_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "team_project_relationships", force: true do |t|
     t.integer  "project_id"
     t.integer  "team_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "team_user_relationships", force: true do |t|
     t.integer  "user_id"
     t.integer  "team_id"
     t.integer  "team_access"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "teams", force: true do |t|
@@ -613,8 +613,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.text     "description"
     t.integer  "creator_id"
     t.boolean  "public"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "users", force: true do |t|
@@ -628,8 +628,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "name"
     t.boolean  "admin",                    default: false, null: false
     t.integer  "projects_limit",           default: 10
@@ -651,6 +651,7 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.integer  "notification_level",       default: 1,     null: false
     t.datetime "password_expires_at"
     t.integer  "created_by_id"
+    t.datetime "last_credential_check_at"
     t.string   "avatar"
     t.string   "confirmation_token"
     t.datetime "confirmed_at"
@@ -658,7 +659,6 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.string   "unconfirmed_email"
     t.boolean  "hide_no_ssh_key",          default: false
     t.string   "website_url",              default: "",    null: false
-    t.datetime "last_credential_check_at"
   end
 
   add_index "users", ["admin"], name: "index_users_on_admin", using: :btree
@@ -675,8 +675,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
     t.integer  "group_access",                   null: false
     t.integer  "group_id",                       null: false
     t.integer  "user_id",                        null: false
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "notification_level", default: 3, null: false
   end
 
@@ -685,8 +685,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
   create_table "users_projects", force: true do |t|
     t.integer  "user_id",                        null: false
     t.integer  "project_id",                     null: false
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "project_access",     default: 0, null: false
     t.integer  "notification_level", default: 3, null: false
   end
@@ -698,8 +698,8 @@ ActiveRecord::Schema.define(version: 20140611135229) do
   create_table "web_hooks", force: true do |t|
     t.string   "url"
     t.integer  "project_id"
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "type",                  default: "ProjectHook"
     t.integer  "service_id"
     t.boolean  "push_events",           default: true,          null: false

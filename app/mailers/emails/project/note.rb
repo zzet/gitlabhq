@@ -62,19 +62,4 @@ class Emails::Project::Note < Emails::Project::Base
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@issue.title}' (##{@issue.iid})")
   end
-
-  def commented_email(notification)
-    @notification = notification
-    @event        = @notification.event
-    @user         = @event.author
-    @note         = @event.source
-    @project      = @note.project
-
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'commented',
-            'X-Gitlab-Source' => 'note',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-wall"
-
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] New note was created on project wall")
-  end
 end

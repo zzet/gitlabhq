@@ -348,27 +348,6 @@ describe EventNotificationMailer do
       end
 
       context "when event source - note" do
-        context "when create note on wall" do
-          before do
-            collect_mails_data do
-              @note = ProjectsService.new(@another_user, project, { note: attributes_for(:note) }).notes.create
-            end
-          end
-
-          it "only one message" do
-            @mails_count.should == 1
-          end
-
-          it "correct email" do
-            @email.from.first.should == @another_user.email
-            @email.to.should be_nil
-            @email.cc.should be_nil
-            @email.bcc.count.should == 1
-            @email.bcc.first.should == @user.email
-            @email.in_reply_to.should == "project-#{project.path_with_namespace}-wall"
-          end
-        end
-
         context "when update note" do
           before do
             @note = ProjectsService.new(@another_user, project, { note: attributes_for(:note) }).notes.create
