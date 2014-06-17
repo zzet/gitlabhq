@@ -6,9 +6,40 @@ class Milestone
       data: data
       success: (data) ->
         if data.saved == true
+          if data.assignee_avatar_url
+            img_tag = $('<img/>')
+            img_tag.attr('src', data.assignee_avatar_url)
+            img_tag.addClass('avatar s16')
+            $(li).find('.assignee-icon').html(img_tag)
+          else
+            $(li).find('.assignee-icon').html('')
           $(li).effect 'highlight'
         else
           new Flash("Issue update failed", 'alert')
+      dataType: "json"
+
+  @sortIssues: (data) ->
+    sort_issues_url = location.href + "/sort_issues"
+
+    $.ajax
+      type: "PUT"
+      url: sort_issues_url
+      data: data
+      success: (data) ->
+        if data.saved != true
+          new Flash("Issues update failed", 'alert')
+      dataType: "json"
+
+  @sortMergeRequests: (data) ->
+    sort_mr_url = location.href + "/sort_merge_requests"
+
+    $.ajax
+      type: "PUT"
+      url: sort_mr_url
+      data: data
+      success: (data) ->
+        if data.saved != true
+          new Flash("MR update failed", 'alert')
       dataType: "json"
 
   @updateMergeRequest: (li, merge_request_url, data) ->
@@ -31,6 +62,11 @@ class Milestone
     $("#issues-list-unassigned, #issues-list-ongoing, #issues-list-closed").sortable(
       connectWith: ".issues-sortable-list",
       dropOnEmpty: true,
+      items: "li:not(.ui-sort-disabled)",
+      update: (event, ui) ->
+        data = $(this).sortable("serialize")
+        Milestone.sortIssues(data)
+
       receive: (event, ui) ->
         new_state = $(this).data('state')
         issue_id = ui.item.data('iid')
@@ -55,6 +91,11 @@ class Milestone
     $("#merge_requests-list-unassigned, #merge_requests-list-ongoing, #merge_requests-list-closed").sortable(
       connectWith: ".merge_requests-sortable-list",
       dropOnEmpty: true,
+      items: "li:not(.ui-sort-disabled)",
+      update: (event, ui) ->
+        data = $(this).sortable("serialize")
+        Milestone.sortMergeRequests(data)
+
       receive: (event, ui) ->
         new_state = $(this).data('state')
         merge_request_id = ui.item.data('iid')

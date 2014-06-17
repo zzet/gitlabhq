@@ -58,8 +58,6 @@ class Dispatcher
         new Events('Team')
       when 'projects:new', 'projects:edit'
         new Project()
-      when 'projects:walls:show'
-        new Wall(project_id)
       when 'projects:teams:members:index'
         new TeamMembers()
       when 'projects:team_members:index'

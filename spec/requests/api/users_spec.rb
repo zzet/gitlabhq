@@ -26,13 +26,24 @@ describe API::API, api: true  do
         end
       end
     end
+
+    context "when admin" do
+      it "should return an array of users" do
+        get api("/users", admin)
+        response.status.should == 200
+        json_response.should be_an Array
+        json_response.first.keys.should include 'email'
+        json_response.first.keys.should include 'extern_uid'
+        json_response.first.keys.should include 'can_create_project'
+      end
+    end
   end
 
   describe "GET /users/:id" do
     it "should return a user by id" do
       get api("/users/#{user.id}", user)
       response.status.should == 200
-      json_response['email'].should == user.email
+      json_response['username'].should == user.username
     end
 
     it "should return a 401 if unauthenticated" do

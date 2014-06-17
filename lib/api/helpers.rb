@@ -36,15 +36,6 @@ module API
       end
     end
 
-    def set_current_user_for_thread
-      RequestStore.store[:current_user] = current_user
-      begin
-        yield
-      ensure
-        RequestStore.store[:current_user] = nil
-      end
-    end
-
     def user_project
       @project ||= find_project(params[:id])
       @project || not_found!

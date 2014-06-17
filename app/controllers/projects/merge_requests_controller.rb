@@ -80,14 +80,26 @@ class Projects::MergeRequestsController < Projects::ApplicationController
         @merge_request.source_branch
       )
 
+      @compare_failed = false
       @commits = compare_action.commits
-      @commits.map! { |commit| Commit.new(commit) }
-      @commit = @commits.first
+
+      if @commits
+        @commits.map! { |commit| Commit.new(commit) }
+        @commit = @commits.first
+      else
+        # false value because failed to get commits from satellite
+        @commits = []
+        @compare_failed = true
+      end
 
       @diffs = compare_action.diffs
       @merge_request.title = @merge_request.source_branch.titleize.humanize
       @target_project = @merge_request.target_project
       @target_repo = @target_project.repository
+
+      diff_line_count = Commit::diff_line_count(@diffs)
+      @suppress_diff = Commit::diff_suppress?(@diffs, diff_line_count)
+      @force_suppress_diff = @suppress_diff
     end
   end
 

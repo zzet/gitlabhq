@@ -35,6 +35,7 @@
 #= require nprogress-turbolinks
 #= require dropzone
 #= require private_pub
+#= require semantic-ui/sidebar
 #= require_directory ./api
 #= require_tree .
 

@@ -41,10 +41,6 @@
       = link_to url_for_project_wiki do
         Wiki
 
-  - if project_nav_tab? :wall
-    = nav_link(controller: :walls) do
-      = link_to 'Wall', project_wall_path(@project)
-
   - if project_nav_tab? :snippets
     = nav_link(controller: :snippets) do
       = link_to 'Snippets', project_snippets_path(@project)

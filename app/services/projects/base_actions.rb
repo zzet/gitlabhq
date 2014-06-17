@@ -16,7 +16,6 @@ module Projects::BaseActions
     default_opts = {
       issues_enabled:         default_features.issues,
       wiki_enabled:           default_features.wiki,
-      wall_enabled:           default_features.wall,
       snippets_enabled:       default_features.snippets,
       merge_requests_enabled: default_features.merge_requests,
       visibility_level:       default_features.visibility_level

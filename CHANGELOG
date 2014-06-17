@@ -26,6 +26,19 @@ v 7.0.0
   - UI improvements for mobile devices
   - Improve diff rendering performance
   - Drag-n-drop for issues and merge requests between states at milestone page 
+  - Fix '0 commits' message for huge repositories on project home page
+  - Prevent 500 error page when visit commit page from large repo
+  - Add notice about huge push over http to unicorn config
+  - File action in satellites uses default 30 seconds timeout instead of old 10 seconds one
+  - Overall performance improvements
+  - Skip init script check on omnibus-gitlab
+  - Be more selective when killing stray Sidekiqs
+  - Check LDAP user filter during sign-in
+  - Remove wall feature (no data loss - you can take it from database)
+  - Dont expose user emails via API unless you are admin 
+  - Detect issues closed by Merge Request description
+  - Better email subject lines from email on push service (Alex Elman)
+  - Enable identicon for gravatar be default
 
 v 6.9.2
   - Revert the commit that broke the LDAP user filter

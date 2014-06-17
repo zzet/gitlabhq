@@ -14,6 +14,9 @@ gem "rails", "~> 4.1.0"
 gem "protected_attributes"
 gem 'rails-observers'
 
+# Make links from text
+gem 'rails_autolink', '~> 1.1'
+
 # Default values for AR models
 gem "default_value_for", "~> 3.0.0"
 
@@ -35,7 +38,7 @@ gem 'elasticsearch-git', github: 'zzet/elasticsearch-git', ref: 'fe04c5dc36cd725
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
-gem "gitlab_git", '~> 5.8'
+gem "gitlab_git", '~> 6.0'
 gem 'rugged', git: 'git://github.com/libgit2/rugged.git', branch: 'development', submodules: true
 
 # Ruby/Rack Git Smart-HTTP Server Handler
@@ -55,9 +58,6 @@ gem "grape", "~> 0.6.1"
 # Replace with rubygems when nesteted entities get released
 gem "grape-entity", "~> 0.4.2"
 gem 'rack-cors', require: 'rack/cors'
-
-# Email validation
-gem "email_validator", "~> 1.4.0", :require => 'email_validator/strict'
 
 # Format dates and times
 # based on human-friendly examples
@@ -173,6 +173,9 @@ gem "rack-attack"
 # Ace editor
 gem 'ace-rails-ap'
 
+# Semantic UI Sass for Sidebar
+gem 'semantic-ui-sass', '~> 0.16.1.0'
+
 gem "sass-rails", '~> 4.0.2'
 gem "coffee-rails"
 gem "uglifier"
@@ -286,5 +289,5 @@ group :test do
 end
 
 group :production do
-  gem "gitlab_meta", '6.0'
+  gem "gitlab_meta", '7.0'
 end
