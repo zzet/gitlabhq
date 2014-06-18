@@ -15,7 +15,7 @@ describe IssuesService do
           description: 'please fix'
         }
 
-        @issue = ProjectsService.new(user, project, opts).issue.create
+        @issue = ProjectsService.new(user, project, issue: opts).issue.create
       end
 
       it { @issue.should be_valid }

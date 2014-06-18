@@ -37,7 +37,8 @@ class Projects::MilestonesController < Projects::ApplicationController
   end
 
   def create
-    @milestone = Milestones::CreateService.new(project, current_user, params[:milestone]).execute
+    milestones_service = ProjectsService.new(current_user, project, params).milestone
+    @milestone = milestones_service.create
 
     if @milestone.save
       redirect_to project_milestone_path(@project, @milestone)
@@ -47,7 +48,8 @@ class Projects::MilestonesController < Projects::ApplicationController
   end
 
   def update
-    @milestone = Milestones::UpdateService.new(project, current_user, params[:milestone]).execute(milestone)
+    milestones_service = ProjectsService.new(current_user, project, params).milestone(milestone)
+    @milestone = milestones_service.update
 
     respond_to do |format|
       format.js

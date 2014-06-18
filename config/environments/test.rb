@@ -39,4 +39,6 @@ Gitlab::Application.configure do
   config.active_support.deprecation = :stderr
 
   config.eager_load = false
+
+  config.cache_store = :memory_store
 end

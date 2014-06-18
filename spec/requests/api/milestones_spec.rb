@@ -92,16 +92,4 @@ describe API::API, api: true  do
       json_response['state'].should == 'closed'
     end
   end
-
-  describe "PUT /projects/:id/milestones/:milestone_id to test observer on close" do
-    before { enable_observers }
-    after { disable_observers }
-
-    it "should create an activity event when an milestone is closed" do
-      OldEvent.should_receive(:create)
-
-      put api("/projects/#{project.id}/milestones/#{milestone.id}", user),
-          state_event: 'close'
-    end
-  end
 end

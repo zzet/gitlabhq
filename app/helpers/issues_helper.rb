@@ -56,12 +56,16 @@ module IssuesHelper
   def title_for_issue(issue_iid, project = @project)
     return '' if project.nil?
 
-    if project.used_default_issues_tracker?
+    if gitlab_issue_tracker?(project)
       issue = project.issues.where(iid: issue_iid).first
-      return issue.title if issue
+      if issue
+        return issue.title
+      else
+        return "Issue ##{issue_iid} (deleted)"
+      end
     end
 
-    ''
+    issue_iid
   end
 
   # Checks if issues_tracker setting exists in gitlab.yml

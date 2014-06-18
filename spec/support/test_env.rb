@@ -61,6 +61,10 @@ module TestEnv
   end
 
   def setup_stubs()
+    # disable loggers
+    #ActiveRecord::Base.logger = nil
+    #Gitlab::AppLogger.stub(info: true)
+
     Gitlab::Event::Factory.stub(call: true)
     # Use tmp dir for FS manipulations
     repos_path = testing_path()

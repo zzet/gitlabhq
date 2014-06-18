@@ -8,10 +8,10 @@ class BaseObserver < ActiveRecord::Observer
   end
 
   def current_user
-    Thread.current[:current_user]
+    RequestStore.store[:current_user]
   end
 
   def current_commit
-    Thread.current[:current_commit]
+    RequestStore.store[:current_commit]
   end
 end

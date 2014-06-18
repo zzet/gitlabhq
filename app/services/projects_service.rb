@@ -23,6 +23,10 @@ class ProjectsService < ::BaseService
     @merge_request_service ||= MergeRequestsService.new(current_user, merge_request, params, project, target_project)
   end
 
+  def milestone(milestone = nil)
+    @milestone_service ||= MilestonesService.new(current_user, milestone, params, project)
+  end
+
   def issue(issue = nil)
     @issue_service ||= IssuesService.new(current_user, issue, params, project)
   end

@@ -43,7 +43,8 @@ module API
         authorize! :admin_milestone, user_project
         required_attributes! [:title]
         attrs = attributes_for_keys [:title, :description, :due_date]
-        milestone = ::Milestones::CreateService.new(user_project, current_user, attrs).execute
+        milestones_service = ProjectsService.new(current_user, user_project, attrs).milestone
+        milestone = milestones_service.create
 
         if milestone.valid?
           present milestone, with: Entities::Milestone
@@ -67,7 +68,8 @@ module API
         authorize! :admin_milestone, user_project
         attrs = attributes_for_keys [:title, :description, :due_date, :state_event]
         milestone = user_project.milestones.find(params[:milestone_id])
-        milestone = ::Milestones::UpdateService.new(user_project, current_user, attrs).execute(milestone)
+        milestones_service = ProjectsService.new(current_user, user_project, attrs).milestone(milestone)
+        milestone = milestones_service.update
 
         if milestone.valid?
           present milestone, with: Entities::Milestone

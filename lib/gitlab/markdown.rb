@@ -173,12 +173,12 @@ module Gitlab
         options = html_options.merge(
           class: "gfm gfm-team_member #{html_options[:class]}"
         )
-        link_to("@#{identifier}", user_url(identifier), options)
+        link_to("@#{identifier}", user_url(user.username), options)
       end
     end
 
     def reference_issue(identifier, project = @project)
-      if project.used_default_issues_tracker? || !external_issues_tracker_enabled?
+      if project.issues_tracker == 'gitlab' || !external_issues_tracker_enabled?
         if project.issue_exists? identifier
           url = url_for_issue(identifier, project)
           title = title_for_issue(identifier)
@@ -190,7 +190,7 @@ module Gitlab
           link_to("##{identifier}", url, options)
         end
       elsif project.issues_tracker == 'jira'
-        reference_jira_issue(identifier, project)
+        reference_external_issue(identifier, project)
       end
     end
 
@@ -226,9 +226,9 @@ module Gitlab
       end
     end
 
-    def reference_jira_issue(identifier, project = @project)
+    def reference_external_issue(identifier, project = @project)
       url = url_for_issue(identifier)
-      title = Gitlab.config.issues_tracker[@project.issues_tracker]["title"]
+      title = Gitlab.config.issues_tracker[project.issues_tracker]["title"]
 
       options = html_options.merge(
         title: "Issue in #{title}",
