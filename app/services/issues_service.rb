@@ -34,7 +34,7 @@ class IssuesService < BaseService
 
   def close(commit = nil)
     if @issue.close
-      #Note.create_status_change_note(@issue, @issue.project, current_user, @issue.state, commit)
+      Note.create_status_change_note(@issue, @issue.project, current_user, @issue.state, commit)
       @issue.create_cross_references!(@issue.project, current_user)
       execute_hooks(@issue)
     end
@@ -56,7 +56,14 @@ class IssuesService < BaseService
       if @issue.update(params[:issue])
         @issue.reset_events_cache
 
-        issue.notice_added_references(issue.project, current_user)
+        @issue.notice_added_references(@issue.project, current_user)
+
+        if @issue.previous_changes.include?('assignee_id')
+          Note.create_assignee_change_note(@issue,
+                                           @issue.project,
+                                           current_user,
+                                           @issue.assignee)
+        end
 
         execute_hooks(@issue)
 

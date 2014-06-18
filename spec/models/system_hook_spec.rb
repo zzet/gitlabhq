@@ -27,7 +27,7 @@ describe SystemHook do
     end
 
     it "project_create hook" do
-      project = create(:project)
+      create(:project)
       WebMock.should have_requested(:post, @system_hook.url).with(body: /project_create/).once
     end
 
