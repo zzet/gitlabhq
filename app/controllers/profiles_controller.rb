@@ -14,8 +14,11 @@ class ProfilesController < ApplicationController
   end
 
   def update
+    if params[:user][:email].present? && params[:email_domain].present?
+      params[:user][:email] += "@#{params[:email_domain]}"
+    end
+
     params[:user].delete(:email) if @user.ldap_user?
-    params[:user][:email] += "@#{params[:email_domain]}"
 
     if @user.update_attributes(params[:user])
       flash[:notice] = "Profile was successfully updated"

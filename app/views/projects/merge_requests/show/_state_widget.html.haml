@@ -20,7 +20,7 @@
         #{time_ago_with_tooltip(@merge_request.closed_event.created_at)}
       %p Changes was not merged into target branch
 
-    - if @merge_request.merged? && @merged.merge_event.present?
+    - if @merge_request.merged? && @merge_request.merge_event.present?
       %h4
         Merged by #{link_to_member(@project, @merge_request.merge_event.author, avatar: false)}
         #{time_ago_with_tooltip(@merge_request.merge_event.created_at)}

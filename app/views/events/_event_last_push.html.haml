@@ -2,10 +2,10 @@
   .event-last-push
     .event-last-push-text
       %span You pushed to
-      = link_to project_commits_path(event.project, event.ref_name) do
-        %strong= event.ref_name
+      = link_to project_commits_path(event.target, event.source.branch_name) do
+        %strong= event.source.branch_name
       at
-      %strong= link_to_project event.project
+      %strong= link_to_project event.target
       #{time_ago_with_tooltip(event.created_at)}
 
     .pull-right

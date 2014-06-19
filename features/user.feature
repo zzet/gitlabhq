@@ -5,15 +5,6 @@ Feature: User
 
   # Signed out
 
-  Scenario: I visit user "John Doe" page while not signed in when he owns a public project
-    Given "John Doe" owns internal project "Internal"
-    And "John Doe" owns public project "Community"
-    When I visit user "John Doe" page
-    Then I should see user "John Doe" page
-    And I should not see project "Enterprise"
-    And I should not see project "Internal"
-    And I should see project "Community"
-
   Scenario: I visit user "John Doe" page while not signed in when he is not authorized to a public project
     Given "John Doe" owns internal project "Internal"
     When I visit user "John Doe" page

@@ -316,19 +316,15 @@ class Project < ActiveRecord::Base
     end
 
     def with_push
-      includes(:old_events).where('old_events.action = ?', OldEvent::PUSHED)
+      includes(:events).where(events: { action: :pushed })
     end
 
     def active
       joins(:issues, :notes, :merge_requests).order("issues.created_at, notes.created_at, merge_requests.created_at DESC")
     end
 
-    def search_by_title query
-      where("projects.archived = ?", false).where("LOWER(projects.name) LIKE :query", query: "%#{query.downcase}%")
-    end
-
     def find_with_namespace(id)
-      return nil unless id.include?("/")
+      return nil unless id && id.include?("/")
 
       id = id.split("/")
       namespace = Namespace.find_by(path: id.first)

@@ -122,18 +122,23 @@ module ApplicationHelper
   # with suggestion to create MR
   def show_last_push_widget?(event)
     # Skip if event is not about added or modified non-master branch
-    return false unless event && event.last_push_to_non_root? && !event.rm_ref?
+    return false unless event
 
-    project = event.project
+    project = event.target
+    push = event.source
+
+    unless !push.to_default_branch? && push.branch? && !push.deleted_branch?
+      return false
+    end
 
     # Skip if project repo is empty or MR disabled
     return false unless project && !project.empty_repo? && project.merge_requests_enabled
 
     # Skip if user already created appropriate MR
-    return false if project.merge_requests.where(source_branch: event.branch_name).opened.any?
+    #return false if project.merge_requests.where(source_branch: push.branch_name).opened.any?
 
     # Skip if user removed branch right after that
-    return false unless project.repository.branch_names.include?(event.branch_name)
+    #return false unless project.repository.branch_names.include?(push.branch_name)
 
     true
   end
