@@ -114,7 +114,7 @@ $list-group-active-bg: $bg_style_color;
 
   li {
     > a {
-      margin-right: 5px;
+      margin-right: 4px;
       line-height: 20px;
       border-color: #EEE;
       color: #888;
@@ -311,4 +311,9 @@ $list-group-active-bg: $bg_style_color;
       text-decoration: underline;
     }
   }
+}
+
+.project-sorting-tabs {
+  float: left;
+  padding-top: 10px;
 }

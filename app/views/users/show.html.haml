@@ -19,9 +19,8 @@
     %hr
 
     %h4 User Activity:
-    -#.activities
-      -#= render 'activities'
     = render @events
+
   .col-md-4
     = render 'profile', user: @user
 
@@ -32,6 +31,7 @@
         = link_to 'Groups', '#groups', 'data-toggle' => 'tab', id: 'sidebar-groups-tab'
       %li
         = link_to 'Teams', '#teams', 'data-toggle' => 'tab', id: 'sidebar-teams-tab'
+
     .tab-content
       .tab-pane.active#projects
         = render "projects", user: @user, projects: @projects

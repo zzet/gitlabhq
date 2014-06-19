@@ -1,6 +1,7 @@
-.ui-box
-  .title.clearfix
-    = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter form-control'
+.panel.panel-default
+  .panel-heading.clearfix
+    = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'dash-filter form-control'
+
   %ul.well-list.js-sidebar-list
     - groups.each do |group|
       %li.js-description-tooltip{"data-title" => "#{group.description}"}

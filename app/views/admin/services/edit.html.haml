@@ -16,6 +16,9 @@
     &larr; to services
 
 %hr
-
-= form_for(@service, as: :service, url: admin_service_path(@service.id), method: :put) do |f|
-  = render "form", f: f
+.panel.panel-default
+  .panel-heading
+    Service attributes
+  .panel-body
+    = form_for(@service, as: :service, url: admin_service_path(@service.id), method: :put, html: { class: "edit_project form-horizontal" }) do |f|
+      = render "form", f: f

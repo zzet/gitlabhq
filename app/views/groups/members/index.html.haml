@@ -7,15 +7,16 @@
 
 %hr
 - can_manage_group = current_user.can? :manage_group, @group
-.panel.panel-default.prepend-top-20
-  .panel-heading
-    %strong #{@group.name}
-    group members
-    %small
-      (#{@members.count})
-  %ul.well-list
-    - @members.each do |member|
-      = render 'member', member: member, show_controls: can_manage_group
+.col-md-6
+  .panel.panel-default.prepend-top-20
+    .panel-heading
+      %strong #{@group.name}
+      group members
+      %small
+        (#{@members.count})
+    %ul.well-list
+      - @members.each do |member|
+        = render 'member', member: member, show_controls: can_manage_group
 - if can_manage_group
   .col-md-6.pull-right
     = render "new_member"

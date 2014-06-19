@@ -41,7 +41,10 @@ class ProfilesController < ApplicationController
   end
 
   def history
-    @events = current_user.recent_events.page(params[:page]).per(20)
+    @events = Event.for_dashboard(@user).
+                    recent.
+                    page(params[:page]).
+                    per(20)
   end
 
   def update_username

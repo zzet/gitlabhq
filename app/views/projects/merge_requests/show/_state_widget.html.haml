@@ -4,7 +4,9 @@
   -#- else
     -#- if @merge_request.source_project.jenkins_ci_with_mr?
       -#= render "projects/merge_requests/show/mr_ci_status"
-  - if @merge_request.source_project.ci_service && @commits.any?
+
+  -#- if @merge_request.source_project.ci_service && @commits.any?
+  - if @merge_request.source_project.gitlab_ci && @commits.any?
     .panel-heading
       = render "projects/merge_requests/show/mr_ci"
   .panel-body
