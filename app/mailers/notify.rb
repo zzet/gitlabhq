@@ -1,8 +1,6 @@
 class Notify < ActionMailer::Base
   include ActionDispatch::Routing::PolymorphicRoutes
 
-  include Emails::Profile
-
   add_template_helper ApplicationHelper
   add_template_helper GitlabMarkdownHelper
   add_template_helper MergeRequestsHelper
