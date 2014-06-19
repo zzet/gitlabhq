@@ -7,10 +7,7 @@ class Emails::Project::Issue < Emails::Project::Base
     @project      = @issue.project
 
     if @user && @project && @issue
-      headers 'X-Gitlab-Entity' => 'project',
-        'X-Gitlab-Action' => 'opened',
-        'X-Gitlab-Source' => 'issue',
-        'In-Reply-To'     => "project-#{@project.path_with_namespace}-issue-#{@issue.iid}"
+      set_x_gitlab_headers(:project, :issue, :opened, "project-#{@project.path_with_namespace}-issue-#{@issue.iid}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@issue.title}' (##{@issue.iid})")
     end
@@ -23,10 +20,7 @@ class Emails::Project::Issue < Emails::Project::Base
     @issue        = @event.source
     @project      = @issue.project
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'closed',
-            'X-Gitlab-Source' => 'issue',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-issue-#{@issue.iid}"
+    set_x_gitlab_headers(:project, :issue, :closed, "project-#{@project.path_with_namespace}-issue-#{@issue.iid}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@issue.title}' (##{@issue.iid})")
   end
@@ -38,10 +32,7 @@ class Emails::Project::Issue < Emails::Project::Base
     @issue        = @event.source
     @project      = @issue.project
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'reopened',
-            'X-Gitlab-Source' => 'issue',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-issue-#{@issue.iid}"
+    set_x_gitlab_headers(:project, :issue, :reopened, "project-#{@project.path_with_namespace}-issue-#{@issue.iid}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@issue.title}' (##{@issue.iid})")
   end

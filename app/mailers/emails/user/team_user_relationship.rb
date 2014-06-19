@@ -8,10 +8,7 @@ class Emails::User::TeamUserRelationship < Emails::User::Base
     @team         = @utur.team
     @projects     = @team.projects
 
-    headers 'X-Gitlab-Entity' => 'user',
-            'X-Gitlab-Action' => 'joined',
-            'X-Gitlab-Source' => 'team-user-relationship',
-            'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
+    set_x_gitlab_headers(:user, 'team-user-relationship', :joined, "user-#{@member.username}-team-#{@team.path}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.username}' membership in '#{@team.name}' team")
   end
@@ -25,10 +22,7 @@ class Emails::User::TeamUserRelationship < Emails::User::Base
     @team         = @source.team
     @changes      = @event.data["previous_changes"]
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'updated',
-            'X-Gitlab-Source' => 'team-user-relationship',
-            'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
+    set_x_gitlab_headers(:user, 'team-user-relationship', :updated, "user-#{@member.username}-team-#{@team.path}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.username}' membership in '#{@team.name}' team")
   end
@@ -43,10 +37,7 @@ class Emails::User::TeamUserRelationship < Emails::User::Base
     @member       = User.find_by_id(@up["user_id"]) if @member.nil? || @member.is_a?(TeamUserRelationship)
 
     if @team && @member
-      headers 'X-Gitlab-Entity' => 'user',
-              'X-Gitlab-Action' => 'left',
-              'X-Gitlab-Source' => 'team-user-relationship',
-              'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
+      set_x_gitlab_headers(:user, 'team-user-relationship', :left, "user-#{@member.username}-team-#{@team.path}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.username}' membership in '#{@team.name}' team")
     end

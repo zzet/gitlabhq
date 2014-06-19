@@ -6,6 +6,7 @@ class Emails::Project::Push < Emails::Project::Base
   def created_branch_email(notification)
     @notification = notification
     @event        = @notification.event
+    @push         = @event.source
     @user         = @event.author
     @source       = @event.source_type
     @project      = @event.target
@@ -26,10 +27,7 @@ class Emails::Project::Push < Emails::Project::Base
 
     @line_notes    = []
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'created_branch',
-            'X-Gitlab-Source' => 'push',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-push-action-#{@event.created_at}"
+    set_x_gitlab_headers(:project, :push, :created_branch, "project-#{@project.path_with_namespace}-push-#{@push.id}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Branch '#{@branch}' was created [undev gitlab commits]")
   end
@@ -38,6 +36,7 @@ class Emails::Project::Push < Emails::Project::Base
     @notification = notification
 
     @event    = @notification.event
+    @push         = @event.source
     @user     = @event.author
     @source   = @event.source_type
     @project  = @event.target
@@ -47,10 +46,7 @@ class Emails::Project::Push < Emails::Project::Base
     @branch = @push_data["ref"]
     @branch.slice!("refs/heads/")
 
-    headers 'X-Gitlab-Entity' => 'project',
-      'X-Gitlab-Action' => 'deleted_branch',
-      'X-Gitlab-Source' => 'push',
-      'In-Reply-To'     => "project-#{@project.path_with_namespace}-push-action-#{@event.created_at}"
+    set_x_gitlab_headers(:project, :push, :deleted_branch, "project-#{@project.path_with_namespace}-push-#{@push.id}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Branch '#{@branch}' was deleted [undev gitlab commits]")
   end
@@ -58,6 +54,7 @@ class Emails::Project::Push < Emails::Project::Base
   def created_tag_email(notification)
     @notification = notification
     @event        = @notification.event
+    @push         = @event.source
     @user         = @event.author
     @source       = @event.source_type
     @project      = @event.target
@@ -65,10 +62,7 @@ class Emails::Project::Push < Emails::Project::Base
     @tag          = @push_data["ref"]
     @tag.slice!("refs/tags/")
 
-    headers 'X-Gitlab-Entity' => 'project',
-      'X-Gitlab-Action' => 'created_tag',
-      'X-Gitlab-Source' => 'push',
-      'In-Reply-To'     => "project-#{@project.path_with_namespace}-push-action-#{@event.created_at}"
+    set_x_gitlab_headers(:project, :push, :created_tag, "project-#{@project.path_with_namespace}-push-#{@push.id}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Tag '#{@tag}' was created [undev gitlab commits]")
   end
@@ -76,6 +70,7 @@ class Emails::Project::Push < Emails::Project::Base
   def deleted_tag_email(notification)
     @notification = notification
     @event        = @notification.event
+    @push         = @event.source
     @user         = @event.author
     @source       = @event.source_type
     @project      = @event.target
@@ -85,10 +80,7 @@ class Emails::Project::Push < Emails::Project::Base
 
     @commit = @project.repository.commit(@push_data["before"])
 
-    headers 'X-Gitlab-Entity' => 'project',
-      'X-Gitlab-Action' => 'deleted_tag',
-      'X-Gitlab-Source' => 'push',
-      'In-Reply-To'     => "project-#{@project.path_with_namespace}-push-action-#{@event.created_at}"
+    set_x_gitlab_headers(:project, :push, :deleted_tag, "project-#{@project.path_with_namespace}-push-#{@push.id}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Tag '#{@tag}' was deleted [undev gitlab commits]")
   end
@@ -97,6 +89,7 @@ class Emails::Project::Push < Emails::Project::Base
     @notification = notification
 
     @event        = @notification.event
+    @push         = @event.source
     @user         = @event.author
     @source       = @event.source_type
     @project      = @event.target
@@ -119,10 +112,7 @@ class Emails::Project::Push < Emails::Project::Base
 
     @line_notes    = []
 
-    headers 'X-Gitlab-Entity' => 'project',
-      'X-Gitlab-Action' => 'pushed',
-      'X-Gitlab-Source' => 'push',
-      'In-Reply-To'     => "project-#{@project.path_with_namespace}-#{@before_commit.oid}"
+    set_x_gitlab_headers(:project, :push, :pushed, "project-#{@project.path_with_namespace}-push-#{@push.id}")
 
     subject = if @commits.many?
                 "[#{@project.path_with_namespace}] [#{@branch}] Pushed #{@commits.count} commits to parent commit #{@before_commit.oid[0..10]} [undev gitlab commits]"
