@@ -87,6 +87,12 @@ class SearchService < BaseService
     }
 
     begin
+      opt = {
+        gids: current_user.authorized_groups.ids,
+        order: params[:order],
+        in: %w(name^10 path^5 description),
+      }
+
       response = Group.search(query, options: opt, page: page)
 
       {
@@ -109,6 +115,12 @@ class SearchService < BaseService
     }
 
     begin
+      opt = {
+        tids: current_user.known_teams.ids,
+        order: params[:order],
+        in: %w(name^10 path^5 description),
+      }
+
       response = Team.search(query, options: opt, page: page)
 
       {
@@ -130,6 +142,11 @@ class SearchService < BaseService
     }
 
     begin
+      opt = {
+        active: true,
+        order: params[:order]
+      }
+
       response = User.search(query, options: opt, page: page)
 
       {
@@ -151,6 +168,11 @@ class SearchService < BaseService
     }
 
     begin
+      opt = {
+        projects_ids: projects_ids,
+        order: params[:order]
+      }
+
       response = MergeRequest.search(query, options: opt, page: page)
 
       {
@@ -171,6 +193,11 @@ class SearchService < BaseService
     }
 
     begin
+      opt = {
+        projects_ids: projects_ids,
+        order: params[:order]
+      }
+
       response = Issue.search(query, options: opt, page: page)
 
       {
@@ -196,6 +223,14 @@ class SearchService < BaseService
     end
 
     begin
+      opt = {
+        repository_id: projects_ids,
+        highlight: true,
+        order: params[:order]
+      }
+
+      opt.merge!({ language: params[:language] }) if params[:language].present? && params[:language] != "All"
+
       res = Repository.search(query, options: opt, page: page)
 
       project_result_params = Proc.new do |r|

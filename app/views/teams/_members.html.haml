@@ -1,6 +1,6 @@
-.ui-box
-  .title.clearfix
-    = search_field_tag :filter_member, nil, placeholder: 'Filter by name', class: 'form-control js-sidebar-filter'
+.panel.panel-default
+  .panel-heading.clearfix
+    = search_field_tag :filter_member, nil, placeholder: 'Filter by name', class: 'form-control dash-filter'
     - if true #current_user.can_create_member?
       %span.pull-right
         = link_to team_members_path(@team), class: "btn btn-new" do

@@ -183,6 +183,10 @@ class Service < ActiveRecord::Base
     read_attribute(:id) || self.class.service_name(nil)
   end
 
+  def category
+    :common
+  end
+
   def title
     read_attribute(:title) || self.class.title
   end
@@ -193,6 +197,10 @@ class Service < ActiveRecord::Base
 
   def service_name
     self.class.service_name
+  end
+
+  def help
+    # implement inside child
   end
 
   def fields

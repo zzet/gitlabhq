@@ -40,17 +40,20 @@ class Push < ActiveRecord::Base
   # Prepared push data for sending to external services
   serialize :data #, ActiveRecord::Serializers::MessagePackSerializer
 
-  def refs_action?;         revafter =~ /^00000/ || revbefore =~ /^00000/; end
+  def refs_action?
+    revafter == "0000000000000000000000000000000000000000" ||
+      revbefore == "0000000000000000000000000000000000000000"
+  end
 
-  def branch?;              ref =~ /^refs\/heads/; end
+  def branch?;              (ref =~ /^refs\/heads/).present?; end
   def to_existing_branch?;  branch? && revbefore != "0000000000000000000000000000000000000000"; end
   def to_default_branch?;   branch? && branch_name == project.default_branch; end
-  def created_branch?;      branch? && revbefore =~ /^00000/; end
-  def deleted_branch?;      branch? && revafter  =~ /^00000/; end
+  def created_branch?;      branch? && revbefore == "0000000000000000000000000000000000000000"; end
+  def deleted_branch?;      branch? && revafter  == "0000000000000000000000000000000000000000"; end
 
-  def tag?;                 ref =~ /^refs\/tag/; end
-  def created_tag?;         tag?    && revbefore =~ /^00000/; end
-  def deleted_tag?;         tag?    && revafter  =~ /^00000/; end
+  def tag?;                 (ref =~ /^refs\/tag/).present?; end
+  def created_tag?;         tag?    && revbefore == "0000000000000000000000000000000000000000"; end
+  def deleted_tag?;         tag?    && revafter  == "0000000000000000000000000000000000000000"; end
 
   def ref_name
     if tag?

@@ -181,6 +181,18 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def upload_image
+    link_to_image = ::Projects::ImageService.new(repository, params, root_url).execute
+
+    respond_to do |format|
+      if link_to_image
+        format.json { render json: { link: link_to_image } }
+      else
+        format.json { render json: "Invalid file.", status: :unprocessable_entity }
+      end
+    end
+  end
+
   protected
 
   def check_git_protocol
@@ -188,6 +200,15 @@ class ProjectsController < ApplicationController
   end
 
   private
+
+  def upload_path
+    base_dir = FileUploader.generate_dir
+    File.join(repository.path_with_namespace, base_dir)
+  end
+
+  def accepted_images
+    %w(png jpg jpeg gif)
+  end
 
   def set_title
     @title = 'New Project'
@@ -215,6 +236,6 @@ class ProjectsController < ApplicationController
   end
 
   def sorted(users)
-    users.uniq.sort_by(&:username).map { |user| { username: user.username, name: user.name } }
+    users.uniq.to_a.compact.sort_by(&:username).map { |user| { username: user.username, name: user.name } }
   end
 end

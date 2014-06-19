@@ -7,17 +7,20 @@ class Admin::GroupsController < Admin::ApplicationController
 
   def show
     @group_projects = @group.projects
-    @members = @group.users
+    @members = @group.members
     @teams = @group.teams
 
     @projects = Project.all
     @projects = @projects.not_in_group(@group) if @group.projects.present?
-    @projects.reject!(&:empty_repo?)
+    # Undefined method for Relation
+    #@projects.reject!(&:empty_repo?)
 
     @users = User.active
     @available_teams = group.teams.any? ? Team.where.not(id: group.teams.pluck(:id)) : Team.all
 
     session[:redirect_to] = admin_group_path(@group)
+    #@members = @group.members.order("group_access DESC").page(params[:members_page]).per(30)
+    #@projects = @group.projects.page(params[:projects_page]).per(30)
   end
 
   def new

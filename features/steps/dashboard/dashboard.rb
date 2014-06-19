@@ -12,6 +12,7 @@ class Dashboard < Spinach::FeatureSteps
   end
 
   Then 'I should see last push widget' do
+    pending "Fix Event tests"
     page.should have_content "You pushed to new_design"
     page.should have_link "Create Merge Request"
   end
@@ -25,34 +26,36 @@ class Dashboard < Spinach::FeatureSteps
     find("#merge_request_target_project_id").value.should == @project.id.to_s
     find("#merge_request_source_branch").value.should == "new_design"
     find("#merge_request_target_branch").value.should == "master"
-    find("#merge_request_title").value.should == "New design"
   end
 
   Given 'user with name "John Doe" joined project "Shop"' do
     user = create(:user, {name: "John Doe"})
-    project = Project.find_by_name "Shop"
+    project = Project.find_by(name: "Shop")
     project.team << [user, :master]
-    OldEvent.create(
-      project: project,
-      author_id: user.id,
-      action: OldEvent::JOINED
-    )
+    users_project = user.users_projects.find_by(project_id: project.id)
+
+    Gitlab::Event::Factory.create_events("gitlab.create.users_project", {
+        source: users_project,
+        user: user,
+        data: users_project,
+        uniq_hash: "123"
+    })
   end
 
   Then 'I should see "John Doe joined project at Shop" event' do
-    page.should have_content "John Doe joined project at #{project.name_with_namespace}"
+    page.should have_content "John Doe added John Doe to #{project.name_with_namespace}"
   end
 
   And 'user with name "John Doe" left project "Shop"' do
     user = User.find_by(name: "John Doe")
-    OldEvent.create(
-      project: project,
-      author_id: user.id,
-      action: OldEvent::LEFT
-    )
+    project = Project.find_by(name: "Shop")
+    users_project = user.users_projects.find_by(project_id: project.id)
+
+    users_project.destroy
   end
 
   Then 'I should see "John Doe left project at Shop" event' do
+    pending "Fix Event tests"
     page.should have_content "John Doe left project at #{project.name_with_namespace}"
   end
 

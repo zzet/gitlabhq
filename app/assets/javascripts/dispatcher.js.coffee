@@ -22,6 +22,8 @@ class Dispatcher
         Issues.init()
       when 'projects:issues:show'
         new Issue()
+      when 'projects:milestones:show'
+        new Milestone()
       when 'projects:issues:new', 'projects:merge_requests:new'
         GitLab.GfmAutoComplete.setup()
       when 'dashboard:show'
@@ -57,8 +59,6 @@ class Dispatcher
         new Events('Team')
       when 'projects:new', 'projects:edit'
         new Project()
-      when 'projects:walls:show'
-        new Wall(project_id)
       when 'projects:teams:members:index'
         new TeamMembers()
       when 'projects:team_members:index'
@@ -94,7 +94,7 @@ class Dispatcher
 
   initHighlight: ->
     $('.highlight pre code').each (i, e) ->
-      hljs.highlightBlock(e)
       $(e).html($.map($(e).html().split("\n"), (line, i) ->
-        "<div class='line' id='LC" + (i + 1) + "'>" + line + "</div>"
+        "<span class='line' id='LC" + (i + 1) + "'>" + line + "</span>"
       ).join("\n"))
+      hljs.highlightBlock(e)

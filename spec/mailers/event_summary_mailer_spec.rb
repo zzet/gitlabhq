@@ -47,6 +47,12 @@ describe EventSummaryMailer do
 
   subject(:mails) { ActionMailer::Base.deliveries }
 
+  def collect_events
+    Gitlab::Event::Factory.unstub(:call)
+    yield
+    Gitlab::Event::Factory.stub(call: true)
+  end
+
   before do
     ActiveRecord::Base.observers.enable(:user_observer) do
       @user = create :user, admin: true
@@ -138,13 +144,15 @@ describe EventSummaryMailer do
       it "should block a few users" do
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          watched_user.block
+        collect_events do
+          @watched_users.each do |watched_user|
+            watched_user.block
+          end
         end
 
         add_retry
 
-        mails.count.should == @watched_users.count + EVENTS_SUMMARY_PERIODS.count
+        mails.count.should == EVENTS_SUMMARY_PERIODS.count
         select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
       end
 
@@ -157,8 +165,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          watched_user.activate
+        collect_events do
+          @watched_users.each do |watched_user|
+            watched_user.activate
+          end
         end
 
         add_retry
@@ -170,15 +180,17 @@ describe EventSummaryMailer do
       it "should update a few users" do
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          watched_user.update_attributes({
-            name: "#{watched_user.name}_updated"
-          })
+        collect_events do
+          @watched_users.each do |watched_user|
+            watched_user.update_attributes({
+              name: "#{watched_user.name}_updated"
+            })
+          end
         end
 
         add_retry
 
-        mails.count.should == @watched_users.count + EVENTS_SUMMARY_PERIODS.count
+        mails.count.should == EVENTS_SUMMARY_PERIODS.count
         select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
       end
     end
@@ -193,12 +205,14 @@ describe EventSummaryMailer do
       it "should join a few user to group" do
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          params = {
-            user_ids: [ watched_user.id ],
-            group_access: Gitlab::Access::DEVELOPER
-          }
-          GroupsService.new(@another_user, @group, params).add_membership
+        collect_events do
+          @watched_users.each do |watched_user|
+            params = {
+              user_ids: [ watched_user.id ],
+              group_access: Gitlab::Access::DEVELOPER
+            }
+            GroupsService.new(@another_user, @group, params).add_membership
+          end
         end
 
         add_retry
@@ -220,11 +234,13 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          params = {
-            group_access: Gitlab::Access::MASTER
-          }
-          GroupsService.new(@another_user, @group, params).update_membership(watched_user)
+        collect_events do
+          @watched_users.each do |watched_user|
+            params = {
+              group_access: Gitlab::Access::MASTER
+            }
+            GroupsService.new(@another_user, @group, params).update_membership(watched_user)
+          end
         end
 
         add_retry
@@ -246,8 +262,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          GroupsService.new(@another_user, @group).remove_membership(watched_user)
+        collect_events do
+          @watched_users.each do |watched_user|
+            GroupsService.new(@another_user, @group).remove_membership(watched_user)
+          end
         end
 
         add_retry
@@ -269,12 +287,14 @@ describe EventSummaryMailer do
       it "should join a few user to project" do
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          params = {
-            user_ids: [ watched_user.id ],
-            project_access: Gitlab::Access::DEVELOPER
-          }
-          ProjectsService.new(@user, @project, params).add_membership
+        collect_events do
+          @watched_users.each do |watched_user|
+            params = {
+              user_ids: [ watched_user.id ],
+              project_access: Gitlab::Access::DEVELOPER
+            }
+            ProjectsService.new(@user, @project, params).add_membership
+          end
         end
 
         add_retry
@@ -295,13 +315,15 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          params = {
-            team_member: {
-              project_access: Gitlab::Access::MASTER
+        collect_events do
+          @watched_users.each do |watched_user|
+            params = {
+              team_member: {
+                project_access: Gitlab::Access::MASTER
+              }
             }
-          }
-          ProjectsService.new(@user, @project, params).update_membership(watched_user)
+            ProjectsService.new(@user, @project, params).update_membership(watched_user)
+          end
         end
 
         add_retry
@@ -323,8 +345,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          ProjectsService.new(@user, @project).remove_membership(watched_user)
+        collect_events do
+          @watched_users.each do |watched_user|
+            ProjectsService.new(@user, @project).remove_membership(watched_user)
+          end
         end
 
         add_retry
@@ -343,12 +367,14 @@ describe EventSummaryMailer do
       it "should add a few users to team" do
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          params = {
-            user_ids: [watched_user.id],
-            team_access: Gitlab::Access::DEVELOPER
-          }
-          TeamsService.new(@another_user, @team, params).add_memberships
+        collect_events do
+          @watched_users.each do |watched_user|
+            params = {
+              user_ids: [watched_user.id],
+              team_access: Gitlab::Access::DEVELOPER
+            }
+            TeamsService.new(@another_user, @team, params).add_memberships
+          end
         end
 
         add_retry
@@ -370,11 +396,13 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          params = {
-            team_access: Gitlab::Access::MASTER
-          }
-          TeamsService.new(@another_user, @team, params).update_memberships(watched_user)
+        collect_events do
+          @watched_users.each do |watched_user|
+            params = {
+              team_access: Gitlab::Access::MASTER
+            }
+            TeamsService.new(@another_user, @team, params).update_memberships(watched_user)
+          end
         end
 
         add_retry
@@ -396,8 +424,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @watched_users.each do |watched_user|
-          TeamsService.new(@another_user, @team).delete_membership(watched_user)
+        collect_events do
+          @watched_users.each do |watched_user|
+            TeamsService.new(@another_user, @team).delete_membership(watched_user)
+          end
         end
 
         add_retry
@@ -420,9 +450,11 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      @projects.each do |project|
-        params = { project: attributes_for(:empty_project) }
-        ProjectsService.new(@another_user, project, params).update
+      collect_events do
+        @projects.each do |project|
+          params = { project: attributes_for(:empty_project) }
+          ProjectsService.new(@another_user, project, params).update
+        end
       end
 
       add_retry
@@ -448,18 +480,18 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      Event::Summary.find_each {|s| s.summary_entity_relationships.each {|r| r.options = [:push]; r.save }}
+      collect_events do
+        Event::Summary.find_each {|s| s.summary_entity_relationships.each {|r| r.options = [:push]; r.save }}
 
-      @projects.each do |project|
-        params = { project: attributes_for(:empty_project) }
-        ProjectsService.new(@another_user, project, params).update
+        @projects.each do |project|
+          params = { project: attributes_for(:empty_project) }
+          ProjectsService.new(@another_user, project, params).update
+        end
+
+        GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
       end
 
-      GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
-
       add_retry
-
-      binding.pry
 
       mails.count.should == EVENTS_SUMMARY_PERIODS.count
       select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
@@ -478,8 +510,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        ITERATION_COUNT.times do
-          create :issue, project: project
+        collect_events do
+          ITERATION_COUNT.times do
+            create :issue, project: project
+          end
         end
 
         add_retry
@@ -501,10 +535,12 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        issues.each do |issue|
-          available_statuses.each do |state|
-            issue.state_event = state
-            issue.save
+        collect_events do
+          issues.each do |issue|
+            available_statuses.each do |state|
+              issue.state_event = state
+              issue.save
+            end
           end
         end
 
@@ -526,8 +562,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        issues.each do |issue|
-          issue.destroy
+        collect_events do
+          issues.each do |issue|
+            issue.destroy
+          end
         end
 
         add_retry
@@ -542,8 +580,10 @@ describe EventSummaryMailer do
       it "should create a few milestones and send one summary emails" do
         create_events_summaries
 
-        @projects.each do |project|
-          create :milestone, project: project
+        collect_events do
+          @projects.each do |project|
+            create :milestone, project: project
+          end
         end
 
         add_retry
@@ -564,8 +604,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        milestones.each do |milestone|
-          milestone.close
+        collect_events do
+          milestones.each do |milestone|
+            milestone.close
+          end
         end
 
         add_retry
@@ -583,11 +625,13 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        ITERATION_COUNT.times do
-          params = {
-            note: attributes_for(:note)
-          }
-          ProjectsService.new(@user, project, params).notes.create
+        collect_events do
+          ITERATION_COUNT.times do
+            params = {
+              note: attributes_for(:note)
+            }
+            ProjectsService.new(@user, project, params).notes.create
+          end
         end
 
         add_retry
@@ -604,8 +648,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        ITERATION_COUNT.times do
-          ProjectsService.new(@another_user, project, note: attributes_for(:note_on_commit)).notes.create
+        collect_events do
+          ITERATION_COUNT.times do
+            ProjectsService.new(@another_user, project, note: attributes_for(:note_on_commit)).notes.create
+          end
         end
 
         add_retry
@@ -617,7 +663,8 @@ describe EventSummaryMailer do
       it "should add a few note for merge request and send one summary emails" do
         project = project_with_code
 
-        merge_request = ProjectsService.new(@another_user, project,
+        merge_request = ProjectsService.new(@another_user,
+                                            project,
                                             attributes_for(:merge_request_with_diffs,
                                                            source_project: project,
                                                            target_project: project)
@@ -629,12 +676,14 @@ describe EventSummaryMailer do
 
                                            create_events_summaries
 
-                                           ITERATION_COUNT.times do
-                                             params = { note: attributes_for(:note_on_merge_request, noteable: merge_request) }
-                                             ProjectsService.new(@another_user, project, params).notes.create
+                                           collect_events do
+                                             ITERATION_COUNT.times do
+                                               params = { note: attributes_for(:note_on_merge_request, noteable: merge_request) }
+                                               ProjectsService.new(@another_user, project, params).notes.create
 
-                                             params = { note: attributes_for(:note_on_merge_request_diff, noteable: merge_request) }
-                                             ProjectsService.new(@another_user, project, params).notes.create
+                                               params = { note: attributes_for(:note_on_merge_request_diff, noteable: merge_request) }
+                                               ProjectsService.new(@another_user, project, params).notes.create
+                                             end
                                            end
 
                                            add_retry
@@ -652,8 +701,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        ITERATION_COUNT.times do
-          ProjectsService.new(@another_user, project, params).notes.create
+        collect_events do
+          ITERATION_COUNT.times do
+            ProjectsService.new(@another_user, project, params).notes.create
+          end
         end
 
         add_retry
@@ -673,8 +724,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        ITERATION_COUNT.times do
-          ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
+        collect_events do
+          ITERATION_COUNT.times do
+            ProjectsService.new(@another_user, project, attributes_for(:merge_request, source_project: project, target_project: project)).merge_request.create
+          end
         end
 
         add_retry
@@ -697,17 +750,19 @@ describe EventSummaryMailer do
 
         ActionMailer::Base.deliveries.clear
 
-        state_events.each do |state_event|
-          merge_requests.each do |merge_request|
-            EventHierarchyWorker.reset
-            RequestStore.store[:borders] = []
+        collect_events do
+          state_events.each do |state_event|
+            merge_requests.each do |merge_request|
+              EventHierarchyWorker.reset
+              RequestStore.store[:borders] = []
 
-            params = {
-              merge_request: {
-                state_event: state_event
+              params = {
+                merge_request: {
+                  state_event: state_event
+                }
               }
-            }
-            ProjectsService.new(@user, project, params).merge_request(merge_request).update
+              ProjectsService.new(@user, project, params).merge_request(merge_request).update
+            end
           end
         end
 
@@ -729,8 +784,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        ITERATION_COUNT.times do
-          create :project_snippet, project: project, author: @another_user
+        collect_events do
+          ITERATION_COUNT.times do
+            create :project_snippet, project: project, author: @another_user
+          end
         end
 
         add_retry
@@ -753,9 +810,11 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        project_snippets.each do |snippet|
-          params = attributes_for :project_snippet, project: nil, author: nil
-          snippet.update_attributes(params)
+        collect_events do
+          project_snippets.each do |snippet|
+            params = attributes_for :project_snippet, project: nil, author: nil
+            snippet.update_attributes(params)
+          end
         end
 
         add_retry
@@ -778,8 +837,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        project_snippets.each do |snippet|
-          snippet.destroy
+        collect_events do
+          project_snippets.each do |snippet|
+            snippet.destroy
+          end
         end
 
         add_retry
@@ -799,8 +860,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        ITERATION_COUNT.times do
-          create :project_hook, project: project
+        collect_events do
+          ITERATION_COUNT.times do
+            create :project_hook, project: project
+          end
         end
 
         add_retry
@@ -821,9 +884,11 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        project_hooks.each do |project_hook|
-          params = attributes_for :project_hook
-          project_hook.update_attributes(params)
+        collect_events do
+          project_hooks.each do |project_hook|
+            params = attributes_for :project_hook
+            project_hook.update_attributes(params)
+          end
         end
 
         add_retry
@@ -844,8 +909,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        project_hooks.each do |project_hook|
-          project_hook.destroy
+        collect_events do
+          project_hooks.each do |project_hook|
+            project_hook.destroy
+          end
         end
 
         add_retry
@@ -860,8 +927,10 @@ describe EventSummaryMailer do
       it "should create a few protected branches and send one summary email" do
         create_events_summaries
 
-        @projects.each do |project|
-          create :protected_branch, project: project, name: "master"
+        collect_events do
+          @projects.each do |project|
+            create :protected_branch, project: project, name: "master"
+          end
         end
 
         add_retry
@@ -880,8 +949,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        protected_branches.each do |protected_branch|
-          protected_branch.destroy
+        collect_events do
+          protected_branches.each do |protected_branch|
+            protected_branch.destroy
+          end
         end
 
         add_retry
@@ -899,8 +970,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        Service.implement_services.map {|s| s.new }.each do |service|
-          @service = create :"#{service.to_param}_service", project: project
+        collect_events do
+          Service.implement_services.map {|s| s.new }.each do |service|
+            @service = create :"#{service.to_param}_service", project: project
+          end
         end
 
         add_retry
@@ -922,8 +995,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        services.each do |service|
-          service.enable
+        collect_events do
+          services.each do |service|
+            service.enable
+          end
         end
 
         add_retry
@@ -945,8 +1020,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        services.each do |service|
-          service.destroy
+        collect_events do
+          services.each do |service|
+            service.destroy
+          end
         end
 
         add_retry
@@ -964,11 +1041,13 @@ describe EventSummaryMailer do
       it "should assign a team to a few projects and send one summary email" do
         create_events_summaries
 
-        @projects.each do |project|
-          params = {
-            team_ids: [ @team.id ]
-          }
-          ProjectsService.new(@another_user, project, params).assign_team
+        collect_events do
+          @projects.each do |project|
+            params = {
+              team_ids: [ @team.id ]
+            }
+            ProjectsService.new(@another_user, project, params).assign_team
+          end
         end
 
         add_retry
@@ -990,8 +1069,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @projects.each do |project|
-          ProjectsService.new(@another_user, project).resign_team(@team)
+        collect_events do
+          @projects.each do |project|
+            ProjectsService.new(@another_user, project).resign_team(@team)
+          end
         end
 
         add_retry
@@ -1009,12 +1090,14 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @projects.each do |project|
-          params = {
-            user_ids: [ user.id ],
-            project_access: Gitlab::Access::DEVELOPER
-          }
-          ProjectsService.new(@user, project, params).add_membership
+        collect_events do
+          @projects.each do |project|
+            params = {
+              user_ids: [ user.id ],
+              project_access: Gitlab::Access::DEVELOPER
+            }
+            ProjectsService.new(@user, project, params).add_membership
+          end
         end
 
         add_retry
@@ -1026,13 +1109,15 @@ describe EventSummaryMailer do
       it "should update a user project relation for a few projects and send one summary email" do
         create_events_summaries
 
-        @projects.each do |project|
-          params = {
-            team_member: {
-              project_access: Gitlab::Access::MASTER
+        collect_events do
+          @projects.each do |project|
+            params = {
+              team_member: {
+                project_access: Gitlab::Access::MASTER
+              }
             }
-          }
-          ProjectsService.new(@user, project, params).update_membership(@another_user)
+            ProjectsService.new(@user, project, params).update_membership(@another_user)
+          end
         end
 
         add_retry
@@ -1044,8 +1129,10 @@ describe EventSummaryMailer do
       it "should left a user from a few projects and send one summary email" do
         create_events_summaries
 
-        @projects.each do |project|
-          ProjectsService.new(@user, project).remove_membership(@another_user)
+        collect_events do
+          @projects.each do |project|
+            ProjectsService.new(@user, project).remove_membership(@another_user)
+          end
         end
 
         add_retry
@@ -1078,7 +1165,9 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      collect_events do
+        GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      end
 
       add_retry
 
@@ -1089,7 +1178,9 @@ describe EventSummaryMailer do
       @oldrev = '0000000000000000000000000000000000000000'
       create_events_summaries
 
-      GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      collect_events do
+        GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      end
 
       add_retry
 
@@ -1100,7 +1191,9 @@ describe EventSummaryMailer do
       @newrev = '0000000000000000000000000000000000000000'
       create_events_summaries
 
-      GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      collect_events do
+        GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      end
 
       add_retry
 
@@ -1112,7 +1205,9 @@ describe EventSummaryMailer do
       @ref = 'refs/tags/v2.2.0'
       create_events_summaries
 
-      GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      collect_events do
+        GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      end
 
       add_retry
 
@@ -1124,7 +1219,9 @@ describe EventSummaryMailer do
       @ref = 'refs/tags/v2.2.0'
       create_events_summaries
 
-      GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      collect_events do
+        GitPushService.new(@another_user, @project, @oldrev, @newrev, @ref).execute
+      end
 
       add_retry
 
@@ -1142,9 +1239,11 @@ describe EventSummaryMailer do
     it "update a few groups and should send one summary email" do
       create_events_summaries
 
-      @groups.each do |group|
-        group.name = "#{group.name}_update"
-        group.save
+      collect_events do
+        @groups.each do |group|
+          group.name = "#{group.name}_update"
+          group.save
+        end
       end
 
       add_retry
@@ -1157,9 +1256,11 @@ describe EventSummaryMailer do
       it "should create a few projects in few groups and send one summary email" do
         create_events_summaries
 
-        @groups.each do |group|
-          params = attributes_for(:project, namespace_id: group.id)
-          ProjectsService.new(@user, params).create
+        collect_events do
+          @groups.each do |group|
+            params = attributes_for(:project, namespace_id: group.id)
+            ProjectsService.new(@user, params).create
+          end
         end
 
         add_retry
@@ -1167,24 +1268,7 @@ describe EventSummaryMailer do
         mails.count.should == EVENTS_SUMMARY_PERIODS.count
         select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
       end
-      it "should update a few projects and send one summary email" do
-        projects
-        new_group = create :group, owner: @user
 
-        clear_prepare_data
-
-        create_events_summaries
-
-        projects.each do |project|
-          params = { project: { namespace_id: new_group.id }}
-          ProjectsService.new(@another_user, project, params).transfer
-        end
-
-        add_retry
-
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
-      end
       it "should delete a few projects and send one summary email" do
         projects
 
@@ -1192,8 +1276,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        projects.each do |project|
-          ProjectsService.new(@another_user, project).delete
+        collect_events do
+          projects.each do |project|
+            ProjectsService.new(@another_user, project).delete
+          end
         end
 
         add_retry
@@ -1211,11 +1297,13 @@ describe EventSummaryMailer do
       it "should assign a team to a few groups and send one summary email" do
         create_events_summaries
 
-        @groups.each do |group|
-          params = {
-            team_ids: [ @team.id ]
-          }
-          GroupsService.new(@another_user, group, params).assign_team
+        collect_events do
+          @groups.each do |group|
+            params = {
+              team_ids: [ @team.id ]
+            }
+            GroupsService.new(@another_user, group, params).assign_team
+          end
         end
 
         add_retry
@@ -1237,8 +1325,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @groups.each do |group|
-          GroupsService.new(@another_user, group).resign_team(@team)
+        collect_events do
+          @groups.each do |group|
+            GroupsService.new(@another_user, group).resign_team(@team)
+          end
         end
 
         add_retry
@@ -1257,12 +1347,14 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @groups.each do |group|
-          params = {
-            user_ids: [ user.id ],
-            group_access: Gitlab::Access::DEVELOPER
-          }
-          GroupsService.new(@another_user, group, params).add_membership
+        collect_events do
+          @groups.each do |group|
+            params = {
+              user_ids: [ user.id ],
+              group_access: Gitlab::Access::DEVELOPER
+            }
+            GroupsService.new(@another_user, group, params).add_membership
+          end
         end
 
         add_retry
@@ -1284,11 +1376,13 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @groups.each do |group|
-          params = {
-            group_access: Gitlab::Access::MASTER
-          }
-          GroupsService.new(@another_user, group, params).update_membership(@another_user)
+        collect_events do
+          @groups.each do |group|
+            params = {
+              group_access: Gitlab::Access::MASTER
+            }
+            GroupsService.new(@another_user, group, params).update_membership(@another_user)
+          end
         end
 
         add_retry
@@ -1310,8 +1404,10 @@ describe EventSummaryMailer do
 
         create_events_summaries
 
-        @groups.each do |group|
-          GroupsService.new(@another_user, group).remove_membership(@another_user)
+        collect_events do
+          @groups.each do |group|
+            GroupsService.new(@another_user, group).remove_membership(@another_user)
+          end
         end
 
         add_retry
@@ -1334,9 +1430,11 @@ describe EventSummaryMailer do
     it "should change info about team a few times and send one summary email" do
       create_events_summaries
 
-      ITERATION_COUNT.times do
-        @team.description = generate :description
-        @team.save
+      collect_events do
+        ITERATION_COUNT.times do
+          @team.description = generate :description
+          @team.save
+        end
       end
 
       add_retry
@@ -1354,8 +1452,10 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      developers.each do |developer|
-        @team.add_users([developer.id], Gitlab::Access::DEVELOPER)
+      collect_events do
+        developers.each do |developer|
+          @team.add_users([developer.id], Gitlab::Access::DEVELOPER)
+        end
       end
 
       add_retry
@@ -1376,8 +1476,10 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      developers.each do |developer|
-        @team.remove_user(developer)
+      collect_events do
+        developers.each do |developer|
+          @team.remove_user(developer)
+        end
       end
 
       add_retry
@@ -1396,12 +1498,14 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      accesses.each do |access|
-        params = {
-          team_access: access
-        }
-        TeamsService.new(@user, @team, params).update_memberships(@another_user)
-        EventHierarchyWorker.reset
+      collect_events do
+        accesses.each do |access|
+          params = {
+            team_access: access
+          }
+          TeamsService.new(@user, @team, params).update_memberships(@another_user)
+          EventHierarchyWorker.reset
+        end
       end
 
       add_retry
@@ -1413,9 +1517,11 @@ describe EventSummaryMailer do
     it "should designate team to group a few times and send one summary email" do
       create_events_summaries
 
-      @groups.each do |group|
-        params = { group_ids: [group.id] }
-        TeamsService.new(@user, @team, params).assign_on_groups
+      collect_events do
+        @groups.each do |group|
+          params = { group_ids: [group.id] }
+          TeamsService.new(@user, @team, params).assign_on_groups
+        end
       end
 
       add_retry
@@ -1426,9 +1532,11 @@ describe EventSummaryMailer do
     it "should designate team to project a few times and send one summary email" do
       create_events_summaries
 
-      @projects.each do |project|
-        params = { project_ids: [project.id] }
-        TeamsService.new(@another_user, @team, params).assign_on_projects
+      collect_events do
+        @projects.each do |project|
+          params = { project_ids: [project.id] }
+          TeamsService.new(@another_user, @team, params).assign_on_projects
+        end
       end
 
       add_retry
@@ -1446,8 +1554,10 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      @groups.each do |group|
-        TeamsService.new(@another_user, @team).resign_from_groups(group)
+      collect_events do
+        @groups.each do |group|
+          TeamsService.new(@another_user, @team).resign_from_groups(group)
+        end
       end
 
       add_retry
@@ -1467,8 +1577,10 @@ describe EventSummaryMailer do
 
       create_events_summaries
 
-      @projects.each do |project|
-        TeamsService.new(@another_user, @team).resign_from_projects(project)
+      collect_events do
+        @projects.each do |project|
+          TeamsService.new(@another_user, @team).resign_from_projects(project)
+        end
       end
 
       add_retry
@@ -1516,577 +1628,580 @@ describe EventSummaryMailer do
     end
 
     it "should send didgest with multiple actions and multiple sources" do
-      # UsersProject action
-      # join
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        params = {
-          user_ids: [ watched_user.id ],
-          project_access: Gitlab::Access::DEVELOPER
-        }
-        ProjectsService.new(@another_user, @project, params).add_membership
-      end
 
-      # update
-      @watched_users.each do |watched_user|
-        params = {
-          team_member: {
-            project_access: Gitlab::Access::MASTER
-          }
-        }
-        ProjectsService.new(@another_user, @project, params).update_membership(watched_user)
-      end
-
-      # left
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        ProjectsService.new(@another_user, @project).remove_membership(watched_user)
-      end
-
-      # UsersGroup actions
-      # join
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        params = {
-          user_ids: [ watched_user.id ],
-          group_access: Gitlab::Access::DEVELOPER
-        }
-        GroupsService.new(@another_user, @group, params).add_membership
-      end
-
-      # update
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        params = {
-          group_access: Gitlab::Access::MASTER
-        }
-        GroupsService.new(@another_user, @group, params).update_membership(watched_user)
-      end
-
-      # left
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        GroupsService.new(@another_user, @group).remove_membership(watched_user)
-      end
-
-      # TeamUserRelationship actions
-      # join
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        params = {
-          user_ids: [watched_user.id],
-          team_access: Gitlab::Access::DEVELOPER
-        }
-        TeamsService.new(@another_user, @team, params).add_memberships
-      end
-
-      # update
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        params = {
-          team_access: Gitlab::Access::MASTER
-        }
-        TeamsService.new(@another_user, @team, params).update_memberships(watched_user)
-      end
-
-      # left
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        TeamsService.new(@another_user, @team).delete_membership(watched_user)
-      end
-
-      # update
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        watched_user.update_attributes(name: watched_user.name + "_updated")
-      end
-
-
-      # Project
-      # Issue actions
-      # #opened
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      issues = []
-      ITERATION_COUNT.times do
-        issues << create(:issue, author: @another_user, project: @project_with_code)
-      end
-
-      # #closed
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      issues.each do |issue|
-        issue.close
-      end
-
-      # #reopened
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      issues.each do |issue|
-        issue.reopen
-      end
-
-      # MergeRequest actions
-      # #opened
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      merge_requests = []
-      ITERATION_COUNT.times do
-        merge_requests << ProjectsService.new(@another_user, @project_with_code, attributes_for(:merge_request, source_project: @project_with_code, target_project: @project_with_code)).merge_request.create
-      end
-
-      # #assigned
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-
-      # #reassigned
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-
-      # #closed #reopened #merged
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-
-      state_events = [ :close, :reopen, :merge ]
-      ActionMailer::Base.deliveries.clear
-
-      state_events.each do |state_event|
-        merge_requests.each do |merge_request|
-          EventHierarchyWorker.reset
-          RequestStore.store[:borders] = []
-
+      collect_events do
+        # UsersProject action
+        # join
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
           params = {
-            merge_request: {
-              state_event: state_event
+            user_ids: [ watched_user.id ],
+            project_access: Gitlab::Access::DEVELOPER
+          }
+          ProjectsService.new(@another_user, @project, params).add_membership
+        end
+
+        # update
+        @watched_users.each do |watched_user|
+          params = {
+            team_member: {
+              project_access: Gitlab::Access::MASTER
             }
           }
-          ProjectsService.new(@another_user, @project_with_code, params).merge_request(merge_request).update
+          ProjectsService.new(@another_user, @project, params).update_membership(watched_user)
         end
-      end
 
-      # Milestone actions
-      # #created
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      milestone = create :milestone, project: @project_with_code
+        # left
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          ProjectsService.new(@another_user, @project).remove_membership(watched_user)
+        end
 
-      # #closed
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      milestone.close
+        # UsersGroup actions
+        # join
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          params = {
+            user_ids: [ watched_user.id ],
+            group_access: Gitlab::Access::DEVELOPER
+          }
+          GroupsService.new(@another_user, @group, params).add_membership
+        end
 
-      # Note actions
-      # #commented
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ITERATION_COUNT.times do
+        # update
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          params = {
+            group_access: Gitlab::Access::MASTER
+          }
+          GroupsService.new(@another_user, @group, params).update_membership(watched_user)
+        end
+
+        # left
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          GroupsService.new(@another_user, @group).remove_membership(watched_user)
+        end
+
+        # TeamUserRelationship actions
+        # join
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          params = {
+            user_ids: [watched_user.id],
+            team_access: Gitlab::Access::DEVELOPER
+          }
+          TeamsService.new(@another_user, @team, params).add_memberships
+        end
+
+        # update
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          params = {
+            team_access: Gitlab::Access::MASTER
+          }
+          TeamsService.new(@another_user, @team, params).update_memberships(watched_user)
+        end
+
+        # left
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          TeamsService.new(@another_user, @team).delete_membership(watched_user)
+        end
+
+        # update
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          watched_user.update_attributes(name: watched_user.name + "_updated")
+        end
+
+
+        # Project
+        # Issue actions
+        # #opened
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        issues = []
+        ITERATION_COUNT.times do
+          issues << create(:issue, author: @another_user, project: @project_with_code)
+        end
+
+        # #closed
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        issues.each do |issue|
+          issue.close
+        end
+
+        # #reopened
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        issues.each do |issue|
+          issue.reopen
+        end
+
+        # MergeRequest actions
+        # #opened
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        merge_requests = []
+        ITERATION_COUNT.times do
+          merge_requests << ProjectsService.new(@another_user, @project_with_code, attributes_for(:merge_request, source_project: @project_with_code, target_project: @project_with_code)).merge_request.create
+        end
+
+        # #assigned
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+
+        # #reassigned
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+
+        # #closed #reopened #merged
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+
+        state_events = [ :close, :reopen, :merge ]
+        ActionMailer::Base.deliveries.clear
+
+        state_events.each do |state_event|
+          merge_requests.each do |merge_request|
+            EventHierarchyWorker.reset
+            RequestStore.store[:borders] = []
+
+            params = {
+              merge_request: {
+                state_event: state_event
+              }
+            }
+            ProjectsService.new(@another_user, @project_with_code, params).merge_request(merge_request).update
+          end
+        end
+
+        # Milestone actions
+        # #created
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        milestone = create :milestone, project: @project_with_code
+
+        # #closed
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        milestone.close
+
+        # Note actions
+        # #commented
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ITERATION_COUNT.times do
+          params = {
+            note: attributes_for(:note)
+          }
+          ProjectsService.new(@another_user, @project_with_code, params).notes.create
+        end
+
+        #
+        # #commented_commit
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ITERATION_COUNT.times do
+          ProjectsService.new(@another_user, @project_with_code, note: attributes_for(:note_on_commit)).notes.create
+        end
+
+        # #commented issue
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        issue = create :issue, project: @project_with_code
+        params = { note: attributes_for(:note_on_issue, noteable: issue) }
+
+        ITERATION_COUNT.times do
+          ProjectsService.new(@another_user, @project_with_code, params).notes.create
+        end
+
+        # #commented marge request
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ITERATION_COUNT.times do
+          params = { note: attributes_for(:note_on_merge_request, noteable: merge_requests.first) }
+          ProjectsService.new(@another_user, @project_with_code, params).notes.create
+
+          params = { note: attributes_for(:note_on_merge_request_diff, noteable: merge_requests.first) }
+          ProjectsService.new(@another_user, @project_with_code, params).notes.create
+        end
+
+        # Project Hook actions
+        # #added
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        project_hooks= []
+        ITERATION_COUNT.times do
+          project_hooks << create(:project_hook, project: @project_with_code)
+        end
+
+        # #updated
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        project_hooks.each do |project_hook|
+          params = attributes_for :project_hook
+          project_hook.update_attributes(params)
+        end
+
+        # #deleted
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        project_hooks.each do |project_hook|
+          project_hook.destroy
+        end
+
+        # Protected Branch actions
+        # #protected
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        protected_branch = create(:protected_branch, project: @project_with_code, name: "master")
+
+        # #unprotected
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        protected_branch.destroy
+
+        # Push Actions
+        # #pushed
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
+        @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
+        @ref = 'refs/heads/master'
+        GitPushService.new(@another_user, @project_with_code, @oldrev, @newrev, @ref).execute
+
+        # #created_branch
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @oldrev = '0000000000000000000000000000000000000000'
+        GitPushService.new(@another_user, @project_with_code, @oldrev, @newrev, @ref).execute
+
+        # #deleted_branch
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
+        @newrev = '0000000000000000000000000000000000000000'
+        GitPushService.new(@another_user, @project_with_code, @oldrev, @newrev, @ref).execute
+
+        # #created_tag
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @oldrev = '0000000000000000000000000000000000000000'
+        @ref = 'refs/tags/v2.2.0'
+        GitPushService.new(@another_user, @project_with_code, @oldrev, @newrev, @ref).execute
+
+        # #deleted_tag
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
+        @newrev = '0000000000000000000000000000000000000000'
+        @ref = 'refs/tags/v2.2.0'
+
+        # TeamProjectRelationship actions
+        # #assigned
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = { team_ids: [ @team.id ] }
+        ProjectsService.new(@another_user, @project_with_code, params).assign_team
+
+        # #resigned
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ProjectsService.new(@another_user, @project_with_code, params).resign_team(@team)
+
+        # UsersProject actions
+        # #joined
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
         params = {
-          note: attributes_for(:note)
+          user_ids: [ @user.id ],
+          project_access: Gitlab::Access::DEVELOPER
         }
-        ProjectsService.new(@another_user, @project_with_code, params).notes.create
-      end
+        ProjectsService.new(@another_user, @project_with_code, params).add_membership
 
-      #
-      # #commented_commit
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ITERATION_COUNT.times do
-        ProjectsService.new(@another_user, @project_with_code, note: attributes_for(:note_on_commit)).notes.create
-      end
+        # #updated
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = { team_member: { project_access: Gitlab::Access::MASTER } }
+        ProjectsService.new(@another_user, @project_with_code, params).update_membership(@user)
 
-      # #commented issue
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      issue = create :issue, project: @project_with_code
-      params = { note: attributes_for(:note_on_issue, noteable: issue) }
+        # #left
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ProjectsService.new(@another_user, @project_with_code).remove_membership(@user)
 
-      ITERATION_COUNT.times do
-        ProjectsService.new(@another_user, @project_with_code, params).notes.create
-      end
+        # WebHook actions
+        # TODO
+        # #added
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #commented marge request
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ITERATION_COUNT.times do
-        params = { note: attributes_for(:note_on_merge_request, noteable: merge_requests.first) }
-        ProjectsService.new(@another_user, @project_with_code, params).notes.create
+        # #updated
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-        params = { note: attributes_for(:note_on_merge_request_diff, noteable: merge_requests.first) }
-        ProjectsService.new(@another_user, @project_with_code, params).notes.create
-      end
+        # #deleted
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # Project Hook actions
-      # #added
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      project_hooks= []
-      ITERATION_COUNT.times do
-        project_hooks << create(:project_hook, project: @project_with_code)
-      end
+        # Project actions
+        # #imported
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        users_ids = @watched_users.map(&:id)
+        params = { project: attributes_for(:empty_project, creator_id: @another_user.id, namespace_id: @group.id) }
+        @first_project = ProjectsService.new(@another_user, params[:project]).create
 
-      # #updated
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      project_hooks.each do |project_hook|
-        params = attributes_for :project_hook
-        project_hook.update_attributes(params)
-      end
+        params = { user_ids: users_ids, project_access: Gitlab::Access::DEVELOPER }
+        ProjectsService.new(@another_user, @first_project, params).add_membership
 
-      # #deleted
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      project_hooks.each do |project_hook|
-        project_hook.destroy
-      end
+        params = { source_project_id: @first_project.id }
+        ProjectsService.new(@another_user, @project_with_code, params).import_memberships
 
-      # Protected Branch actions
-      # #protected
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      protected_branch = create(:protected_branch, project: @project_with_code, name: "master")
+        # #members_removed
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ProjectsService.new(@another_user, @project_with_code, { ids: users_ids }).batch_remove_memberships
 
-      # #unprotected
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      protected_branch.destroy
+        # #members_added
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = { user_ids: users_ids, project_access: Gitlab::Access::DEVELOPER }
+        ProjectsService.new(@another_user, @project_with_code, params).add_membership
 
-      # Push Actions
-      # #pushed
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
-      @newrev = 'b19a04f53caeebf4fe5ec2327cb83e9253dc91bb'
-      @ref = 'refs/heads/master'
-      GitPushService.new(@another_user, @project_with_code, @oldrev, @newrev, @ref).execute
+        # #members_updated
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ProjectsService.new(@another_user, @project_with_code, { ids: users_ids, team_member: { project_access: Gitlab::Access::MASTER } }).batch_update_memberships
 
-      # #created_branch
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @oldrev = '0000000000000000000000000000000000000000'
-      GitPushService.new(@another_user, @project_with_code, @oldrev, @newrev, @ref).execute
+        # #teams_added
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #deleted_branch
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
-      @newrev = '0000000000000000000000000000000000000000'
-      GitPushService.new(@another_user, @project_with_code, @oldrev, @newrev, @ref).execute
+        # #transfer
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = attributes_for :group, owner: @another_user.id
+        @another_group = GroupsService.new(@another_user, params).create
+        params = { project: { namespace_id: @another_group.id }}
+        ProjectsService.new(@another_user, @project_with_code, params).transfer
 
-      # #created_tag
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @oldrev = '0000000000000000000000000000000000000000'
-      @ref = 'refs/tags/v2.2.0'
-      GitPushService.new(@another_user, @project_with_code, @oldrev, @newrev, @ref).execute
+        # #updated
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @project_with_code.update_attributes(name: @project_with_code.name + "_after_update")
 
-      # #deleted_tag
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @oldrev = '93efff945215a4407afcaf0cba15ac601b56df0d'
-      @newrev = '0000000000000000000000000000000000000000'
-      @ref = 'refs/tags/v2.2.0'
+        # #deleted
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ProjectsService.new(@another_user, @project_with_code).delete
 
-      # TeamProjectRelationship actions
-      # #assigned
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = { team_ids: [ @team.id ] }
-      ProjectsService.new(@another_user, @project_with_code, params).assign_team
+        # Group
+        # Project actions
+        # #added
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = attributes_for(:project, namespace_id: @watched_group.id)
+        project_in_group = ProjectsService.new(@another_user, params).create
 
-      # #resigned
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ProjectsService.new(@another_user, @project_with_code, params).resign_team(@team)
+        # #removed
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = { project: { namespace_id: @another_group.id }}
+        ProjectsService.new(@another_user, project_in_group, params).transfer
 
-      # UsersProject actions
-      # #joined
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = {
-        user_ids: [ @user.id ],
-        project_access: Gitlab::Access::DEVELOPER
-      }
-      ProjectsService.new(@another_user, @project_with_code, params).add_membership
+        params = { project: { namespace_id: @watched_group.id }}
+        ProjectsService.new(@another_user, project_in_group, params).transfer
 
-      # #updated
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = { team_member: { project_access: Gitlab::Access::MASTER } }
-      ProjectsService.new(@another_user, @project_with_code, params).update_membership(@user)
+        # #updated
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #left
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ProjectsService.new(@another_user, @project_with_code).remove_membership(@user)
+        # #deleted
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        ProjectsService.new(@another_user, project_in_group).delete
 
-      # WebHook actions
-      # TODO
-      # #added
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # Team actions
+        # #assigned
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = { team_ids: [ @team.id ] }
+        GroupsService.new(@another_user, @watched_group, params).assign_team
 
-      # #updated
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # #resigned
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = { team_ids: [ @team.id ] }
+        GroupsService.new(@another_user, @watched_group).resign_team(@team)
 
-      # #deleted
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # User actions
+        # #joined
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |wu|
+          params = {
+            user_ids: [ wu.id ],
+            group_access: Gitlab::Access::DEVELOPER
+          }
+          GroupsService.new(@another_user, @watched_group, params).add_membership
+        end
 
-      # Project actions
-      # #imported
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      users_ids = @watched_users.map(&:id)
-      params = { project: attributes_for(:empty_project, creator_id: @another_user.id, namespace_id: @group.id) }
-      @first_project = ProjectsService.new(@another_user, params[:project]).create
+        # #updated
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |wu|
+          params = { group_access: Gitlab::Access::MASTER }
+          GroupsService.new(@another_user, @watched_group, params).update_membership(wu)
+        end
 
-      params = { user_ids: users_ids, project_access: Gitlab::Access::DEVELOPER }
-      ProjectsService.new(@another_user, @first_project, params).add_membership
+        # #deleted
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |wu|
+          params = {
+            user_ids: [ wu.id ],
+            group_access: Gitlab::Access::DEVELOPER
+          }
+          GroupsService.new(@another_user, @watched_group).remove_membership(wu)
+        end
 
-      params = { source_project_id: @first_project.id }
-      ProjectsService.new(@another_user, @project_with_code, params).import_memberships
-
-      # #members_removed
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ProjectsService.new(@another_user, @project_with_code, { ids: users_ids }).batch_remove_memberships
-
-      # #members_added
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = { user_ids: users_ids, project_access: Gitlab::Access::DEVELOPER }
-      ProjectsService.new(@another_user, @project_with_code, params).add_membership
-
-      # #members_updated
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ProjectsService.new(@another_user, @project_with_code, { ids: users_ids, team_member: { project_access: Gitlab::Access::MASTER } }).batch_update_memberships
-
-      # #teams_added
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-
-      # #transfer
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = attributes_for :group, owner: @another_user.id
-      @another_group = GroupsService.new(@another_user, params).create
-      params = { project: { namespace_id: @another_group.id }}
-      ProjectsService.new(@another_user, @project_with_code, params).transfer
-
-      # #updated
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @project_with_code.update_attributes(name: @project_with_code.name + "_after_update")
-
-      # #deleted
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ProjectsService.new(@another_user, @project_with_code).delete
-
-      # Group
-      # Project actions
-      # #added
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = attributes_for(:project, namespace_id: @watched_group.id)
-      project_in_group = ProjectsService.new(@another_user, params).create
-
-      # #removed
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = { project: { namespace_id: @another_group.id }}
-      ProjectsService.new(@another_user, project_in_group, params).transfer
-
-      params = { project: { namespace_id: @watched_group.id }}
-      ProjectsService.new(@another_user, project_in_group, params).transfer
-
-      # #updated
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-
-      # #deleted
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      ProjectsService.new(@another_user, project_in_group).delete
-
-      # Team actions
-      # #assigned
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = { team_ids: [ @team.id ] }
-      GroupsService.new(@another_user, @watched_group, params).assign_team
-
-      # #resigned
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = { team_ids: [ @team.id ] }
-      GroupsService.new(@another_user, @watched_group).resign_team(@team)
-
-      # User actions
-      # #joined
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |wu|
-        params = {
-          user_ids: [ wu.id ],
-          group_access: Gitlab::Access::DEVELOPER
-        }
+        # #members_added
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        params = { user_ids: users_ids, group_access: Gitlab::Access::DEVELOPER }
         GroupsService.new(@another_user, @watched_group, params).add_membership
-      end
 
-      # #updated
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |wu|
-        params = { group_access: Gitlab::Access::MASTER }
-        GroupsService.new(@another_user, @watched_group, params).update_membership(wu)
-      end
+        # #teams_added
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #deleted
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |wu|
-        params = {
-          user_ids: [ wu.id ],
-          group_access: Gitlab::Access::DEVELOPER
-        }
-        GroupsService.new(@another_user, @watched_group).remove_membership(wu)
-      end
+        # Group actions
+        # #updated
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_group.update_attributes(attributes_for(:group))
 
-      # #members_added
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      params = { user_ids: users_ids, group_access: Gitlab::Access::DEVELOPER }
-      GroupsService.new(@another_user, @watched_group, params).add_membership
+        # #deleted
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        GroupsService.new(@another_user, @watched_group).delete
 
-      # #teams_added
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # Team
+        # Project actions
+        # #assigned
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # Group actions
-      # #updated
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_group.update_attributes(attributes_for(:group))
+        # #resigned
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #deleted
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      GroupsService.new(@another_user, @watched_group).delete
+        # Group actions
+        # #assigned
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # Team
-      # Project actions
-      # #assigned
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # resigned
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #resigned
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-
-      # Group actions
-      # #assigned
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-
-      # resigned
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-
-      # User actions
-      # #joined
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        params = {
-          user_ids: [watched_user.id],
-          team_access: Gitlab::Access::DEVELOPER
-        }
-        TeamsService.new(@another_user, @watched_team, params).add_memberships
-      end
+        # User actions
+        # #joined
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          params = {
+            user_ids: [watched_user.id],
+            team_access: Gitlab::Access::DEVELOPER
+          }
+          TeamsService.new(@another_user, @watched_team, params).add_memberships
+        end
 
 
-      # #updated
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        params = {
-          team_access: Gitlab::Access::MASTER
-        }
-        TeamsService.new(@another_user, @watched_team, params).update_memberships(watched_user)
-      end
+        # #updated
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          params = {
+            team_access: Gitlab::Access::MASTER
+          }
+          TeamsService.new(@another_user, @watched_team, params).update_memberships(watched_user)
+        end
 
-      # #left
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        TeamsService.new(@another_user, @watched_team).delete_membership(watched_user)
-      end
+        # #left
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          TeamsService.new(@another_user, @watched_team).delete_membership(watched_user)
+        end
 
-      # Team actions
-      # #updated
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # Team actions
+        # #updated
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #groups_added
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # #groups_added
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #projects_added
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # #projects_added
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #members_added
-      # TODO
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
+        # #members_added
+        # TODO
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
 
-      # #deleted
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      TeamsService.new(@another_user, @watched_team).delete
+        # #deleted
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        TeamsService.new(@another_user, @watched_team).delete
 
-      # block
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        watched_user.block
-      end
+        # block
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          watched_user.block
+        end
 
-      # User action
-      # activate
-      EventHierarchyWorker.reset
-      RequestStore.store[:borders] = []
-      @watched_users.each do |watched_user|
-        watched_user.activate
+        # User action
+        # activate
+        EventHierarchyWorker.reset
+        RequestStore.store[:borders] = []
+        @watched_users.each do |watched_user|
+          watched_user.activate
+        end
       end
 
       # # delete
       #EventHierarchyWorker.reset
       #RequestStore.store[:borders] = []
       #@watched_users.each do |watched_user|
-        #watched_user.destroy
+      #watched_user.destroy
       #end
 
       mails.clear
@@ -2094,8 +2209,6 @@ describe EventSummaryMailer do
       add_retry
 
       save_emails
-
-      #binding.pry
 
       mails.count.should == EVENTS_SUMMARY_PERIODS.count
       select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count

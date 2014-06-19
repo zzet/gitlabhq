@@ -1,6 +1,6 @@
 - @teams.each do |team|
-  .ui-box
-    .title
+  .panel.panel-default
+    .panel-heading
       %strong= link_to team.name, team_url(team)
       team members (#{team.team_user_relationships.count})
       .pull-right
@@ -14,4 +14,3 @@
     %ul.well-list
       - team.team_user_relationships.order('team_access DESC').each do |member|
         = render 'teams/members/member', team: team, member: member, show_controls: false
-  %br

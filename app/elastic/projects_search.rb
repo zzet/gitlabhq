@@ -88,7 +88,8 @@ module ProjectsSearch
             terms: {
               field: "categories.name",
               all_terms: true,
-              size: Project.category_counts.count
+              # FIXME. Remove to_a
+              size: Project.category_counts.to_a.count
             }
           }
         },

@@ -60,23 +60,21 @@ module ApplicationHelper
 
   def avatar_icon(user_email = '', size = nil)
     user = User.find_by(email: user_email)
-    if user && user.avatar.present?
-      user.avatar.url
+
+    if user
+      user.avatar_url(size) || default_avatar
     else
       gravatar_icon(user_email, size)
     end
   end
 
   def gravatar_icon(user_email = '', size = nil)
-    size = 40 if size.nil? || size <= 0
+    GravatarService.new.execute(user_email, size) ||
+      default_avatar
+  end
 
-    if !Gitlab.config.gravatar.enabled || user_email.blank?
-      '/assets/no_avatar.png'
-    else
-      gravatar_url = request.ssl? || gitlab_config.https ? Gitlab.config.gravatar.ssl_url : Gitlab.config.gravatar.plain_url
-      user_email.strip!
-      sprintf gravatar_url, hash: Digest::MD5.hexdigest(user_email.downcase), size: size
-    end
+  def default_avatar
+    image_path('no_avatar.png')
   end
 
   def last_commit(project)
@@ -124,18 +122,23 @@ module ApplicationHelper
   # with suggestion to create MR
   def show_last_push_widget?(event)
     # Skip if event is not about added or modified non-master branch
-    return false unless event && event.last_push_to_non_root? && !event.rm_ref?
+    return false unless event
 
-    project = event.project
+    project = event.target
+    push = event.source
+
+    unless !push.to_default_branch? && push.branch? && !push.deleted_branch?
+      return false
+    end
 
     # Skip if project repo is empty or MR disabled
     return false unless project && !project.empty_repo? && project.merge_requests_enabled
 
     # Skip if user already created appropriate MR
-    return false if project.merge_requests.where(source_branch: event.branch_name).opened.any?
+    #return false if project.merge_requests.where(source_branch: push.branch_name).opened.any?
 
     # Skip if user removed branch right after that
-    return false unless project.repository.branch_names.include?(event.branch_name)
+    #return false unless project.repository.branch_names.include?(push.branch_name)
 
     true
   end
@@ -288,8 +291,11 @@ module ApplicationHelper
     GitHub::Markup.render(file_name, file_content).html_safe
   end
 
-  def spinner(text = nil)
-    content_tag :div, class: 'loading hide' do
+  def spinner(text = nil, visible = false)
+    css_class = "loading"
+    css_class << " hide" unless visible
+
+    content_tag :div, class: css_class do
       content_tag(:i, nil, class: 'icon-spinner icon-spin') + text
     end
   end
@@ -313,5 +319,32 @@ module ApplicationHelper
     else
       "(deleted #{name})"
     end
+  end
+
+  def link_to(name = nil, options = nil, html_options = nil, &block)
+    begin
+      uri = URI(options)
+      host = uri.host
+      absolute_uri = uri.absolute?
+    rescue URI::InvalidURIError, ArgumentError
+      host = nil
+      absolute_uri = nil
+    end
+
+    # Add "nofollow" only to external links
+    if host && host != Gitlab.config.gitlab.host && absolute_uri
+      if html_options
+        if html_options[:rel]
+          html_options[:rel] << " nofollow"
+        else
+          html_options.merge!(rel: "nofollow")
+        end
+      else
+        html_options = Hash.new
+        html_options[:rel] = "nofollow"
+      end
+    end
+
+    super
   end
 end

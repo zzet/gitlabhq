@@ -1,6 +1,6 @@
 .login-box
   %h3.page-title Sign in
-  - if ldap_enabled?
+  - if ldap_enabled? && gitlab_config.signin_enabled
     %ul.nav.nav-tabs
       %li.active
         = link_to 'LDAP', '#tab-ldap', 'data-toggle' => 'tab'
@@ -18,10 +18,17 @@
         Вопросы и предложения можно оставить в чатике
         = link_to "“INFR || Gitlab || багрепортинг”", "skype:?chat&blob=l5lSuvYSiiUL4031uYVHplQ6t20qzQ7uW2XMDLjVZGVGoQFQaD7GDgyiBDRZ6AQMmmTyBikUENGLfP6H5K3rsKzdug3odtgoFQI"
     %br
-    = render partial: 'devise/sessions/new_base'
+    - if ldap_enabled?
+      = render partial: 'devise/sessions/new_ldap'
 
+    - elsif gitlab_config.signin_enabled
+      = render partial: 'devise/sessions/new_base'
 
-  = render 'devise/sessions/oauth_providers' if devise_mapping.omniauthable?
+    - else
+      %div
+        No authentication methods configured.
+
+  = render 'devise/sessions/oauth_providers' if Gitlab.config.omniauth.enabled && devise_mapping.omniauthable?
   %hr
 
   - if gitlab_config.signup_enabled

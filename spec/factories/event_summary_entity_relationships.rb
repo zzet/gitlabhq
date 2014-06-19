@@ -14,9 +14,8 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
-  factory :event_summary_entity_relationship, :class => 'Event::SummaryEntityRelationship' do
-    summary_id 1
-    entity_id 1
-    entity_type "MyString"
+  factory :event_summary_entity_relationship, class: Event::SummaryEntityRelationship do
+    summary
+    entity { create :project }
   end
 end

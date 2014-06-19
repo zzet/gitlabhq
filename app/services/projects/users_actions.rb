@@ -9,7 +9,6 @@ module Projects::UsersActions
       users = User.where(id: user_ids)
       @project.team << [users, params[:project_access]]
     end
-
     reindex_with_elastic(Project, project.id)
 
     receive_delayed_notifications

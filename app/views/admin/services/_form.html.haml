@@ -3,50 +3,61 @@
     %ul
       - @service.errors.full_messages.each do |msg|
         %li= msg
+.col-md-6
+  .panel.panel-default
+    .panel-heading
+      Service global attributes
+    .panel-body
+      .form-group
+        = f.label :active_state_event, class: 'control-label' do
+          Global state
+        .col-sm-10
+          = f.select(:active_state_event, @service.active_state_transitions.map {|s| [s.human_event, s.event]}, { include_blank: @service.human_active_state_name }, { class: "medium form-control select-wide" })
 
-%fieldset
-  .form-group
-    = f.label :avtive_state_event, "Global state", class: "control-label"
-    .col-sm-10
-      = f.select(:active_state_event, @service.active_state_transitions.map {|s| [s.human_event, s.event]}, include_blank: @service.human_active_state_name)
+      .form-group
+        = f.label :title, class: "control-label"
+        .col-sm-10
+          = f.text_field :title, class: "form-control", placeholder: "Enter uniq human name for service."
 
-  .form-group
-    = f.label :title, class: "control-label"
-    .col-sm-10
-      = f.text_field :title, class: "form-control", placeholder: "Enter uniq human name for service."
+      .form-group
+        = f.label :description, class: "control-label"
+        .col-sm-10
+          = f.text_field :description, class: "form-control", placeholder: "Enter description for service."
 
-  .form-group
-    = f.label :description, class: "control-label"
-    .col-sm-10
-      = f.text_field :description, class: "form-control", placeholder: "Enter description for service."
+      .form-group
+        = f.label :public_state_event, "Public", class: "control-label"
+        .col-sm-10
+          = f.select(:public_state_event, @service.public_state_transitions.map {|s| [s.human_event, s.event]}, { include_blank: @service.human_public_state_name }, { class: "medium form-control select-wide" })
 
-  .form-group
-    = f.label :public_state_event, "Public", class: "control-label"
-    .col-sm-10
-      = f.select(:public_state_event, @service.public_state_transitions.map {|s| [s.human_event, s.event]}, include_blank: @service.human_public_state_name)
+.col-md-6
+  .panel.panel-default
+    .panel-heading
+      Service settings
+    .panel-body
+      - if @service.respond_to?(:configuration)
+        - configuration = @service.configuration
+        = f.fields_for :configuration, configuration do |config|
+          - configuration.fields.each do |field|
+            - name = field[:name]
+            - type = field[:type]
+            - placeholder = field[:placeholder]
 
-%fieldset
-  = f.fields_for :service_key_service_relationships do |sksr|
-    = render "service_key_service_relationships", f: sksr
+            .form-group
+              = config.label name, class: "control-label"
+              .col-sm-10
+                - if type == 'text'
+                  = config.text_field name, class: "form-control", placeholder: placeholder
+                - elsif type == 'checkbox'
+                  = config.check_box name
 
-  - if @service.respond_to?(:configuration)
-    - configuration = @service.configuration
-    = f.fields_for :configuration, configuration do |config|
-      - configuration.fields.each do |field|
-        - name = field[:name]
-        - type = field[:type]
-        - placeholder = field[:placeholder]
+.col-md-12
+  .panel.panel-default
+    .panel-heading
+      Service ssh keys
+    .panel-body
+      = f.fields_for :service_key_service_relationships do |sksr|
+        = render "service_key_service_relationships", f: sksr
 
-        .form-group
-          = config.label name, class: "control-label"
-          .col-sm-10
-            - if type == 'text'
-              = config.text_field name, class: "form-control", placeholder: placeholder
-            - elsif type == 'checkbox'
-              = config.check_box name
-
+.col-md-12
   .form-actions
     = f.submit 'Save', class: 'btn btn-save'
-    &nbsp;
-    - if @service.valid? && @service.enabled? && @service.can_test?
-      -#= link_to 'Test settings', test_admin_service_path(@service.to_param), class: 'btn btn-small'

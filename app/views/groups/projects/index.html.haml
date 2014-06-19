@@ -4,8 +4,8 @@
   members access to group.
 %hr
 - manage_group =  current_user.can? :manage_group, @group
-.ui-box.span9
-  .title
+.panel.panel-default.span9
+  .panel-heading.clearfix
     %strong= @group.name
     projects:
     - if can? current_user, :manage_group, @group

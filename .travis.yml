@@ -5,11 +5,16 @@ env:
     - DB=postgresql
     - TRAVIS=true
   matrix:
-    - TASK=jasmine:ci
-    - TASK=spec
-    - TASK=spinach
+    - TASK=spinach_project DB=postgresql
+    - TASK=spinach_other DB=postgresql
+    - TASK=spec:api DB=postgresql
+    - TASK=spec:feature DB=postgresql
+    - TASK=spec:other DB=postgresql
+    - TASK=jasmine:ci DB=postgresql
 before_install:
   - sudo apt-get install libicu-dev -y
+install: 
+  - "bundle install --deployment --without production"
 branches:
   only:
     - 'master'

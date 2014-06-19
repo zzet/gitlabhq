@@ -58,7 +58,7 @@ Gitlab::Application.configure do
                else
                  "redis://localhost:6379"
                end
-  config.cache_store = :redis_store, resque_url
+  config.cache_store = :redis_store, resque_url, {namespace: 'cache:gitlab'}
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -79,11 +79,6 @@ Gitlab::Application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 
-  # Log the query plan for queries taking more than this (works
-  # with SQLite, MySQL, and PostgreSQL)
-  # config.active_record.auto_explain_threshold_in_seconds = 0.5
-
-  #config.action_mailer.delivery_method = :smtp
   # Defaults to:
   # # config.action_mailer.sendmail_settings = {
   # #   location: '/usr/sbin/sendmail',

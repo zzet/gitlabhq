@@ -4,11 +4,12 @@ class Projects::BranchesController < Projects::ApplicationController
   before_filter :require_non_empty_project
 
   before_filter :authorize_code_access!
-  before_filter :authorize_push!, only: [:create]
-  before_filter :authorize_admin_project!, only: [:destroy]
+  before_filter :authorize_push!, only: [:create, :destroy]
 
   def index
-    @branches = Kaminari.paginate_array(@repository.branches).page(params[:page]).per(30)
+    @sort = params[:sort] || 'name'
+    @branches = @repository.branches_sorted_by(@sort)
+    @branches = Kaminari.paginate_array(@branches).page(params[:page]).per(30)
   end
 
   def recent
@@ -26,7 +27,7 @@ class Projects::BranchesController < Projects::ApplicationController
 
     respond_to do |format|
       format.html { redirect_to project_branches_path(@project) }
-      format.js { render nothing: true }
+      format.js
     end
   end
 end

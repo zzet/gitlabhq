@@ -1,7 +1,7 @@
 class GitPushService
   attr_accessor :current_user, :project, :params,
-                :oldrev, :newrev, :ref,
-                :push_data, :push_commits
+    :oldrev, :newrev, :ref,
+    :push_data, :push_commits
 
   def initialize(user, project, oldrev = nil, newrev = nil, ref = nil, params = {})
     @current_user = user
@@ -46,6 +46,7 @@ class GitPushService
 
     project.ensure_satellite_exists
     project.repository.expire_cache
+    project.update_repository_size
 
     if push.to_existing_branch?
       project.update_merge_requests(oldrev, newrev, ref, @current_user)
@@ -55,6 +56,7 @@ class GitPushService
     if push.tag?
       project.execute_hooks(@push_data.dup, :tag_push_hooks)
     else
+      Elastic::RepositoryIndexer.perform_async(push.id)
       project.execute_hooks(@push_data.dup, :push_hooks)
     end
 
@@ -74,8 +76,6 @@ class GitPushService
 
       process_commit_messages(push)
     end
-
-    Elastic::RepositoryIndexer.perform_async(push.id)
   end
 
   # This method provide a sample data
@@ -119,6 +119,10 @@ class GitPushService
         RequestStore.store[:current_commit] = commit
 
         issues_to_close.each { |i| i.close && i.save }
+        # FIXME. Add Issue close service
+        #issues_to_close.each do |issue|
+        #Issues::CloseService.new(project, author, {}).execute(issue, commit)
+        #end
       end
 
       # Create cross-reference notes for any other references. Omit any issues that were referenced in an

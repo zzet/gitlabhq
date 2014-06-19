@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Issues" do
+describe "Issues", feature: true do
   let(:project) { create(:project) }
 
   before do
@@ -239,19 +239,6 @@ describe "Issues" do
   describe 'update milestone from issue#show' do
     let!(:issue) { create(:issue, project: project, author: @user) }
     let!(:milestone) { create(:milestone, project: project) }
-
-    context 'by authorized user' do
-
-      it 'with dropdown menu' do
-        visit project_issue_path(project, issue)
-
-        find('.edit-issue.inline-update').select(milestone.title, from: 'issue_milestone_id')
-        click_button 'Update Issue'
-
-        page.should have_content "Milestone"
-        page.has_select?('issue_assignee_id', :selected => milestone.title)
-      end
-    end
 
     context 'by unauthorized user' do
       let(:guest) { create(:user) }
