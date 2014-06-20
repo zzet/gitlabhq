@@ -25,13 +25,9 @@ class Admin::ProjectsController < Admin::ApplicationController
   end
 
   def transfer
-    result = ::ProjectsService.new(current_user, @project, project: params).transfer(:admin)
+    result = ::ProjectsService.new(current_user, @project, project: params.dup).transfer
 
-    if result
-      redirect_to [:admin, @project]
-    else
-      render :show
-    end
+    redirect_to [:admin, @project.reload]
   end
 
   protected
