@@ -1,3 +1,9 @@
+- if grouped_entities.empty?
+  .nothing-here-block
+    There are no any entity in this Digest.
+    %br
+    Please, add entities.
+
 - grouped_entities.each do |entity_type, entities|
   .ui-box
     .title
