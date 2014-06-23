@@ -73,7 +73,7 @@ module IssuesHelper
     Gitlab.config.issues_tracker && Gitlab.config.issues_tracker.values.any?
   end
 
-  def gitlab_issue_tracker?(project)
+  def gitlab_issue_tracker?(project = @project)
     project.issues_tracker.try(:to_sym) == :gitlab
   end
 

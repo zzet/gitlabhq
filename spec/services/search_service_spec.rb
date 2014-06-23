@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 describe 'SearchService' do
-  let(:user) { create(:user, namespace: found_namespace) }
-  let(:public_user) { create(:user, namespace: public_namespace) }
-  let(:internal_user) { create(:user, namespace: internal_namespace) }
+  let!(:user) { create(:user, namespace: found_namespace) }
+  let!(:public_user) { create(:user, namespace: public_namespace) }
+  let!(:internal_user) { create(:user, namespace: internal_namespace) }
 
-  let(:found_namespace) { create(:namespace, name: 'searchable namespace', path:'another_thing') }
-  let(:unfound_namespace) { create(:namespace, name: 'unfound namespace', path: 'yet_something_else') }
-  let(:internal_namespace) { create(:namespace, name: 'searchable internal namespace', path: 'something_internal') }
-  let(:public_namespace) { create(:namespace, name: 'searchable public namespace', path: 'something_public') }
+  let!(:found_namespace) { create(:namespace, name: 'searchable namespace', path:'another_thing') }
+  let!(:unfound_namespace) { create(:namespace, name: 'unfound namespace', path: 'yet_something_else') }
+  let!(:internal_namespace) { create(:namespace, name: 'searchable internal namespace', path: 'something_internal') }
+  let!(:public_namespace) { create(:namespace, name: 'searchable public namespace', path: 'something_public') }
 
   let(:found_project) { create(:project, :private, name: 'searchable_project', creator_id: user.id, namespace: found_namespace) }
   let(:unfound_project) { create(:project, :private, name: 'unfound_project', creator_id: user.id, namespace: unfound_namespace) }

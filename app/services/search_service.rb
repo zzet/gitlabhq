@@ -80,7 +80,7 @@ class SearchService < BaseService
 
   def search_in_groups(query)
     opt = {
-      gids: current_user.authorized_groups.ids,
+      gids: current_user ? current_user.authorized_groups.ids : [],
       order: params[:order],
       fields: %w(name^10 path^5 description),
       highlight: true
@@ -102,7 +102,7 @@ class SearchService < BaseService
 
   def search_in_teams(query)
     opt = {
-      tids: current_user.known_teams.ids,
+      tids: current_user ? current_user.known_teams.ids : [],
       order: params[:order],
       fields: %w(name^10 path^5 description),
       highlight: true
@@ -231,8 +231,6 @@ class SearchService < BaseService
       end
 
       known_projects_ids
-    rescue Exception => e
-      {}
     end
   end
 
@@ -249,5 +247,4 @@ class SearchService < BaseService
     known_projects_ids += current_user.known_projects.pluck(:id) if current_user
     known_projects_ids + Project.public_or_internal_only(current_user).pluck(:id)
   end
-
 end

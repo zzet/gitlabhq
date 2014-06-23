@@ -178,19 +178,15 @@ module Gitlab
     end
 
     def reference_issue(identifier, project = @project)
-      if project.issues_tracker == 'gitlab' || !external_issues_tracker_enabled?
-        if project.issue_exists? identifier
-          url = url_for_issue(identifier, project)
-          title = title_for_issue(identifier)
-          options = html_options.merge(
-            title: "Issue: #{title}",
-            class: "gfm gfm-issue #{html_options[:class]}"
-          )
+      if project.issue_exists? identifier
+        url = url_for_issue(identifier, project)
+        title = title_for_issue(identifier)
+        options = html_options.merge({
+          title: "Issue: #{title}",
+          class: "gfm gfm-issue #{html_options[:class]}"
+        })
 
-          link_to("##{identifier}", url, options)
-        end
-      elsif project.issues_tracker == 'jira'
-        reference_external_issue(identifier, project)
+        link_to("##{identifier}", url, options)
       end
     end
 
