@@ -19,14 +19,14 @@
 = render "search/facets/repository/project", projects: @search_results[:repositories][:commits][:projects], type: :commits
 
 %h4
-  - if @search_results[:repositories][:commits][:total_count] > 0
-    #{@search_results[:repositories][:commits][:total_count]} results found in
-    - if @search_results[:repositories][:commits][:projects].many?
-      #{ @search_results[:repositories][:commits][:projects].count } projects
-    - else
-      #{ @search_results[:repositories][:commits][:projects].first[:name] } project
+  - if @search_results[:repositories][:blobs][:total_count] > 0
+    #{@search_results[:repositories][:blobs][:total_count]} results found in
+    - if @project || @search_results[:repositories][:blobs][:projects] == 1
+      #{ @search_results[:repositories][:blobs][:projects].first[:name] } project
+    - elsif @search_results[:repositories][:blobs][:projects].many?
+      #{ @search_results[:repositories][:blobs][:projects].count } projects
   - else
-    No matches found
+    No matches found.
 
 %hr
 .search_results

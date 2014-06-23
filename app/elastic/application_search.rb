@@ -8,7 +8,8 @@ module ApplicationSearch
     # git-elasticsearch-1.production.infra.home has address 10.40.56.23
     self.__elasticsearch__.client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port
 
-    index_name [Rails.application.class.parent_name.downcase, self.name.downcase, Rails.env.to_s].join('-')
+    env = (Rails.env == 'staging') ? 'production' : Rails.env
+    index_name [Rails.application.class.parent_name.downcase, self.name.downcase, env].join('-')
 
     settings \
       index: {
@@ -51,4 +52,19 @@ module ApplicationSearch
     after_commit lambda { Elastic::BaseIndexer.perform_async(:delete, self.class.to_s, self.id) }, on: :destroy
     after_touch  lambda { Elastic::BaseIndexer.perform_async(:update, self.class.to_s, self.id) }
   end
+
+   module ClassMethods
+     def highlight_options(fields)
+       es_fields = fields.map { |field| field.split('^').first }.inject({}) do |memo, field|
+         memo[field.to_sym] = {}
+         memo
+       end
+
+       {
+           pre_tags: ["gitlabelasticsearch→"],
+           post_tags: ["←gitlabelasticsearch"],
+           fields: es_fields
+       }
+     end
+   end
 end
