@@ -121,6 +121,33 @@ class ProjectTeam
     false
   end
 
+  def guest?(user)
+    max_tm_access(user.id) == Gitlab::Access::GUEST
+  end
+
+  def reporter?(user)
+    max_tm_access(user.id) == Gitlab::Access::REPORTER
+  end
+
+  def developer?(user)
+    max_tm_access(user.id) == Gitlab::Access::DEVELOPER
+  end
+
+  def master?(user)
+    max_tm_access(user.id) == Gitlab::Access::MASTER
+  end
+
+  def max_tm_access(user_id)
+    access = []
+    access << project.users_projects.find_by(user_id: user_id).try(:access_field)
+
+    if group
+      access << group.users_groups.find_by(user_id: user_id).try(:access_field)
+    end
+
+    access.compact.max
+  end
+
   private
 
   def fetch_members(level = nil)
@@ -168,7 +195,9 @@ class ProjectTeam
     project_teams_member_ids = project_teams_members.is_a?(Array) ? [] : project_teams_members.pluck(:user_id)
     group_teams_member_ids   = group_teams_members.is_a?(Array)   ? [] : group_teams_members.pluck(:user_id)
 
-    (project_teams_member_ids + group_teams_member_ids).uniq
+    user_ids = (project_teams_member_ids + group_teams_member_ids).uniq
+
+    User.where(id: user_ids)
   end
 
   def project_access(member)

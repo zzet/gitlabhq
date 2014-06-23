@@ -9,7 +9,7 @@
     = render 'shared/event_filter'
     .content_list
     = spinner
-  .col-md-4.project-side.hidden-sm
+  .col-md-4.project-side.hidden-sm.hidden-xs
     .clearfix
       - if @project.archived?
         .alert.alert-warning
@@ -30,7 +30,7 @@
         - if @project.description.present?
           %p.light= @project.description
 
-      .clearfix
+      .clearfix.prepend-top-10
         - if @project.forked_from_project
           .alert.alert-success
             %i.icon-code-fork.project-fork-icon

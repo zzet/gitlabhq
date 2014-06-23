@@ -1,19 +1,21 @@
-.ui-box
-  .title.clearfix
-    = search_field_tag :filter_team, nil, placeholder: 'Filter by name', class: 'form-control js-sidebar-filter'
+.panel.panel-default
+  .panel-heading.clearfix
+    = search_field_tag :filter_team, nil, placeholder: 'Filter by name', class: 'form-control dash-filter'
     - if can? current_user, :manage_group, @group
       %span.pull-right
         = link_to group_teams_path(@group), class: "btn btn-new" do
           %i.icon-plus
           Assign team
+
   %ul.well-list.js-sidebar-list
+    - if teams.blank?
+      .nothing-here-block You have no teams yet.
+
     - teams.each do |team|
       %li.group-row.js-description-tooltip{"data-title" => "#{team.description}"}
         = link_to team_path(id: team.path), class: dom_class(team) do
-          %span.group-name.filter-title
-            = truncate(team.name, length: 35)
+          %span.str-truncated
+            %span.group-name.filter-title
+              = team.name
           %span.arrow
             %i.icon-angle-right
-    - if teams.blank?
-      %li
-        .nothing-here-block You have no teams yet.

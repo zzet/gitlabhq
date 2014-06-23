@@ -125,7 +125,8 @@ class Team < ActiveRecord::Base
   end
 
   def add_users(user_ids, access)
-    user_ids.compact.each do |user_id|
+    user_ids = user_ids.compact if user_ids.is_a?(Array)
+    user_ids.each do |user_id|
       user_id = user_id.id if user_id.is_a? User
       team_user_relationships.create(user_id: user_id, team_access: access)
     end

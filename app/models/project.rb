@@ -6,8 +6,8 @@
 #  name                   :string(255)
 #  path                   :string(255)
 #  description            :text
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
+#  created_at             :datetime
+#  updated_at             :datetime
 #  creator_id             :integer
 #  issues_enabled         :boolean          default(TRUE), not null
 #  wall_enabled           :boolean          default(TRUE), not null
@@ -36,13 +36,18 @@ class Project < ActiveRecord::Base
   extend Enumerize
 
   default_value_for :archived, false
+  default_value_for :issues_enabled, true
+  default_value_for :merge_requests_enabled, true
+  default_value_for :wiki_enabled, true
+  default_value_for :wall_enabled, false
+  default_value_for :snippets_enabled, true
 
   ActsAsTaggableOn.strict_case_match = true
 
   attr_accessible :name, :path, :description, :issues_tracker, :label_list, :category_list,
-    :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
+    :issues_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
     :wiki_enabled, :visibility_level, :import_url, :last_activity_at, :last_pushed_at, :git_protocol_enabled,
-    :wiki_engine, :wiki_external_id, :wiki_external_id, as: [:default, :admin]
+    :wiki_engine, :wiki_external_id, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
 
@@ -58,7 +63,7 @@ class Project < ActiveRecord::Base
   has_one :forked_project_link, dependent: :destroy, foreign_key: "forked_to_project_id"
   has_one :forked_from_project, through: :forked_project_link
 
-  has_one :last_event, -> {order 'events.created_at DESC'}, class_name: Event, as: :target
+  has_one :last_event, -> { events.order(created_at: :desc) }, class_name: Event, as: :target
   has_many :events, class_name: Event, as: :target
 
   has_many :services,           dependent: :destroy
@@ -110,7 +115,7 @@ class Project < ActiveRecord::Base
             exclusion: { in: Gitlab::Blacklist.path },
             format: { with: Gitlab::Regex.path_regex,
                       message: "only letters, digits & '_' '-' '.' allowed. Letter or digit should be first" }
-  validates :issues_enabled, :wall_enabled, :merge_requests_enabled,
+  validates :issues_enabled, :merge_requests_enabled,
             :wiki_enabled, inclusion: { in: [true, false] }
   validates :issues_tracker_id, length: { maximum: 255 }, allow_blank: true
   validates :namespace, presence: true
@@ -129,7 +134,7 @@ class Project < ActiveRecord::Base
       from :update,   to: :transfer,  conditions: -> { @source.namespace_id_changed? && @source.namespace_id != @changes[:namespace_id].first } do
         @event_data[:owner_changes] = @changes
       end
-      from :update,   to: :updated,   conditions: -> { [:name, :path, :description, :creator_id, :default_branch, :issues_enabled, :wall_enabled, :merge_requests_enabled, :public, :issues_tracker, :issues_tracker_id].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
+      from :update,   to: :updated,   conditions: -> { [:name, :path, :description, :creator_id, :default_branch, :issues_enabled, :merge_requests_enabled, :public, :issues_tracker, :issues_tracker_id].inject(false) { |m,v| m = m || @changes.has_key?(v.to_s) } }
       from :destroy,  to: :deleted
 
       # Mass actions
@@ -310,26 +315,16 @@ class Project < ActiveRecord::Base
       where(visibility_level: visibility_levels)
     end
 
-    def accessible_to(user)
-      accessible_ids = publicish(user).pluck(:id)
-      accessible_ids += user.authorized_projects.pluck(:id) if user
-      where(id: accessible_ids)
-    end
-
     def with_push
-      includes(:old_events).where('old_events.action = ?', OldEvent::PUSHED)
+      includes(:events).where(events: { action: :pushed })
     end
 
     def active
       joins(:issues, :notes, :merge_requests).order("issues.created_at, notes.created_at, merge_requests.created_at DESC")
     end
 
-    def search_by_title query
-      where("projects.archived = ?", false).where("LOWER(projects.name) LIKE :query", query: "%#{query.downcase}%")
-    end
-
     def find_with_namespace(id)
-      return nil unless id.include?("/")
+      return nil unless id && id.include?("/")
 
       id = id.split("/")
       namespace = Namespace.find_by(path: id.first)
@@ -348,6 +343,7 @@ class Project < ActiveRecord::Base
       when 'oldest' then reorder('projects.created_at ASC')
       when 'recently_updated' then reorder('projects.updated_at DESC')
       when 'last_updated' then reorder('projects.updated_at ASC')
+      when 'largest_repository' then reorder('projects.repository_size DESC')
       else reorder("namespaces.path, projects.name ASC")
       end
     end
@@ -411,7 +407,7 @@ class Project < ActiveRecord::Base
 
   def check_limit
     unless creator.can_create_project?
-      errors[:limit_reached] << ("Your own projects limit is #{creator.projects_limit}! Please contact administrator to increase it")
+      errors[:limit_reached] << ("Your project limit is #{creator.projects_limit} projects! Please contact your administrator to increase it")
     end
   rescue
     errors[:base] << ("Can't check your ability to create project")
@@ -453,8 +449,11 @@ class Project < ActiveRecord::Base
     self.id
   end
 
+  # Tags are shared by issues and merge requests
   def issues_labels
-    @issues_labels ||= (issues_default_labels + issues.tags_on(:labels)).uniq.sort_by(&:name)
+    @issues_labels ||= (issues_default_labels +
+                        merge_requests.tags_on(:labels) +
+                        issues.tags_on(:labels)).uniq.sort_by(&:name)
   end
 
   def issue_exists?(issue_id)
@@ -505,6 +504,14 @@ class Project < ActiveRecord::Base
     jenkins_ci? && jenkins_ci.configuration && jenkins_ci.configuration.merge_request_enabled
   end
 
+  def ci_services
+    services.select { |service| service.category == :ci }
+  end
+
+  def ci_service
+    @ci_service ||= ci_services.select(&:enabled?).first
+  end
+
   # For compatibility with old code
   def code
     path
@@ -553,10 +560,6 @@ class Project < ActiveRecord::Base
     else
       path
     end
-  end
-
-  def transfer(new_namespace)
-    ProjectTransferService.new.transfer(self, new_namespace)
   end
 
   def execute_hooks(data, hooks_scope = :push_hooks)
@@ -747,5 +750,13 @@ class Project < ActiveRecord::Base
   def change_head(branch)
     gitlab_shell.update_repository_head(self.path_with_namespace, branch)
     reload_default_branch
+  end
+
+  def forked_from?(project)
+    forked? && project == forked_from_project
+  end
+
+  def update_repository_size
+    update_attribute(:repository_size, repository.size)
   end
 end

@@ -4,15 +4,16 @@
   members access to group.
 %hr
 - admin_team_member =  current_user.can? :manage_group, @group
-.ui-box.col-md-6.no_margin
-  .title
-    %strong #{@group.name}
-    group teams
-    %small
-      (#{@teams.count})
-  %ul.well-list
-    - @teams.each do |team|
-      = render 'team', team: team, show_controls: admin_team_member
+.col-md-6
+  .panel.panel-default
+    .panel-heading
+      %strong #{@group.name}
+      group teams
+      %small
+        (#{@teams.count})
+    %ul.well-list
+      - @teams.each do |team|
+        = render 'team', team: team, show_controls: admin_team_member
 - if admin_team_member
   .col-md-6.pull-right
     = render "new_team"

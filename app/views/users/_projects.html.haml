@@ -1,7 +1,8 @@
-.ui-box
-  .title.clearfix
-    = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter form-control'
+.panel.panel-default
+  .panel-heading.clearfix
+    = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'dash-filter form-control'
+
   %ul.well-list.js-sidebar-list
-    - @projects.each do |project|
+    - projects.each do |project|
       %li.js-description-tooltip{"data-title" => "#{project.description}"}
         = link_to_project project

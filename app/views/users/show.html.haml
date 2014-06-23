@@ -17,10 +17,10 @@
       %small member since #{@user.created_at.stamp("Nov 12, 2031")}
     .clearfix
     %hr
+
     %h4 User Activity:
-    -#.activities
-      -#= render 'activities'
     = render @events
+
   .col-md-4
     = render 'profile', user: @user
 
@@ -31,10 +31,11 @@
         = link_to 'Groups', '#groups', 'data-toggle' => 'tab', id: 'sidebar-groups-tab'
       %li
         = link_to 'Teams', '#teams', 'data-toggle' => 'tab', id: 'sidebar-teams-tab'
+
     .tab-content
       .tab-pane.active#projects
-        = render "projects", user: @user
+        = render "projects", user: @user, projects: @projects
       .tab-pane#groups
-        = render "groups",   user: @user
+        = render "groups",   user: @user, groups: @groups
       .tab-pane#teams
-        = render "teams",    user: @user
+        = render "teams",    user: @user, teams: @teams

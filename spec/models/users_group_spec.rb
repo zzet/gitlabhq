@@ -6,8 +6,8 @@
 #  group_access       :integer          not null
 #  group_id           :integer          not null
 #  user_id            :integer          not null
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
+#  created_at         :datetime
+#  updated_at         :datetime
 #  notification_level :integer          default(3), not null
 #
 
@@ -20,7 +20,7 @@ describe UsersGroup do
   end
 
   describe "Mass assignment" do
-    it { should_not allow_mass_assignment_of(:group_id) }
+    it { should allow_mass_assignment_of(:group_id) }
   end
 
   describe "Validation" do

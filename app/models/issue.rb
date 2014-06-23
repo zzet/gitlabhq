@@ -7,15 +7,19 @@
 #  assignee_id  :integer
 #  author_id    :integer
 #  project_id   :integer
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
+#  created_at   :datetime
+#  updated_at   :datetime
 #  position     :integer          default(0)
 #  branch_name  :string(255)
 #  description  :text
 #  milestone_id :integer
 #  state        :string(255)
 #  iid          :integer
+#  attachment   :string(255)
 #
+
+require 'carrierwave/orm/activerecord'
+require 'file_size_validator'
 
 class Issue < ActiveRecord::Base
   include Issuable

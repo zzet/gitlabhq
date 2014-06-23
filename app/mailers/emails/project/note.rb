@@ -19,10 +19,7 @@ class Emails::Project::Note < Emails::Project::Base
       end
 
       if @project && @commit
-        headers 'X-Gitlab-Entity' => 'project/commit',
-          'X-Gitlab-Action' => 'commented',
-          'X-Gitlab-Source' => 'note',
-          'In-Reply-To'     => "project-#{@project.path_with_namespace}-commit-#{@commit_sha}"
+        set_x_gitlab_headers(:project, :note, :commented_commit, "project-#{@project.path_with_namespace}-commit-#{@commit_sha}")
 
         mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Commit '#{@commit.title}' (sha #{@commit.short_id}) was commented")
       end
@@ -37,10 +34,7 @@ class Emails::Project::Note < Emails::Project::Base
     @project        = @note.project
     @merge_request  = @note.noteable
 
-    headers 'X-Gitlab-Entity' => 'project',
-      'X-Gitlab-Action' => 'commented',
-      'X-Gitlab-Source' => 'note',
-      'In-Reply-To'     => "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.iid}"
+    set_x_gitlab_headers(:project, :note, :commented_merge_request, "project-#{@project.path_with_namespace}-merge_request-#{@merge_request.iid}")
 
     if @note && @project && @merge_request
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@merge_request.title}' (##{@merge_request.iid})")
@@ -55,26 +49,8 @@ class Emails::Project::Note < Emails::Project::Base
     @project        = @note.project
     @issue          = @note.noteable
 
-    headers 'X-Gitlab-Entity' => 'project',
-      'X-Gitlab-Action' => 'commented',
-      'X-Gitlab-Source' => 'note',
-      'In-Reply-To'     => "project-#{@project.path_with_namespace}-issue-#{@issue.iid}"
+    set_x_gitlab_headers(:project, :note, :commented_issue, "project-#{@project.path_with_namespace}-issue-#{@issue.iid}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] '#{@issue.title}' (##{@issue.iid})")
-  end
-
-  def commented_email(notification)
-    @notification = notification
-    @event        = @notification.event
-    @user         = @event.author
-    @note         = @event.source
-    @project      = @note.project
-
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'commented',
-            'X-Gitlab-Source' => 'note',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-wall"
-
-    mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] New note was created on project wall")
   end
 end

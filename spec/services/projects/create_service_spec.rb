@@ -42,7 +42,7 @@ describe ProjectsService do
       context 'wiki_enabled true creates wiki repository directory' do
         before do
           @project = create_project(@user, @opts)
-          @path = GollumWiki.new(@project, @user).send(:path_to_repo)
+          @path = ProjectWiki.new(@project, @user).send(:path_to_repo)
         end
 
         it { File.exists?(@path).should be_true }
@@ -52,7 +52,7 @@ describe ProjectsService do
         before do
           @opts.merge!(wiki_enabled: false)
           @project = create_project(@user, @opts)
-          @path = GollumWiki.new(@project, @user).send(:path_to_repo)
+          @path = ProjectWiki.new(@project, @user).send(:path_to_repo)
         end
 
         it { File.exists?(@path).should be_false }
@@ -65,7 +65,6 @@ describe ProjectsService do
         @settings.stub(:issues) { true }
         @settings.stub(:merge_requests) { true }
         @settings.stub(:wiki) { true }
-        @settings.stub(:wall) { true }
         @settings.stub(:snippets) { true }
         stub_const("Settings", Class.new)
         @restrictions = double("restrictions")
@@ -108,7 +107,6 @@ describe ProjectsService do
         @settings.stub(:issues) { true }
         @settings.stub(:merge_requests) { true }
         @settings.stub(:wiki) { true }
-        @settings.stub(:wall) { true }
         @settings.stub(:snippets) { true }
         @settings.stub(:visibility_level) { Gitlab::VisibilityLevel::PRIVATE }
         stub_const("Settings", Class.new)

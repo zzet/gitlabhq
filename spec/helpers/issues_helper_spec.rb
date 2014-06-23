@@ -13,7 +13,8 @@ describe IssuesHelper do
 
     it "should always return empty string if used external tracker" do
       @project = ext_project
-      title_for_issue(rand(100)).should eq ""
+      issue_iid = rand(100)
+      title_for_issue(issue_iid).should eq issue_iid
     end
 
     it "should always return empty string if project nil" do

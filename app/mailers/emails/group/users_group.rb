@@ -8,10 +8,7 @@ class Emails::Group::UsersGroup < Emails::Group::Base
     @member       = @ug.user
     @group        = @ug.group if @group.is_a?(UsersGroup)
 
-    headers 'X-Gitlab-Entity' => 'group',
-            'X-Gitlab-Action' => 'joined',
-            'X-Gitlab-Source' => 'group-user-relationship',
-            'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+    set_x_gitlab_headers(:group, 'user-group-relationship', :joined, "group-#{@group.path}-user-#{@member.username}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@group.path}] '#{ @member.name }' membership in group")
   end
@@ -29,10 +26,7 @@ class Emails::Group::UsersGroup < Emails::Group::Base
       @previous_permission  = Gitlab::Access.options_with_owner.key(@changes["group_access"].first)
       @current_permission   = Gitlab::Access.options_with_owner.key(@changes["group_access"].last)
 
-      headers 'X-Gitlab-Entity' => 'group',
-              'X-Gitlab-Action' => 'updated',
-              'X-Gitlab-Source' => 'group-user-relationship',
-              'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+      set_x_gitlab_headers(:group, 'user-group-relationship', :updated, "group-#{@group.path}-user-#{@member.username}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@group.path}] '#{ @member.name }' membership in group")
     end
@@ -48,10 +42,7 @@ class Emails::Group::UsersGroup < Emails::Group::Base
     @group        = Group.find_by_id(@ug["group_id"]) if @group.nil? || @group.is_a?(UsersGroup)
 
     if @member && @group
-    headers 'X-Gitlab-Entity' => 'group',
-            'X-Gitlab-Action' => 'left',
-            'X-Gitlab-Source' => 'group-user-relationship',
-            'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+      set_x_gitlab_headers(:group, 'user-group-relationship', :left, "group-#{@group.path}-user-#{@member.username}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@group.path}] '#{ @member.name }' membership in group")
     end

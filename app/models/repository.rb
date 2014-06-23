@@ -60,12 +60,6 @@ class Repository
     tags.find { |tag| tag.name == name }
   end
 
-  def recent_branches(limit = 20)
-    branches.sort do |a, b|
-      commit(b.target).committed_date <=> commit(a.target).committed_date
-    end[0..limit]
-  end
-
   def add_branch(branch_name, ref)
     Rails.cache.delete(cache_key(:branch_names))
 
@@ -117,7 +111,7 @@ class Repository
   def commit_count
     Rails.cache.fetch(cache_key(:commit_count)) do
       begin
-        raw_repository.raw.commit_count
+        raw_repository.commit_count(self.root_ref)
       rescue
         0
       end
@@ -219,5 +213,25 @@ class Repository
 
   def last_commit_for_path(sha, path)
     commits(sha, path, 1).last
+  end
+
+  # Remove archives older than 2 hours
+  def clean_old_archives
+    Gitlab::Popen.popen(%W(find #{Gitlab.config.gitlab.repository_downloads_path} -mmin +120 -delete))
+  end
+
+  def branches_sorted_by(value)
+    case value
+    when 'recently_updated'
+      branches.sort do |a, b|
+        commit(b.target).committed_date <=> commit(a.target).committed_date
+      end
+    when 'last_updated'
+      branches.sort do |a, b|
+        commit(a.target).committed_date <=> commit(b.target).committed_date
+      end
+    else
+      branches
+    end
   end
 end

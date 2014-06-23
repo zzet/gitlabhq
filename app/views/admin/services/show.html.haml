@@ -1,8 +1,8 @@
 = render "service_head"
 
-.span5
-  .ui-box
-    .title
+.col-md-6
+  .panel.panel-default
+    .panel-heading
       Service info:
     %ul.well-list
       %li
@@ -33,9 +33,9 @@
               %span= configuration.send(field[:name])
               %br
 
-.span6
-  .ui-box
-    .title
+.col-md-6
+  .panel.panel-default
+    .panel-heading
       Projects:
     %ul.well-list
       - @projects.each do |project|

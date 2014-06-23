@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe API::API do
+describe API::API, api: true  do
   include ApiHelpers
 
   let(:user1) { create(:user) }
@@ -153,7 +153,7 @@ describe API::API do
   describe "POST /groups/:id/projects/:project_id" do
     let(:project) { create(:project) }
     before(:each) do
-      project.stub(:transfer).and_return(true)
+      ProjectsService.any_instance.stub(transfer: true)
       Project.stub(:find).and_return(project)
     end
 
@@ -167,6 +167,7 @@ describe API::API do
     context "when authenticated as admin" do
       it "should transfer project to group" do
         post api("/groups/#{group1.id}/projects/#{project.id}", admin)
+        response.status.should == 201
       end
     end
   end

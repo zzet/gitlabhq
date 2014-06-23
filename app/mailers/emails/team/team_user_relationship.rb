@@ -9,10 +9,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
     @projects     = @team.projects
     @permission   = Gitlab::Access.options_with_owner.key(@utur.team_access)
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'joined',
-            'X-Gitlab-Source' => 'team-user-relationship',
-            'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
+    set_x_gitlab_headers(:team, 'team-user-relationship', :joined, "team-#{@team.path}-user-#{@member.username}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.name}' membership in '#{@team.name}' team")
   end
@@ -26,10 +23,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
     @member       = @utur.user
     @changes      = @event.data["previous_changes"]
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'updated',
-            'X-Gitlab-Source' => 'team-user-relationship',
-            'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
+    set_x_gitlab_headers(:team, 'team-user-relationship', :updated, "team-#{@team.path}-user-#{@member.username}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.name}' membership in '#{@team.name}' team")
   end
@@ -43,10 +37,7 @@ class Emails::Team::TeamUserRelationship < Emails::Team::Base
     @member       = User.find_by_id(@up["user_id"])
 
     if @team && @member
-      headers 'X-Gitlab-Entity' => 'team',
-              'X-Gitlab-Action' => 'left',
-              'X-Gitlab-Source' => 'team-user-relationship',
-              'In-Reply-To'     => "team-#{@team.path}-user-#{@member.username}"
+      set_x_gitlab_headers(:team, 'team-user-relationship', :left, "team-#{@team.path}-user-#{@member.username}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@member.name}' membership in '#{@team.name}' team")
     end

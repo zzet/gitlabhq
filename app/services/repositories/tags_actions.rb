@@ -11,6 +11,8 @@ module Repositories::TagsActions
 
       GitPushService.new(current_user, project, oldrev, newrev, ref).execute
     end
+
+    new_tag
   end
 
   def delete_tag_action(tag)
