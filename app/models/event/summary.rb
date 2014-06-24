@@ -26,7 +26,7 @@ class Event::Summary < ActiveRecord::Base
   validates :title, presence: true
   validates :period, presence: true
 
-  state_machine :state, initial: :disabled do
+  state_machine :state, initial: :enabled do
     state :disabled
     state :enabled
 
