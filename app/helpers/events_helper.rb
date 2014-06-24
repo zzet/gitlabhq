@@ -171,7 +171,10 @@ module EventsHelper
     target = event.target
     branch = event.branch_name
 
-    if target.class == Project && target.repository.branch_names.include?(branch)
+    if target.class.is_a?(Project) &&
+      target.repository &&
+      target.repository.branch_names.include?(branch)
+
       link_to project_commits_path(target, event.ref_name) do
         content_tag :strong, truncate(event.ref_name, length: 30)
       end
