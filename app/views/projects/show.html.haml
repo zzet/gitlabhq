@@ -92,10 +92,10 @@
           - else
             #{link_to @project.owner_name, @project.owner}
 
-        - if @project.categories.any?
+        - if @categories.any?
           %p
             %span.light Categories
-            = @project.categories.join(", ")
+            = @categories.join(", ")
 
       - if @project.gitlab_ci?
         %hr

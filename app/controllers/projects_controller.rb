@@ -79,6 +79,8 @@ class ProjectsController < ApplicationController
     @gitlab_ci_service  = @project.services.where(type: Service::GitlabCi).first
     @build_face_service = @project.services.where(type: Service::BuildFace).first
 
+    @categories = @project.categories.pluck(:name)
+
     respond_to do |format|
       format.html do
         if @project.empty_repo?
