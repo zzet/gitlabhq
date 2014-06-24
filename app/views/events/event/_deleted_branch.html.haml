@@ -3,6 +3,6 @@
 .event-title
   %span.author_name= link_to_author event
   %span.event_label{class: event.action}= event.action.gsub('_', ' ')
-  %strong= gfm event.branch_name
+  = link_to_event_branch(event)
   at
   = link_to_event_target(event)

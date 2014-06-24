@@ -167,4 +167,17 @@ module EventsHelper
     end
   end
 
+  def link_to_event_branch(event)
+    target = event.target
+    branch = event.branch_name
+
+    if target.class == Project && target.repository.branch_names.include?(branch)
+      link_to project_commits_path(target, event.ref_name) do
+        content_tag :strong, truncate(event.ref_name, length: 30)
+      end
+    else
+      content_tag :strong, event.branch_name
+    end
+  end
+
 end
