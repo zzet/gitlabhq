@@ -20,6 +20,6 @@
   .edit-member.hide.js-toggle-content
     = form_for member, url: team_member_path(team, user.username) do |f|
       .from-group.prepend-top-20
-        .col-sm-3
+        .col-sm-6
           = f.select :team_access, options_for_select(Team.access_roles, member.team_access), {}, class: "medium project-access-select form-control"
         = f.submit 'Save', class: 'btn btn-save'
