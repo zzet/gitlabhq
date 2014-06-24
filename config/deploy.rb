@@ -143,5 +143,5 @@ namespace :deploy do
 
   after 'finishing', 'deploy:web:restart'
   after 'finishing', 'deploy:queue:restart'
-  after 'finishing', 'airbrake:deploy'
+#  after 'finishing', 'airbrake:deploy'
 end
