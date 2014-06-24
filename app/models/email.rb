@@ -24,7 +24,6 @@ class Email < ActiveRecord::Base
   validates :email, presence: true, email: { strict_mode: true }, uniqueness: true
   validate :unique_email, if: ->(email) { email.email_changed? }
 
-  after_create :notify
   before_validation :cleanup_email
 
   def cleanup_email
@@ -32,6 +31,8 @@ class Email < ActiveRecord::Base
   end
 
   def unique_email
-    self.errors.add(:email, 'has already been taken') if User.exists?(email: self.email)
+    if User.exists?(email: self.email)
+      self.errors.add(:email, 'has already been taken')
+    end
   end
 end

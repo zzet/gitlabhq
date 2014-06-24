@@ -34,7 +34,6 @@ class Key < ActiveRecord::Base
   delegate :name, :email, to: :user, prefix: true
 
   after_create :add_to_shell
-  after_create :notify_user
   after_destroy :remove_from_shell
 
   def strip_white_space
@@ -56,10 +55,6 @@ class Key < ActiveRecord::Base
       shell_id,
       key
     )
-  end
-
-  def notify_user
-    #NotificationService.new.new_key(self)
   end
 
   def remove_from_shell
