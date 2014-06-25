@@ -15,7 +15,7 @@
 class Event::Summary < ActiveRecord::Base
   extend Enumerize
 
-  attr_accessible :title, :description, :period, :state_event
+  attr_accessible :title, :description, :period, :state_event, :summary_diff
 
   belongs_to :user
   has_many :summary_entity_relationships, dependent: :destroy, class_name: Event::SummaryEntityRelationship
