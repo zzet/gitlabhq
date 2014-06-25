@@ -171,7 +171,7 @@ module EventsHelper
     target = event.target
     branch = event.branch_name
 
-    if target.class.is_a?(Project) &&
+    if target.is_a?(Project) &&
       target.repository &&
       target.repository.branch_names.include?(branch)
 
