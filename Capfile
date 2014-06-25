@@ -1,21 +1,9 @@
-# Load DSL and Setup Up Stages
-require 'capistrano/version'
-load 'deploy'
+require 'capistrano/setup'
+require 'capistrano/deploy'
 
-require 'bundler/capistrano'
+require 'capistrano/bundler'
+require 'capistrano/rails/assets'
+require 'capistrano/rails/migrations'
+require 'airbrake/capistrano3'
 
-require 'capistrano/ext/multistage'
-
-require 'undev/capistrano'
-
-# Maintance page with deploy
-require 'capistrano/maintenance'
-
-# Uncomment if you will use Airbrake notifications
-require 'airbrake/capistrano'
-
-Dir['vendor/gems/*/recipes/*.rb','vendor/plugins/*/recipes/*.rb'].each { |plugin| load(plugin) }
-
-load 'deploy' if respond_to?(:namespace) # cap2 differentiator
-load 'deploy/assets'
-load 'config/deploy' # remove this line to skip loading any of the default tasks
+Dir.glob('lib/capistrano/tasks/*.rake').each { |r| import r }

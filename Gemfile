@@ -82,7 +82,8 @@ gem "carrierwave"
 gem 'dropzonejs-rails'
 
 # for aws storage
-gem "fog", "~> 1.14", group: :aws
+#gem "fog", "~> 1.14", group: :aws
+#gem "fog" #, "~> 1.3.1", group: :aws
 gem "unf", group: :aws
 
 # Authorization
@@ -219,15 +220,19 @@ end
 
 group :undev do
   # Deploy with Capistrano
-  gem "capi"
-  gem 'capistrano'
-  gem 'capistrano-ext'
-  gem 'capistrano-maintenance'
+  #gem "capi"
+  gem 'capistrano', '~> 3.2.0'
+  gem 'capistrano-bundler'
+  gem 'capistrano-rails'
 
-  gem 'undev', '>=0.2.1'
+  #gem 'capistrano'
+  #gem 'capistrano-ext'
+  #gem 'capistrano-maintenance'
+
+  #gem 'undev', '>=0.2.1'
 end
 
-gem 'airbrake'
+gem 'airbrake', '~> 3.1.16'
 gem 'newrelic_rpm'
 
 gem 'rb-inotify', require: linux_only('rb-inotify')
