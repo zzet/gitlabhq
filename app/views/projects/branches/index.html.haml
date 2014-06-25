@@ -25,6 +25,12 @@
             Last updated
 %hr
 - unless @branches.empty?
+  - if can? current_user, :admin_project, @project
+    %p.light
+      You can manage protected branches on
+      = link_to project_protected_branches_path(@project) do
+        settings page
+    %hr
   %ul.bordered-list.top-list.all-branches
     - @branches.each do |branch|
       = render "projects/branches/branch", branch: branch
