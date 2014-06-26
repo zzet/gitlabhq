@@ -1,6 +1,6 @@
 .tab-pane#members-list
   %fieldset
-    .ui-box
+    .panel.panel-default
       %h5.title
         Add user to Group projects:
       .ui-box-body.form-holder
@@ -15,7 +15,7 @@
             = select_tag :project_access, options_for_select(Project.access_options), {class: "project-access-select chosen span2"}
           %hr
           = submit_tag 'Add user to projects in group', class: "btn btn-create"
-    .ui-box
+    .panel.panel-default
       %h5.title
         Users from Group projects
         %small

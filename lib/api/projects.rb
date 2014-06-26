@@ -77,7 +77,7 @@ module API
       get ":id/events" do
         limit = (params[:per_page] || 20).to_i
         offset = (params[:page] || 0).to_i * limit
-        events = user_project.old_events.recent.limit(limit).offset(offset)
+        events = user_project.events.recent.limit(limit).offset(offset)
 
         present events, with: Entities::Event
       end
@@ -88,7 +88,6 @@ module API
       #   name (required) - name for new project
       #   description (optional) - short project description
       #   issues_enabled (optional)
-      #   wall_enabled (optional)
       #   merge_requests_enabled (optional)
       #   wiki_enabled (optional)
       #   snippets_enabled (optional)
@@ -103,7 +102,6 @@ module API
                                      :path,
                                      :description,
                                      :issues_enabled,
-                                     :wall_enabled,
                                      :merge_requests_enabled,
                                      :wiki_enabled,
                                      :snippets_enabled,
@@ -131,7 +129,6 @@ module API
       #   description (optional) - short project description
       #   default_branch (optional) - 'master' by default
       #   issues_enabled (optional)
-      #   wall_enabled (optional)
       #   merge_requests_enabled (optional)
       #   wiki_enabled (optional)
       #   snippets_enabled (optional)
@@ -146,7 +143,6 @@ module API
                                      :description,
                                      :default_branch,
                                      :issues_enabled,
-                                     :wall_enabled,
                                      :merge_requests_enabled,
                                      :wiki_enabled,
                                      :snippets_enabled,
@@ -235,7 +231,7 @@ module API
 
         @users = User.search(params[:search], page: params[:page],
                              per: params[:per_page], options: {uids: uids}).records
-        present @users, with: Entities::User
+        present @users, with: Entities::UserBasic
       end
 
       # Get a project labels

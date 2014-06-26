@@ -13,8 +13,9 @@ module Repositories::BranchesActions
   end
 
   def create_branch_action(branch, ref)
-    project.repository.add_branch(branch, ref)
-    new_branch = project.repository.find_branch(branch)
+    repository = project.repository
+    repository.add_branch(branch, ref)
+    new_branch = repository.find_branch(branch)
     if new_branch
       oldrev = "0000000000000000000000000000000000000000"
       newrev = new_branch.target
@@ -22,11 +23,33 @@ module Repositories::BranchesActions
 
       GitPushService.new(current_user, project, oldrev, newrev, ref).execute
     end
+    new_branch
   end
 
   def delete_branch_action(branch)
-    branch = project.repository.find_branch(branch)
-    if branch && project.repository.rm_branch(branch.name)
+    repository = project.repository
+    branch = repository.find_branch(branch)
+
+    # No such branch
+    unless branch
+      return error('No such branch')
+    end
+
+    if branch.name == repository.root_ref
+      return error('Cannot remove HEAD branch')
+    end
+
+    # Dont allow remove of protected branch
+    if project.protected_branch?(branch.name)
+      return error('Protected branch cant be removed')
+    end
+
+    # Dont allow user to remove branch if he is not allowed to push
+    unless current_user.can?(:push_code, project)
+      return error('You don\'t have push access to repo')
+    end
+
+    if branch && repository.rm_branch(branch.name)
       oldrev = branch.target
       newrev = "0000000000000000000000000000000000000000"
       ref = "refs/heads/" << branch.name
@@ -34,6 +57,8 @@ module Repositories::BranchesActions
       GitPushService.new(current_user, project, oldrev, newrev, ref).execute
 
       receive_delayed_notifications
+
+      return success("Branch '#{branch}' was removed")
     end
   end
 end

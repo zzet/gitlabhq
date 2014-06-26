@@ -7,7 +7,8 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def show
-    @projects = user.authorized_projects
+    @personal_projects = user.personal_projects
+    @joined_projects = user.projects.joined(@user)
     @groups = user.groups
     @teams = user.teams
   end
@@ -21,11 +22,9 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def block
-    if UsersService.new(@current_user, user).block
-      redirect_to :back, alert: "Successfully blocked"
-    else
-      redirect_to :back, alert: "Error occurred. User was not blocked"
-    end
+    Sidekiq::Client.enqueue_to(:nain, BlockUserWorker, user.id, @current_user.id)
+
+    redirect_to :back, alert: "Task on block #{user.name} user was successfully added in queue"
   end
 
   def unblock

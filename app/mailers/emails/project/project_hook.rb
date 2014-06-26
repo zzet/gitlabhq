@@ -6,10 +6,7 @@ class Emails::Project::ProjectHook < Emails::Project::Base
     @project_hook = @event.source
     @project      = @project_hook.project
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'created',
-            'X-Gitlab-Source' => 'project_hook',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-project_hook-#{@project_hook.id}"
+    set_x_gitlab_headers(:project, :project_hook, :created, "project-#{@project.path_with_namespace}-project_hook-#{@project_hook.id}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Project Hooks")
   end
@@ -22,10 +19,7 @@ class Emails::Project::ProjectHook < Emails::Project::Base
     @project      = @project_hook.project
     @changes      = @event.data["previous_changes"]
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'updated',
-            'X-Gitlab-Source' => 'project_hook',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-project_hook-#{@project_hook.id}"
+    set_x_gitlab_headers(:project, :project_hook, :updated, "project-#{@project.path_with_namespace}-project_hook-#{@project_hook.id}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Project Hooks")
   end
@@ -38,10 +32,7 @@ class Emails::Project::ProjectHook < Emails::Project::Base
     @project      = @event.target
     @project_hook = data
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'deleted',
-            'X-Gitlab-Source' => 'project_hook',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-project_hook-#{@project_hook["id"]}"
+    set_x_gitlab_headers(:project, :project_hook, :deleted, "project-#{@project.path_with_namespace}-project_hook-#{@project_hook['id']}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Project Hooks")
   end

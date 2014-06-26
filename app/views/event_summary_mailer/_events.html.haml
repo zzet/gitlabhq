@@ -1,7 +1,7 @@
 %dl
   - @events.group_by(&:target_type).each do |target_type, events_by_target_type|
     %dt
-      = "#{ target_type.pluralize } (#{ events_by_target_type.count }):"
+      = "#{ target_type.pluralize } (#{ pluralize(events_by_target_type.count, "event") }):"
       %ul
       - events_by_target_type.group_by(&:target_id).each do |target_id, events_by_target|
         %li

@@ -17,48 +17,58 @@
               %td
                 = render template_name(push_event_by_ref), template_arguments(push_event_by_ref)
     - else
-      %h5
-        Pushes to
-        = event.source.ref_name
+      - if @events_summary.summary_diff
 
-      -#- summary_args = args
-      -#- summary_args[:data]["revafter"] = push_events_by_ref.last.source.revafter
-      -#- if summary_args[:data]["revbefore"] =~ /000000000/
-        -#- summary_args[:data]["revbefore"] = event.target.repository.commit(event.target.default_branch).id
-      -#- if summary_args[:data]["revafter"] =~ /000000000/
-        -#- summary_args[:data]["revafter"] = push_events_by_ref[push_events_by_ref.count - 2].source.revafter
+        - summary_args = args
+        - summary_args[:summary_diff] = true
+        - summary_args[:data]["revafter"] = push_events_by_ref.last.source.revafter
+        - pr = event.target
 
-      -#%h5 Summary diff
-      -#%dd
-        -#%table
-          -#%tr
-            -#%td{ style: "width: 180px"}
-              -#%span{ style: "color: #999; font-size: 12px; background-color: #eee; border-radius: 10px; padding: 5px;"}
-                -#Summary push info from
-                -#= push_events_by_ref.first.created_at
-                -#to
-                -#= push_events_by_ref.last.created_at
-              -#&rarr;
-            -#%td
-              -#- template_name_to_render = template_name(push_events_by_ref.first)
-              -#- if template_name_to_render =~ /created_branch/
-                -#- template_name_to_render = template_name(push_events_by_ref.last)
-              -#- if template_name_to_render =~ /deleted_branch/ && push_events_by_ref.many?
-                -#- template_name_to_render = template_name(push_events_by_ref.second || push_events_by_ref.last)
+        - if event.source.ref_name == pr.default_branch || pr.repository.commits_between(pr.default_branch, summary_args[:data]["revafter"]).any?
+          %h5
+            Pushes to
+            = event.source.ref_name
 
-              -#= render template_name_to_render, summary_args
+          - if summary_args[:data]["revbefore"] =~ /000000000/
+            - summary_args[:data]["revbefore"] = event.target.repository.commit(event.target.default_branch).id
 
-      -#%h5 Pushes
-      - push_events_by_ref.each do |push_event_by_ref|
-        %dd
-          %table
-            %tr
-              %td{ style: "width:180px;vertical-align:top;"}
-                %span{ style: "color:#999;font-size:12px;"}
-                  = push_event_by_ref.created_at
-                &rarr;
-              %td
-                = render template_name(push_event_by_ref), template_arguments(push_event_by_ref)
+          -#- if summary_args[:data]["revafter"] =~ /000000000/
+          -#  - summary_args[:data]["revafter"] = push_events_by_ref[push_events_by_ref.count - 2].source.revafter
+
+          %dd
+            %table
+              %tr
+                %td{ style: "width: 180px"}
+                  %span{ style: "color: #999; font-size: 12px; background-color: #eee; border-radius: 10px; padding: 5px;"}
+                    Summary push info from
+                    = push_events_by_ref.first.created_at
+                    to
+                    = push_events_by_ref.last.created_at
+                  &rarr;
+                %td
+                  - template_name_to_render = template_name(push_events_by_ref.first)
+                  - if template_name_to_render =~ /created_branch/
+                    - template_name_to_render = template_name(push_events_by_ref.last)
+                  - if template_name_to_render =~ /deleted_branch/ && push_events_by_ref.many?
+                    - template_name_to_render = template_name(push_events_by_ref.second || push_events_by_ref.last)
+
+                  - begin
+                    = render template_name_to_render, summary_args
+                  - rescue
+                    Error :(
+                    Please, contact with administrator.
+
+      - else
+        - push_events_by_ref.each do |push_event_by_ref|
+          %dd
+            %table
+              %tr
+                %td{ style: "width:180px;vertical-align:top;"}
+                  %span{ style: "color:#999;font-size:12px;"}
+                    = push_event_by_ref.created_at
+                  &rarr;
+                %td
+                  = render template_name(push_event_by_ref), template_arguments(push_event_by_ref)
 
 - rescue Exception => e
   %dd

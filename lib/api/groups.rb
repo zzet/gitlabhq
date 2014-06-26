@@ -92,11 +92,13 @@ module API
       #   POST /groups/:id/projects/:project_id
       post ":id/projects/:project_id" do
         authenticated_as_admin!
-        @group = Group.find(params[:id])
+        group = Group.find(params[:id])
         project = Project.find(params[:project_id])
-        transfer_result = Projects::TransferService.new(current_user, project, @group).execute
-        if transfer_result
-          present @group
+
+        result = ProjectsService.new(current_user, project, namespace_id: group.id).transfer
+
+        if result
+          present group
         else
           not_found!
         end

@@ -21,6 +21,9 @@
               %i.icon-search
           %li
             = link_to "skype:?chat&blob=eGjOvcNshTTHGKuUXYWojG-ohpbm4aQTUCOdlfp3EG5hzZjWJZX1NbHAC-wb4UWj1BjWNOcR5xl6Kt8r5fAybXOAXyIV7xX17sZCXY7Q3mQzduTFym1PR1eGAeQIHLUMbu69eq9iqDsYelz9rxp1FYj0JEfdk1dPEbLaqB22rBqHtTqjLWU5D1Hk9Sqjmj1dhysUvfQYpDVCPSCr5pD_HJvtGlB-", title: "Чат багрепортинга", class: 'has_bottom_tooltip', 'data-original-title' => 'Чат багрепортинга' do
+              %i.icon-skype
+          %li
+            = link_to help_path, title: 'Help', class: 'has_bottom_tooltip', 'data-original-title' => 'Help'  do
               %i.icon-question-sign
           %li
             = link_to public_root_path, title: "Public area", class: 'has_bottom_tooltip', 'data-original-title' => 'Public area' do
@@ -45,7 +48,7 @@
           %li
             = link_to destroy_user_session_path, class: "logout", method: :delete, title: "Logout", class: 'has_bottom_tooltip', 'data-original-title' => 'Logout'  do
               %i.icon-signout
-          %li
+          %li.hidden-xs
             = link_to current_user, class: "profile-pic", id: 'profile-pic' do
               = image_tag avatar_icon(current_user.email, 26), alt: 'User activity'
 

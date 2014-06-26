@@ -25,5 +25,7 @@
 %hr
 .search_results
   %ul.bordered-list
-    = render partial: "search/results/merge_request", collection: @search_results[:merge_requests][:records]
+    - @search_results[:merge_requests][:records].each_with_index do |merge_request, index|
+      = render partial: "search/results/merge_request", locals: { merge_request: merge_request,
+       result: @search_results[:merge_requests][:results][index] }
   = paginate @search_results[:merge_requests][:results], theme: 'gitlab'

@@ -18,6 +18,7 @@
 
   .edit-member.hide.js-toggle-content
     = form_for :group_member, url: group_member_path(@group.path, user.username), method: :put do |f|
-      .alert.prepend-top-20
-        = f.select :group_access, options_for_select(UsersGroup.group_access_roles, member.group_access)
+      .form-group.prepend-top-10
+        .col-sm-6
+          = f.select :group_access, options_for_select(UsersGroup.group_access_roles, member.group_access), {}, class: "medium project-access-select form-control"
         = f.submit 'Save', class: 'btn btn-save'

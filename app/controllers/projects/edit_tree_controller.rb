@@ -28,11 +28,12 @@ class Projects::EditTreeController < Projects::BaseTreeController
 
   def preview
     @content = params[:content]
-    #FIXME workaround https://github.com/gitlabhq/gitlabhq/issues/5939
+    #FIXME workaround https://github.com/gitlabhq/gitlabhq/issues/5936
     @content += "\n" if @blob.data.end_with?("\n")
 
-    diffy = Diffy::Diff.new(@blob.data, @content, diff: '-U 3', include_diff_info: true)
-    @diff = Gitlab::Diff::DiffyParser.new(diffy)
+    diffy = Diffy::Diff.new(@blob.data, @content, diff: '-U 3',
+                            include_diff_info: true)
+    @diff = Gitlab::DiffParser.new(diffy.diff.scan(/.*\n/))
 
     render layout: false
   end

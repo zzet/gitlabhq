@@ -1,6 +1,5 @@
 class Notify < ActionMailer::Base
-  include Emails::Projects
-  include Emails::Profile
+  include ActionDispatch::Routing::PolymorphicRoutes
 
   add_template_helper ApplicationHelper
   add_template_helper GitlabMarkdownHelper
@@ -47,6 +46,22 @@ class Notify < ActionMailer::Base
     if recipient = User.find(recipient_id)
       recipient.email
     end
+  end
+
+  # Set the Message-ID header field
+  #
+  # local_part - The local part of the message ID
+  #
+  def set_message_id(local_part)
+    headers["Message-ID"] = "<#{local_part}@#{Gitlab.config.gitlab.host}>"
+  end
+
+  # Set the References header field
+  #
+  # local_part - The local part of the referenced message ID
+  #
+  def set_reference(local_part)
+    headers["References"] = "<#{local_part}@#{Gitlab.config.gitlab.host}>"
   end
 
   # Formats arguments into a String suitable for use as an email subject

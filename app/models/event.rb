@@ -84,35 +84,34 @@ class Event < ActiveRecord::Base
 
   #TODO split method
   scope :for_dashboard, -> (target) do
+    table = self.arel_table
     q = joins('LEFT JOIN events as e2 on events.parent_event_id = e2.id')
 
-    if target.class.in?([Group, Team])
-      projects_ids = target.projects.pluck(:id)
-      table = self.arel_table
+    case target.class.name
+      when 'Group', 'Team'
+        projects_ids = target.projects.pluck(:id)
 
-      q = q.where(
-        (table[:target_type].eq(target.class.name).and(table[:target_id].eq(target.id)))
-        .or(
-            table[:target_type].eq('Project')
-              .and(table[:target_id].in(projects_ids))
-              .and(table[:source_type].not_eq(TeamProjectRelationship))
+        q = q.where(
+            (table[:target_type].eq(target.class.name).and(table[:target_id].eq(target.id)))
+            .or(
+                table[:target_type].eq('Project')
+                .and(table[:target_id].in(projects_ids))
+                .and(table[:source_type].not_eq(TeamProjectRelationship))
+            )
         )
-      )
-    elsif target.class == User
-      projects_ids = target.projects.pluck(:id)
-      table = self.arel_table
+      when 'User'
+        projects_ids = target.authorized_projects.pluck(:id)
 
-      q = q.where(
-          (table[:target_type].eq(target.class.name).and(table[:target_id].eq(target.id)))
-          .or(
-              table[:target_type].eq('Project')
-              .and(table[:target_id].in(projects_ids))
-              .and(table[:author_id].eq(target.id))
-          )
-      )
-    else
-      #TODO remove, unused
-      q = q.where(target_type: target.class, target_id: target.id)
+        q = q.where(
+            (table[:target_type].eq(target.class.name).and(table[:target_id].eq(target.id)))
+            .or(
+                table[:target_type].eq('Project')
+                .and(table[:target_id].in(projects_ids))
+                .and(table[:author_id].eq(target.id))
+            )
+        )
+      else
+        q = q.where(target_type: target.class, target_id: target.id)
     end
 
     q.where('e2.target_type IS NULL or events.target_type <> e2.target_type')

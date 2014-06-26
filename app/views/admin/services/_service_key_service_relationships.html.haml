@@ -1,6 +1,6 @@
 - key_relation = f.object
 - key = key_relation.service_key
-.control-group
+.form-group
   = f.label :code_access_state_event, "Code access for key #{key.title}", class: "control-label"
-  .controls
-    = f.select(:code_access_state_event, key_relation.code_access_state_transitions.map {|s| [s.human_event, s.event]}, include_blank: key_relation.human_code_access_state_name)
+  .col-sm-9
+    = f.select(:code_access_state_event, key_relation.code_access_state_transitions.map {|s| [s.human_event, s.event]}, { include_blank: key_relation.human_code_access_state_name}, { class: "medium form-control select-wide" })

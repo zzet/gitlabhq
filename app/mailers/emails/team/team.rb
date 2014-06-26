@@ -5,10 +5,7 @@ class Emails::Team::Team < Emails::Team::Base
     @user         = @event.author
     @team         = @event.source
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'created',
-            'X-Gitlab-Source' => 'team',
-            'In-Reply-To'     => "team-#{@team.path}"
+    set_x_gitlab_headers(:team, :team, :created, "team-#{@team.path}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "New team '#{@team.name}' was created")
   end
@@ -20,10 +17,7 @@ class Emails::Team::Team < Emails::Team::Base
     @team         = @event.source
     @changes      = @event.data["previous_changes"]
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'updated',
-            'X-Gitlab-Source' => 'team',
-            'In-Reply-To'     => "team-#{@team.path}"
+    set_x_gitlab_headers(:team, :team, :updated, "team-#{@team.path}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team.name}' was updated")
   end
@@ -35,10 +29,7 @@ class Emails::Team::Team < Emails::Team::Base
     @user         = @event.author
     @team         = data
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'deleted',
-            'X-Gitlab-Source' => 'team',
-            'In-Reply-To'     => "team-#{@team["path"]}"
+    set_x_gitlab_headers(:team, :team, :deleted, "team-#{@team['path']}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Team '#{@team['name']}' was removed")
   end
@@ -51,10 +42,7 @@ class Emails::Team::Team < Emails::Team::Base
     @events       = Event.where(parent_event_id: @event.id, target_type: User)
     @members  = @team.team_user_relationships.where(user_id: @events.pluck(:target_id))
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'members_added',
-            'X-Gitlab-Source' => 'team',
-            'In-Reply-To'     => "team-#{@team.path}-members"
+    set_x_gitlab_headers(:team, :team, :members_added, "team-#{@team.path}-members")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "#{@events.count} users were added to team '#{@team.path}'")
   end
@@ -67,10 +55,7 @@ class Emails::Team::Team < Emails::Team::Base
     @events       = Event.where(parent_event_id: @event.id, target_type: Project)
     @projects     = Project.where(id: @events.pluck(:target_id))
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'projects_added',
-            'X-Gitlab-Source' => 'team',
-            'In-Reply-To'     => "team-#{@team.path}-projects"
+    set_x_gitlab_headers(:team, :team, :projects_added, "team-#{@team.path}-projects")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@team.path}' team was assigned on #{@events.count} projects")
   end
@@ -83,10 +68,7 @@ class Emails::Team::Team < Emails::Team::Base
     @events       = Event.where(parent_event_id: @event.id, target_type: Group)
     @groups       = Group.where(id: @events.pluck(:target_id))
 
-    headers 'X-Gitlab-Entity' => 'team',
-            'X-Gitlab-Action' => 'groups_added',
-            'X-Gitlab-Source' => 'team',
-            'In-Reply-To'     => "team-#{@team.path}-teams"
+    set_x_gitlab_headers(:team, :team, :groups_added, "team-#{@team.path}-groups")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "'#{@team.path}' team was assigned on #{@events.count} groups")
   end

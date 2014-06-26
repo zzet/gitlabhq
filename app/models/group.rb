@@ -6,8 +6,8 @@
 #  name        :string(255)      not null
 #  path        :string(255)      not null
 #  owner_id    :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
+#  created_at  :datetime
+#  updated_at  :datetime
 #  type        :string(255)
 #  description :string(255)      default(""), not null
 #  avatar      :string(255)
@@ -102,12 +102,6 @@ class Group < Namespace
   validates :avatar, file_size: { maximum: 100.kilobytes.to_i }
 
   mount_uploader :avatar, AttachmentUploader
-  
-  def self.accessible_to(user)
-    accessible_ids = Project.accessible_to(user).pluck(:namespace_id)
-    accessible_ids += user.groups.pluck(:id) if user
-    where(id: accessible_ids)
-  end
 
   def human_name
     name
@@ -149,6 +143,10 @@ class Group < Namespace
     owners.include?(user) || admins.include?(user) || masters.include?(user)
   end
 
+  def has_master?(user)
+    members.masters.where(user_id: user).any?
+  end
+
   def last_owner?(user)
     owners.include?(user) && owners.size == 1
   end
@@ -161,5 +159,9 @@ class Group < Namespace
     unless self.avatar.image?
       self.errors.add :avatar, "only images allowed"
     end
+  end
+
+  def public_profile?
+    projects.public_only.any?
   end
 end

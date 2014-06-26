@@ -10,8 +10,12 @@ class Admin::ProjectsController < Admin::ApplicationController
   end
 
   def show
-    @users = User.active
-    @users = @users.not_in_project(@project) if @project.users.present?
+    if @group
+      @group_members = @group.members.order("group_access DESC").page(params[:group_members_page]).per(30)
+    end
+
+    @project_members = @project.users_projects.page(params[:project_members_page]).per(30)
+
     check_git_protocol
   end
 
@@ -21,13 +25,9 @@ class Admin::ProjectsController < Admin::ApplicationController
   end
 
   def transfer
-    result = ::ProjectsService.new(current_user, @project, project: params).transfer(:admin)
+    result = ::ProjectsService.new(current_user, @project, project: params.dup).transfer
 
-    if result
-      redirect_to [:admin, @project]
-    else
-      render :show
-    end
+    redirect_to [:admin, @project.reload]
   end
 
   protected

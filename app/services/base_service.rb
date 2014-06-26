@@ -47,4 +47,26 @@ class BaseService
 
     receive_delayed_notifications
   end
+
+  def log_info message
+    Gitlab::AppLogger.info message
+  end
+
+  def error(message)
+    {
+      message: message,
+      status: :error
+    }
+  end
+
+  def success(message = "")
+    {
+      message: message,
+      status: :success
+    }
+  end
+
+  def create_milestone_note(issueable)
+    Note.create_milestone_change_note(issueable, issueable.project, current_user, issueable.milestone)
+  end
 end

@@ -13,7 +13,7 @@
 #= require jquery.history
 #= require jquery.waitforimages
 #= require jquery.atwho
-#= require jquery.scrollto
+#= require jquery.scrollTo
 #= require jquery.blockUI
 #= require jquery.customSelect.min
 #= require turbolinks
@@ -33,7 +33,9 @@
 #= require underscore.string.min
 #= require nprogress
 #= require nprogress-turbolinks
+#= require dropzone
 #= require private_pub
+#= require semantic-ui/sidebar
 #= require_directory ./api
 #= require_tree .
 

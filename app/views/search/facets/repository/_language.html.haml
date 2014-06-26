@@ -1,10 +1,10 @@
 %h4 Languages
 %ul.nav.nav-pills.nav-stacked
   %li{class: "#{'active' if params[:language] == "All" || params[:language].blank?}"}
-    = link_to search_path(language: "All", search: params[:search], type: :code) do
+    = link_to search_path_with_project(:code, params, language: "All") do
       All
   - languages.each do |language|
     %li{class: "#{'active' if params[:language] == language["term"]}"}
-      = link_to search_path(language: language["term"], search: params[:search], type: :code) do
+      = link_to search_path_with_project(:code, params, language: language["term"]) do
         = language["term"]
         %small.pull-right= language["count"]

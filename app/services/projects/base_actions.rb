@@ -16,7 +16,6 @@ module Projects::BaseActions
     default_opts = {
       issues_enabled:         default_features.issues,
       wiki_enabled:           default_features.wiki,
-      wall_enabled:           default_features.wall,
       snippets_enabled:       default_features.snippets,
       merge_requests_enabled: default_features.merge_requests,
       visibility_level:       default_features.visibility_level
@@ -72,8 +71,8 @@ module Projects::BaseActions
       if @project.wiki_enabled?
         begin
           # force the creation of a wiki,
-          GollumWiki.new(@project, @project.owner).wiki
-        rescue GollumWiki::CouldNotCreateWikiError => ex
+          ProjectWiki.new(@project, @project.owner).wiki
+        rescue ProjectWiki::CouldNotCreateWikiError => ex
           # Prevent project observer crash
           # if failed to create wiki
           nil
@@ -138,9 +137,7 @@ module Projects::BaseActions
 
   def transfer_action(namespace, role = :default)
     Project.transaction do
-      allowed_transfer = can?(current_user, :change_namespace, project) || role == :admin
-
-      if allowed_transfer && (namespace != project.namespace)
+      if allowed_transfer?(current_user, project, namespace)
         old_project_teams = project.teams
         old_project_teams_ids = old_project_teams.pluck(:id)
 
@@ -164,7 +161,12 @@ module Projects::BaseActions
           end
 
           receive_delayed_notifications
+
+          return true
         end
+      else
+        project.errors.add(:namespace, 'is invalid')
+        return false
       end
     end
   end
@@ -213,8 +215,15 @@ module Projects::BaseActions
   end
 
   def allowed_namespace?(user, namespace_id)
-    namespace = Namespace.find_by_id(namespace_id)
+    namespace = Namespace.find_by(id: namespace_id)
     current_user.can?(:manage_namespace, namespace)
+  end
+
+  def allowed_transfer?(current_user, project, namespace)
+    namespace &&
+      can?(current_user, :change_namespace, project) &&
+      namespace.id != project.namespace_id &&
+      current_user.can?(:create_projects, namespace)
   end
 
   def transfer_to(new_namespace)
@@ -233,25 +242,21 @@ module Projects::BaseActions
       project.namespace = new_namespace
       project.save!
 
-      if project.save
-        # Move main repository
-        unless gitlab_shell.mv_repository(old_path, new_path)
-          raise TransferError.new('Cannot move project')
-        end
-
-        # Move wiki repo also if present
-        gitlab_shell.mv_repository("#{old_path}.wiki", "#{new_path}.wiki")
-
-        # Create a new satellite (reload project from DB)
-        Project.find(project.id).ensure_satellite_exists
-
-        # clear project cached events
-        project.reset_events_cache
-
-        return true
-      else
-        raise TransferError.new("Cannot update project namespace")
+      # Move main repository
+      unless gitlab_shell.mv_repository(old_path, new_path)
+        raise TransferError.new('Cannot move project')
       end
+
+      # Move wiki repo also if present
+      gitlab_shell.mv_repository("#{old_path}.wiki", "#{new_path}.wiki")
+
+      # Create a new satellite (reload project from DB)
+      Project.find(project.id).ensure_satellite_exists
+
+      # clear project cached events
+      project.reset_events_cache
+
+      return true
     rescue TransferError => ex
       project.reload
       project.errors.add(:namespace_id, ex.message)

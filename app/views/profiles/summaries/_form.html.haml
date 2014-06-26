@@ -9,10 +9,18 @@
   .col-sm-10
     = f.text_field :title, required: true, class: 'form-control'
     %span.help-inline * required
-.form-group
-  = f.label :description, class: 'control-label'
-  .col-sm-10
-    = f.text_field :description, class: 'form-control'
+- if @summary.persisted?
+  .form-group
+    = f.label :description, class: 'control-label'
+    .col-sm-10
+      = f.text_field :description, class: 'form-control'
+
+  .form-group
+    = f.label :summary_diff, class: 'control-label'
+    .col-sm-10
+      = f.check_box :summary_diff, class: 'form-control'
+      %span.help-inline
+        Send summary commit log and summary diff for pushes
 .form-group
   = f.label :period, class: 'control-label'
   .col-sm-10

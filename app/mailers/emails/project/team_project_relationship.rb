@@ -7,10 +7,7 @@ class Emails::Project::TeamProjectRelationship < Emails::Project::Base
     @project      = @utpr.project
     @team         = @utpr.team
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'assigned',
-            'X-Gitlab-Source' => 'team-project-relationship',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-team-#{@team.path}"
+    set_x_gitlab_headers(:project, 'team-project-relationship', :assigned, "project-#{@project.path_with_namespace}-team-#{@team.path}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Team '#{@team.name}' was assigned to project")
   end
@@ -24,10 +21,7 @@ class Emails::Project::TeamProjectRelationship < Emails::Project::Base
     @team         = Team.find_by_id(data["team_id"])
 
     if @project && @team
-      headers 'X-Gitlab-Entity' => 'project',
-              'X-Gitlab-Action' => 'deleted',
-              'X-Gitlab-Source' => 'team-project-relationship',
-              'In-Reply-To'     => "project-#{@project.path_with_namespace}-team-#{@team.path}"
+      set_x_gitlab_headers(:project, 'team-project-relationship', :resigned, "project-#{@project.path_with_namespace}-team-#{@team.path}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] Team '#{@team.name}' was resigned from project")
     end
