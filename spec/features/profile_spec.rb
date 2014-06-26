@@ -1,11 +1,12 @@
 require 'spec_helper'
 
-describe "Profile account page" do
+describe "Profile account page", feature: true do
   before(:each) { enable_observers }
   after(:each) {disable_observers}
   let(:user) { create(:user) }
 
   before do
+    Gitlab.config.gitlab.stub(:signup_enabled).and_return(true)
     login_as :user
   end
 

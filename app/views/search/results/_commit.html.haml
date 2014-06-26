@@ -1,4 +1,8 @@
 %li
+  - highlight = commit.highlight
+  - highlight_sha = highlight['commit.sha'].try(:first)
+  - highlight_msg = highlight['commit.message'].try(:join, "\n")
+
   - commit = commit["_source"]["commit"]
   - project = Project.find_by(id: commit["rid"])
   - if project
@@ -7,7 +11,7 @@
     &ndash;
     = link_to project_commit_path(project.path_with_namespace, commit["sha"]) do
       %strong.term
-        = commit[:sha]
+        = highlight_sha || commit[:sha]
     %div.prepend-top-10.commit.term
       %strong Author:
       = "#{commit["author"]["name"]} (#{commit["author"]["email"]}) at #{l DateTime.parse(commit["author"]["time"])}"
@@ -19,4 +23,8 @@
         %br
 
       %strong Message:
-      %div= commit["message"].gsub("\n", "<br \>").html_safe
+      - if highlight_msg.present?
+        %div= highlight_msg.gsub("\n", "<br \>").html_safe
+      - else
+        %div= commit["message"].gsub("\n", "<br \>").html_safe
+

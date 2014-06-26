@@ -1,6 +1,6 @@
 - if lookup_context.exists?("events/event/_#{event.action}")
   .event-item{class: "#{event.body? ? "event-block" : "event-inline" }", rel: event.id}
-    %span.cgray.pull-right
+    .event-item-timestamp
       #{time_ago_with_tooltip(event.created_at)}
 
     = render "events/event/#{event.action}", event: event

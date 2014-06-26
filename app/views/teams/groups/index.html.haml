@@ -6,9 +6,12 @@
 
 - can_manage_team =  current_user.can? :manage_team, @team
 .col-md-6
-  %ul.well-list.team_groups_list
-    - @groups.each do |group|
-      = render 'group', group: group, show_controls: can_manage_team
+  .panel.panel-default
+    .panel-heading
+      Groups
+    %ul.well-list.team_groups_list
+      - @groups.each do |group|
+        = render 'group', group: group, show_controls: can_manage_team
 
 - if can_manage_team
   .col-md-6.pull-right

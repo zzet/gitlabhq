@@ -40,17 +40,16 @@ module API
       # Example Request:
       #   POST /projects/:id/milestones
       post ":id/milestones" do
-        set_current_user_for_thread do
-          authorize! :admin_milestone, user_project
-          required_attributes! [:title]
+        authorize! :admin_milestone, user_project
+        required_attributes! [:title]
+        attrs = attributes_for_keys [:title, :description, :due_date]
+        milestones_service = ProjectsService.new(current_user, user_project, attrs).milestone
+        milestone = milestones_service.create
 
-          attrs = attributes_for_keys [:title, :description, :due_date]
-          @milestone = user_project.milestones.new attrs
-          if @milestone.save
-            present @milestone, with: Entities::Milestone
-          else
-            not_found!
-          end
+        if milestone.valid?
+          present milestone, with: Entities::Milestone
+        else
+          not_found!
         end
       end
 
@@ -66,16 +65,16 @@ module API
       # Example Request:
       #   PUT /projects/:id/milestones/:milestone_id
       put ":id/milestones/:milestone_id" do
-        set_current_user_for_thread do
-          authorize! :admin_milestone, user_project
+        authorize! :admin_milestone, user_project
+        attrs = attributes_for_keys [:title, :description, :due_date, :state_event]
+        milestone = user_project.milestones.find(params[:milestone_id])
+        milestones_service = ProjectsService.new(current_user, user_project, attrs).milestone(milestone)
+        milestone = milestones_service.update
 
-          @milestone = user_project.milestones.find(params[:milestone_id])
-          attrs = attributes_for_keys [:title, :description, :due_date, :state_event]
-          if @milestone.update_attributes attrs
-            present @milestone, with: Entities::Milestone
-          else
-            not_found!
-          end
+        if milestone.valid?
+          present milestone, with: Entities::Milestone
+        else
+          not_found!
         end
       end
     end

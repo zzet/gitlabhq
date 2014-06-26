@@ -16,18 +16,20 @@
   - @refs_are_same = diff_data[:same]
   - @suppress_diff = diff_data[:suppress_diff]
 
-  Pushed by
-  = link_to author.name, user_url(author.username)
-  to
-  = link_to @branch, project_tree_url(@project.path_with_namespace, @branch)
-  branch at
-  = event.created_at
-  %br
-  Parent commit:
-  = link_to project_commit_url(@project, @before_commit.oid) do
-    = "(#{@before_commit.oid[0..10]})"
-    = simple_format(@before_commit.message)
-  %br
+  - if @push_data[:summary_diff] && @commits.many?
+    Pushed by
+    = link_to author.name, user_url(author.username)
+    to
+    = link_to @branch, project_tree_url(@project.path_with_namespace, @branch)
+    branch at
+    = event.created_at
+    %br
+    Parent commit:
+    = link_to project_commit_url(@project, @before_commit.oid) do
+      = "(#{@before_commit.oid[0..10]})"
+      = simple_format(@before_commit.message)
+    %br
+
   = link_to 'Compare it', project_compare_url(event.target, from: @before_commit.oid, to: @after_commit.oid)
   %br
 

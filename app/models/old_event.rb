@@ -284,15 +284,9 @@ class OldEvent < ActiveRecord::Base
     end.to_s
   end
 
-  def wall_note?
-    target.noteable_type.blank?
-  end
-
   def note_target_type
     if target.noteable_type.present?
       target.noteable_type.titleize
-    else
-      "Wall"
     end.downcase
   end
 

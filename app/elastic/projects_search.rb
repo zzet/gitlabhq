@@ -88,7 +88,8 @@ module ProjectsSearch
             terms: {
               field: "categories.name",
               all_terms: true,
-              size: Project.category_counts.count
+              # FIXME. Remove to_a
+              size: Project.category_counts.to_a.count
             }
           }
         },
@@ -205,7 +206,7 @@ module ProjectsSearch
       ]
 
       if options[:highlight]
-        query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
+        query_hash[:highlight] = highlight_options(options[:in])
       end
 
       self.__elasticsearch__.search(query_hash)

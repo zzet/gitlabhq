@@ -8,10 +8,7 @@ class Emails::User::UsersGroup < Emails::User::Base
     @member       = @up.user
     @member       = @up.user if @member.is_a?(UsersGroup)
 
-    headers 'X-Gitlab-Entity' => 'user',
-            'X-Gitlab-Action' => 'joined',
-            'X-Gitlab-Source' => 'group-user-relationship',
-            'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+    set_x_gitlab_headers(:user, 'user-group-relationship', :joined, "user-#{@member.username}-group-#{@group.path}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was added to '#{@group.path}' group")
   end
@@ -29,10 +26,7 @@ class Emails::User::UsersGroup < Emails::User::Base
       @previous_permission = Gitlab::Access.options_with_owner.key(@changes["group_access"].first)
       @current_permission  = Gitlab::Access.options_with_owner.key(@changes["group_access"].last)
 
-      headers 'X-Gitlab-Entity' => 'user',
-              'X-Gitlab-Action' => 'updated',
-              'X-Gitlab-Source' => 'group-user-relationship',
-              'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+      set_x_gitlab_headers(:user, 'user-group-relationship', :updated, "user-#{@member.username}-group-#{@group.path}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Permissions for user '#{ @member.name }' in group '#{@group.path}' was updated")
     end
@@ -48,10 +42,7 @@ class Emails::User::UsersGroup < Emails::User::Base
     @member       = User.find_by_id(@up["user_id"]) if @member.nil? || @member.is_a?(UsersGroup)
 
     if @group && @member
-      headers 'X-Gitlab-Entity' => 'user',
-              'X-Gitlab-Action' => 'left',
-              'X-Gitlab-Source' => 'group-user-relationship',
-              'In-Reply-To'     => "group-#{@group.path}-user-#{@member.username}"
+      set_x_gitlab_headers(:user, 'user-group-relationship', :left, "user-#{@member.username}-group-#{@group.path}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was removed from '#{@group.path}' group team")
     end

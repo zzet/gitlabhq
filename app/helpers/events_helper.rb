@@ -110,8 +110,6 @@ module EventsHelper
           "#{event.note_target_type} ##{truncate event.note_target_iid}"
         end
       end
-    elsif event.wall_note?
-      link_to 'wall', project_wall_path(event.project)
     else
       content_tag :strong do
         "(deleted)"
@@ -166,6 +164,22 @@ module EventsHelper
       link_to_target event.target
     else
       "(deleted #{event.target_type.downcase})"
+    end
+  end
+
+  def link_to_event_branch(event)
+    target = event.target
+    branch = event.branch_name
+
+    if target.is_a?(Project) &&
+      target.repository &&
+      target.repository.branch_names.include?(branch)
+
+      link_to project_commits_path(target, event.ref_name) do
+        content_tag :strong, truncate(event.ref_name, length: 30)
+      end
+    else
+      content_tag :strong, event.branch_name
     end
   end
 

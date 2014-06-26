@@ -36,6 +36,7 @@
 #  notification_level       :integer          default(1), not null
 #  password_expires_at      :datetime
 #  created_by_id            :integer
+#  last_credential_check_at :datetime
 #  avatar                   :string(255)
 #  confirmation_token       :string(255)
 #  confirmed_at             :datetime
@@ -43,7 +44,6 @@
 #  unconfirmed_email        :string(255)
 #  hide_no_ssh_key          :boolean          default(FALSE)
 #  website_url              :string(255)      default(""), not null
-#  last_credential_check_at :datetime
 #
 
 require 'carrierwave/orm/activerecord'
@@ -52,6 +52,11 @@ require 'file_size_validator'
 class User < ActiveRecord::Base
   include Watchable
   include UsersSearch
+
+  default_value_for :admin, false
+  default_value_for :can_create_group, true
+  default_value_for :can_create_team, false
+  default_value_for :hide_no_ssh_key, false
 
   devise :database_authenticatable, :token_authenticatable, :lockable, :async,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :confirmable, :registerable
@@ -87,7 +92,8 @@ class User < ActiveRecord::Base
   has_many :users_groups,             dependent: :destroy
   has_many :groups,                   through: :users_groups
   has_many :owned_groups,             -> { where(users_groups: { group_access: UsersGroup::OWNER } )}, through: :users_groups, source: :group
-  has_many :created_groups,           class_name: Group, foreign_key: :owner_id
+  has_many :masters_groups,           -> { where users_groups: { group_access: UsersGroup::MASTER } }, through: :users_groups, source: :group
+  has_many :created_groups,          class_name: Group, foreign_key: :owner_id
 
   # Projects
   has_many :users_projects,           dependent: :destroy
@@ -101,10 +107,8 @@ class User < ActiveRecord::Base
   has_many :snippets,                 dependent: :destroy, foreign_key: :author_id, class_name: Snippet
   has_many :notes,                    dependent: :destroy, foreign_key: :author_id
   has_many :merge_requests,           dependent: :destroy, foreign_key: :author_id
-  has_many :events,                   dependent: :destroy, foreign_key: :author_id,   class_name: "Event"
-  has_many :recent_events, -> { order "id DESC" }, foreign_key: :author_id,   class_name: "Event"
-  has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: "Issue"
-  has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: "MergeRequest"
+  has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: Issue
+  has_many :assigned_merge_requests,  dependent: :destroy, foreign_key: :assignee_id, class_name: MergeRequest
 
   has_many :issues,                   dependent: :destroy, foreign_key: :author_id
   has_many :assigned_issues,          dependent: :destroy, foreign_key: :assignee_id, class_name: Issue
@@ -130,9 +134,10 @@ class User < ActiveRecord::Base
   has_many :master_team_groups,              through: :master_team_group_relationships, source: :group
 
   # Events
-  has_many :personal_events,                               class_name: OldEvent, foreign_key: :author_id
-  has_many :recent_events,        -> { order(id: :desc) }, class_name: OldEvent, foreign_key: :author_id
-  has_many :old_events,               dependent: :destroy, class_name: OldEvent, foreign_key: :author_id
+  has_many :events,                   dependent: :destroy, foreign_key: :author_id, class_name: Event
+  has_many :personal_events,                               foreign_key: :author_id, class_name: Event
+  has_many :recent_events,        -> { order(id: :desc) }, foreign_key: :author_id, class_name: Event
+  has_many :old_events,               dependent: :destroy, foreign_key: :author_id, class_name: OldEvent
 
   # Notifications & Subscriptions
   has_many :personal_subscriptions,   dependent: :destroy, class_name: Event::Subscription
@@ -469,11 +474,11 @@ class User < ActiveRecord::Base
 
   def recent_push project_id = nil
     # Get push old_events not earlier than 2 hours ago
-    old_events = recent_events.code_push.where("created_at > ?", Time.now - 2.hours)
-    old_events = old_events.where(project_id: project_id) if project_id
+    events = recent_events.with_push.where("created_at > ?", Time.now - 2.hours)
+    events = events.where(target_id: project_id, target_type: Project) if project_id
 
     # Take only latest one
-    old_events = old_events.recent.limit(1).first
+    events = events.limit(1).first
   end
 
   def projects_sorted_by_activity
@@ -587,5 +592,25 @@ class User < ActiveRecord::Base
 
   def all_ssh_keys
     keys.map(&:key)
+  end
+
+  def temp_oauth_email?
+    email =~ /\Atemp-email-for-oauth/
+  end
+
+  def generate_tmp_oauth_email
+    self.email = "temp-email-for-oauth-#{username}@gitlab.localhost"
+  end
+
+  def public_profile?
+    authorized_projects.public_only.any?
+  end
+
+  def avatar_url(size = nil)
+    if avatar.present?
+      URI::join(Gitlab.config.gitlab.url, avatar.url).to_s
+    else
+      GravatarService.new.execute(email, size)
+    end
   end
 end

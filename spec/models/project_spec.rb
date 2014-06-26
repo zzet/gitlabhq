@@ -6,8 +6,8 @@
 #  name                   :string(255)
 #  path                   :string(255)
 #  description            :text
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
+#  created_at             :datetime
+#  updated_at             :datetime
 #  creator_id             :integer
 #  issues_enabled         :boolean          default(TRUE), not null
 #  wall_enabled           :boolean          default(TRUE), not null
@@ -77,7 +77,7 @@ describe Project do
       project2 = build(:project)
       project2.stub(:creator).and_return(double(can_create_project?: false, projects_limit: 0).as_null_object)
       project2.should_not be_valid
-      project2.errors[:limit_reached].first.should match(/Your own projects limit is 0/)
+      project2.errors[:limit_reached].first.should match(/Your project limit is 0/)
     end
   end
 

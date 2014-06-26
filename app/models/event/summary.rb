@@ -15,7 +15,7 @@
 class Event::Summary < ActiveRecord::Base
   extend Enumerize
 
-  attr_accessible :title, :description, :period, :state_event
+  attr_accessible :title, :description, :period, :state_event, :summary_diff
 
   belongs_to :user
   has_many :summary_entity_relationships, dependent: :destroy, class_name: Event::SummaryEntityRelationship
@@ -26,7 +26,7 @@ class Event::Summary < ActiveRecord::Base
   validates :title, presence: true
   validates :period, presence: true
 
-  state_machine :state, initial: :disabled do
+  state_machine :state, initial: :enabled do
     state :disabled
     state :enabled
 

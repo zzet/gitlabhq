@@ -1,6 +1,6 @@
-.ui-box
-  .title.clearfix
-    = search_field_tag :filter_projects, nil, placeholder: 'Filter by name', class: 'form-control js-sidebar-filter'
+.panel.panel-default
+  .panel-heading.clearfix
+    = search_field_tag :filter_projects, nil, placeholder: 'Filter by name', class: 'form-control dash-filter'
     - if current_user.can_create_project?
       %span.pull-right
         = link_to team_projects_path(@team), class: "btn btn-new" do

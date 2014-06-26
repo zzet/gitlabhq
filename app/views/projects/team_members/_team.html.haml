@@ -1,7 +1,7 @@
 .team-table.js-batch-action-container
   - can_admin_project = (can? current_user, :admin_project, @project)
-  .ui-box
-    .title
+  .panel.panel-default
+    .panel-heading
       .batch-action-column
         = check_box_tag :check_ids, nil, false, class: 'js-batch-action-check-all'
       %strong #{@project.name}

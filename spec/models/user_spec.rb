@@ -36,6 +36,7 @@
 #  notification_level       :integer          default(1), not null
 #  password_expires_at      :datetime
 #  created_by_id            :integer
+#  last_credential_check_at :datetime
 #  avatar                   :string(255)
 #  confirmation_token       :string(255)
 #  confirmed_at             :datetime
@@ -43,7 +44,6 @@
 #  unconfirmed_email        :string(255)
 #  hide_no_ssh_key          :boolean          default(FALSE)
 #  website_url              :string(255)      default(""), not null
-#  last_credential_check_at :datetime
 #
 
 require 'spec_helper'
@@ -84,8 +84,14 @@ describe User do
         user = build(:user, email: 'info@example.com')
         expect(user).to be_valid
       end
+
       it 'accepts info+test@example.com' do
         user = build(:user, email: 'info+test@example.com')
+        expect(user).to be_valid
+      end
+
+      it "accepts o'reilly@example.com" do
+        user = build(:user, email: "o'reilly@example.com")
         expect(user).to be_valid
       end
 
@@ -96,6 +102,11 @@ describe User do
 
       it 'rejects mailto:test@example.com' do
         user = build(:user, email: 'mailto:test@example.com')
+        expect(user).to be_invalid
+      end
+
+      it "rejects lol!'+=?><#$%^&*()@gmail.com" do
+        user = build(:user, email: "lol!'+=?><#$%^&*()@gmail.com")
         expect(user).to be_invalid
       end
     end

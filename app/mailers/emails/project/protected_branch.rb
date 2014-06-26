@@ -6,10 +6,7 @@ class Emails::Project::ProtectedBranch < Emails::Project::Base
     @branch       = @event.source
     @project      = @event.target
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'created',
-            'X-Gitlab-Source' => 'protected_branch',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-branch-#{@branch.name}"
+    set_x_gitlab_headers(:project, :protected_branch, :created, "project-#{@project.path_with_namespace}-protected_branch-#{@branch.name}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] [#{@branch.name}] Branch status")
   end
@@ -22,10 +19,7 @@ class Emails::Project::ProtectedBranch < Emails::Project::Base
     @project      = @event.target
     @branch       = data
 
-    headers 'X-Gitlab-Entity' => 'project',
-            'X-Gitlab-Action' => 'removed',
-            'X-Gitlab-Source' => 'protected_branch',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-branch-#{@branch["name"]}"
+    set_x_gitlab_headers(:project, :protected_branch, :deleted, "project-#{@project.path_with_namespace}-protected_branch-#{@branch['name']}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "[#{@project.path_with_namespace}] [#{@branch["name"]}] Branch status")
   end

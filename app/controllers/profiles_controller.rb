@@ -3,6 +3,7 @@ class ProfilesController < ApplicationController
 
   before_filter :user
   before_filter :authorize_change_username!, only: :update_username
+  skip_before_filter :require_email, only: [:show, :update]
 
   layout 'profile'
 
@@ -13,8 +14,11 @@ class ProfilesController < ApplicationController
   end
 
   def update
+    if params[:user][:email].present? && params[:email_domain].present?
+      params[:user][:email] += "@#{params[:email_domain]}"
+    end
+
     params[:user].delete(:email) if @user.ldap_user?
-    params[:user][:email] += "@#{params[:email_domain]}"
 
     if @user.update_attributes(params[:user])
       flash[:notice] = "Profile was successfully updated"
@@ -37,7 +41,10 @@ class ProfilesController < ApplicationController
   end
 
   def history
-    @events = current_user.recent_events.page(params[:page]).per(20)
+    @events = Event.for_dashboard(@user).
+                    recent.
+                    page(params[:page]).
+                    per(20)
   end
 
   def update_username

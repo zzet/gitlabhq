@@ -37,7 +37,9 @@
   %hr
   .search_results
     %ul.bordered-list
-      = render partial: "search/results/project", collection: @search_results[:projects][:records]
+      - @search_results[:projects][:records].each_with_index do |project, index|
+        = render partial: "search/results/project", locals: { project: project,
+         result: @search_results[:projects][:results][index] }
     = paginate @search_results[:projects][:results], theme: 'gitlab'
 
 - else

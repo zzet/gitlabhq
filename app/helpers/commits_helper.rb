@@ -16,9 +16,10 @@ module CommitsHelper
   end
 
   def each_diff_line(diff, index)
-    Gitlab::Diff::GritParser.new(diff).each do |full_line, type, line_code, line_new, line_old|
-      yield(full_line, type, line_code, line_new, line_old)
-    end
+    Gitlab::DiffParser.new(diff.diff.lines.to_a, diff.new_path)
+      .each do |full_line, type, line_code, line_new, line_old|
+        yield(full_line, type, line_code, line_new, line_old)
+      end
   end
 
   def each_diff_line_near(diff, index, expected_line_code)
@@ -75,15 +76,13 @@ module CommitsHelper
 
     # Add the root project link and the arrow icon
     crumbs = content_tag(:li) do
-      content_tag(:span, nil, class: 'arrow') +
-      link_to(@project.name, project_commits_path(@project, @ref))
+      link_to(@project.path, project_commits_path(@project, @ref))
     end
 
     if @path
       parts = @path.split('/')
 
       parts.each_with_index do |part, i|
-        crumbs += content_tag(:span, ' / ', class: 'divider')
         crumbs += content_tag(:li) do
           # The text is just the individual part, but the link needs all the parts before it
           link_to part, project_commits_path(@project, tree_join(@ref, parts[0..i].join('/')))
@@ -116,7 +115,7 @@ module CommitsHelper
         added_lines[line_new]   = { line_code: line_code, type: type, line: line }
       end
     end
-    max_length = old_file ? old_file.sloc + added_lines.length : file.sloc
+    max_length = old_file ? [old_file.loc, file.loc].max : file.loc
 
     offset1 = 0
     offset2 = 0
@@ -196,11 +195,11 @@ module CommitsHelper
     options[:type] ||= :path
     source_name = commit.send "#{options[:source]}_name".to_sym
     source_email = commit.send "#{options[:source]}_email".to_sym
-    
+
     user = User.find_for_commit(source_email, source_name)
     person_name = user.nil? ? source_name : user.name
     person_email = user.nil? ? source_email : user.email
-    
+
     text = if options[:avatar]
             avatar = image_tag(avatar_icon(person_email, options[:size]), class: "avatar #{"s#{options[:size]}" if options[:size]}", width: options[:size], alt: "")
             %Q{#{avatar} <span class="commit-#{options[:source]}-name">#{person_name}</span>}
@@ -218,5 +217,9 @@ module CommitsHelper
     else
       link_to(text.html_safe, options[:type] == :path ? user_path(user) : user_url(user), options)
     end
+  end
+
+  def diff_file_mode_changed?(diff)
+    diff.a_mode && diff.b_mode && diff.a_mode != diff.b_mode
   end
 end

@@ -2,23 +2,35 @@ class SearchController < ApplicationController
   include SearchHelper
 
   def show
-    @project = Project.find_by(id: params[:project_id]) if params[:project_id].present?
     @group   = Group.find_by(id: params[:group_id])     if params[:group_id].present?
 
-    if @project
-      return access_denied! unless can?(current_user, :download_code, @project)
-      @search_results = SearchService.new(current_user, params).global_search
-      #@search_results = SearchService.new(current_user, params).project_search(@project)
+    if project
+      return access_denied! unless can?(current_user, :download_code, project)
+      @search_results = SearchService.new(current_user, params).project_search(project)
     else
       @search_results = SearchService.new(current_user, params).global_search
     end
+
+    @search_results = SearchDecorator.new(@search_results)
+
+    params[:type] = @search_results.type unless params[:type]
   end
 
   def autocomplete
     term = params[:term]
-    @project = Project.find(params[:project_id]) if params[:project_id].present?
-    @ref = params[:project_ref] if params[:project_ref].present?
 
-    render json: search_autocomplete_opts(term).to_json
+    if params[:project_id].present?
+      project = Project.find(params[:project_id])
+
+      render json: search_autocomplete_opts(term, project)
+    else
+      render json: search_autocomplete_opts(term)
+    end
+  end
+
+  private
+
+  def project
+    @project ||= Project.find_with_namespace(params.fetch(:project, ''))
   end
 end

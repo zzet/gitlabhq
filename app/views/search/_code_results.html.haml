@@ -21,10 +21,10 @@
 %h4
   - if @search_results[:repositories][:blobs][:total_count] > 0
     #{@search_results[:repositories][:blobs][:total_count]} results found in
-    - if @search_results[:repositories][:blobs][:projects].many?
-      #{ @search_results[:repositories][:blobs][:projects].count } projects
-    - elsif @search_results[:repositories][:blobs][:projects].any?
+    - if @project || @search_results[:repositories][:blobs][:projects] == 1
       #{ @search_results[:repositories][:blobs][:projects].first[:name] } project
+    - elsif @search_results[:repositories][:blobs][:projects].many?
+      #{ @search_results[:repositories][:blobs][:projects].count } projects
   - else
     No matches found.
 

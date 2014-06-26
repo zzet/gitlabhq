@@ -123,6 +123,11 @@ namespace :gitlab do
     def check_init_script_exists
       print "Init script exists? ... "
 
+      if omnibus_gitlab?
+        puts 'skipped (omnibus-gitlab has no init script)'.magenta
+        return
+      end
+
       script_path = "/etc/init.d/gitlab"
 
       if File.exists?(script_path)
@@ -141,6 +146,11 @@ namespace :gitlab do
 
     def check_init_script_up_to_date
       print "Init script up-to-date? ... "
+
+      if omnibus_gitlab?
+        puts 'skipped (omnibus-gitlab has no init script)'.magenta
+        return
+      end
 
       recipe_path = Rails.root.join("lib/support/init.d/", "gitlab")
       script_path = "/etc/init.d/gitlab"
@@ -342,6 +352,7 @@ namespace :gitlab do
       check_repo_base_is_not_symlink
       check_repo_base_user_and_group
       check_repo_base_permissions
+      check_satellites_permissions
       check_update_hook_is_up_to_date
       check_repos_update_hooks_is_link
       check_gitlab_shell_self_test
@@ -438,6 +449,29 @@ namespace :gitlab do
         )
         for_more_information(
           see_installation_guide_section "GitLab Shell"
+        )
+        fix_and_rerun
+      end
+    end
+
+    def check_satellites_permissions
+      print "Satellites access is drwxr-x---? ... "
+
+      satellites_path = Gitlab.config.satellites.path
+      unless File.exists?(satellites_path)
+        puts "can't check because of previous errors".magenta
+        return
+      end
+
+      if File.stat(satellites_path).mode.to_s(8).ends_with?("0750")
+        puts "yes".green
+      else
+        puts "no".red
+        try_fixing_it(
+          "sudo chmod u+rwx,g=rx,o-rwx #{satellites_path}",
+        )
+        for_more_information(
+          see_installation_guide_section "GitLab"
         )
         fix_and_rerun
       end
@@ -582,6 +616,22 @@ namespace :gitlab do
       Gitlab::Shell.new.version
     end
 
+    def required_gitlab_shell_version
+      File.read(File.join(Rails.root, "GITLAB_SHELL_VERSION")).strip
+    end
+
+    def gitlab_shell_major_version
+      required_gitlab_shell_version.split(".")[0].to_i
+    end
+
+    def gitlab_shell_minor_version
+      required_gitlab_shell_version.split(".")[1].to_i
+    end
+
+    def gitlab_shell_patch_version
+      required_gitlab_shell_version.split(".")[2].to_i
+    end
+
     def has_gitlab_shell3?
       gitlab_shell_version.try(:start_with?, "v3.")
     end
@@ -613,7 +663,7 @@ namespace :gitlab do
       else
         puts "no".red
         try_fixing_it(
-          sudo_gitlab("RAILS_ENV=production script/background_jobs start")
+          sudo_gitlab("RAILS_ENV=production bin/background_jobs start")
         )
         for_more_information(
           see_installation_guide_section("Install Init Script"),
@@ -755,7 +805,7 @@ namespace :gitlab do
   end
 
   def check_gitlab_shell
-    required_version = Gitlab::VersionInfo.new(1, 9, 1)
+    required_version = Gitlab::VersionInfo.new(gitlab_shell_major_version, gitlab_shell_minor_version, gitlab_shell_patch_version)
     current_version = Gitlab::VersionInfo.parse(gitlab_shell_version)
 
     print "GitLab Shell version >= #{required_version} ? ... "
@@ -782,5 +832,9 @@ namespace :gitlab do
       )
       fix_and_rerun
     end
+  end
+
+  def omnibus_gitlab?
+    Dir.pwd == '/opt/gitlab/embedded/service/gitlab-rails'
   end
 end

@@ -5,8 +5,8 @@
 #  id                    :integer          not null, primary key
 #  url                   :string(255)
 #  project_id            :integer
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
+#  created_at            :datetime
+#  updated_at            :datetime
 #  type                  :string(255)      default("ProjectHook")
 #  service_id            :integer
 #  push_events           :boolean          default(TRUE), not null
@@ -27,7 +27,7 @@ describe SystemHook do
     end
 
     it "project_create hook" do
-      project = create(:project)
+      create(:project)
       WebMock.should have_requested(:post, @system_hook.url).with(body: /project_create/).once
     end
 
@@ -59,7 +59,7 @@ describe SystemHook do
       user = create(:user)
       project = create(:project)
       project.team << [user, :master]
-      project.users_projects.clear
+      project.users_projects.destroy_all
       WebMock.should have_requested(:post, @system_hook.url).with(body: /user_remove_from_team/).once
     end
   end

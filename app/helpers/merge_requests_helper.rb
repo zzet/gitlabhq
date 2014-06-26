@@ -1,8 +1,8 @@
 module MergeRequestsHelper
   def new_mr_path_from_push_event(event)
-    target_project = event.project.forked_from_project || event.project
+    target_project = event.target.forked_from_project || event.target
     new_project_merge_request_path(
-      event.project,
+      event.target,
       new_mr_from_push_event(event, target_project)
     )
   end
@@ -16,11 +16,11 @@ module MergeRequestsHelper
 
   def new_mr_from_push_event(event, target_project)
     return :merge_request => {
-      source_project_id: event.project.id,
+      source_project_id: event.target.id,
       target_project_id: target_project.id,
-      source_branch: event.branch_name,
+      source_branch: event.source.branch_name,
       target_branch: target_project.repository.root_ref,
-      title: event.branch_name.humanize
+      title: event.source.branch_name.titleize.humanize
     }
   end
 
@@ -32,7 +32,8 @@ module MergeRequestsHelper
   end
 
   def ci_build_details_path merge_request
-    gitlab_ci_service  = merge_request.source_project.services.where(type: Service::GitlabCi).first
+    #merge_request.source_project.ci_service.build_page(merge_request.last_commit.sha)
+    gitlab_ci_service = merge_request.source_project.services.where(type: Service::GitlabCi).first
     gitlab_ci_service.build_page(merge_request.last_commit.sha)
   end
 
@@ -42,5 +43,9 @@ module MergeRequestsHelper
     else
       "Branches: #{@merge_request.source_branch} #{separator} #{@merge_request.target_branch}"
     end
+  end
+
+  def issues_sentence(issues)
+    issues.map { |i| "##{i.iid}" }.to_sentence
   end
 end

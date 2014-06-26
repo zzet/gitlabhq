@@ -28,12 +28,12 @@ WebMock.allow_net_connect!
 require 'capybara/poltergeist'
 Capybara.javascript_driver = :poltergeist
 Capybara.register_driver :poltergeist do |app|
-    Capybara::Poltergeist::Driver.new(app, :js_errors => false, :timeout => 60)
+  Capybara::Poltergeist::Driver.new(app, js_errors: false, timeout: 90)
 end
 Spinach.hooks.on_tag("javascript") do
   ::Capybara.current_driver = ::Capybara.javascript_driver
 end
-Capybara.default_wait_time = 60
+Capybara.default_wait_time = 6
 Capybara.ignore_hidden_elements = false
 
 DatabaseCleaner.strategy = :truncation
@@ -41,11 +41,16 @@ DatabaseCleaner.strategy = :truncation
 Spinach.hooks.before_scenario do
   sleep 0.2
   TestEnv.setup_stubs
+  Gitlab::Event::Factory.unstub(:call)
+  Gitlab.config.stub(:corporate_email_domains) { ["email.com"] }
+  PrivatePub.stub(publish_to: true)
   DatabaseCleaner.start
 end
 
 Spinach.hooks.after_scenario do
   sleep 0.2
+  Gitlab::Event::Factory.stub(call: true)
+  PrivatePub.unstub(:publish_to)
   DatabaseCleaner.clean
   sleep 1
 end
@@ -55,6 +60,4 @@ Spinach.hooks.before_run do
   RSpec::Mocks::setup self
 
   include FactoryGirl::Syntax::Methods
-  MergeRequestObserver.any_instance.stub(current_user: create(:user))
 end
-

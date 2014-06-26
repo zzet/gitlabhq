@@ -15,7 +15,7 @@ class DashboardController < ApplicationController
     @has_authorized_projects = @projects.count > 0
     @teams = current_user.teams
     @projects_count = @projects.count
-    @projects = @projects.limit(@projects_limit)
+    @projects = @projects.limit(@projects_limit).includes(:namespace)
 
     @events = Event.for_main_dashboard(current_user)
     @events = @event_filter.apply_filter(@events)

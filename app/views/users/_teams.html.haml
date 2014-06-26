@@ -1,8 +1,9 @@
-.ui-box
-  .title.clearfix
+.panel.panel-default
+  .panel-heading.clearfix
     = search_field_tag :filter_group, nil, placeholder: 'Filter by name', class: 'js-sidebar-filter form-control'
+
   %ul.well-list.js-sidebar-list
-    - @teams.each do |team|
+    - teams.each do |team|
       %li.js-description-tooltip{"data-title" => "#{team.description}"}
         = link_to team_path(team), class: dom_class(team) do
           %strong.well-title.filter-title= team.name

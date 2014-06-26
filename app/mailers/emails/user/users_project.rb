@@ -8,10 +8,7 @@ class Emails::User::UsersProject < Emails::User::Base
     @member       = @up.user
     @member       = @up.user if @member.is_a?(UsersProject)
 
-    headers 'X-Gitlab-Entity' => 'user',
-            'X-Gitlab-Action' => 'joined',
-            'X-Gitlab-Source' => 'project-user-relationship',
-            'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
+    set_x_gitlab_headers(:user, 'user-project-relationship', :joined, "user-#{@member.username}-project-#{@project.path_with_namespace}")
 
     mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was added to '#{@project.path_with_namespace}' project")
   end
@@ -29,10 +26,7 @@ class Emails::User::UsersProject < Emails::User::Base
       @previous_permission = UsersProject.access_roles.key(@changes["project_access"].first)
       @current_permission  = UsersProject.access_roles.key(@changes["project_access"].last)
 
-      headers 'X-Gitlab-Entity' => 'user',
-              'X-Gitlab-Action' => 'updated',
-              'X-Gitlab-Source' => 'project-user-relationship',
-              'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
+      set_x_gitlab_headers(:user, 'user-project-relationship', :updated, "user-#{@member.username}-project-#{@project.path_with_namespace}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "Permissions for user '#{ @member.name }' in project '#{@project.path_with_namespace}' was updated")
     end
@@ -48,10 +42,7 @@ class Emails::User::UsersProject < Emails::User::Base
     @member       = User.find_by_id(@up["user_id"]) if @member.nil? || @member.is_a?(UsersProject)
 
     if @project && @member
-      headers 'X-Gitlab-Entity' => 'user',
-              'X-Gitlab-Action' => 'left',
-              'X-Gitlab-Source' => 'project-user-relationship',
-              'In-Reply-To'     => "project-#{@project.path_with_namespace}-user-#{@member.username}"
+      set_x_gitlab_headers(:user, 'user-project-relationship', :left, "user-#{@member.username}-project-#{@project.path_with_namespace}")
 
       mail(from: "#{@user.name} <#{@user.email}>", bcc: @notification.subscriber.email, subject: "User '#{@member.name}' was removed from '#{@project.path_with_namespace}' project team")
     end

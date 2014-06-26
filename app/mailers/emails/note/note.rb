@@ -20,8 +20,6 @@ class Emails::Note::Note < Emails::Base
         Emails::Project::Note.commented_commit_email(notification).deliver!
       when Issue
         Emails::Project::Note.commented_issue_email(notification).deliver!
-      when NilClass # Project wall
-        Emails::Project::Note.commented_email(notification).deliver!
       else
         raise "wow"
       end

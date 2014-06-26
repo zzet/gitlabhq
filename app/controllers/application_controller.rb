@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   before_filter :default_headers
   before_filter :add_gon_variables
   before_filter :configure_permitted_parameters, if: :devise_controller?
+  before_filter :require_email, unless: :devise_controller?
 
   protect_from_forgery with: :exception
   #protect_from_forgery
@@ -123,6 +124,11 @@ class ApplicationController < ActionController::Base
     return access_denied! unless can?(current_user, :push_code, project)
   end
 
+  def authorize_labels!
+    # Labels should be accessible for issues and/or merge requests
+    authorize_read_issue! || authorize_read_merge_request!
+  end
+
   def access_denied!
     render "errors/access_denied", layout: "errors", status: 404
   end
@@ -176,10 +182,13 @@ class ApplicationController < ActionController::Base
     gon.default_issues_tracker = Project.issues_tracker.default_value
     gon.default_wiki_engine = Project.wiki_engine.default_value
     gon.api_version = API::API.version
-    gon.api_token = current_user.private_token if current_user
-    gon.gravatar_url = request.ssl? || Gitlab.config.gitlab.https ? Gitlab.config.gravatar.ssl_url : Gitlab.config.gravatar.plain_url
     gon.relative_url_root = Gitlab.config.gitlab.relative_url_root
-    gon.gravatar_enabled = Gitlab.config.gravatar.enabled
+    gon.default_avatar_url = URI::join(Gitlab.config.gitlab.url, ActionController::Base.helpers.image_path('no_avatar.png')).to_s
+
+    if current_user
+      gon.current_user_id = current_user.id
+      gon.api_token = current_user.private_token
+    end
   end
 
   def redirect_back_or_default(default)
@@ -245,5 +254,11 @@ class ApplicationController < ActionController::Base
 
   def hexdigest(string)
     Digest::SHA1.hexdigest string
+  end
+
+  def require_email
+    if current_user && current_user.temp_oauth_email?
+      redirect_to profile_path, notice: 'Please complete your profile with email address' and return
+    end
   end
 end
