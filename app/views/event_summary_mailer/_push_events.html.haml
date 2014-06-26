@@ -23,7 +23,7 @@
         - summary_args[:data]["revafter"] = push_events_by_ref.last.source.revafter
         - pr = event.target
 
-        - if pr.repository.commits_between(pr.default_branch, summary_args[:data]["revafter"]).any?
+        - if event.source.ref_name == pr.default_branch || pr.repository.commits_between(pr.default_branch, summary_args[:data]["revafter"]).any?
           %h5
             Pushes to
             = event.source.ref_name
