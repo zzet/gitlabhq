@@ -20,6 +20,7 @@
       - if @events_summary.summary_diff
 
         - summary_args = args
+        - summary_args[:summary_diff] = true
         - summary_args[:data]["revafter"] = push_events_by_ref.last.source.revafter
         - pr = event.target
 
