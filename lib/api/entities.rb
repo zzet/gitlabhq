@@ -222,6 +222,7 @@ module API
       expose :author, :assignee, using: Entities::UserBasic
       expose :source_project_id, :target_project_id
       expose :label_list, as: :labels
+      expose (:last_build_status) { |entity| entity.ci_builds.any? ? entity.ci_builds.last.state : "nothing" }
     end
 
     class SSHKey < Grape::Entity
