@@ -18,6 +18,15 @@ module API
 
       # List merge requests
       #
+      # last_build_status:
+      #   - nothing   - no builds (no information)
+      #   - build
+      #   - fail
+      #   - success
+      #   - skipped
+      #   - aborted
+      #   - unstable
+      #
       # Parameters:
       #   id (required) - The ID of a project
       #   state (optional) - Return requests "merged", "opened" or "closed"
