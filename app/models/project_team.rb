@@ -145,6 +145,12 @@ class ProjectTeam
       access << group.users_groups.find_by(user_id: user_id).try(:access_field)
     end
 
+    if teams.any?
+      access << teams.map do |t|
+        t.team_user_relationships.find_by(user_id: user_id).try(:access_field)
+      end.flatten
+    end
+
     access.compact.max
   end
 
@@ -201,6 +207,6 @@ class ProjectTeam
   end
 
   def project_access(member)
-    
+
   end
 end
