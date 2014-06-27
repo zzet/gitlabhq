@@ -1,24 +1,41 @@
 - entities.each do |relation|
   %li{ class: "#{dom_class(relation)} js-toggle-container", id: dom_id(relation) }
+
     - group = relation.entity
     - available_options = Group.watched_titles
     - source_descriptions = Group.watched_descriptions
-    - options = relation.options.any? ? (Group.watched_sources & relation.options.map {|o| o.to_sym }) : Group.watched_sources
+    - options = relation.active_sources
+
     .summary-entity-actions.pull-right
       = link_to "#", class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
         Edit
       = link_to profile_summary_group_path(summary.id, relation.id), class: "btn-tiny btn btn-danger", data: { confirm: "You are shure?" }, method: :delete do
         Remove
+
     .summary-entity-name
       = link_to group.name, group_path(group.path)
+
     .summary-entity-info
       = options.map {|o| available_options[o] }.join(", ")
+
       .edit-member.hide.js-toggle-content
         = form_for relation, url: profile_summary_group_path(summary, relation), method: :put do |f|
           - available_options.each do |key, val|
-            %span.has_bottom_tooltip{"data-original-title" => source_descriptions[key] }
-              = f.check_box :options, { multiple: true, checked: (options.include?(key) || options.empty?) }, key
-              = val
-            %br
+
+            .col-sm-2
+              %span.has_bottom_tooltip{"data-original-title" => source_descriptions[key] }
+                = f.check_box :options, { multiple: true, checked: (options.include?(key) || options.empty?) }, key
+                = val
+
+            .col-sm-6
+              - options_actions = relation.active_actions_for_source(key)
+              - source_actions(group, key).each do |action|
+
+                .col-sm-12
+                  = f.check_box :"options_#{key}_actions", { multiple: true, checked: (options.include?(key) || options.empty?) }, action
+                  = action.to_s.humanize
+
+            .clearfix
+            %hr
           = f.submit 'Save', class: 'btn btn-save'
           %br

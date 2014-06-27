@@ -5,8 +5,10 @@
     Please, add entities.
 
 - grouped_entities.each do |entity_type, entities|
-  .ui-box
-    .title
-      %strong= entity_type.pluralize
-    %ul.well-list
-      = render "#{entity_type.downcase}".pluralize, summary: summary, entities: entities
+  .panel.panel-default
+    .panel-heading
+      .title
+        %strong= entity_type.pluralize
+    .panel-body
+      %ul.well-list
+        = render "#{entity_type.downcase}".pluralize, summary: summary, entities: entities

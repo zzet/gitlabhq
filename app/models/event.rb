@@ -56,6 +56,53 @@ class Event < ActiveRecord::Base
   scope :with_push, -> { where(source_type: Push) }
   scope :by_user,     ->(user)   { where(author_id: user.id) }
 
+  scope :for_summary_relation, -> (rel, from = nil, to = nil) do
+    table = self.arel_table
+
+    acc = where(target_id: rel.entity_id, target_type: rel.entity_type)
+    acc = where(created_at: from..to) if from && to
+
+    relation_actions = rel.options_actions
+
+    if relation_actions && relation_actions.is_a?(Hash)
+      cond = nil
+
+      relation_actions.each { |source, actions|
+        q = table[:source_type].eq(source.to_s.camelize)
+
+        q = if source == :push && actions.include?(:pushed)
+              pushed_events = acc.with_push.where(action: :pushed)
+
+              actions_cond = table[:action].eq(:pushed).
+                and(table[:source_id].in(
+                  filter_push_events_for_summary(rel, pushed_events).pluck(:id)
+              ))
+
+              non_pushed_actions = actions.keys.dup
+              non_pushed_actions.delete(:pushed)
+
+              if non_pushed_actions.any?
+                actions_cond = actions_cond.or(table[:action].in(non_pushed_actions))
+              end
+
+              q.and(actions_cond)
+            else
+              q.and(table[:action].in(actions.keys))
+            end
+
+        cond = cond.nil? ? q : cond.or(q)
+      }
+
+      acc = acc.where(cond)
+    else
+      if entity_relation.options.any?
+        acc = acc.where(source_type: rel.options.map(&:camelize))
+      end
+    end
+
+    acc
+  end
+
   scope :for_main_dashboard, -> (user) do
     table = self.arel_table
 
@@ -210,4 +257,38 @@ class Event < ActiveRecord::Base
   def tag_name
     @tag_name ||= data["ref"].gsub("refs/tags/", "")
   end
+
+  private
+
+  def self.filter_push_events_for_summary(rel, events)
+    ee = events.where(source: Push, action: :pushed)
+
+    if rel.options_actions[:push] &&
+       rel.options_actions[:push][:pushed] &&
+       rel.options_actions.is_a?(Array)
+
+      branched = rel.options_actions[:push][:pushed].dup
+      branched.delete("Any branch")
+
+      if branches.any?
+        ee = ee.select do |push_event|
+          allowed_push = false
+          push = push_event.source
+
+          if push
+            allowed_push = branches.inject(false) do |res, branch|
+              res || push.branch_name == branch
+            end
+          end
+
+          allowed_push
+        end
+
+        ee = events.where(source: Push, action: :pushed, source_id: ee.pluck(:id))
+      end
+    end
+
+    ee
+  end
+
 end

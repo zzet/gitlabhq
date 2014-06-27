@@ -79,6 +79,12 @@ module Watchable
       @base_actions ||= @watched_actions_map[watchable_name].keys
     end
 
+    def result_actions_names(source = watchable_name)
+      @watched_actions_map[source].map do |k, v|
+        v.map { |a| a[:name] }
+      end.flatten
+    end
+
     # Before actions for current target
     def before_actions_for(target)
       @before_actions[target] || { actions: [], conditions: [] }

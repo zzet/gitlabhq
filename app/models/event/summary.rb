@@ -74,17 +74,10 @@ class Event::Summary < ActiveRecord::Base
 
     result = []
     summary_entity_relationships.each do |entity_relation|
-      # TODO. Add filter by action here
-      events = Event.where(target_id: entity_relation.entity_id,
-                           target_type: entity_relation.entity_type,
-                           created_at: from..to).order(created_at: :asc)
-      if entity_relation.options.any?
-        events = events.where(source_type: entity_relation.options.map(&:camelize))
-      end
-      result << events unless events.blank?
+      result << Event.for_summary_relation(entity_relation, from, to).pluck(:id)
     end
 
-    result.flatten.uniq
+    Event.where(id: result.flatten.uniq)
   end
 
   private
