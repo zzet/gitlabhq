@@ -151,7 +151,7 @@ class ProjectTeam
       end.flatten
     end
 
-    access.compact.max
+    access.flatten.compact.max
   end
 
   private
