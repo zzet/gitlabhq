@@ -47,9 +47,8 @@
         Users
         %small.pull-right= @search_results[:users][:total_count]
 
-  %hr
-
 - if @search_results.code? && params[:type] == "code"
+  %hr
   = render "search/facets/repository/language",
     languages: @search_results.founded_languages
 

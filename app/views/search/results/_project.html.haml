@@ -1,6 +1,6 @@
 %li
   = link_to project do
-    %strong.term= result.highlight.name_with_namespace.try(:first)
+    %strong.term= result.highlight.name_with_namespace.try(:first) || result.highlight.path_with_namespace.try(:first)
   - if result.description.present?
     &ndash;
     %span.light.term= project.description
