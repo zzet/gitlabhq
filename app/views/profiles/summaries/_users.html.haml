@@ -22,18 +22,24 @@
         = form_for relation, url: profile_summary_user_path(summary, relation), method: :put do |f|
           - available_options.each do |key, val|
 
-            .col-sm-2
-              %span.has_bottom_tooltip{"data-original-title" => source_descriptions[key] }
-                = f.check_box :options, { multiple: true, checked: (options.include?(key) || options.empty?) }, key
-                = val
+            .js-toggle-sub-container
+              .col-sm-2
+                %span.has_bottom_tooltip{"data-original-title" => source_descriptions[key] }
+                  = f.check_box :options, { multiple: true, checked: (options.include?(key) || options.empty?) }, key
+                  = val
 
-            .col-sm-6
-              - options_actions = relation.active_actions_for_source(key)
-              - source_actions(user, key).each do |action|
+              .pull-left
+                = link_to '#', id: dom_id(relation, "toggle_edit_actions_form"), class: "btn-tiny btn js-toggle-sub-button", title: 'Edit actions' do
+                  %i.icon-edit
 
-                .col-sm-12
-                  = f.check_box :"options_#{key}_actions", { multiple: true, checked: (options.include?(key) || options.empty?) }, action
-                  = action.to_s.humanize
+              .col-sm-6
+                .edit-actions.hide.js-toggle-sub-content
+                  - options_actions = relation.active_actions_for_source(key)
+                  - source_actions(user, key).each do |action|
+
+                    .col-sm-12
+                      = f.check_box :"options_#{key}_actions", { multiple: true, checked: (options.include?(key) || options.empty?) }, action
+                      = action.to_s.humanize
 
             .clearfix
             %hr
