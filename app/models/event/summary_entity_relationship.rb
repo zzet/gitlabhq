@@ -29,6 +29,7 @@ class Event::SummaryEntityRelationship < ActiveRecord::Base
     return @active_options if defined?(@active_options)
 
     source_klass = entity_type.constantize
+
     @active_options = if options.any?
                         source_klass.watched_sources & options.map  do |o|
                           o.to_sym
@@ -44,7 +45,7 @@ class Event::SummaryEntityRelationship < ActiveRecord::Base
 
     oa = options_actions
     if oa.is_a?(Hash) && oa.any? && oa[source]
-      oa[source].map {|k, v| k.to_sym}.keep_if do |k|
+      oa[source].map { |k, v| k.to_sym }.keep_if do |k|
         source_klass.result_actions_names(source).include?(k)
       end
     else

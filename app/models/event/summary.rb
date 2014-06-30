@@ -88,13 +88,13 @@ class Event::Summary < ActiveRecord::Base
     else
       case period
       when :daily
-        Time.zone.now - 1.day
+        1.day.ago
       when :weekly
-        Time.zone.now - 1.week
+        1.week.ago
       when :monthly
-        Time.zone.now - 1.month
+        1.month.ago
       else
-        Time.zone.now - 1.week
+        raise ArgumentError.new("period is invalid")
       end
     end
   end
