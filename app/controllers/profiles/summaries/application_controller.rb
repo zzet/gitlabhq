@@ -37,7 +37,7 @@ class Profiles::Summaries::ApplicationController < Profiles::ApplicationControll
           end
         end
       else
-        opts.delete!(option)
+        opts.delete(option)
       end
     end
 
