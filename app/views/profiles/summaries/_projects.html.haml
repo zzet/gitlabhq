@@ -51,6 +51,5 @@
                         = select_tag(:"options_#{key}_actions_#{action}_branches", options_for_select(branches.map {|s| [s.humanize, s]}), { class: "medium form-control select-wide" })
 
             .clearfix
-            %hr
           = f.submit 'Save', class: 'btn btn-save'
           %br
