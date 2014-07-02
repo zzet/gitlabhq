@@ -50,8 +50,8 @@
                   - if template_name_to_render =~ /created_branch/
                     - template_name_to_render = template_name(push_events_by_ref.last)
 
-                  - if template_name_to_render =~ /deleted_branch/ && push_events_by_ref.many?
-                    - template_name_to_render = template_name(push_events_by_ref.second || push_events_by_ref.last)
+                    - if template_name_to_render =~ /deleted_branch/ && push_events_by_ref.many?
+                      - template_name_to_render = template_name(push_events_by_ref.second || push_events_by_ref.last)
 
                   - begin
                     = render template_name_to_render, summary_args
