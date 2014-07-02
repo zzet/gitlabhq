@@ -48,7 +48,7 @@
                       - branches += (project.repository.try(:branch_names) || [project.default_branch || "master"])
 
                       .col-sm-6
-                        = select_tag(:"options_#{key}_actions_#{action}_branches", options_for_select(branches.map {|s| [s.humanize, s]}), { class: "medium form-control select-wide" })
+                        = select_tag(:"options_#{key}_actions_#{action}_branches", options_for_select(branches.map {|s| [s.humanize, s]}, relation.options_actions[:push][:pushed].first), { class: "medium form-control select-wide" })
 
             .clearfix
           = f.submit 'Save', class: 'btn btn-save'

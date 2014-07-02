@@ -27,10 +27,10 @@ class Profiles::Summaries::ApplicationController < Profiles::ApplicationControll
       if actions.any?
         options[option] = actions.inject({}) {|r, a| r.merge!({ a => true })}
 
-        if klass.is_a?(Project)
+        if klass.name == "Project"
           if option == "push" && actions.include?("pushed")
             branshes = [params[:"options_#{option}_actions_pushed_branches"]].flatten
-            branshes.delete!("Any branch")
+            branshes.delete("Any branch")
             if branshes.any?
               options["push"]["pushed"] = branshes
             end
