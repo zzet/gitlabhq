@@ -15,6 +15,7 @@
 class Team < ActiveRecord::Base
   include Gitlab::Access
   include Watchable
+  include Favouriteable
   include TeamsSearch
 
   attr_accessible :name, :description, :creator_id, :path, :public

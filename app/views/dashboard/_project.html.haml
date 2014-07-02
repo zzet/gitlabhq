@@ -1,6 +1,9 @@
 = link_to project_path(project), class: dom_class(project) do
   .dash-project-access-icon
     = visibility_level_icon(project.visibility_level)
+  - if defined?(favourited) && favourited
+    .dash-project-access-icon
+      .icon-heart
   %span.str-truncated
     %span.namespace-name
       - if project.namespace

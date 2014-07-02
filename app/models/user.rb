@@ -51,6 +51,7 @@ require 'file_size_validator'
 
 class User < ActiveRecord::Base
   include Watchable
+  include Favouriteable
   include UsersSearch
 
   default_value_for :admin, false
@@ -148,6 +149,13 @@ class User < ActiveRecord::Base
 
   has_many :summaries, class_name: Event::Summary, dependent: :destroy
   has_many :file_tokens
+
+  # Favourites
+  has_many :personal_favourites,      dependent: :destroy, class_name: Favourite
+  has_many :favourited_projects,      through: :personal_favourites, source: :entity, source_type: Project
+  has_many :favourited_groups,        through: :personal_favourites, source: :entity, source_type: Group
+  has_many :favourited_teams,         through: :personal_favourites, source: :entity, source_type: Team
+  has_many :favourited_users,         through: :personal_favourites, source: :entity, source_type: User
 
   #
   # Validations

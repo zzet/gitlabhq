@@ -11,11 +11,21 @@ class DashboardController < ApplicationController
     # If user needs more - point to Dashboard#projects page
     @projects_limit = 30
 
-    @groups = current_user.personal_groups.sort_by(&:human_name)
-    @has_authorized_projects = @projects.count > 0
-    @teams = current_user.teams
+    @favourited_groups = current_user.favourited_groups.order(name: :asc)
+    @groups = current_user.personal_groups.
+      where.not(id: @favourited_groups.pluck(:id)).sort_by(&:human_name)
+
+    @favourited_teams = current_user.favourited_teams
+    @teams = current_user.teams.where.not(id: @favourited_teams.pluck(:id))
+
     @projects_count = @projects.count
-    @projects = @projects.limit(@projects_limit).includes(:namespace)
+    @has_authorized_projects = @projects_count > 0
+
+    @favourited_projects = current_user.favourited_projects.
+      limit(@projects_limit).includes(:namespace)
+
+    @projects = @projects.where.not(id: @favourited_projects.pluck(:id)).
+      limit(@projects_limit - @favourited_projects.count).includes(:namespace)
 
     @events = Event.for_main_dashboard(current_user)
     @events = @event_filter.apply_filter(@events)

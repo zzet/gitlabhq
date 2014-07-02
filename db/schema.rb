@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140620084907) do
+ActiveRecord::Schema.define(version: 20140630140501) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -169,6 +169,14 @@ ActiveRecord::Schema.define(version: 20140620084907) do
   add_index "events", ["parent_event_id"], name: "index_events_on_parent_event_id", using: :btree
   add_index "events", ["target_type", "target_id"], name: "index_events_on_target_type_and_target_id", using: :btree
   add_index "events", ["uniq_hash"], name: "index_events_on_uniq_hash", using: :btree
+
+  create_table "favourites", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "entity_id"
+    t.string   "entity_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "file_tokens", force: true do |t|
     t.integer  "user_id"
