@@ -24,7 +24,7 @@
         - summary_args[:data]["revafter"] = push_events_by_ref.last.source.revafter
         - pr = event.target
 
-        - if event.source.ref_name == pr.default_branch || pr.repository.commits_between(pr.default_branch, summary_args[:data]["revafter"]).any?
+        - if event.source.ref_name == pr.default_branch || pr.repository.commits_between(pr.default_branch, summary_args[:data]["revafter"]).any? || summary_args[:data]["revafter"] =~ /000000000/
           %h5
             Pushes to
             = event.source.ref_name
@@ -49,6 +49,7 @@
                   - template_name_to_render = template_name(push_events_by_ref.first)
                   - if template_name_to_render =~ /created_branch/
                     - template_name_to_render = template_name(push_events_by_ref.last)
+
                   - if template_name_to_render =~ /deleted_branch/ && push_events_by_ref.many?
                     - template_name_to_render = template_name(push_events_by_ref.second || push_events_by_ref.last)
 
