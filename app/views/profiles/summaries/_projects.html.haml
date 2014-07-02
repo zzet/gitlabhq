@@ -38,7 +38,7 @@
                   - source_actions(project, key).each do |action|
 
                     %div{ class: action.to_sym == :pushed ? "col-sm-3" : "col-sm-12"}
-                      = f.check_box :"options_#{key}_actions", { multiple: true, checked: (options.include?(key) || options.empty?) }, action
+                      = f.check_box :"options_#{key}_actions", { multiple: true, checked: (options_actions.include?(action) || options_actions.empty?) }, action
                       = action.to_s.humanize
                       - if action.to_sym == :pushed
                         to

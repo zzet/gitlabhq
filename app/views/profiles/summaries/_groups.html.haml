@@ -38,7 +38,7 @@
                   - source_actions(group, key).each do |action|
 
                     .col-sm-12
-                      = f.check_box :"options_#{key}_actions", { multiple: true, checked: (options.include?(key) || options.empty?) }, action
+                      = f.check_box :"options_#{key}_actions", { multiple: true, checked: (options_actions.include?(action) || options_actions.empty?) }, action
                       = action.to_s.humanize
 
             .clearfix
