@@ -11,10 +11,12 @@ class DashboardController < ApplicationController
     # If user needs more - point to Dashboard#projects page
     @projects_limit = 30
 
+    @groups_count = current_user.personal_groups.count
     @favourited_groups = current_user.favourited_groups.order(name: :asc)
     @groups = current_user.personal_groups.
       where.not(id: @favourited_groups.pluck(:id)).sort_by(&:human_name)
 
+    @teams_count = current_user.teams.count
     @favourited_teams = current_user.favourited_teams
     @teams = current_user.teams.where.not(id: @favourited_teams.pluck(:id))
 

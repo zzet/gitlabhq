@@ -6,11 +6,11 @@
   %li
     = link_to '#groups', 'data-toggle' => 'tab', id: 'sidebar-groups-tab' do
       Groups
-      %span.badge= @groups.count
+      %span.badge= @groups_count
   %li
     = link_to '#teams', 'data-toggle' => 'tab', id: 'sidebar-teams-tab' do
       Teams
-      %span.badge= @teams.count
+      %span.badge= @teams_count
 
 
 .tab-content
