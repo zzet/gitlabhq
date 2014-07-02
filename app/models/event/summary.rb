@@ -86,7 +86,7 @@ class Event::Summary < ActiveRecord::Base
     if last_send_date
       last_send_date
     else
-      case period
+      case period.to_sym
       when :daily
         1.day.ago
       when :weekly
