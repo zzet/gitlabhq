@@ -48,7 +48,12 @@
                       - branches += (project.repository.try(:branch_names) || [project.default_branch || "master"])
 
                       .col-sm-6
-                        = select_tag(:"options_#{key}_actions_#{action}_branches", options_for_select(branches.map {|s| [s.humanize, s]}, relation.options_actions[:push][:pushed].first), { class: "medium form-control select-wide" })
+                        - if relation.options_actions.any? && relation.options_actions[:push] && relation.options_actions[:push][:pushed]
+                          - dbranch = relation.options_actions[:push][:pushed].try(:first) || branches.first
+                        - else
+                          - dbranch = branches.first
+
+                        = select_tag(:"options_#{key}_actions_#{action}_branches", options_for_select(branches.map {|s| [s.humanize, s]}, dbranch), { class: "medium form-control select-wide" })
 
             .clearfix
           = f.submit 'Save', class: 'btn btn-save'
