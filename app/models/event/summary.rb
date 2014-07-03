@@ -74,17 +74,10 @@ class Event::Summary < ActiveRecord::Base
 
     result = []
     summary_entity_relationships.each do |entity_relation|
-      # TODO. Add filter by action here
-      events = Event.where(target_id: entity_relation.entity_id,
-                           target_type: entity_relation.entity_type,
-                           created_at: from..to).order(created_at: :asc)
-      if entity_relation.options.any?
-        events = events.where(source_type: entity_relation.options.map(&:camelize))
-      end
-      result << events unless events.blank?
+      result << Event.for_summary_relation(entity_relation, from, to).pluck(:id)
     end
 
-    result.flatten.uniq
+    Event.where(id: result.flatten.uniq)
   end
 
   private
@@ -93,15 +86,15 @@ class Event::Summary < ActiveRecord::Base
     if last_send_date
       last_send_date
     else
-      case period
+      case period.to_sym
       when :daily
-        Time.zone.now - 1.day
+        1.day.ago
       when :weekly
-        Time.zone.now - 1.week
+        1.week.ago
       when :monthly
-        Time.zone.now - 1.month
+        1.month.ago
       else
-        Time.zone.now - 1.week
+        raise ArgumentError.new("period is invalid")
       end
     end
   end
