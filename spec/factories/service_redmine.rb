@@ -6,6 +6,10 @@ FactoryGirl.define do
     title
     description
 
+    after :create do |service|
+      service.create_configuration(attributes_for(:redmine_configuration))
+    end
+
     trait :public do
       public_state "published"
     end

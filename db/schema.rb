@@ -496,14 +496,33 @@ ActiveRecord::Schema.define(version: 20140630140501) do
     t.string   "merge_request_path"
     t.text     "branches"
     t.boolean  "merge_request_enabled"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
   end
 
   create_table "service_configuration_pivotal_trackers", force: true do |t|
     t.integer  "service_id"
     t.string   "service_type"
     t.string   "token"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  create_table "service_configuration_redmines", force: true do |t|
+    t.string   "domain"
+    t.string   "web_hook_path"
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "service_configuration_slacks", force: true do |t|
+    t.integer  "service_id"
+    t.string   "service_type"
+    t.string   "token"
+    t.string   "room"
+    t.string   "subdomain"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
