@@ -258,6 +258,10 @@ module API
       expose :id
     end
 
+    class Favourite < Grape::Entity
+      expose :id, :entity_id, :entity_type, :user_id
+    end
+
     class ProjectAccess < Grape::Entity
       expose :project_access, as: :access_level
       expose :notification_level

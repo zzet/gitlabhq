@@ -1,0 +1,8 @@
+= link_to group_path(id: group.path), class: dom_class(group) do
+  = image_tag group_icon(group.path), class: "avatar s24"
+  - if defined?(favourited) && favourited
+    %i.icon-heart
+  %span.group-name.filter-title
+    = truncate(group.name, length: 35)
+  %span.arrow
+    %i.icon-angle-right

@@ -1,0 +1,7 @@
+%span.pull-right
+  - if @current_user.present?
+    %a.btn.btn-small.heart-button.has_bottom_tooltip{class: heart_class(@current_user, current_entity), role: 'button', 'data-original-title' => heart_title(@current_user, current_entity), 'data-entity-id' => current_entity.id, 'data-entity-type' => current_entity.class.model_name.to_s.underscore }
+      - if current_entity.favourited_by? @current_user
+        %i.icon-heart
+      - else
+        %i.icon-heart-empty

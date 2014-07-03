@@ -1,0 +1,7 @@
+= link_to team_path(id: team.path), class: dom_class(team) do
+  - if defined?(favourited) && favourited
+    %i.icon-heart
+  %span.group-name.filter-title
+    = truncate(team.name, length: 35)
+  %span.arrow
+    %i.icon-angle-right

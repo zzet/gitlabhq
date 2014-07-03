@@ -108,7 +108,7 @@ class EventSummaryMailer < ActionMailer::Base
     end
 
     def mailer_project_link(project)
-      if project.persisted?
+      if project && project.persisted?
         "#{link_to(project.name_with_namespace, project_url(project.path_with_namespace))}".html_safe
       else
         "<b>#{project.try(:name_with_namespace)} (#{ project.try(:path_with_namespace) })</b>".html_safe

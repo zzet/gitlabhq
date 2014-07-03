@@ -1,0 +1,25 @@
+%h3.page-title
+  Favourites
+%p.light
+  List of your favorites
+%hr
+- @grouped_favourites.each do |favourite_type, favourites|
+  .panel.panel-default
+    .panel-heading
+      %strong= favourite_type.pluralize(favourites.count)
+    .panel-body
+      %ul.well-list
+        - favourites.each do |favourite|
+          %li{id: "favourite-info-#{favourite.id}"}
+            - entity = favourite.entity
+            .pull-right
+              = render "shared/heart_button", current_entity: entity
+              %span.light
+                Favourited
+                = time_ago_in_words(favourite.created_at) + " ago"
+                &nbsp;
+            - if entity.respond_to?(:visibility_level)
+              .dash-project-access-icon
+                = visibility_level_icon(entity.visibility_level)
+            %strong= link_to_favourite(entity)
+            %div.light= entity.try(:description)
