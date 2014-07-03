@@ -18,7 +18,7 @@ set :log_level, :debug
 set :undev_ruby_version, 'ruby-2.0.0-p247'
 set :default_env, { path: "/opt/#{fetch(:undev_ruby_version)}/bin/:$PATH" }
 
-set :linked_dirs, %w(log pids tmp public/assets)
+set :linked_dirs, %w(log pids tmp public/assets public/uploads public/system)
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call

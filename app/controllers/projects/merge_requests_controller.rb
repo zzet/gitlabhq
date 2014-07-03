@@ -188,9 +188,10 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   end
 
   def ci_status
-    gitlab_ci_service = project.services.where(type: Service::GitlabCi).first
-    status = gitlab_ci_service.commit_status(merge_request.last_commit.sha)
-    #status = @merge_request.source_project.ci_service.commit_status(merge_request.last_commit.sha)
+    #gitlab_ci_service = project.services.where(type: Service::GitlabCi).first
+    #status = gitlab_ci_service.commit_status(merge_request.last_commit.sha)
+    ##status = @merge_request.source_project.ci_service.commit_status(merge_request.last_commit.sha)
+    status = @merge_request.ci_status
     response = {status: status}
 
     render json: response
