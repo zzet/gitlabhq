@@ -17,8 +17,11 @@
       .nothing-here-block Project activity will be displayed here
     = spinner
   .side.col-md-4
-    .append-bottom-20.description-block
+    .append-bottom-20
+      = render "shared/heart_button", current_entity: @group
       = render "shared/watch_button", current_entity: @group
+      .clearfix
+    .append-bottom-20.description-block
       = image_tag group_icon(@group.path), class: "avatar s90"
 
       %h3.page_title

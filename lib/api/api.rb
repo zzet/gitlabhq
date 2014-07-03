@@ -47,5 +47,6 @@ module API
     mount Namespaces
     mount Branches
     mount Subscriptions
+    mount Favourites
   end
 end

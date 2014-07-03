@@ -6,20 +6,20 @@
   %li
     = link_to '#groups', 'data-toggle' => 'tab', id: 'sidebar-groups-tab' do
       Groups
-      %span.badge= @groups.count
+      %span.badge= @groups_count
   %li
     = link_to '#teams', 'data-toggle' => 'tab', id: 'sidebar-teams-tab' do
       Teams
-      %span.badge= @teams.count
+      %span.badge= @teams_count
 
 
 .tab-content
   .tab-pane.active#projects
-    = render "projects", projects: @projects, authorized_projects: @authorized_projects
+    = render "projects", favourited_projects: @favourited_projects, projects: @projects, authorized_projects: @authorized_projects
   .tab-pane#groups
-    = render "groups", groups: @groups
+    = render "groups", favourited_groups: @favourited_groups, groups: @groups
   .tab-pane#teams
-    = render "teams", teams: @teams
+    = render "teams", favourited_teams: @favourited_teams, teams: @teams
 
 
 .prepend-top-20

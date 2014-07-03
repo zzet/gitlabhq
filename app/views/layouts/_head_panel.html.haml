@@ -43,6 +43,9 @@
             = link_to profile_path, title: "Profile settings", class: 'has_bottom_tooltip', 'data-original-title' => 'Profile settings"'  do
               %i.icon-user
           %li
+            = link_to profile_favourites_path, title: "Favourites", class: 'has_bottom_tooltip', 'data-original-title' => 'Favourites' do
+              %i.icon-heart
+          %li
             = link_to profile_subscriptions_path, title: "Subscriptions", class: 'has_bottom_tooltip', 'data-original-title' => 'Subscriptions' do
               %i.icon-eye-open
           %li
