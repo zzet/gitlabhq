@@ -12,3 +12,10 @@ $ ->
       toggleClass('icon-chevron-up')
     $(@).closest(".js-toggle-container").find(".js-toggle-content").toggle()
     e.preventDefault()
+
+  $("body").on "click", ".js-toggle-sub-button", (e) ->
+    $(@).find('i').
+      toggleClass('icon-chevron-down').
+      toggleClass('icon-chevron-up')
+    $(@).closest(".js-toggle-sub-container").find(".js-toggle-sub-content").toggle()
+    e.preventDefault()

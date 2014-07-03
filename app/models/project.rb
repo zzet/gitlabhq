@@ -30,6 +30,7 @@
 
 class Project < ActiveRecord::Base
   include Watchable
+  include Favouriteable
   include ProjectsSearch
   include Gitlab::ShellAdapter
   include Gitlab::VisibilityLevel

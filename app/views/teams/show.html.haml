@@ -13,24 +13,11 @@
       .nothing-here-block Projects activity will be displayed here
     .loading.hide
   .side.col-sm-4
-    %div.description-block
-      -#- if can? current_user, :manage_team, @team
-        -#.dropdown.pull-right
-          -#%a.dropdown-toggle.btn.btn-small{href: '#', "data-toggle" => "dropdown"}
-            -#%i.icon-plus-sign-alt
-            -#%b.caret
-          -#%ul.dropdown-menu
-            -#%li
-              -#= link_to new_team_member_path(@team), title: "Add new team member" do
-                -#%i.icon-plus
-                -#New team member
-            -#%li
-              -#= link_to edit_team_path(@team), title: "Assign project" do
-                -#%i.icon-plus
-                -#Assign on project
-
+    .append-bottom-20
+      = render "shared/heart_button", current_entity: @team
       = render "shared/watch_button", current_entity: @team
-
+      .clearfix
+    .description-block
       %h3.page_title
         = @team.name
       - unless @team.description.blank?

@@ -150,6 +150,7 @@ Gitlab::Application.routes.draw do
 
     scope module: :profiles do
       resources :subscriptions
+      resources :favourites, only: [:index]
       resources :summaries do
         member do
           get :send_now

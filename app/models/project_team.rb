@@ -146,9 +146,8 @@ class ProjectTeam
     end
 
     if teams.any?
-      access << teams.map do |t|
-        t.team_user_relationships.find_by(user_id: user_id).try(:access_field)
-      end.flatten
+      teams_access = TeamUserRelationship.where(team_id: teams.pluck(:id), user_id: user_id).pluck(:team_access)
+      access << teams_access.compact.flatten
     end
 
     access.flatten.compact.max
@@ -165,7 +164,7 @@ class ProjectTeam
   end
 
   def teams
-    (project_teams + group_teams).uniq
+    Team.where(id: (project_teams + group_teams).flatten.compact.uniq)
   end
 
   def project_teams

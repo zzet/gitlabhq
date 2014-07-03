@@ -18,6 +18,7 @@ require 'file_size_validator'
 
 class Group < Namespace
   include Watchable
+  include Favouriteable
   include GroupsSearch
 
   has_many :team_group_relationships, dependent: :destroy

@@ -1,24 +1,61 @@
 - entities.each do |relation|
   %li{ class: "#{dom_class(relation)} js-toggle-container", id: dom_id(relation) }
+
     - project = relation.entity
     - available_options = Project.watched_titles
     - source_descriptions = Project.watched_descriptions
-    - options = relation.options.any? ? (Project.watched_sources & relation.options.map {|o| o.to_sym }) : Project.watched_sources
+    - options = relation.active_sources
+
     .summary-entity-actions.pull-right
       = link_to "#", class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
+        %i.icon-edit
         Edit
       = link_to profile_summary_project_path(summary.id, relation.id), class: "btn-tiny btn btn-danger", data: { confirm: "You are shure?" }, method: :delete do
         Remove
+
     .summary-entity-name
       = link_to project.name_with_namespace, project_path(project.path_with_namespace)
+
     .summary-entity-info
       = options.map {|o| available_options[o] }.join(", ")
+
       .edit-member.hide.js-toggle-content
         = form_for relation, url: profile_summary_project_path(summary, relation), method: :put do |f|
           - available_options.each do |key, val|
-            %span.has_bottom_tooltip{"data-original-title" => source_descriptions[key] }
-              = f.check_box :options, { multiple: true, checked: (options.include?(key) || options.empty?) }, key
-              = val
-            %br
+
+            .js-toggle-sub-container
+              .col-sm-3
+                %span.has_bottom_tooltip{"data-original-title" => source_descriptions[key] }
+                  = f.check_box :options, { multiple: true, checked: (options.include?(key) || options.empty?) }, key
+                  = val
+
+              .pull-left
+                = link_to '#', id: dom_id(relation, "toggle_edit_actions_form"), class: "btn-tiny btn js-toggle-sub-button", title: 'Edit actions' do
+                  %i.icon-edit
+
+              .col-sm-6
+                .edit-actions.hide.js-toggle-sub-content
+                  - options_actions = relation.active_actions_for_source(key)
+                  - source_actions(project, key).each do |action|
+
+                    %div{ class: action.to_sym == :pushed ? "col-sm-3" : "col-sm-12"}
+                      = f.check_box :"options_#{key}_actions", { multiple: true, checked: (options_actions.include?(action) || options_actions.empty?) }, action
+                      = action.to_s.humanize
+                      - if action.to_sym == :pushed
+                        to
+
+                    - if action.to_sym == :pushed
+                      - branches = ["Any branch"]
+                      - branches += (project.repository.try(:branch_names) || [project.default_branch || "master"])
+
+                      .col-sm-6
+                        - if relation.options_actions.any? && relation.options_actions[:push] && relation.options_actions[:push][:pushed]
+                          - dbranch = relation.options_actions[:push][:pushed].try(:first) || branches.first
+                        - else
+                          - dbranch = branches.first
+
+                        = select_tag(:"options_#{key}_actions_#{action}_branches", options_for_select(branches.map {|s| [s.humanize, s]}, dbranch), { class: "medium form-control select-wide" })
+
+            .clearfix
           = f.submit 'Save', class: 'btn btn-save'
           %br

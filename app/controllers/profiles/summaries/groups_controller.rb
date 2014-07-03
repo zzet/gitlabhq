@@ -12,14 +12,11 @@ class Profiles::Summaries::GroupsController < Profiles::Summaries::ApplicationCo
 
   def update
     relation = summary.summary_entity_relationships.find(params[:id])
-    options = begin
-                params[:event_summary_entity_relationship][:options].keep_if do |option|
-                  Group.watched_sources.include?(option.to_sym)
-                end
-              rescue
-                []
-              end
-    relation.update_attributes({options: options})
+
+    opts, options = extract_options(Group, params)
+
+    relation.update_attributes({ options: opts, options_actions: options })
+
     redirect_to edit_profile_summary_path(summary)
   end
 

@@ -7,13 +7,12 @@
           %i.icon-plus
           New team
   %ul.well-list.dash-list
+    - favourited_teams.each do |team|
+      %li.group-row.js-description-tooltip{"data-title" => "#{team.description}"}
+        = render "team", team: team, favourited: true
     - teams.each do |team|
       %li.group-row.js-description-tooltip{"data-title" => "#{team.description}"}
-        = link_to team_path(id: team.path), class: dom_class(team) do
-          %span.group-name.filter-title
-            = truncate(team.name, length: 35)
-          %span.arrow
-            %i.icon-angle-right
-    - if teams.blank?
+        = render "team", team: team
+    - if teams.blank? && favourited_teams.blank?
       %li
         .nothing-here-block You have no teams yet.

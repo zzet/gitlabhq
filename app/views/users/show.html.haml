@@ -9,6 +9,7 @@
             %i.icon-edit
             Edit Profile settings
       - else
+        = render "shared/heart_button", current_entity: @user
         = render "shared/watch_button", current_entity: @user
 
       %br
