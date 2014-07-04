@@ -26,7 +26,8 @@ class Note < ActiveRecord::Base
 
   default_value_for :system, false
 
-  attr_accessible :note, :noteable, :noteable_id, :noteable_type, :project_id,
+  attr_accessible :note, :noteable, :noteable_id, :noteable_type,
+                  :project_id, :author_id, :system, :st_diff,
                   :attachment, :line_code, :commit_id
   attr_mentionable :note
 

@@ -14,6 +14,9 @@ class EventSummaryMailer < ActionMailer::Base
   def daily_digest(user_id, events_ids, events_summary_id, current_time)
     @user           = User.find(user_id)
     @events         = Event.where(id: events_ids)
+
+    @groupped_events = events_groupped_by_targets(@events)
+
     @events_summary = Event::Summary.find(events_summary_id)
     @current_time   = current_time
 
@@ -23,6 +26,9 @@ class EventSummaryMailer < ActionMailer::Base
   def weekly_digest(user_id, events_ids, events_summary_id, current_time)
     @user           = User.find(user_id)
     @events         = Event.where(id: events_ids)
+
+    @groupped_events = events_groupped_by_targets(@events)
+
     @events_summary = Event::Summary.find(events_summary_id)
     @current_time   = current_time
 
@@ -32,6 +38,9 @@ class EventSummaryMailer < ActionMailer::Base
   def monthly_digest(user_id, events_ids, events_summary_id, current_time)
     @user           = User.find(user_id)
     @events         = Event.where(id: events_ids)
+
+    @groupped_events = events_groupped_by_targets(@events)
+
     @events_summary = Event::Summary.find(events_summary_id)
     @current_time   = current_time
 
@@ -39,6 +48,105 @@ class EventSummaryMailer < ActionMailer::Base
   end
 
   private
+
+  #{
+  #  "Project"=> {
+  #    :events=> []
+  #    :events_count=>58,
+  #    :grouped_events=> {
+  #      3104=> {
+  #        :events=> []
+  #        :events_count=>58,
+  #        :grouped_events=> {
+  #
+  #          "MergeRequest"=> {
+  #            :events=> []
+  #            :events_count=>4
+  #          },
+  #
+  #          "Note"=> {
+  #            :events=> []
+  #            :events_count=>1
+  #          },
+  #
+  #            "Push"=> {
+  #            :events=> []
+  #            :events_count=>53
+  #          }
+  #        }
+  #      }
+  #    }
+  #  }
+  #}
+  def events_groupped_by_targets(events)
+     events_targets = events.pluck(:target_type).uniq
+     events_by_targets = events_targets.inject({}) do |res, target|
+      target_events = events.where(target_type: target)
+
+      res[target] = {
+        events: target_events,
+        events_count: target_events.count,
+        grouped_events: events_groupped_by_targets_ids(target_events)
+      }
+
+      res
+    end
+
+    events_by_targets
+  end
+
+  def events_groupped_by_targets_ids(events)
+    events_targets = events.pluck(:target_id).uniq
+    event_ids = events.pluck(:id)
+    events_by_targets_ids = events_targets.inject({}) do |res, target_id|
+      target_events = Event.where(id: event_ids, target_id: target_id)
+
+      res[target_id] = {
+        events: target_events,
+        events_count: target_events.count,
+        grouped_events: events_groupped_by_sources(target_events)
+      }
+
+      res
+    end
+
+    events_by_targets_ids
+  end
+
+  def events_groupped_by_sources(events)
+    events_sources = events.pluck(:source_type).uniq
+    event_ids = events.pluck(:id)
+    events_by_sources = events_sources.inject({}) do |res, source_type|
+      source_events = Event.where(id: event_ids, source_type: source_type)
+
+      res[source_type] = {
+        events: source_events,
+        events_count: source_events.count,
+        grouped_events: events_groupped_by_source_ids(source_events)
+      }
+
+      res
+    end
+
+    events_by_sources
+  end
+
+  def events_groupped_by_source_ids(events)
+    events_sources = events.pluck(:source_id).uniq
+    event_ids = events.pluck(:id)
+    events_by_sources_ids = events_sources.inject({}) do |res, source_id|
+      source_events = Event.where(id: event_ids, source_id: source_id)
+
+      res[source_id] = {
+        events: source_events,
+        events_count: source_events.count
+      }
+
+      res
+    end
+
+    events_by_sources_ids
+  end
 
   def template_name(event)
     "event_summary_mailer/#{event.target_type.underscore}/#{event.source_type.underscore}/#{event.action}"
@@ -79,7 +187,13 @@ class EventSummaryMailer < ActionMailer::Base
                                   action: :deleted)
         end
         begin
-          entity = klass.new(event.data)
+          attrs = ActionController::Parameters.new(event.data)
+          #attrs.permit!
+
+          entity = klass.new
+          attrs.each_pair do |k, v|
+            entity.send(k, v)
+          end
         rescue
         end
       end
