@@ -1,40 +1,40 @@
 %dl
-  - @events.group_by(&:target_type).each do |target_type, events_by_target_type|
+  - @groupped_events.each_pair do |target_type, events_by_tt|
     %dt
-      = "#{ target_type.pluralize } (#{ pluralize(events_by_target_type.count, "event") }):"
+      = "#{ target_type.pluralize } (#{ pluralize(events_by_tt[:events_count], "event") }):"
       %ul
-      - events_by_target_type.group_by(&:target_id).each do |target_id, events_by_target|
-        %li
-          %a(href="##{target_id}")
-            = render 'target', target_type: target_type, target_id: target_id, last_event: events_by_target.last
-          = "(#{ pluralize(events_by_target.count, "event") })"
-          %ul
-            - events_by_target.group_by(&:source_type).each do |source_type, events_by_source_type|
-              %li
-                = link_to "##{target_id}_#{source_type}" do
-                  = mailer_source_type_human(source_type)
-                = "(#{ pluralize(events_by_source_type.count, "event") })"
+        - events_by_tt[:grouped_events].each_pair do |target_id, events_by_ti|
+          %li
+            %a(href="##{target_id}")
+              = render 'target', target_type: target_type, target_id: target_id, last_event: events_by_ti[:events].last
+            = "(#{ pluralize(events_by_ti[:events_count], "event") })"
+            %ul
+              - events_by_ti[:grouped_events].each_pair do |source_type, events_by_st|
+                %li
+                  = link_to "##{target_id}_#{source_type}" do
+                    = mailer_source_type_human(source_type)
+                  = "(#{ pluralize(events_by_st[:events_count], "event") })"
       %br
 
-- @events.group_by(&:target_type).each do |target_type, events_by_target_type|
+- @groupped_events.each_pair do |target_type, events_by_tt|
   %h2= "#{target_type.pluralize} events"
 
-  - events_by_target_type.group_by(&:target_id).each do |target_id, events_by_target|
+  - events_by_tt[:grouped_events].each_pair do |target_id, events_by_ti|
 
     %a(name="#{target_id}")
     %h3= render 'target', target_type: target_type, target_id: target_id
 
-    - events_by_target.group_by(&:source_type).each do |source_type, events_by_source_type|
+    - events_by_ti[:grouped_events].each_pair do |source_type, events_by_st|
 
       %a(name="#{target_id}_#{source_type}")
       %h4= "#{mailer_source_type_human(source_type)} events"
 
       %dl
         - if source_type == "Push"
-          = render "push_events", events_by_source_type: events_by_source_type
+          = render "push_events", events_by_source_type: events_by_st
         - else
-          - events_by_source_type.group_by(&:source_id).each do |source_id, events_by_source|
-            - events_by_source.each do |event|
+          - events_by_st[:grouped_events].each_pair do |source_id, events_by_source|
+            - events_by_source[:events].find_each do |event|
               - if event.source_type == "Note" && event.data['system']
                 -# Skip system notes
               - else

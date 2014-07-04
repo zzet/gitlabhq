@@ -13,7 +13,7 @@ class ProtectedBranch < ActiveRecord::Base
   include Watchable
   include Gitlab::ShellAdapter
 
-  attr_accessible :name
+  attr_accessible :name, :project_id
 
   belongs_to :project
   validates :name, presence: true

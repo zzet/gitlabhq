@@ -1,6 +1,6 @@
 - begin
   - push_events = {}
-  - events_by_source_type.each { |e| push_events[e.source.ref] ||= []; push_events[e.source.ref] << e }
+  - events_by_source_type[:events].find_each { |e| push_events[e.source.ref] ||= []; push_events[e.source.ref] << e }
 
   - push_events.sort.each do |ref, push_events_by_ref|
     - event = push_events_by_ref.first
@@ -57,7 +57,10 @@
                     = render template_name_to_render, summary_args
                   - rescue
                     Error :(
-                    Please, contact with administrator.
+                    %br
+                    Likely to render the necessary data are not available in the repository
+                    %br
+                    Please, contact with administrator for more details.
 
       - else
         - push_events_by_ref.each do |push_event_by_ref|

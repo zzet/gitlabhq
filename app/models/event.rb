@@ -60,7 +60,7 @@ class Event < ActiveRecord::Base
     table = self.arel_table
 
     acc = where(target_id: rel.entity_id, target_type: rel.entity_type)
-    acc = where(created_at: from..to) if from && to
+    acc = acc.where(created_at: from..to) if from && to
 
     relation_actions = rel.options_actions
 
