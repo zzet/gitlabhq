@@ -8,6 +8,7 @@
 
     .summary-entity-actions.pull-right
       = link_to "#", class: "btn-tiny btn js-toggle-button", title: 'Edit access level' do
+        %i.icon-edit
         Edit
       = link_to profile_summary_group_path(summary.id, relation.id), class: "btn-tiny btn btn-danger", data: { confirm: "You are shure?" }, method: :delete do
         Remove
