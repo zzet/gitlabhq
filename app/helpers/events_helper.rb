@@ -41,6 +41,7 @@ module EventsHelper
       EventFilter.comments => "icon-comments",
       EventFilter.team     => "icon-user",
       EventFilter.group    => "icon-user",
+      EventFilter.favourite  => "icon-heart",
     }
   end
 

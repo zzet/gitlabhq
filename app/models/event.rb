@@ -103,12 +103,18 @@ class Event < ActiveRecord::Base
     acc
   end
 
-  scope :for_main_dashboard, -> (user) do
+  scope :for_main_dashboard, -> (user, favourited = false) do
     table = self.arel_table
 
-    projects_ids = user.authorized_projects.pluck(:id)
-    groups_ids = user.authorized_groups.pluck(:id)
-    teams_ids = user.only_authorized_teams_ids
+    if favourited
+      projects_ids = user.favourited_projects.pluck(:id)
+      groups_ids = user.favourited_groups.pluck(:id)
+      teams_ids = user.favourited_teams.pluck(:id)
+    else
+      projects_ids = user.authorized_projects.pluck(:id)
+      groups_ids = user.authorized_groups.pluck(:id)
+      teams_ids = user.only_authorized_teams_ids
+    end
 
     project_related = [Push, Note, MergeRequest]
     where(

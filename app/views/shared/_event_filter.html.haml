@@ -7,3 +7,5 @@
     = event_filter_link EventFilter.team, 'Team'
   - if @dashboard.nil? or @dashboard == Group
     = event_filter_link EventFilter.group, 'Group'
+  - if @dashboard.nil?
+    = event_filter_link EventFilter.favourite, 'Favourited'
