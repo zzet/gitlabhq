@@ -55,22 +55,14 @@ class SearchService < BaseService
                           end
                         end
 
-      namespace_terms = response.response["facets"]["namespaceFacet"]["terms"].
-          map{ |term| term['term'] }
-      namespaces = Namespace.where(id: namespace_terms)
-      grouped_namespaces = namespaces.to_a.inject({}) do |memo, namespace|
-        memo[namespace.id] = namespace
-        memo
-      end
-
       {
         records: response.records,
         results: response.results,
         response: response.response,
         total_count: response.total_count,
         namespaces: response.response["facets"]["namespaceFacet"]["terms"].map do |term|
-          { namespace: grouped_namespaces[term["term"]], count: term["count"] }
-        end,
+          { namespace: Namespace.find(term["term"]), count: term["count"] } if term[:count] > 0
+        end.compact,
         categories: categories_list
       }
     rescue Exception => e
