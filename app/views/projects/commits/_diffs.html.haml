@@ -86,3 +86,11 @@
             = render "projects/commits/image", diff: diff, old_file: old_file, file: file, index: i
           - else
             .nothing-here-block No preview for this file type
+
+:javascript
+  var diffParallelView = #{params[:view] == 'parallel'};
+  if(diffParallelView) {
+    var leftOffset = $('.files').offset().left;
+    var windowWidth = $(window).width();
+    $('.files').width(windowWidth).css('margin-left', (-1) * leftOffset)
+  }
