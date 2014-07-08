@@ -1,0 +1,4 @@
+= link_to project_blob_path(project, tree_join(commit.id, diff.new_path)),
+  { class: 'btn btn-small view-file js-view-file' } do
+  View file @
+  %span.commit-short-id= commit.short_id(6)

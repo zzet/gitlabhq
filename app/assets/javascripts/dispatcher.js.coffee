@@ -24,8 +24,11 @@ class Dispatcher
         new Issue()
       when 'projects:milestones:show'
         new Milestone()
-      when 'projects:issues:new', 'projects:merge_requests:new'
+      when 'projects:issues:new'
         GitLab.GfmAutoComplete.setup()
+      when 'projects:merge_requests:new'
+        GitLab.GfmAutoComplete.setup()
+        new Diff()
       when 'dashboard:show'
         new Dashboard()
         new Activities()
@@ -34,10 +37,16 @@ class Dispatcher
         new Events()
       when 'projects:commit:show'
         new Commit()
+        new Diff()
       when 'projects:compare:show', 'projects:compare:index'
         new Compare()
-      when 'projects:commits:show', 'projects:merge_requests:index', 'projects:merge_requests:show'
+      when 'projects:commits:show', 'projects:merge_requests:index'
         new JenkinsBuild()
+      when 'projects:merge_requests:show'
+        new JenkinsBuild()
+        new Diff()
+      when "projects:merge_requests:diffs"
+        new Diff()
       when 'groups:show'
         new Activities()
         new DashboardTooltips()
