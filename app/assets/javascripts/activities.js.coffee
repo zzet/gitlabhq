@@ -26,6 +26,10 @@ class Activities
     else
       event_filters.splice index, 1
 
-    $.cookie "event_filter", event_filters.join(","), { path: '/' }
+    today = new Date()
+    expire_date = new Date()
+    expire_date.setTime(today.getTime() + 3600000 * 24 * 14)
+
+    $.cookie "event_filter", event_filters.join(","), { path: '/', expires: expire_date }
 
 @Activities = Activities
