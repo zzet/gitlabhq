@@ -23,6 +23,7 @@ set :linked_dirs, %w(log pids tmp public/assets public/uploads public/system)
 set :pty, true
 
 SSHKit.config.command_map[:sv_restart] = 'sudo sv -w 30 restart'
+SSHKit.config.command_map[:sv_force_restart] = 'sudo sv force-restart'
 
 set :unicorn_web_service, "/etc/service/gitlab-web-unicorn"
 set :unicorn_api_service, "/etc/service/gitlab-web-unicorn_api"
@@ -116,9 +117,14 @@ namespace :deploy do
         if test "[ -L #{fetch(:unicorn_api_service)} ]"
           execute :sv_restart, fetch(:unicorn_api_service)
         end
+      end
+    end
 
+    desc 'Restart faye'
+    task :faye_restart do
+      on roles :app do
         if test "[ -L #{fetch(:faye_service)} ]"
-          execute :sv_restart, fetch(:faye_service)
+          execute :sv_force_restart, fetch(:faye_service), raise_on_non_zero_exit: false
         end
       end
     end
@@ -155,6 +161,7 @@ namespace :deploy do
   after 'deploy:updating', 'deploy:symlink_config:unicorn'
 
   after 'finishing', 'deploy:web:restart'
+  after 'finishing', 'deploy:web:faye_restart'
   after 'finishing', 'deploy:queue:restart'
 #  after 'finishing', 'airbrake:deploy'
   #after 'finishing', 'deploy:maintenance:disable'
