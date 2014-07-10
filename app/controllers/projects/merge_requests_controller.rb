@@ -17,7 +17,8 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   before_filter :authorize_modify_merge_request!, only: [:close, :edit, :update, :sort]
 
   def index
-    params[:sort] ||= 'newest'
+    params[:sort] ||= cookies[:merge_request_sort] || 'newest'
+    cookies[:merge_request_sort] = params[:sort]
     params[:scope] = 'all' if params[:scope].blank?
     params[:state] = 'opened' if params[:state].blank?
 

@@ -34,11 +34,11 @@ class Service::Jenkins < Service
     return true unless data[:ref] =~ /heads/
 
     # Create build for push
-    branches = configuration.branches_list
+    branches_regexp = configuration.branches_regexp
     branch_name = data[:ref].gsub("refs/heads/", "")
     user = User.find(data[:user_id])
 
-    if branches.include?(branch_name)
+    if branch_name.match(branches_regexp)
 
       build = builds.create(source_project: project, source_branch: branch_name, source_sha: data[:after], user: user)
       build.run

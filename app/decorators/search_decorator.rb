@@ -1,17 +1,27 @@
 class SearchDecorator
-  def initialize(search_result)
+  TYPE_MAP = {
+      'project' => :projects?,
+      'group' => :groups?,
+      'team' => :teams?,
+      'merge_request' => :merge_requests?,
+      'issue' => :issues?,
+      'code' => :code?,
+      'commits' => :commits?,
+      'user' => :users?,
+  }
+
+  def initialize(search_result, type = '')
     @sr = search_result
+    @t = type
   end
 
   def type
-    return 'project' if projects?
-    return 'group' if groups?
-    return 'team' if teams?
-    return 'merge_request' if merge_requests?
-    return 'issue' if issues?
-    return 'code' if code?
-    return 'commits' if commits?
-    return 'user' if users?
+    ([@t] + TYPE_MAP.keys).each do |key|
+      if key && self.respond_to?(TYPE_MAP[key]) && self.send(TYPE_MAP[key])
+        return key
+      end
+    end
+
     ''
   end
 

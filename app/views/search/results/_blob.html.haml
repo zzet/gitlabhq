@@ -14,7 +14,7 @@
         - content_lines = []
         %div.highlighted-data{class: user_color_scheme_class}
           .line-numbers
-            - blob["highlight"]["blob.content"].each do |content|
+            - blob.fetch("highlight", {}).fetch("blob.content", {}).each do |content|
               - content_lines = content.split("\n")
           .highlight
             %pre

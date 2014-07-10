@@ -24,13 +24,27 @@ class Service::Configuration::Jenkins < ActiveRecord::Base
       { type: 'text',     name: 'host',                   placeholder: 'http://ci01.undev.cc' },
       { type: 'text',     name: 'push_path',              placeholder: '/build/project' },
       { type: 'text',     name: 'merge_request_path',     placeholder: '/build/merge_request' },
-      { type: 'text',     name: 'branches',               placeholder: 'master, develop, staging' },
+      { type: 'text',     name: 'branches',               placeholder: 'master, develop, staging, release/.*, \A.*/foo\z' },
       { type: 'checkbox', name: 'merge_request_enabled',  placeholder: '' },
     ]
   end
 
   def branches_list
     return [] if branches.blank?
-    branches.split(",").map { |branch| branch.strip }
+    branches.split(",").map do |branch|
+      branch.strip
+    end
+  end
+
+  def branches_regexp
+    brs = branches_list
+    bb = brs.map do |b|
+      b = b.include?("\\A") ? b : "\\A#{b}"
+      b.include?("\\z") ? b : "#{b}\\z"
+    end.map do |b|
+      b.gsub!("\\"){'\\'}
+    end
+
+    Regexp.union(bb.map{|b| Regexp.new(b)})
   end
 end

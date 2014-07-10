@@ -3,7 +3,7 @@
   = link_to [merge_request.target_project, merge_request] do
     %span ##{merge_request.iid}
     %strong.term
-      = truncate result.highlight.title.try(:first), length: 50
+      = truncate highlighted(result, merge_request, :title), length: 50
   - if merge_request.for_fork?
     %span.light (#{merge_request.source_project.name_with_namespace}:#{merge_request.source_branch} &rarr; #{merge_request.target_project.name_with_namespace}:#{merge_request.target_branch})
   - else

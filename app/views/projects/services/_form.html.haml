@@ -39,7 +39,8 @@
           = config.label name, class: "control-label"
           .col-sm-10
             - if type == 'text'
-              = config.text_field name, class: "form-control", placeholder: placeholder, disabled: disable_state
+              .has_bottom_tooltip{'data-original-title' => "#{placeholder}"}
+                = config.text_field name, class: "form-control", placeholder: placeholder, disabled: disable_state
             - elsif type == 'textarea'
               = f.text_area name, rows: 5, class: "form-control", placeholder: placeholder, disabled: disable_state
             - elsif type == 'checkbox'
