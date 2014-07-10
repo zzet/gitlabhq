@@ -20,9 +20,6 @@ set :default_env, { path: "/opt/#{fetch(:undev_ruby_version)}/bin/:$PATH" }
 
 set :linked_dirs, %w(log pids tmp public/assets public/uploads public/system)
 
-# Default branch is :master
-# ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
-
 set :pty, true
 
 SSHKit.config.command_map[:sv_restart] = 'sudo sv -w 30 restart'
@@ -35,12 +32,6 @@ set :sidekiq_main_service, "/etc/service/gitlab-sidekiq-main"
 set :sidekiq_mail_service, "/etc/service/gitlab-sidekiq-mail"
 set :sidekiq_gitshell_service, "/etc/service/gitlab-sidekiq-gitshell"
 set :sidekiq_elasticsearch_service, "/etc/service/gitlab-sidekiq-elasticsearch"
-
-# Default value for :linked_files is []
-# set :linked_files, %w{config/database.yml}
-
-# Default value for linked_dirs is []
-# set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
 
 namespace :rake do
   desc 'Run rake task on remote server'
@@ -56,6 +47,26 @@ namespace :rake do
 end
 
 namespace :deploy do
+  namespace :maintenance do
+    desc "Enable maintenance mode"
+    task :enable do
+      on roles :app do
+        execute "ln -nfs #{release_path}/public/gitlab_logo.png #{current_path}/public/assets/gitlab_logo.png"
+        execute "ln -nfs #{release_path}/public/static.css #{current_path}/public/assets/static.css"
+        execute "ln -nfs #{release_path}/public/deploy.html #{current_path}/public/maintenance.html"
+      end
+    end
+
+    desc "Disable maintenance mode"
+    task :disable do
+      on roles :app do
+        execute "rm #{current_path}/public/maintenance.html"
+        execute "rm #{current_path}/public/assets/gitlab_logo.png"
+        execute "rm #{current_path}/public/assets/static.css"
+      end
+    end
+  end
+
   namespace :symlink_config do
     desc 'Symlinks the database.yml'
     task :db do
@@ -136,6 +147,8 @@ namespace :deploy do
     end
   end
 
+  before 'deploy:starting', 'deploy:maintenance:enable'
+
   after 'deploy:updating', 'deploy:symlink_config:db'
   after 'deploy:updating', 'deploy:symlink_config:gitlab'
   after 'deploy:updating', 'deploy:symlink_config:resque'
@@ -144,4 +157,5 @@ namespace :deploy do
   after 'finishing', 'deploy:web:restart'
   after 'finishing', 'deploy:queue:restart'
 #  after 'finishing', 'airbrake:deploy'
+  #after 'finishing', 'deploy:maintenance:disable'
 end
