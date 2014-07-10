@@ -60,9 +60,11 @@ class SearchService < BaseService
         results: response.results,
         response: response.response,
         total_count: response.total_count,
-        namespaces: response.response["facets"]["namespaceFacet"]["terms"].map do |term|
-          { namespace: Namespace.find(term["term"]), count: term["count"] } if term[:count] > 0
-        end.compact,
+        namespaces: response.response["facets"]["namespaceFacet"]["terms"].
+            select { |term| term['count'] > 0 }.
+            map do |term|
+              { namespace: Namespace.find(term["term"]), count: term["count"] }
+            end,
         categories: categories_list
       }
     rescue Exception => e
