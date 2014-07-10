@@ -1,6 +1,6 @@
 %li
   = link_to group do
-    %strong.term= result.highlight.name.try(:first)
+    %strong.term= highlighted(result, group, :name)
   - if group.description.present?
     &ndash;
     %span.light.term= group.description

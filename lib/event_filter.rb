@@ -25,6 +25,10 @@ class EventFilter
     def group
       'group'
     end
+
+    def favourite
+      'favourite'
+    end
   end
 
   def initialize params
@@ -51,10 +55,19 @@ class EventFilter
     target_types << Team if filter.include? 'team'
     target_types << Group if filter.include? 'group'
 
-    events.where(
-      table[:action].in(actions)
-      .or(table[:target_type].in(target_types))
-    )
+    action_cond = table[:action].in(actions)
+    target_cond = table[:target_type].in(target_types)
+
+    events = if actions.any? && target_types.any?
+               events.where(action_cond.or(target_cond))
+             elsif actions.any? && target_types.empty?
+               events.where(action_cond)
+             elsif actions.blank? && target_types.any?
+               events.where(target_cond)
+             else
+               events
+             end
+    events
   end
 
   def options key

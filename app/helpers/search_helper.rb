@@ -88,4 +88,14 @@ module SearchHelper
   def search_result_sanitize(str)
     Sanitize.clean(str)
   end
+
+  def highlighted_project(result, project)
+    result.fetch(:highlight, {}).fetch(:name_with_namespace, [])[0] ||
+      result.fetch(:highlight, {}).fetch(:path_with_namespace, [])[0] ||
+      project.path_with_namespace
+  end
+
+  def highlighted(result, object, field)
+    result.fetch(:highlight, {}).fetch(field, [])[0] || object[field]
+  end
 end

@@ -29,7 +29,8 @@ class DashboardController < ApplicationController
     @projects = @projects.where.not(id: @favourited_projects.pluck(:id)).
       limit(@projects_limit - @favourited_projects.count).includes(:namespace)
 
-    @events = Event.for_main_dashboard(current_user)
+    favourited_filter = @event_filter.active?('favourite')
+    @events = Event.for_main_dashboard(current_user, favourited_filter)
     @events = @event_filter.apply_filter(@events)
     @events = @events.limit(20).offset(params[:offset] || 0).recent
 

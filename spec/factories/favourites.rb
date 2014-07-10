@@ -3,6 +3,6 @@
 FactoryGirl.define do
   factory :favourite do
     user
-    entity { factory :project }
+    entity factory: :project
   end
 end

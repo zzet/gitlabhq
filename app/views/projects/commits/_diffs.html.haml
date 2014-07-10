@@ -52,9 +52,8 @@
 
             .diff-btn-group
               - if @commit.parent_ids.present?
-                = link_to project_blob_path(project, tree_join(@commit.parent_id, diff.new_path)), { class: 'btn btn-small view-file' } do
-                  View file @
-                  %span.commit-short-id= @commit.short_id(6)
+                = render partial: 'projects/commits/diffs/view_file_btn',
+                  locals: {commit: @commit, diff: diff, project: project}
           - else
             %span= diff.new_path
             - if diff_file_mode_changed?(diff)
@@ -71,10 +70,8 @@
                   Edit
                 &nbsp;
 
-              = link_to project_blob_path(project, tree_join(@commit.id, diff.new_path)), { class: 'btn btn-small view-file' } do
-                View file @
-                %span.commit-short-id= @commit.short_id(6)
-
+              = render partial: 'projects/commits/diffs/view_file_btn',
+                locals: {commit: @commit, diff: diff, project: project}
 
         .diff-content
           -# Skipp all non non-supported blobs
@@ -89,3 +86,11 @@
             = render "projects/commits/image", diff: diff, old_file: old_file, file: file, index: i
           - else
             .nothing-here-block No preview for this file type
+
+:javascript
+  var diffParallelView = #{params[:view] == 'parallel'};
+  if(diffParallelView) {
+    var leftOffset = $('.files').offset().left;
+    var windowWidth = $(window).width();
+    $('.files').width(windowWidth).css('margin-left', (-1) * leftOffset)
+  }
