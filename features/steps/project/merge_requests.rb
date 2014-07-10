@@ -239,6 +239,14 @@ class ProjectMergeRequests < Spinach::FeatureSteps
     end
   end
 
+  step 'I unfold diff' do
+    first('.js-unfold').click
+  end
+
+  step 'I should see additional file lines' do
+    expect(first('.old_line')).to have_content('1')
+  end
+
   def project
     @project ||= Project.find_by!(name: "Shop")
   end
