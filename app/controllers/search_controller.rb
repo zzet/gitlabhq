@@ -11,9 +11,7 @@ class SearchController < ApplicationController
       @search_results = SearchService.new(current_user, params).global_search
     end
 
-    @search_results = SearchDecorator.new(@search_results)
-
-    params[:type] = @search_results.type unless params[:type]
+    @search_results = SearchDecorator.new(@search_results, params[:type])
   end
 
   def autocomplete

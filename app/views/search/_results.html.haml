@@ -1,12 +1,4 @@
-- case params[:type]
-- when NilClass
-  - if @search_results[:projects][:records].present?
-    = render "project_results"
-  - elsif @search_results[:repositories][:blobs][:results].any?
-    = render "code_results"
-  - else
-    %h4 No matches found
-
+- case @search_results.type
 - when "project"
   = render "project_results"
 
@@ -30,3 +22,6 @@
 
 - when "commits"
   = render "commits_results"
+
+- else
+  %h4 No matches found
