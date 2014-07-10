@@ -346,6 +346,6 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def ci_status
-    ci_builds.last.state
+    ci_builds.any? ? ci_builds.last.state : ""
   end
 end
