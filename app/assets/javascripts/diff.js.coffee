@@ -23,7 +23,7 @@ class Diff
           since = prev_new_line + 1
           unfold = false
 
-      link = $('.js-view-file').attr('href') + '/diff'
+      link = target.parents('.diff-file').attr('data-blob-diff-path')
       params =
         since: since
         to: to

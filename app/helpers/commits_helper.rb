@@ -228,4 +228,8 @@ module CommitsHelper
   def diff_file_mode_changed?(diff)
     diff.a_mode && diff.b_mode && diff.a_mode != diff.b_mode
   end
+
+  def unfold_bottom_class(bottom)
+    (bottom) ? "js-unfold-bottom" : ""
+  end
 end

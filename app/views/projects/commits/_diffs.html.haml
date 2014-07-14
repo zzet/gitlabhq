@@ -45,7 +45,9 @@
       - file = project.repository.blob_at(@commit.id, diff.new_path)
       - file = project.repository.blob_at(@commit.parent_id, diff.old_path) unless file
       - next unless file
-      .diff-file.js-toggle-container{id: "diff-#{i}", class: ("line-wrapping" if file.language && file.language.wrap)}
+      .diff-file.js-toggle-container{id: "diff-#{i}",
+       class: ("line-wrapping" if file.language && file.language.wrap),
+       data: {blob_diff_path: diff_project_blob_path(project, tree_join(@commit.id, diff.new_path))}}
         .diff-header{id: "file-path-#{hexdigest(diff.new_path || diff.old_path)}"}
           - if diff.deleted_file
             %span= diff.old_path

@@ -8,9 +8,8 @@
     - last_line = line_new
     %tr.line_holder{ id: line_code, class: "#{type}" }
       - if type == "match"
-        %td.old_line.diff-line-num.unfold.js-unfold{data: {linenumber: line_old}}= "..."
-        %td.new_line.diff-line-num.unfold.js-unfold{data: {linenumber: line_new}}= "..."
-        %td.line_content.matched= line
+        = render "projects/commits/diffs/match_line", {line: line,
+          line_old: line_old, line_new: line_new, bottom: false}
       - else
         %td.old_line.diff-line-num{data: {linenumber: raw(type == "new" ? "&nbsp;" : "#{line_old}")}}
           = link_to raw(type == "new" ? "&nbsp;" : line_old), "##{line_code}", id: line_code, class: "linenumber-content"
@@ -26,9 +25,8 @@
         = render "projects/notes/diff_notes_with_reply", notes: comments, line: line
 
   - if last_line > 0
-    %td.old_line.diff-line-num.unfold.js-unfold.js-unfold-bottom{data: {linenumber: last_line}}= "..."
-    %td.new_line.diff-line-num.unfold.js-unfold.js-unfold-bottom{data: {linenumber: last_line}}= "..."
-    %td.line_content.matched
+    = render "projects/commits/diffs/match_line", {line: "",
+      line_old: last_line, line_new: last_line, bottom: true}
 
 - if diff.diff.blank? && diff_file_mode_changed?(diff)
   .file-mode-changed
