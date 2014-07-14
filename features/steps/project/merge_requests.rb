@@ -244,7 +244,7 @@ class ProjectMergeRequests < Spinach::FeatureSteps
   end
 
   step 'I should see additional file lines' do
-    expect(first('.old_line')).to have_content('1')
+    expect(first('.text-file')).to have_content('.bundle')
   end
 
   def project
