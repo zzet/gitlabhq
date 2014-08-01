@@ -127,6 +127,8 @@ module ApplicationHelper
     project = event.target
     push = event.source
 
+    return false unless project
+
     unless !push.to_default_branch? && push.branch? && !push.deleted_branch?
       return false
     end
