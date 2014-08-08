@@ -44,9 +44,8 @@ Feature: Public Projects Feature
     Given group "TestGroup" has internal project "Internal"
     And "John Doe" is owner of group "TestGroup"
     When I sign in as a user
-    And I visit group "TestGroup" members page
+    And I visit group "TestGroup" page
     Then I should see group member "John Doe"
-    And I should not see member roles
 
   Scenario: I should see group with private, internal and public projects as visitor
     Given group "TestGroup" has internal project "Internal"
@@ -76,9 +75,8 @@ Feature: Public Projects Feature
     Given group "TestGroup" has internal project "Internal"
     Given group "TestGroup" has public project "Community"
     And "John Doe" is owner of group "TestGroup"
-    When I visit group "TestGroup" members page
+    When I visit group "TestGroup" page
     Then I should see group member "John Doe"
-    And I should not see member roles
 
   Scenario: I should see group with private, internal and public projects as user
     Given group "TestGroup" has internal project "Internal"
@@ -114,6 +112,5 @@ Feature: Public Projects Feature
     Given group "TestGroup" has public project "Community"
     And "John Doe" is owner of group "TestGroup"
     When I sign in as a user
-    And I visit group "TestGroup" members page
+    And I visit group "TestGroup" page
     Then I should see group member "John Doe"
-    And I should not see member roles

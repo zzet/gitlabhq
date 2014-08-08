@@ -206,13 +206,13 @@ class Spinach::Features::TeamSettingsPages < Spinach::FeatureSteps
   end
 
    step 'I open Danger settings' do
-     within ".project-edit-content" do
-       find('.js-toggle-visibility-link').click
+     within ".js-toggle-container" do
+       find('.js-toggle-button').click
      end
    end
 
    step 'click on Remove Button' do
-     within ".js-toggle-visibility-container" do
+     within ".js-toggle-content" do
        find(".btn-remove").click
      end
    end

@@ -9,7 +9,8 @@ class DashboardSearch < Spinach::FeatureSteps
   end
 
   Then 'I should see "Shop" project link' do
-    page.should have_link "Shop"
+    project = Project.find_by(name: "Shop")
+    page.should have_selector("a#project-#{project.namespace.path}-#{project.path}")
   end
 
   Given 'I search for "Contibuting"' do

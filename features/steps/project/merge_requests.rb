@@ -30,7 +30,9 @@ class ProjectMergeRequests < Spinach::FeatureSteps
   step 'I should see closed merge request "Bug NS-04"' do
     merge_request = MergeRequest.find_by!(title: "Bug NS-04")
     merge_request.closed?.should be_true
-    page.should have_content "Closed by"
+    within('.issue-box .state-label') do
+      page.should have_content "Closed"
+    end
   end
 
   step 'I should see merge request "Bug NS-04"' do

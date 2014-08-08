@@ -378,7 +378,7 @@ describe EventNotificationMailer do
             @mails.first.to.should be_nil
             @mails.first.cc.should be_nil
             @mails.first.bcc.count.should == 1
-            @mails.first.bcc.first.should == @user.email
+            @mails.first.bcc.first.should be_in [@user.email, @commiter_user.email]
             @mails.first.in_reply_to.should == "project-#{project.path_with_namespace}-commit-bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
           end
 
@@ -387,7 +387,7 @@ describe EventNotificationMailer do
             @mails.last.to.should be_nil
             @mails.last.cc.should be_nil
             @mails.last.bcc.count.should == 1
-            @mails.last.bcc.first.should == @commiter_user.email
+            @mails.last.bcc.first.should be_in [@user.email, @commiter_user.email]
             @mails.last.in_reply_to.should == "project-#{project.path_with_namespace}-commit-bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
           end
         end
@@ -411,7 +411,7 @@ describe EventNotificationMailer do
             @mails.first.to.should be_nil
             @mails.first.cc.should be_nil
             @mails.first.bcc.count.should == 1
-            @mails.first.bcc.first.should == @user.email
+            @mails.first.bcc.first.should be_in [@user.email, @commiter_user.email]
             @mails.first.in_reply_to.should == "project-#{project.path_with_namespace}-commit-bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
           end
 
@@ -420,8 +420,8 @@ describe EventNotificationMailer do
             @mails.last.to.should be_nil
             @mails.last.cc.should be_nil
             @mails.last.bcc.count.should == 1
-            @mails.last.bcc.first.should == @commiter_user.email
-            @mails.first.in_reply_to.should == "project-#{project.path_with_namespace}-commit-bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
+            @mails.last.bcc.first.should be_in [@user.email, @commiter_user.email]
+            @mails.last.in_reply_to.should == "project-#{project.path_with_namespace}-commit-bcf03b5de6c33f3869ef70d68cf06e679d1d7f9a"
           end
         end
 
@@ -564,7 +564,7 @@ describe EventNotificationMailer do
               @mails.first.to.should be_nil
               @mails.first.cc.should be_nil
               @mails.first.bcc.count.should == 1
-              @mails.first.bcc.first.should == @user.email
+              @mails.first.bcc.first.should be_in [@user.email, @commiter_user.email]
               @mails.first.in_reply_to.should == "project-#{project.path_with_namespace}-merge_request-#{@merge_request.iid}"
               @mails.first.body.should_not be_empty
             end
@@ -574,7 +574,7 @@ describe EventNotificationMailer do
               @mails.last.to.should be_nil
               @mails.last.cc.should be_nil
               @mails.last.bcc.count.should == 1
-              @mails.last.bcc.first.should == @another_user.email
+              @mails.last.bcc.first.should be_in [@user.email, @another_user.email]
               @mails.last.in_reply_to.should == "project-#{project.path_with_namespace}-merge_request-#{@merge_request.iid}"
               @mails.last.body.should_not be_empty
             end
@@ -816,7 +816,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should == "project-#{project.path_with_namespace}-branch-master"
+            @email.in_reply_to.should == "project-#{project.path_with_namespace}-protected_branch-master"
             @email.body.should_not be_empty
           end
         end
@@ -840,7 +840,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should == "project-#{project.path_with_namespace}-branch-#{@pb.name}"
+            @email.in_reply_to.should == "project-#{project.path_with_namespace}-protected_branch-#{@pb.name}"
             @email.body.should_not be_empty
           end
         end
@@ -1145,7 +1145,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should == "project-#{project.path_with_namespace}-#{@oldrev}"
+            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-/
             @email.body.should_not be_empty
           end
         end
@@ -1168,7 +1168,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-action-/
+            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-/
           end
         end
 
@@ -1191,7 +1191,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-action-/
+            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-/
           end
         end
 
@@ -1213,7 +1213,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-action-/
+            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-/
           end
         end
 
@@ -1236,7 +1236,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-action-/
+            @email.in_reply_to.should =~ /project-#{project.path_with_namespace}-push-/
           end
         end
 
@@ -2252,7 +2252,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "project-#{project.path_with_namespace}-user-#{@watched_user.username}"
+              @email.in_reply_to.should == "user-#{@watched_user.username}-project-#{project.path_with_namespace}"
               @email.body.should_not be_empty
             end
           end
@@ -2274,7 +2274,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "project-#{project.path_with_namespace}-user-#{@watched_user.username}"
+              @email.in_reply_to.should == "user-#{@watched_user.username}-project-#{project.path_with_namespace}"
               @email.body.should_not be_empty
             end
           end
@@ -2305,7 +2305,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should == "group-#{@group.path}-user-#{@watched_user.username}"
+            @email.in_reply_to.should == "user-#{@watched_user.username}-group-#{@group.path}"
             @email.body.should_not be_empty
           end
         end
@@ -2333,7 +2333,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "group-#{@group.path}-user-#{@watched_user.username}"
+              @email.in_reply_to.should == "user-#{@watched_user.username}-group-#{@group.path}"
               @email.body.should_not be_empty
             end
           end
@@ -2355,7 +2355,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "group-#{@group.path}-user-#{@watched_user.username}"
+              @email.in_reply_to.should == "user-#{@watched_user.username}-group-#{@group.path}"
               @email.body.should_not be_empty
             end
           end
@@ -2385,7 +2385,7 @@ describe EventNotificationMailer do
             @email.cc.should be_nil
             @email.bcc.count.should == 1
             @email.bcc.first.should == @user.email
-            @email.in_reply_to.should == "team-#{@team.path}-user-#{@watched_user.username}"
+            @email.in_reply_to.should == "user-#{@watched_user.username}-team-#{@team.path}"
             @email.body.should_not be_empty
           end
         end
@@ -2415,7 +2415,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "team-#{@team.path}-user-#{@watched_user.username}"
+              @email.in_reply_to.should == "user-#{@watched_user.username}-team-#{@team.path}"
               @email.body.should_not be_empty
             end
           end
@@ -2437,7 +2437,7 @@ describe EventNotificationMailer do
               @email.cc.should be_nil
               @email.bcc.count.should == 1
               @email.bcc.first.should == @user.email
-              @email.in_reply_to.should == "team-#{@team.path}-user-#{@watched_user.username}"
+              @email.in_reply_to.should == "user-#{@watched_user.username}-team-#{@team.path}"
               @email.body.should_not be_empty
             end
           end

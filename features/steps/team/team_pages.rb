@@ -10,6 +10,9 @@ class Spinach::Features::TeamPages < Spinach::FeatureSteps
     @event   = create(:closed_issue_event, project: @project)
 
     @project.team << [current_user, :master]
+
+    current_user.can_create_team = true
+    current_user.save
   end
 
   step 'I click new team link' do

@@ -1,7 +1,7 @@
 .side-filters
   = form_tag project_entities_path, method: 'get' do
     - if current_user
-      %fieldset
+      %fieldset.assignation-filter
         %ul.nav.nav-pills.nav-stacked
           %li{class: ("active" if params[:scope] == 'all')}
             = link_to project_filter_path(scope: 'all') do
@@ -13,7 +13,7 @@
             = link_to project_filter_path(scope: 'created-by-me') do
               Created by me
 
-    %fieldset
+    %fieldset.state-filter
       %legend State
       %ul.nav.nav-pills
         %li{class: ("active" if params[:state] == 'opened')}
@@ -44,7 +44,7 @@
               Without my notes
 
     - if defined?(labels)
-      %fieldset
+      %fieldset.label-filter
         %legend Labels
         %ul.nav.nav-pills.nav-stacked.nav-small.labels-filter
           - issue_label_names.each do |label_name|
@@ -63,7 +63,7 @@
               %br
               or #{link_to 'generate', generate_project_labels_path(@project, redirect: redirect), method: :post} default set of labels
 
-    %fieldset
+    %fieldset.reset-filter
       - if %w(state scope milestone_id assignee_id label_name discussion).select { |k| params[k].present? }.any?
         = link_to project_filter_path(state: nil, scope: nil, discussion: nil), class: 'cgray pull-right' do
           %i.icon-remove

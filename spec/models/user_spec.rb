@@ -57,7 +57,7 @@ describe User do
     it { should have_many(:keys).dependent(:destroy) }
     it { should have_many(:events) }
     it { should have_many(:old_events).dependent(:destroy) }
-    it { should have_many(:recent_events).class_name('OldEvent') }
+    it { should have_many(:recent_events).class_name('Event') }
     it { should have_many(:issues).dependent(:destroy) }
     it { should have_many(:notes).dependent(:destroy) }
     it { should have_many(:assigned_issues).dependent(:destroy) }

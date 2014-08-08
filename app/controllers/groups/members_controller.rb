@@ -1,9 +1,9 @@
 class Groups::MembersController < Groups::ApplicationController
 
-  before_filter :authorize_admin_group! #, only: [:new, :edit, :create, :update, :destroy]
+  before_filter :authorize_admin_group!, only: [:index, :create, :update, :destroy]
 
   def index
-    @members = group.users_groups.order("group_access DESC")
+    @members = group.users_groups.order(group_access: :desc)
     @member_group_relation = group.users_groups.build
     #@avaliable_members = User.not_in_group(@group)
     render :index, layout: 'group_settings'
