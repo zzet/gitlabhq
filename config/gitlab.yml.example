@@ -264,6 +264,8 @@ test:
   gitlab:
     host: localhost
     port: 80
+
+  default_issues_tracker: redmine
   issues_tracker:
     redmine:
       title: "Redmine"
