@@ -9,7 +9,7 @@ production:
   # username: git
   # password:
   # host: localhost
-  # port: 5432 
+  # port: 5432
   # socket: /tmp/postgresql.sock
 
 #
@@ -46,4 +46,4 @@ test: &test
   password:
   database: gitlabhq_test
   encoding: unicode
-  host: 127.0.0.1
+  host: /tmp/
