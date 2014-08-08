@@ -265,7 +265,15 @@ test:
     host: localhost
     port: 80
 
+  default_wiki_engine: undev
+
+  wiki_engine:
+    undev:
+      title: "Undev wiki (wiki.undev.cc)"
+      project_url: "http://wiki.undev.cc/:wiki_external_id"
+
   default_issues_tracker: redmine
+
   issues_tracker:
     redmine:
       title: "Redmine"
@@ -273,6 +281,10 @@ test:
       issues_url: "http://redmine/:project_id/:issues_tracker_id/:id"
       new_issue_url: "http://redmine/projects/:issues_tracker_id/issues/new"
       all_issues_url: "http://pm.undev.cc/stuff_to_do"
+
+  elasticsearch:
+    host: 'localhost'
+    port: 9200
 
 staging:
   <<: *base
