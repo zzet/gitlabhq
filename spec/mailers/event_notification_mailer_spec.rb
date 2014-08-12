@@ -1242,8 +1242,8 @@ describe EventNotificationMailer do
 
         context "when pushed revert" do
           before do
-            @oldrev = 'c844723a2404f97421c14ed48bbb8fec9fa8f6b7'
-            @newrev  = 'aacbb9a9a5e317728a985674a61279781fb3ca26'
+            @oldrev = '5719f02f34339237a2b1faeda30976a404358910'
+            @newrev  = '7279e8c1774f3116dd74ca462447189730f9eff8'
 
             collect_mails_data do
               GitPushService.new(@another_user, project, @oldrev, @newrev, @ref).execute
