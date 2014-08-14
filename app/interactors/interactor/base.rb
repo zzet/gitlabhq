@@ -13,6 +13,17 @@ class Interactor::Base
     abilities.allowed?(object, action, subject)
   end
 
+  def stop_async_job(queue, job_id)
+    if job_id.present?
+      # Stop job, if running
+      queue = Sidekiq::Queue.new(queue)
+
+      queue.each do |job|
+        job.delete if job.jid == job_id
+      end
+    end
+  end
+
   def receive_delayed_notifications
     notifications = Event::Subscription::Notification.delayed
     notifications.each do |notification|
