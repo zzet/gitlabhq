@@ -48,7 +48,7 @@ class Project < ActiveRecord::Base
   attr_accessible :name, :path, :description, :issues_tracker, :label_list, :category_list,
     :issues_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
     :wiki_enabled, :visibility_level, :import_url, :last_activity_at, :last_pushed_at, :git_protocol_enabled,
-    :wiki_engine, :wiki_external_id, as: [:default, :admin]
+    :wiki_engine, :wiki_external_id,:namespace_id, as: [:default, :admin]
 
   attr_accessible :namespace_id, :creator_id, as: :admin
 
@@ -298,7 +298,6 @@ class Project < ActiveRecord::Base
     state :finished
     state :failed
 
-    after_transition any => :started, :do => :add_import_job
   end
 
   class << self
@@ -380,10 +379,6 @@ class Project < ActiveRecord::Base
 
   def saved?
     id && persisted?
-  end
-
-  def add_import_job
-    RepositoryImportWorker.perform_in(2.seconds, id)
   end
 
   def import?
