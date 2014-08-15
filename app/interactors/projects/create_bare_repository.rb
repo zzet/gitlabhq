@@ -26,14 +26,7 @@ module Projects
     def rollback
       project = context[:project]
 
-      if context[:create_repo_job_id].present?
-        # Stop job, if running
-        queue = Sidekiq::Queue.new("gitlab_shell")
-
-        queue.each do |job|
-          job.delete if job.jid == context[:create_repo_job_id]
-        end
-      end
+      stop_async_job("gitlab_shell", context[:create_repo_job_id])
 
       GitlabShellWorker.perform_async(
         :remove_repository,
