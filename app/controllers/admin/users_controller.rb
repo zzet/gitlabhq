@@ -22,7 +22,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def block
-    Sidekiq::Client.enqueue_to(:nain, BlockUserWorker, user.id, @current_user.id)
+    Sidekiq::Client.enqueue_to(:common, BlockUserWorker, user.id, @current_user.id)
 
     redirect_to :back, alert: "Task on block #{user.name} user was successfully added in queue"
   end
