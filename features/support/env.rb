@@ -43,14 +43,14 @@ Spinach.hooks.before_scenario do
   TestEnv.setup_stubs
   Gitlab::Event::Factory.unstub(:call)
   Gitlab.config.stub(:corporate_email_domains) { ["email.com"] }
-  PrivatePub.stub(publish_to: true)
+  #PrivatePub.stub(publish_to: true)
   DatabaseCleaner.start
 end
 
 Spinach.hooks.after_scenario do
   sleep 0.2
   Gitlab::Event::Factory.stub(call: true)
-  PrivatePub.unstub(:publish_to)
+  #PrivatePub.unstub(:publish_to)
   DatabaseCleaner.clean
   sleep 1
 end

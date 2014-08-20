@@ -127,12 +127,14 @@ module ApplicationHelper
     project = event.target
     push = event.source
 
-    unless !push.to_default_branch? && push.branch? && !push.deleted_branch?
+    # Skip if project repo is empty or MR disabled
+    unless project && !project.empty_repo? && project.merge_requests_enabled
       return false
     end
 
-    # Skip if project repo is empty or MR disabled
-    return false unless project && !project.empty_repo? && project.merge_requests_enabled
+    unless !push.to_default_branch? && push.branch? && !push.deleted_branch?
+      return false
+    end
 
     # Skip if user already created appropriate MR
     #return false if project.merge_requests.where(source_branch: push.branch_name).opened.any?

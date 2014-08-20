@@ -13,7 +13,7 @@ class ProfileEmails < Spinach::FeatureSteps
   end
 
   And 'I submit new email "my@email.com"' do
-    fill_in "email_email", with: "my"
+    fill_in "email_email", with: "my@email.com"
     click_button "Add"
   end
 

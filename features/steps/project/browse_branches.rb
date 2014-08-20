@@ -39,7 +39,7 @@ class ProjectBrowseBranches < Spinach::FeatureSteps
   end
 
   step 'I should see new branch created' do
-    within '.tree-ref-holder' do
+    within '.all-branches' do
       page.should have_content 'deploy_keys'
     end
   end

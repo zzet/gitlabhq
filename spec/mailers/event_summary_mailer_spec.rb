@@ -23,6 +23,10 @@ describe EventSummaryMailer do
     mails.select{ |m| m.subject.match(/digest title/) }
   end
 
+  def expected_mails_count(entities = [])
+    EVENTS_SUMMARY_PERIODS.count + entities.inject(0) { |a, e| a += Event::Subscription.where(target_id: e.id, target_type: e.class.name).count }
+  end
+
   def add_retry
     EVENTS_SUMMARY_PERIODS.each do |period, detail|
       Timecop.travel(detail[0]) do
@@ -111,8 +115,7 @@ describe EventSummaryMailer do
     EVENTS_SUMMARY_PERIODS.each do |period, details|
       events_summary = Event::Summary.new({
         title: "#{period.to_s.capitalize} digest title",
-        period: period,
-        state_event: :enable
+        period: period
       })
       events_summary.last_send_date = Time.zone.now
       events_summary.user = @user
@@ -152,8 +155,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should activate a few users" do
@@ -173,8 +175,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a few users" do
@@ -190,8 +191,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -217,8 +217,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a few user relationship for group" do
@@ -245,8 +244,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should left a few user from a group" do
@@ -270,8 +268,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -299,8 +296,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a few users project relationships" do
@@ -328,8 +324,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should delete a few users from project" do
@@ -353,8 +348,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -379,8 +373,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a team user relationship of a few users" do
@@ -407,8 +400,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should remove a few users from team" do
@@ -432,8 +424,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -459,8 +450,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
 
       clear_prepare_data
 
@@ -493,8 +483,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
 
       clear_prepare_data
 
@@ -518,8 +507,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should change status of issue a few times in project and send one summary email" do
@@ -546,8 +534,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should delete a few issues in project and send one summary email" do
@@ -570,8 +557,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -588,8 +574,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should change status of a few milestones and send one summary email" do
@@ -612,34 +597,11 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
     context "#note" do
-      it "should create a few notes for project and send one summary email" do
-        project = @projects.first
-
-        clear_prepare_data
-
-        create_events_summaries
-
-        collect_events do
-          ITERATION_COUNT.times do
-            params = {
-              note: attributes_for(:note)
-            }
-            ProjectsService.new(@user, project, params).notes.create
-          end
-        end
-
-        add_retry
-
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
-      end
-
       it "should create a few notes for project and send one summary email and one email for commit author" do
         project = ProjectsService.new(@another_user, attributes_for(:project)).create
         project.team << [@user, Gitlab::Access::DEVELOPER]
@@ -656,8 +618,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should add a few note for merge request and send one summary emails" do
@@ -670,26 +631,25 @@ describe EventSummaryMailer do
                                                            target_project: project)
                                            ).merge_request.create
 
-                                           params = { note: attributes_for(:note_on_merge_request, noteable: merge_request) }
+        params = { note: attributes_for(:note_on_merge_request, noteable: merge_request) }
 
-                                           clear_prepare_data
+        clear_prepare_data
 
-                                           create_events_summaries
+        create_events_summaries
 
-                                           collect_events do
-                                             ITERATION_COUNT.times do
-                                               params = { note: attributes_for(:note_on_merge_request, noteable: merge_request) }
-                                               ProjectsService.new(@another_user, project, params).notes.create
+        collect_events do
+          ITERATION_COUNT.times do
+            params = { note: attributes_for(:note_on_merge_request, noteable: merge_request) }
+            ProjectsService.new(@another_user, project, params).notes.create
 
-                                               params = { note: attributes_for(:note_on_merge_request_diff, noteable: merge_request) }
-                                               ProjectsService.new(@another_user, project, params).notes.create
-                                             end
-                                           end
+            params = { note: attributes_for(:note_on_merge_request_diff, noteable: merge_request) }
+            ProjectsService.new(@another_user, project, params).notes.create
+          end
+        end
 
-                                           add_retry
+        add_retry
 
-                                           mails.count.should == EVENTS_SUMMARY_PERIODS.count
-                                           select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should add a few note for issue and send one summary emails" do
@@ -709,8 +669,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end # note
 
@@ -732,8 +691,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should change statuses of a few merge requests and send one summary email" do
@@ -768,8 +726,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end # merge_request
 
@@ -792,8 +749,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a few snippets and send one summary emails" do
@@ -819,8 +775,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should delete a few snippets and send one summary emails" do
@@ -845,8 +800,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
     end # snippet
@@ -868,8 +822,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a few project hooks and send one summary emails" do
@@ -893,8 +846,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should delete a few project hooks and send one summary emails" do
@@ -917,8 +869,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
     end # project hook
@@ -935,8 +886,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should delete a few protected branches and send one summary email" do
@@ -957,8 +907,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -978,8 +927,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a few services and send one summary email" do
@@ -1003,8 +951,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should destroy a few services and send one summary email" do
@@ -1028,8 +975,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -1052,8 +998,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should resign a team to a few projects and send one summary email" do
@@ -1077,8 +1022,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -1102,8 +1046,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a user project relation for a few projects and send one summary email" do
@@ -1122,8 +1065,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should left a user from a few projects and send one summary email" do
@@ -1137,8 +1079,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
   end
@@ -1171,7 +1112,6 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
     end
 
     it "should push new branch" do
@@ -1184,7 +1124,6 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
     end
 
     it "should delete branch" do
@@ -1197,7 +1136,6 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
     end
 
     it "should push new tag" do
@@ -1211,7 +1149,6 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
     end
 
     it "should delete tag" do
@@ -1225,7 +1162,6 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
     end
   end
 
@@ -1248,8 +1184,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
 
     context "#project" do
@@ -1265,8 +1200,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should delete a few projects and send one summary email" do
@@ -1284,8 +1218,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
 
@@ -1308,8 +1241,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should resign a team from a few groups and send one summary email" do
@@ -1333,8 +1265,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
     end
@@ -1359,8 +1290,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should update a user group relation for a few groups and send one summary email" do
@@ -1387,8 +1317,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
 
       it "should left a user from a few groups and send one summary email" do
@@ -1412,8 +1341,7 @@ describe EventSummaryMailer do
 
         add_retry
 
-        mails.count.should == EVENTS_SUMMARY_PERIODS.count
-        select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+        select_digest_mails(mails).count.should == expected_mails_count
       end
     end
   end
@@ -1439,8 +1367,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
 
     it "should add developers a few times and send one summary email" do
@@ -1460,8 +1387,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
 
     it "should remove developeres a few times and send one summary email" do
@@ -1484,8 +1410,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
 
     it "should change access for user a few times and send one summary email" do
@@ -1510,8 +1435,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
 
     it "should designate team to group a few times and send one summary email" do
@@ -1526,7 +1450,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
 
     it "should designate team to project a few times and send one summary email" do
@@ -1541,8 +1465,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
 
     it "should remove team from group a few times and send one summary email" do
@@ -1562,8 +1485,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
 
     it "should remove team from project a few times and send one summary email" do
@@ -1585,8 +1507,7 @@ describe EventSummaryMailer do
 
       add_retry
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
-      select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
+      select_digest_mails(mails).count.should == expected_mails_count
     end
   end
 
@@ -1801,16 +1722,6 @@ describe EventSummaryMailer do
         milestone.close
 
         # Note actions
-        # #commented
-        EventHierarchyWorker.reset
-        RequestStore.store[:borders] = []
-        ITERATION_COUNT.times do
-          params = {
-            note: attributes_for(:note)
-          }
-          ProjectsService.new(@another_user, @project_with_code, params).notes.create
-        end
-
         #
         # #commented_commit
         EventHierarchyWorker.reset
@@ -2210,7 +2121,6 @@ describe EventSummaryMailer do
 
       save_emails
 
-      mails.count.should == EVENTS_SUMMARY_PERIODS.count
       select_digest_mails(mails).count.should == EVENTS_SUMMARY_PERIODS.count
     end
   end

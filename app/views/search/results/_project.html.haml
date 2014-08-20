@@ -1,5 +1,5 @@
 %li
-  = link_to project do
+  = link_to project, id: "project-#{project.namespace.path}-#{project.path}" do
     %strong.term= highlighted_project(result, project)
   - if result.description.present?
     &ndash;

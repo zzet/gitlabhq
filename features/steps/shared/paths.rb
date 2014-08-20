@@ -54,7 +54,7 @@ module SharedPaths
   end
 
   step 'I visit group "Guest" members page' do
-    visit members_group_path(Group.find_by(name:"Guest"))
+    visit group_members_path(Group.find_by(name:"Guest"))
   end
 
   step 'I visit group "Guest" settings page' do
@@ -285,6 +285,9 @@ module SharedPaths
   end
 
   step 'I visit project source page' do
+    @project.wiki_engine = "gitlab"
+    @project.save
+
     visit project_tree_path(@project, root_ref)
   end
 

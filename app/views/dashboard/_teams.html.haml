@@ -3,7 +3,7 @@
     = search_field_tag :filter_team, nil, placeholder: 'Filter by name', class: 'dash-filter form-control'
     - if current_user.can_create_team?
       %span.pull-right
-        = link_to new_team_path, class: "btn btn-new" do
+        = link_to new_team_path, class: "btn btn-new", id: 'new-team-button' do
           %i.icon-plus
           New team
   %ul.well-list.dash-list

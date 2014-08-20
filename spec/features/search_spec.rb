@@ -16,7 +16,9 @@ describe "Search", feature: true  do
   end
 
   it "should show project in search results" do
-    page.should have_content @project.name
+    sleep(1)
+    page.should have_selector("a#project-#{@project.namespace.path}-#{@project.path}")
+    #page.should have_content @project.name
   end
 end
 

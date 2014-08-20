@@ -8,9 +8,6 @@
   = form_tag(project_edit_tree_path(@project, @id), method: :put, class: "form-horizontal") do
     .file-holder.file
       .file-title
-        .btn-group.js-edit-mode.left-options
-          = link_to 'Edit', '#editor', class: 'active hover btn btn-tiny'
-          = link_to editing_preview_title(@blob.name), '#preview', class: 'btn btn-tiny', 'data-preview-url' => preview_project_edit_tree_path(@project, @id)
         %i.icon-file
         %span.file_name
           %span.monospace.light #{@ref}:
