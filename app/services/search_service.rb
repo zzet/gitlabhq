@@ -60,11 +60,7 @@ class SearchService < BaseService
         results: response.results,
         response: response.response,
         total_count: response.total_count,
-        namespaces: response.response["facets"]["namespaceFacet"]["terms"].
-            select { |term| term['count'] > 0 }.
-            map do |term|
-              { namespace: Namespace.find(term["term"]), count: term["count"] }
-            end,
+        namespaces: namespaces(response.response["facets"]["namespaceFacet"]["terms"]),
         categories: categories_list
       }
     rescue Exception => e
@@ -240,5 +236,18 @@ class SearchService < BaseService
     known_projects_ids = []
     known_projects_ids += current_user.known_projects.pluck(:id) if current_user
     known_projects_ids + Project.public_or_internal_only(current_user).pluck(:id)
+  end
+
+  def namespaces(terms)
+    founded_terms = terms.select { |term| term['count'] > 0 }
+    grouped_terms = founded_terms.inject({}) do |memo, term|
+      memo[term["term"]] = term["count"]
+      memo
+    end
+
+    select_hash = Namespace.find(grouped_terms.keys).map do |namespace|
+      { namespace: namespace, count: grouped_terms[namespace.id] }
+    end
+    select_hash.sort { |x, y| y[:count] <=> x[:count] }
   end
 end
