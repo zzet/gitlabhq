@@ -188,23 +188,9 @@ class SearchService < BaseService
     begin
       res = Repository.search(query, options: opt, page: page)
 
-      project_result_params = Proc.new do |r|
-        pr = Project.find_by(id: r["term"])
-        if pr
-          {
-              name: pr.name_with_namespace,
-              path: pr.path_with_namespace,
-              count: r["count"]
-          }
-        else
-          nil
-        end
-      end
+      res[:blobs][:projects] = project_filter(res[:blobs][:repositories])
+      res[:blobs][:commits] = project_filter(res[:commits][:repositories])
 
-      res[:blobs][:projects] = res[:blobs][:repositories].
-          map(&project_result_params).compact
-      res[:commits][:projects] = res[:commits][:repositories].
-          map(&project_result_params).compact
       res
     rescue Exception => e
       {}
@@ -238,6 +224,29 @@ class SearchService < BaseService
     known_projects_ids + Project.public_or_internal_only(current_user).pluck(:id)
   end
 
+  def project_filter(es_results)
+    terms = es_results.
+        select { |term| term['count'] > 0 }.
+        inject({}) do |memo, term|
+          memo[term["term"]] = term["count"]
+          memo
+        end
+
+    projects_meta_data = Project.joins(:namespace).where(id: terms.keys).
+        pluck(['projects.name','projects.path',
+               'namespaces.name as namespace_name',
+               'namespaces.path as namespace_path',
+               'projects.id'].join(","))
+
+    projects_meta_data.map do |meta|
+      {
+        name: meta[2] + ' / ' + meta[0],
+        path: meta[3] + ' / ' + meta[1],
+        count: terms[meta[4]]
+      }
+    end.sort { |x, y| y[:count] <=> x[:count] }
+  end
+
   def namespaces(terms)
     founded_terms = terms.select { |term| term['count'] > 0 }
     grouped_terms = founded_terms.inject({}) do |memo, term|
@@ -245,9 +254,8 @@ class SearchService < BaseService
       memo
     end
 
-    select_hash = Namespace.find(grouped_terms.keys).map do |namespace|
+    Namespace.find(grouped_terms.keys).map do |namespace|
       { namespace: namespace, count: grouped_terms[namespace.id] }
-    end
-    select_hash.sort { |x, y| y[:count] <=> x[:count] }
+    end.sort { |x, y| y[:count] <=> x[:count] }
   end
 end
