@@ -1,10 +1,13 @@
 class GitlabShellWorker
-  include Sidekiq::Worker
   include Gitlab::ShellAdapter
 
-  sidekiq_options queue: :gitlab_shell
+  @queue = :gitlab_shell
 
   def perform(action, *arg)
     gitlab_shell.send(action, *arg)
+  end
+
+  def self.perform(action, *arg)
+    GitlabShellWorker.new.perform(action, *arg)
   end
 end

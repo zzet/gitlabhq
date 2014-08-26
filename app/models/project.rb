@@ -383,7 +383,7 @@ class Project < ActiveRecord::Base
   end
 
   def add_import_job
-    RepositoryImportWorker.perform_in(2.seconds, id)
+    Resque.enqueue(RepositoryImportWorker, id)
   end
 
   def import?

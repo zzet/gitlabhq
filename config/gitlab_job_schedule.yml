@@ -1,0 +1,7 @@
+---
+FixMailDigestSchedulesJob:
+  description: 'Add any missing digest email sending schedules'
+  queue: mail_notifications
+  every:
+    - '1h'
+    - :first_in: '10s'

@@ -1,15 +1,7 @@
-require 'sidekiq/web'
+require "resque_web"
 require 'api/api'
 
 Gitlab::Application.routes.draw do
-  get "users/create"
-  get "users/destroy"
-  get "teams/create"
-  get "teams/destroy"
-  get "groups/create"
-  get "groups/destroy"
-  get "projects/create"
-  get "projects/destroy"
   #
   # Search
   #
@@ -24,11 +16,10 @@ Gitlab::Application.routes.draw do
   get ':username.keys' => 'profiles/keys#get_keys' , constraints: { username: /.*/ }
 
   constraint = lambda { |request| request.env["warden"].authenticate? and request.env['warden'].user.admin? }
-  constraints constraint do
-    mount Sidekiq::Web, at: "/admin/sidekiq", as: :sidekiq
-  end
 
-  get "/dashboard/stats", to: Sidekiq::Web, as: :sidekiq_stats, format: false
+  constraints constraint do
+    mount ResqueWeb::Engine => "/resque_web", as: :resque_web
+  end
 
   # Enable Grack support
   mount Grack::Bundle.new({

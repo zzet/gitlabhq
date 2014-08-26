@@ -1,10 +1,9 @@
 class PostReceive
-  include Sidekiq::Worker
   include Gitlab::Identifier
 
-  sidekiq_options queue: :post_receive
+  @queue = :post_receive
 
-  def perform(repo_path, oldrev, newrev, ref, identifier)
+  def self.perform(repo_path, oldrev, newrev, ref, identifier)
 
     if repo_path.start_with?(Gitlab.config.gitlab_shell.repos_path.to_s)
       repo_path.gsub!(Gitlab.config.gitlab_shell.repos_path.to_s, "")

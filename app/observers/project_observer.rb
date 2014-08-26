@@ -12,15 +12,8 @@ class ProjectObserver < BaseObserver
   end
 
   def after_destroy(project)
-    GitlabShellWorker.perform_async(
-      :remove_repository,
-      project.path_with_namespace
-    )
-
-    GitlabShellWorker.perform_async(
-      :remove_repository,
-      project.path_with_namespace + ".wiki"
-    )
+    Resque.enqueue(GitlabShellWorker, :remove_repository, project.path_with_namespace)
+    Resque.enqueue(GitlabShellWorker, :remove_repository, project.path_with_namespace + ".wiki")
 
     project.satellite.destroy
 

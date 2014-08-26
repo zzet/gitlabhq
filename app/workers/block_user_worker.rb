@@ -1,9 +1,7 @@
 class BlockUserWorker
-  include Sidekiq::Worker
+  @queue = :common
 
-  sidekiq_options queue: :common
-
-  def perform(user_idi, author_id)
+  def self.perform(user_idi, author_id)
     author = User.find(author_id)
     user = User.find(user_id)
 

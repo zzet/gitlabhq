@@ -62,10 +62,7 @@ module Projects::BaseActions
       if @project.import?
         @project.import_start
       else
-        GitlabShellWorker.perform_async(
-          :add_repository,
-          @project.path_with_namespace
-        )
+        Resque.enqueue(GitlabShellWorker, :add_repository, @project.path_with_namespace)
       end
 
       if @project.wiki_enabled?
@@ -266,18 +263,12 @@ module Projects::BaseActions
 
   def enable_git_protocol(project)
     Gitlab::AppLogger.info("#{project.owner.name} granted public access via git protocol for project \"#{project.name_with_namespace}\"")
-    GitlabShellWorker.perform_async(
-      :enable_git_protocol,
-      project.path_with_namespace
-    )
+    Resque.enqueue(GitlabShellWorker, :enable_git_protocol, project.path_with_namespace)
   end
 
   def disable_git_protocol(project)
     Gitlab::AppLogger.info("#{project.owner.name} removed public access via git protocol for project \"#{project.name_with_namespace}\"")
-    GitlabShellWorker.perform_async(
-      :disable_git_protocol,
-      project.path_with_namespace
-    )
+    Resque.enqueue(GitlabShellWorker, :disable_git_protocol, project.path_with_namespace)
   end
 
   def git_checkpoint_service

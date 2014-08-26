@@ -1,9 +1,7 @@
 class SystemHookWorker
-  include Sidekiq::Worker
+  @queue = :system_hook
 
-  sidekiq_options queue: :system_hook
-
-  def perform(hook_id, data)
-    SystemHook.find(hook_id).execute data
+  def self.perform(hook_id, data)
+    SystemHook.find(hook_id).execute(data)
   end
 end

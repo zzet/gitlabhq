@@ -1,20 +1,17 @@
 class Summaries::DailyWorker
-  include Sidekiq::Worker
-  include Sidetiq::Schedulable
+  @queue = :mail_notifications
 
-  sidekiq_options queue: :mail_notifications
+  def self.perform(id)
+    summary = Event::Summary.find(id)
+    current_time = Time.zone.now
 
-  recurrence { daily }
+    events = summary.events_for(current_time)
+    if events.any?
 
-  def perform
-    summaries = Event::Summary.current_daily
-    summaries.each do |summary|
-      current_time = Time.zone.now
-
-      events = summary.events_for(current_time)
-      next if events.blank?
-
-      EventSummaryMailer.daily_digest(summary.user.id, events.map(&:id), summary.id, current_time).deliver!
+      EventSummaryMailer.daily_digest(summary.user.id,
+                                      events.map(&:id),
+                                      summary.id,
+                                      current_time).deliver!
 
       summary.last_send_date = current_time
       summary.save

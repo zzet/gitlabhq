@@ -1,3 +1,5 @@
+require 'resque-scheduler'
+
 # Custom Redis configuration
 config_file = Rails.root.join('config', 'resque.yml')
 
@@ -7,16 +9,6 @@ resque_url = if File.exists?(config_file)
                "redis://localhost:6379"
              end
 
-Sidekiq.configure_server do |config|
-  config.redis = {
-    url: resque_url,
-    namespace: 'resque:gitlab'
-  }
-end
+Resque.redis = resque_url
+Resque.redis.namespace = "resque:gitlab"
 
-Sidekiq.configure_client do |config|
-  config.redis = {
-    url: resque_url,
-    namespace: 'resque:gitlab'
-  }
-end

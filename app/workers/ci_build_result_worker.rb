@@ -1,10 +1,9 @@
 class CiBuildResultWorker
-  include Sidekiq::Worker
   include Gitlab::Identifier
 
-  sidekiq_options queue: :build_result
+  @queue = :build_result
 
-  def perform(data)
+  def self.perform(data)
     source_build = CiBuild.find(data["buildId"])
     source_build.update_attributes(data: data)
 
@@ -13,7 +12,9 @@ class CiBuildResultWorker
 
     fill_build_data(source_build, parser)
 
-    builds = CiBuild.where(source_sha: parser.commits, source_project_id: source_build.source_project_id).where.not(id: source_build.id)
+    builds = CiBuild.where(source_sha: parser.commits,
+                           source_project_id: source_build.source_project_id).
+                           where.not(id: source_build.id)
 
     builds.find_each do |build|
       unless build.merge_request_build?

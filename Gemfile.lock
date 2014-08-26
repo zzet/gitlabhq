@@ -23,15 +23,6 @@ GIT
     rugged (0.19.0)
 
 GIT
-  remote: git://github.com/tobiassvn/sidetiq.git
-  revision: 4f7d7daea3873443b17bf2f3da61619532bbeba2
-  specs:
-    sidetiq (0.5.0)
-      celluloid (>= 0.14.1)
-      ice_cube (~> 0.11.0)
-      sidekiq (>= 2.16.0)
-
-GIT
   remote: git://github.com/zzet/elasticsearch-git.git
   revision: f6ee5c71e02d180eb743bec9dcc9457bab3cd997
   ref: f6ee5c71e02d180eb743bec9dcc9457bab3cd997
@@ -143,7 +134,6 @@ GEM
     coffee-script-source (1.6.3)
     colored (1.2)
     colorize (0.5.8)
-    connection_pool (2.0.0)
     cookiejar (0.3.2)
     coveralls (0.7.0)
       multi_json (~> 1.3)
@@ -317,7 +307,6 @@ GEM
       multi_xml (>= 0.5.2)
     httpauth (0.2.0)
     i18n (0.6.9)
-    ice_cube (0.11.3)
     ice_nine (0.10.0)
     jasmine (2.0.2)
       jasmine-core (~> 2.0.0)
@@ -364,6 +353,7 @@ GEM
     mime-types (1.25.1)
     mini_portile (0.6.0)
     minitest (5.3.4)
+    mono_logger (1.1.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (1.2.0)
@@ -492,8 +482,8 @@ GEM
     redis-activesupport (4.0.0)
       activesupport (~> 4)
       redis-store (~> 1.1.0)
-    redis-namespace (1.4.1)
-      redis (~> 3.0.4)
+    redis-namespace (1.5.1)
+      redis (~> 3.0, >= 3.0.4)
     redis-rack (1.5.0)
       rack (~> 1.5)
       redis-store (~> 1.1.0)
@@ -506,6 +496,26 @@ GEM
     ref (1.0.5)
     request_store (1.0.5)
     require_all (1.3.2)
+    resque (1.25.2)
+      mono_logger (~> 1.0)
+      multi_json (~> 1.0)
+      redis-namespace (~> 1.3)
+      sinatra (>= 0.9.2)
+      vegas (~> 0.1.2)
+    resque-multi-job-forks (0.4.2)
+      json
+      resque (~> 1.22)
+    resque-scheduler (3.0.0)
+      mono_logger (~> 1.0)
+      redis (~> 3.0)
+      resque (~> 1.25)
+      rufus-scheduler (~> 2.0)
+    resque-web (0.0.6)
+      coffee-rails
+      jquery-rails
+      resque
+      sass-rails
+      twitter-bootstrap-rails
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rouge (1.3.3)
@@ -527,6 +537,8 @@ GEM
     ruby-progressbar (1.2.0)
     rubyntlm (0.1.1)
     rubypants (0.2.0)
+    rufus-scheduler (2.0.24)
+      tzinfo (>= 0.3.22)
     safe_yaml (0.9.7)
     sanitize (2.1.0)
       nokogiri (>= 1.4.4)
@@ -550,12 +562,6 @@ GEM
     sexp_processor (4.4.0)
     shoulda-matchers (2.1.0)
       activesupport (>= 3.0.0)
-    sidekiq (3.0.1)
-      celluloid (>= 0.15.2)
-      connection_pool (>= 2.0.0)
-      json
-      redis (>= 3.0.6)
-      redis-namespace (>= 1.3.1)
     simple_oauth (0.1.9)
     simplecov (0.8.2)
       docile (~> 1.1.0)
@@ -632,6 +638,11 @@ GEM
       polyglot (>= 0.3.1)
     turbolinks (2.0.0)
       coffee-rails
+    twitter-bootstrap-rails (2.2.8)
+      actionpack (>= 3.1)
+      execjs
+      rails (>= 3.1)
+      railties (>= 3.1)
     twitter-stream (0.1.16)
       eventmachine (>= 0.12.8)
       http_parser.rb (~> 0.5.1)
@@ -651,6 +662,8 @@ GEM
       raindrops (~> 0.7)
     unicorn-worker-killer (0.4.2)
       unicorn (~> 4)
+    vegas (0.1.11)
+      rack (>= 1.0.0)
     version_sorter (1.1.0)
     virtus (1.0.1)
       axiom-types (~> 0.0.5)
@@ -767,6 +780,10 @@ DEPENDENCIES
   redcarpet (~> 2.2.2)
   redis-rails
   request_store
+  resque
+  resque-multi-job-forks
+  resque-scheduler
+  resque-web
   rspec-rails
   rugged!
   sanitize (~> 2.0)
@@ -777,8 +794,6 @@ DEPENDENCIES
   semantic-ui-sass (~> 0.16.1.0)
   settingslogic
   shoulda-matchers (~> 2.1.0)
-  sidekiq (~> 3.0.1)
-  sidetiq!
   simplecov
   simplecov-vim
   sinatra

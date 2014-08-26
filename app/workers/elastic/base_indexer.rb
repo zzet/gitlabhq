@@ -1,11 +1,12 @@
 class Elastic::BaseIndexer
-  include Sidekiq::Worker
-  sidekiq_options queue: 'elasticsearch', retry: false, backtrace: true
+  @queue = :elasticsearch
 
-  Logger = Sidekiq.logger.level == Logger::DEBUG ? Sidekiq.logger : nil
-  Client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port, logger: Logger
+  Logger = Resque.logger.level == Logger::DEBUG ? Resque.logger : nil
+  Client = Elasticsearch::Client.new(host: Gitlab.config.elasticsearch.host,
+                                     port: Gitlab.config.elasticsearch.port,
+                                     logger: Logger)
 
-  def perform(operation, klass, record_id, options={})
+  def self.perform(operation, klass, record_id, options={})
     logger.debug [operation, "#{klass}##{record_id} #{options.inspect}"]
 
     cklass = klass.constantize
