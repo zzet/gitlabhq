@@ -15,9 +15,18 @@ GIT
     elasticsearch-rails (0.1.0.rc1)
 
 GIT
-  remote: git://github.com/skv-headless/elasticsearch-git.git
-  revision: 7ef0bbd1be2966d8a2cbf6a6ef9f4cdc8fc77db4
-  ref: 7ef0bbd1be2966d8a2cbf6a6ef9f4cdc8fc77db4
+  remote: git://github.com/tobiassvn/sidetiq.git
+  revision: 4f7d7daea3873443b17bf2f3da61619532bbeba2
+  specs:
+    sidetiq (0.5.0)
+      celluloid (>= 0.14.1)
+      ice_cube (~> 0.11.0)
+      sidekiq (>= 2.16.0)
+
+GIT
+  remote: git://github.com/zzet/elasticsearch-git.git
+  revision: a3fb57b303ad8b8c629b301ca009cd7d486089fb
+  ref: a3fb57b303ad8b8c629b301ca009cd7d486089fb
   specs:
     elasticsearch-git (0.0.4)
       activemodel (~> 4.1.0)
@@ -27,15 +36,6 @@ GIT
       elasticsearch-model
       gitlab-linguist (> 2.9.0)
       rugged (~> 0.21.0)
-
-GIT
-  remote: git://github.com/tobiassvn/sidetiq.git
-  revision: 4f7d7daea3873443b17bf2f3da61619532bbeba2
-  specs:
-    sidetiq (0.5.0)
-      celluloid (>= 0.14.1)
-      ice_cube (~> 0.11.0)
-      sidekiq (>= 2.16.0)
 
 GEM
   remote: http://rubygems.org/
