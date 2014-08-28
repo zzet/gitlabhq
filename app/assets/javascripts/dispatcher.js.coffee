@@ -35,18 +35,6 @@ class Dispatcher
         new DashboardTooltips()
         new SidebarSort()
         new Events()
-      when 'projects:commit:show'
-        new Commit()
-        new Diff()
-      when 'projects:compare:show', 'projects:compare:index'
-        new Compare()
-      when 'projects:commits:show', 'projects:merge_requests:index'
-        new JenkinsBuild()
-      when 'projects:merge_requests:show'
-        new JenkinsBuild()
-        new Diff()
-      when "projects:merge_requests:diffs"
-        new Diff()
       when 'groups:show'
         new Activities()
         new DashboardTooltips()
@@ -66,6 +54,18 @@ class Dispatcher
         new SidebarSort()
         new SidebarTabs('teams')
         new Events('Team')
+      when 'projects:commit:show'
+        new Commit()
+        new Diff()
+      when 'projects:compare:show', 'projects:compare:index'
+        new Compare()
+      when 'projects:commits:show', 'projects:merge_requests:index'
+        new JenkinsBuild()
+      when 'projects:merge_requests:show'
+        new JenkinsBuild()
+        new Diff()
+      when "projects:merge_requests:diffs"
+        new Diff()
       when 'projects:new', 'projects:edit'
         new Project()
       when 'projects:teams:members:index'

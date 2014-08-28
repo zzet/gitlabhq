@@ -1,4 +1,4 @@
-# # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # #
 # Gitlab application config file  #
 # # # # # # # # # # # # # # # # # #
 #
@@ -213,7 +213,7 @@ staging:
   <<: *base
   gitlab:
     ## Web server settings
-    host: gitlab-staging-01.undev.cc
+    host: git.staging.infra.home
     port: 443
     https: false
     signup_enabled: true          # default: false - Account passwords are not sent via the email if signup is enabled.

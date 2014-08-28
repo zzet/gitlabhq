@@ -27,6 +27,7 @@
 #= require js-routes
 #= require highlightjs.min
 #= require ace/ace
+#= require ace/ext-searchbox
 #= require d3
 #= require react
 #= require underscore

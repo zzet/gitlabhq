@@ -30,7 +30,7 @@
   initLoadMore: ->
     $(document).unbind('scroll')
     $(document).endlessScroll
-      bottomPixels: 400
+      bottomPixels: Math.abs($(document).height() - $(window).height() + 200)
       fireDelay: 1000
       fireOnce: true
       ceaseFire: ->
