@@ -31,9 +31,9 @@
               Email is read-only for LDAP user
           - else
             - email = @user.email
-            - @user.email = email.split("@").first
             .col-sm-6.no_padding
-              = f.text_field :email, class: "form-control", placeholder: "Email", required: true
+              = text_field_tag :email, email.split("@").first,
+               class: "form-control", placeholder: "Email", required: true
             .col-sm-6.no_padding
               = select_tag :email_domain, options_for_select(Gitlab.config.corporate_email_domains.map { |e| ["@" + e, e]},  email.split("@").last || Gitlab.config.corporate_email_domains.first),
                            class: "form-control middle",

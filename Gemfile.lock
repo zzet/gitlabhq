@@ -15,14 +15,6 @@ GIT
     elasticsearch-rails (0.1.0.rc1)
 
 GIT
-  remote: git://github.com/libgit2/rugged.git
-  revision: 0ac443721f775d2402f376e9974967b147a8f44b
-  branch: development
-  submodules: true
-  specs:
-    rugged (0.19.0)
-
-GIT
   remote: git://github.com/tobiassvn/sidetiq.git
   revision: 4f7d7daea3873443b17bf2f3da61619532bbeba2
   specs:
@@ -33,17 +25,17 @@ GIT
 
 GIT
   remote: git://github.com/zzet/elasticsearch-git.git
-  revision: f6ee5c71e02d180eb743bec9dcc9457bab3cd997
-  ref: f6ee5c71e02d180eb743bec9dcc9457bab3cd997
+  revision: a3fb57b303ad8b8c629b301ca009cd7d486089fb
+  ref: a3fb57b303ad8b8c629b301ca009cd7d486089fb
   specs:
     elasticsearch-git (0.0.4)
-      activemodel (> 4.0.0)
-      activesupport (> 4.0.0)
+      activemodel (~> 4.1.0)
+      activesupport (~> 4.1.0)
       charlock_holmes (~> 0.6.9)
       elasticsearch-api (> 0.4.0)
       elasticsearch-model
       gitlab-linguist (> 2.9.0)
-      rugged (~> 0.19.0)
+      rugged (~> 0.21.0)
 
 GEM
   remote: http://rubygems.org/
@@ -101,6 +93,7 @@ GEM
       debug_inspector (>= 0.0.1)
     bootstrap-sass (3.0.3.0)
       sass (~> 3.2)
+    browser (0.6.0)
     builder (3.2.2)
     capistrano (3.2.1)
       i18n
@@ -174,12 +167,12 @@ GEM
     dotenv (0.9.0)
     dropzonejs-rails (0.4.14)
       rails (> 3.1)
-    elasticsearch (0.4.8)
-      elasticsearch-api (= 0.4.8)
-      elasticsearch-transport (= 0.4.8)
-    elasticsearch-api (0.4.8)
+    elasticsearch (1.0.4)
+      elasticsearch-api (= 1.0.4)
+      elasticsearch-transport (= 1.0.4)
+    elasticsearch-api (1.0.4)
       multi_json
-    elasticsearch-transport (0.4.8)
+    elasticsearch-transport (1.0.4)
       faraday
       multi_json
     em-http-request (1.0.3)
@@ -207,7 +200,7 @@ GEM
     factory_girl_rails (4.3.0)
       factory_girl (~> 4.3.0)
       railties (>= 3.0.0)
-    faraday (0.8.8)
+    faraday (0.8.9)
       multipart-post (~> 1.2.0)
     faraday_middleware (0.9.0)
       faraday (>= 0.7.4, < 0.9)
@@ -240,7 +233,7 @@ GEM
       multi_json
     gitlab-grack (2.0.0.pre)
       rack (~> 1.5.1)
-    gitlab-grit (2.6.9)
+    gitlab-grit (2.6.10)
       charlock_holmes (~> 0.6)
       diff-lcs (~> 1.1)
       mime-types (~> 1.15)
@@ -251,12 +244,12 @@ GEM
       mime-types (~> 1.19)
     gitlab_emoji (0.0.1.1)
       emoji (~> 1.0.1)
-    gitlab_git (6.0.0)
+    gitlab_git (6.2.1)
       activesupport (~> 4.0)
       charlock_holmes (~> 0.6)
       gitlab-grit (~> 2.6)
       gitlab-linguist (~> 3.0)
-      rugged (~> 0.19.0)
+      rugged (~> 0.21.0)
     gitlab_meta (7.0)
     gitlab_omniauth-ldap (1.0.4)
       net-ldap (~> 0.3.1)
@@ -306,7 +299,7 @@ GEM
       activesupport (>= 4.0.1)
       haml (>= 3.1, < 5.0)
       railties (>= 4.0.1)
-    hashie (2.0.5)
+    hashie (2.1.2)
     hike (1.2.3)
     hipchat (0.14.0)
       httparty
@@ -316,7 +309,7 @@ GEM
       json (~> 1.8)
       multi_xml (>= 0.5.2)
     httpauth (0.2.0)
-    i18n (0.6.9)
+    i18n (0.6.11)
     ice_cube (0.11.3)
     ice_nine (0.10.0)
     jasmine (2.0.2)
@@ -363,7 +356,7 @@ GEM
     method_source (0.8.2)
     mime-types (1.25.1)
     mini_portile (0.6.0)
-    minitest (5.3.4)
+    minitest (5.3.5)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (1.2.0)
@@ -411,7 +404,7 @@ GEM
       multi_json (~> 1.0)
       websocket-driver (>= 0.2.0)
     polyglot (0.3.4)
-    posix-spawn (0.3.8)
+    posix-spawn (0.3.9)
     private_pub (1.0.3)
       faye
     protected_attributes (1.0.7)
@@ -527,6 +520,7 @@ GEM
     ruby-progressbar (1.2.0)
     rubyntlm (0.1.1)
     rubypants (0.2.0)
+    rugged (0.21.0)
     safe_yaml (0.9.7)
     sanitize (2.1.0)
       nokogiri (>= 1.4.4)
@@ -636,7 +630,7 @@ GEM
       eventmachine (>= 0.12.8)
       http_parser.rb (~> 0.5.1)
       simple_oauth (~> 0.1.4)
-    tzinfo (1.2.1)
+    tzinfo (1.2.2)
       thread_safe (~> 0.1)
     uglifier (2.3.2)
       execjs (>= 0.3.0)
@@ -682,6 +676,7 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   bootstrap-sass (~> 3.0)
+  browser
   capistrano (~> 3.2.0)
   capistrano-bundler
   capistrano-rails
@@ -768,7 +763,7 @@ DEPENDENCIES
   redis-rails
   request_store
   rspec-rails
-  rugged!
+  rugged
   sanitize (~> 2.0)
   sass-rails (~> 4.0.2)
   sdoc

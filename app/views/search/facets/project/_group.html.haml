@@ -10,7 +10,7 @@
       %ul.dropdown-menu
         - namespaces.each do |namespace|
           %li{class: "#{'active' if params[:namespace] == namespace[:namespace].path}"}
-            = link_to search_path(args.merge({ namespace: namespace[:namespace].path })) do
+            %a{href: search_path(args.merge({ namespace: namespace[:namespace].path }))}
               = namespace[:namespace].name
               %small.pull-right= namespace[:count]
     &nbsp;

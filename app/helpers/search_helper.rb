@@ -8,11 +8,7 @@ module SearchHelper
   def search_autocomplete_opts(term, project = nil)
     return unless current_user
 
-    if project
-      file_names_autocomplete(term, project)
-    else
-      groups_autocomplete(term) + teams_autocomplete(term) + projects_autocomplete(term)
-    end
+    groups_autocomplete(term) + teams_autocomplete(term) + projects_autocomplete(term)
   end
 
   def search_filter_path(query, type: :project, order: :created_at)
@@ -69,18 +65,6 @@ module SearchHelper
       {
         label: "project: #{search_result_sanitize(p.name_with_namespace)}",
         url: project_path(p)
-      }
-    end
-  end
-
-  def file_names_autocomplete(term, project, limit = 5)
-    options = {repository_id: project.try(:id)}
-    response = Repository.search_file_names(term, per: limit, options: options)
-
-    response.results.map do |file_name|
-      {
-        label: file_name.fields['blob.path'],
-        url: project_blob_path(project, ['master', file_name.fields['blob.path']].join('/'))
       }
     end
   end

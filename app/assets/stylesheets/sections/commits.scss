@@ -208,12 +208,20 @@ li.commit {
 }
 
 .hide-line-numbers {
-  .linenumber-content {
+  .linenumber-content,
+  .new_line a,
+  .old_line a {
     display: none !important;
     visibility: hidden !important;
   }
-  .diff-line-num:before {
-    content: attr(data-linenumber) !important;
+  .diff-line-num:before,
+  .new_line:before {
+    content: attr(data-diff-linenumber) !important;
+    float: left;
+    width: 35px;
+  }
+  .line_holder.old .new_line:before {
+    content: '' !important;
   }
 }
 
