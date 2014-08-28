@@ -17,13 +17,7 @@ class SearchController < ApplicationController
   def autocomplete
     term = params[:term]
 
-    if params[:project_id].present?
-      project = Project.find(params[:project_id])
-
-      render json: search_autocomplete_opts(term, project)
-    else
-      render json: search_autocomplete_opts(term)
-    end
+    render json: search_autocomplete_opts(term)
   end
 
   private
