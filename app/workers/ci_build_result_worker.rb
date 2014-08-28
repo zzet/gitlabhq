@@ -1,6 +1,4 @@
 class CiBuildResultWorker
-  include Gitlab::Identifier
-
   @queue = :build_result
 
   def self.perform(data)

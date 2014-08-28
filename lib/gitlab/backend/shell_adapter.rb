@@ -4,10 +4,6 @@
 #
 module Gitlab
   module ShellAdapter
-    def self.gitlab_shell
-      Gitlab::Shell.new
-    end
-
     def gitlab_shell
       Gitlab::Shell.new
     end

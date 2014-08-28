@@ -1,7 +1,7 @@
 class BlockUserWorker
   @queue = :common
 
-  def self.perform(user_idi, author_id)
+  def self.perform(user_id, author_id)
     author = User.find(author_id)
     user = User.find(user_id)
 

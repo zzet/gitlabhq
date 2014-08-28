@@ -7,7 +7,7 @@ class Elastic::BaseIndexer
                                      logger: Logger)
 
   def self.perform(operation, klass, record_id, options={})
-    logger.debug [operation, "#{klass}##{record_id} #{options.inspect}"]
+    Logger.debug [operation, "#{klass}##{record_id} #{options.inspect}"]
 
     cklass = klass.constantize
 

@@ -4,7 +4,10 @@ class PostReceive
   @queue = :post_receive
 
   def self.perform(repo_path, oldrev, newrev, ref, identifier)
+    PostReceive.new.perform(repo_path, oldrev, newrev, ref, identifier)
+  end
 
+  def perform(repo_path, oldrev, newrev, ref, identifier)
     if repo_path.start_with?(Gitlab.config.gitlab_shell.repos_path.to_s)
       repo_path.gsub!(Gitlab.config.gitlab_shell.repos_path.to_s, "")
     else
