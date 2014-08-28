@@ -96,7 +96,7 @@ gem "six"
 gem "seed-fu"
 
 # Markdown to HTML
-gem "redcarpet",     "~> 2.2.2"
+gem "redcarpet",     "~> 3.1.2"
 gem "github-markup"
 gem "org-ruby" # For rendering .org files
 
