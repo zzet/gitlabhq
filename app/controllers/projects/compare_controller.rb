@@ -12,6 +12,7 @@ class Projects::CompareController < Projects::ApplicationController
     compare = Gitlab::Git::Compare.new(@repository.raw_repository, params[:from], params[:to], MergeRequestDiff::COMMITS_SAFE_SIZE)
 
     @commits       = compare.commits
+    @commit        = compare.head
     @diffs         = compare.diffs(paths)
     @refs_are_same = compare.same
     @line_notes    = []
