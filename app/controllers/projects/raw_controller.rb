@@ -65,8 +65,7 @@ class Projects::RawController < Projects::ApplicationController
     elsif @blob.name =~ /(?:msi|exe|rar|r0\d|7z|7zip|zip)$/
       'application/octet-stream'
     else
-      @blob.mime_type
+      "#{@blob.mime_type}; charset=#{@blob.detect_encoding[:encoding]}"
     end
   end
-
 end
