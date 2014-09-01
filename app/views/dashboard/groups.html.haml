@@ -1,0 +1,35 @@
+%h3.page-title
+  Authorized Groups
+%p.light
+  All groups you have access to are listed here. Public groups are not included here unless you are a member
+%hr
+.row
+  .col-md-3.hidden-sm.hidden-xs.side-filters
+    = render "groups_filter"
+  .col-md-9
+    %ul.bordered-list.my-projects.top-list
+      - @groups.each do |group|
+        %li.my-project-row
+          %h4.project-title
+            = link_to group_path(group), class: dom_class(group) do
+              = group.name
+
+            - user_group = group.users_groups.find_by(user_id: current_user)
+            - if can?(current_user, :destroy, user_group)
+              .pull-right
+                = link_to leave_profile_group_path(group), data: { confirm: "Leave group?"}, method: :delete, remote: true, class: "btn-tiny btn remove-row", title: 'Leave group' do
+                  %i.icon-signout
+                  Leave
+
+          - if group.description.present?
+            %div.light= truncate group.description, length: 100
+          %div.light
+            #{pluralize(group.projects.count, "project")}, #{pluralize(group.users.count, "user")}
+
+
+        - if @groups.blank?
+          %li
+            .nothing-here-block There are no groups here.
+
+    .bottom
+      = paginate @groups, theme: "gitlab"
