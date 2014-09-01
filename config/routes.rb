@@ -1,5 +1,5 @@
-require "resque_web"
 require 'api/api'
+require 'resque/scheduler/server'
 
 Gitlab::Application.routes.draw do
   #
@@ -18,7 +18,7 @@ Gitlab::Application.routes.draw do
   constraint = lambda { |request| request.env["warden"].authenticate? and request.env['warden'].user.admin? }
 
   constraints constraint do
-    mount ResqueWeb::Engine => "/resque_web", as: :resque_web
+    mount Resque::Server.new, at: '/resque_web', as: :resque_web
   end
 
   # Enable Grack support

@@ -12,3 +12,4 @@ resque_url = if File.exists?(config_file)
 Resque.redis = resque_url
 Resque.redis.namespace = "resque:gitlab"
 
+Resque::Scheduler.dynamic = true
