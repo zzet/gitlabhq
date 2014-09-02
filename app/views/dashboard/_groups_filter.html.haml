@@ -14,7 +14,7 @@
       = link_to groups_dashboard_filter_path(scope: 'joined') do
         Joined
         %span.pull-right
-          = current_user.authorized_groups.where.not(id: current_user.created_groups).count
+          = current_user.groups.where.not(id: current_user.created_groups.pluck(:id).count
     = nav_tab :scope, 'owned' do
       = link_to groups_dashboard_filter_path(scope: 'owned') do
         Owned
