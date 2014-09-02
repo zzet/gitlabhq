@@ -7,8 +7,14 @@
       .form-group.project-name-holder
         = f.label :name, class: 'control-label' do
           %strong Project name
-        .col-sm-10
+        .col-sm-5
           = f.text_field :name, placeholder: "Example Project", class: "form-control", tabindex: 1, autofocus: true
+        .col-sm-5
+          #auto_slug.input-group.hide
+            = label_tag 'name_parametrized', class: 'control-label' do
+              %strong repository
+            .col-sm-9
+              = text_field_tag :name_parametrized, "Project repository path", disabled: true, class: "form-control"
 
       - if current_user.can_select_namespace?
         .form-group
