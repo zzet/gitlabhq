@@ -92,8 +92,8 @@ class User < ActiveRecord::Base
   # Groups
   has_many :users_groups,             dependent: :destroy
   has_many :groups,                   through: :users_groups
-  has_many :owned_groups,             -> { where(users_groups: { group_access: UsersGroup::OWNER } )}, through: :users_groups, source: :group
-  has_many :masters_groups,           -> { where users_groups: { group_access: UsersGroup::MASTER } }, through: :users_groups, source: :group
+  has_many :owned_joined_groups,      -> { where(users_groups: { group_access: UsersGroup::OWNER } )}, through: :users_groups, source: :group
+  has_many :masters_joined_groups,    -> { where(users_groups: { group_access: UsersGroup::MASTER } )}, through: :users_groups, source: :group
   has_many :created_groups,          class_name: Group, foreign_key: :owner_id
 
   # Projects
@@ -337,8 +337,14 @@ class User < ActiveRecord::Base
 
   # Groups where user is an owner
   def owned_groups
-   @group_ids = groups.pluck(:id) + master_team_groups.pluck(:id)
+   @group_ids = owned_joined_groups.pluck(:id) +
+     masters_joined_groups.pluck(:id) +
+     master_team_groups.pluck(:id)
    Group.where(id: @group_ids)
+  end
+
+  def masters_groups
+    masters_joined_groups
   end
 
   def owned_projects
