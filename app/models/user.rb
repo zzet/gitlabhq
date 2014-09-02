@@ -92,8 +92,8 @@ class User < ActiveRecord::Base
   # Groups
   has_many :users_groups,             dependent: :destroy
   has_many :groups,                   through: :users_groups
-  has_many :owned_groups,             -> { where(users_groups: { group_access: UsersGroup::OWNER } )}, through: :users_groups, source: :group
-  has_many :masters_groups,           -> { where users_groups: { group_access: UsersGroup::MASTER } }, through: :users_groups, source: :group
+  has_many :owned_joined_groups,      -> { where(users_groups: { group_access: UsersGroup::OWNER } )}, through: :users_groups, source: :group
+  has_many :masters_joined_groups,    -> { where(users_groups: { group_access: UsersGroup::MASTER } )}, through: :users_groups, source: :group
   has_many :created_groups,          class_name: Group, foreign_key: :owner_id
 
   # Projects
@@ -337,8 +337,16 @@ class User < ActiveRecord::Base
 
   # Groups where user is an owner
   def owned_groups
-   @group_ids = groups.pluck(:id) + master_team_groups.pluck(:id)
+   @group_ids = begin
+                  owned_joined_groups.pluck(:id) +
+                    masters_joined_groups.pluck(:id) +
+                    master_team_groups.pluck(:id)
+                end.uniq
    Group.where(id: @group_ids)
+  end
+
+  def masters_groups
+    masters_joined_groups
   end
 
   def owned_projects
@@ -367,8 +375,8 @@ class User < ActiveRecord::Base
   end
 
   def personal_groups
-    @group_ids ||= (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
-    Group.where(id: @group_ids).order('namespaces.name ASC')
+    @personal_group_ids ||= (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id)).flatten.uniq
+    Group.where(id: @personal_group_ids).order('namespaces.name ASC')
   end
 
   def authorized_namespaces

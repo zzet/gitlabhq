@@ -1,0 +1,40 @@
+%fieldset
+  %ul.nav.nav-pills.nav-stacked
+    = nav_tab :scope, nil do
+      = link_to groups_dashboard_filter_path(scope: nil) do
+        All
+        %span.pull-right
+          = current_user.authorized_groups.count
+    - if current_user.admin?
+      = nav_tab :scope, 'personal' do
+        = link_to groups_dashboard_filter_path(scope: 'personal') do
+          Personal
+          %span.pull-right
+            = current_user.personal_groups.count
+    = nav_tab :scope, 'joined' do
+      = link_to groups_dashboard_filter_path(scope: 'joined') do
+        Joined
+        %span.pull-right
+          = current_user.groups.where.not(id: current_user.created_groups.pluck(:id)).count
+    = nav_tab :scope, 'owned' do
+      = link_to groups_dashboard_filter_path(scope: 'owned') do
+        Owned
+        %span.pull-right
+          = current_user.owned_groups.count
+    = nav_tab :scope, 'created' do
+      = link_to groups_dashboard_filter_path(scope: 'created') do
+        Created by me
+        %span.pull-right
+          = current_user.created_groups.count
+
+- if @teams.present?
+  %fieldset
+    %legend Teams
+    %ul.nav.nav-pills.nav-stacked.nav-small
+      - @teams.each do |team|
+        %li{ class: (team.name == params[:team]) ? 'active' : 'light' }
+          = link_to groups_dashboard_path(team: team.name) do
+            %i.icon-folder-close-alt
+            = team.name
+            %small.pull-right
+              = team.groups.count
