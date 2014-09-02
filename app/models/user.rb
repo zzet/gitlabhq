@@ -337,9 +337,11 @@ class User < ActiveRecord::Base
 
   # Groups where user is an owner
   def owned_groups
-   @group_ids = owned_joined_groups.pluck(:id) +
-     masters_joined_groups.pluck(:id) +
-     master_team_groups.pluck(:id)
+   @group_ids = begin
+                  owned_joined_groups.pluck(:id) +
+                    masters_joined_groups.pluck(:id) +
+                    master_team_groups.pluck(:id)
+                end.uniq
    Group.where(id: @group_ids)
   end
 

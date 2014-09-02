@@ -104,7 +104,7 @@ class DashboardController < ApplicationController
                 when 'personal' then
                   current_user.created_groups
                 when 'joined' then
-                  current_user.groups.where.not(id: current_user.created_groups)
+                  current_user.groups.where.not(id: current_user.created_groups.pluck(:id))
                 when 'owned' then
                   current_user.owned_groups
                 else
