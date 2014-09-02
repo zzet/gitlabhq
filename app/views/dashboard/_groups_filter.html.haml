@@ -5,11 +5,12 @@
         All
         %span.pull-right
           = current_user.authorized_groups.count
-    = nav_tab :scope, 'personal' do
-      = link_to groups_dashboard_filter_path(scope: 'personal') do
-        Personal
-        %span.pull-right
-          = current_user.personal_groups.count
+    - if current_user.admin?
+      = nav_tab :scope, 'personal' do
+        = link_to groups_dashboard_filter_path(scope: 'personal') do
+          Personal
+          %span.pull-right
+            = current_user.personal_groups.count
     = nav_tab :scope, 'joined' do
       = link_to groups_dashboard_filter_path(scope: 'joined') do
         Joined
