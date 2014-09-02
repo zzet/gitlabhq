@@ -24,6 +24,13 @@ class Project
       else
         $('#project_issues_tracker_id').removeAttr('disabled')
 
+    $('form#new_project #project_name').on 'keyup', ->
+      slug = $.friendly_id $(this).val()
+      if slug != $(this).val().trim()
+        $('#auto_slug').show()
+        $('#name_parametrized').val(slug + '.git')
+      else
+        $('#auto_slug').hide()
 
 @Project = Project
 

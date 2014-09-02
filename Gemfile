@@ -28,6 +28,8 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
 gem 'omniauth-github'
 
+gem 'jquery-friendly_id-rails'
+
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
 gem "gitlab_git", '~> 6.0'
@@ -156,7 +158,7 @@ gem "rack-attack"
 # Ace editor
 gem 'ace-rails-ap'
 
-# Keyboard shortcuts 
+# Keyboard shortcuts
 gem 'mousetrap-rails'
 
 # Semantic UI Sass for Sidebar
