@@ -375,8 +375,8 @@ class User < ActiveRecord::Base
   end
 
   def personal_groups
-    @group_ids ||= (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id))
-    Group.where(id: @group_ids).order('namespaces.name ASC')
+    personal_group_ids = (groups.pluck(:id) + team_groups.pluck(:id) + authorized_projects.pluck(:namespace_id)).flatten.uniq
+    Group.where(id: personal_group_ids).order('namespaces.name ASC')
   end
 
   def authorized_namespaces

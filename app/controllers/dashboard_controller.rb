@@ -102,6 +102,8 @@ class DashboardController < ApplicationController
   def groups
     @groups = case params[:scope]
                 when 'personal' then
+                  current_user.personal_groups
+                when 'created' then
                   current_user.created_groups
                 when 'joined' then
                   current_user.groups.where.not(id: current_user.created_groups.pluck(:id))

@@ -9,7 +9,7 @@
       = link_to groups_dashboard_filter_path(scope: 'personal') do
         Personal
         %span.pull-right
-          = current_user.created_groups.count
+          = current_user.personal_groups.count
     = nav_tab :scope, 'joined' do
       = link_to groups_dashboard_filter_path(scope: 'joined') do
         Joined
@@ -20,6 +20,11 @@
         Owned
         %span.pull-right
           = current_user.owned_groups.count
+    = nav_tab :scope, 'created' do
+      = link_to groups_dashboard_filter_path(scope: 'created') do
+        Created by me
+        %span.pull-right
+          = current_user.created_groups.count
 
 - if @teams.present?
   %fieldset
