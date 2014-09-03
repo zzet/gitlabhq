@@ -1,7 +1,24 @@
 ---
-FixMailDigestSchedulesJob:
-  description: 'Add any missing digest email sending schedules'
-  queue: mail_notifications
+send_daily_digests:
+  description: 'Send daily digests'
+  queue: mail_nitofications
+  class: 'Summaries::DailyWorker'
   every:
     - '1h'
-    - :first_in: '10s'
+    - :first_in: '5m'
+
+send_weekly_digests:
+  description: 'Send weekly digests'
+  queue: mail_nitofications
+  class: 'Summaries::WeeklyWorker'
+  every:
+    - '1h'
+    - :first_in: '10m'
+
+send_monthly_digests:
+  description: 'Send monthly digests'
+  queue: mail_nitofications
+  class: 'Summaries::MonthlyWorker'
+  every:
+    - '1h'
+    - :first_in: '15m'
