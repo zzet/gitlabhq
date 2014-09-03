@@ -8,7 +8,7 @@ class Elastic::RepositoryIndexer
 
     repo.index_commits(from_rev: push.revbefore, to_rev: push.revafter)
 
-    if push.ref == push.project.default_branch
+    if push.ref.name == push.project.default_branch
       repo.index_blobs(from_rev: push.revbefore, to_rev: push.revafter)
     end
   end
