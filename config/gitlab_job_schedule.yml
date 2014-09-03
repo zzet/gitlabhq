@@ -1,7 +1,7 @@
 ---
 send_daily_digests:
   description: 'Send daily digests'
-  queue: mail_nitofications
+  queue: mail_notifications
   class: 'Summaries::DailyWorker'
   every:
     - '1h'
@@ -9,7 +9,7 @@ send_daily_digests:
 
 send_weekly_digests:
   description: 'Send weekly digests'
-  queue: mail_nitofications
+  queue: mail_notifications
   class: 'Summaries::WeeklyWorker'
   every:
     - '1h'
@@ -17,7 +17,7 @@ send_weekly_digests:
 
 send_monthly_digests:
   description: 'Send monthly digests'
-  queue: mail_nitofications
+  queue: mail_notifications
   class: 'Summaries::MonthlyWorker'
   every:
     - '1h'
