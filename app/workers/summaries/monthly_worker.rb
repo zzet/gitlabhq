@@ -1,7 +1,7 @@
 class Summaries::MonthlyWorker
   @queue = :mail_notifications
 
-  def self.perform(id)
+  def self.perform
     Event::Summary.current_monthly.find_each do |summary|
       current_time = Time.zone.now
 

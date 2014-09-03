@@ -1,7 +1,7 @@
 class Summaries::WeeklyWorker
   @queue = :mail_notifications
 
-  def self.perform(id)
+  def self.perform
     Event::Summary.current_weekly.find_each do |summary|
       current_time = Time.zone.now
       events = summary.events_for current_time
