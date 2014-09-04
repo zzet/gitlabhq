@@ -56,7 +56,7 @@ class GitPushService
     if push.tag?
       project.execute_hooks(@push_data.dup, :tag_push_hooks)
     else
-      Elastic::RepositoryIndexer.perform_async(push.id)
+      Resque.enqueue(Elastic::RepositoryIndexer, push.id)
       project.execute_hooks(@push_data.dup, :push_hooks)
     end
 

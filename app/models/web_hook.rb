@@ -58,6 +58,6 @@ class WebHook < ActiveRecord::Base
   end
 
   def async_execute(data)
-    Sidekiq::Client.enqueue(ProjectWebHookWorker, id, data)
+    Resque.enqueue(ProjectWebHookWorker, id, data)
   end
 end

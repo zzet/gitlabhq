@@ -29,10 +29,10 @@ set :unicorn_web_service, "/etc/service/gitlab-web-unicorn"
 set :unicorn_api_service, "/etc/service/gitlab-web-unicorn_api"
 set :faye_service,         "/etc/service/gitlab-web-faye"
 
-set :sidekiq_main_service, "/etc/service/gitlab-sidekiq-main"
-set :sidekiq_mail_service, "/etc/service/gitlab-sidekiq-mail"
-set :sidekiq_gitshell_service, "/etc/service/gitlab-sidekiq-gitshell"
-set :sidekiq_elasticsearch_service, "/etc/service/gitlab-sidekiq-elasticsearch"
+set :resque_main_service, "/etc/service/gitlab-resque-main"
+set :resque_mail_service, "/etc/service/gitlab-resque-mail"
+set :resque_gitshell_service, "/etc/service/gitlab-resque-gitshell"
+set :resque_elasticsearch_service, "/etc/service/gitlab-resque-elasticsearch"
 
 namespace :rake do
   desc 'Run rake task on remote server'
@@ -131,23 +131,23 @@ namespace :deploy do
   end
 
   namespace :queue do
-    desc 'Restart sidekiq'
+    desc 'Restart resque'
     task :restart do
       on roles :app do
-        if test "[ -L #{fetch(:sidekiq_main_service)} ]"
-          execute :sv_restart, fetch(:sidekiq_main_service)
+        if test "[ -L #{fetch(:resque_main_service)} ]"
+          execute :sv_restart, fetch(:resque_main_service)
         end
 
-        if test "[ -L #{fetch(:sidekiq_mail_service)} ]"
-          execute :sv_restart, fetch(:sidekiq_mail_service)
+        if test "[ -L #{fetch(:resque_mail_service)} ]"
+          execute :sv_restart, fetch(:resque_mail_service)
         end
 
-        if test "[ -L #{fetch(:sidekiq_gitshell_service)} ]"
-          execute :sv_restart, fetch(:sidekiq_gitshell_service)
+        if test "[ -L #{fetch(:resque_gitshell_service)} ]"
+          execute :sv_restart, fetch(:resque_gitshell_service)
         end
 
-        if test "[ -L #{fetch(:sidekiq_elasticsearch_service)} ]"
-          execute :sv_restart, fetch(:sidekiq_elasticsearch_service)
+        if test "[ -L #{fetch(:resque_elasticsearch_service)} ]"
+          execute :sv_restart, fetch(:resque_elasticsearch_service)
         end
       end
     end

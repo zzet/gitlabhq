@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140703170514) do
+ActiveRecord::Schema.define(version: 20140825170514) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(version: 20140703170514) do
 
   add_index "events", ["created_at"], name: "index_events_on_created_at", order: {"created_at"=>:desc}, using: :btree
   add_index "events", ["parent_event_id"], name: "index_events_on_parent_event_id", using: :btree
+  add_index "events", ["target_type", "target_id", "source_type", "source_id", "first_domain_type", "first_domain_id", "second_domain_type", "second_domain_id"], name: "for_main_dashboard_index", where: "(parent_event_id IS NULL)", using: :btree
   add_index "events", ["target_type", "target_id"], name: "index_events_on_target_type_and_target_id", using: :btree
   add_index "events", ["uniq_hash"], name: "index_events_on_uniq_hash", using: :btree
 
@@ -285,6 +286,7 @@ ActiveRecord::Schema.define(version: 20140703170514) do
   add_index "merge_requests", ["created_at"], name: "index_merge_requests_on_created_at", using: :btree
   add_index "merge_requests", ["milestone_id"], name: "index_merge_requests_on_milestone_id", using: :btree
   add_index "merge_requests", ["source_branch"], name: "index_merge_requests_on_source_branch", using: :btree
+  add_index "merge_requests", ["source_project_id"], name: "index_merge_requests_on_project_id", using: :btree
   add_index "merge_requests", ["source_project_id"], name: "index_merge_requests_on_source_project_id", using: :btree
   add_index "merge_requests", ["target_branch"], name: "index_merge_requests_on_target_branch", using: :btree
   add_index "merge_requests", ["target_project_id", "iid"], name: "index_merge_requests_on_target_project_id_and_iid", unique: true, using: :btree
@@ -343,6 +345,7 @@ ActiveRecord::Schema.define(version: 20140703170514) do
   add_index "notes", ["noteable_type"], name: "index_notes_on_noteable_type", using: :btree
   add_index "notes", ["project_id", "noteable_type"], name: "index_notes_on_project_id_and_noteable_type", using: :btree
   add_index "notes", ["project_id"], name: "index_notes_on_project_id", using: :btree
+  add_index "notes", ["project_id"], name: "not_system_notes", where: "(system = false)", using: :btree
   add_index "notes", ["updated_at"], name: "index_notes_on_updated_at", using: :btree
 
   create_table "old_events", force: true do |t|
@@ -392,6 +395,7 @@ ActiveRecord::Schema.define(version: 20140703170514) do
   end
 
   add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree
+  add_index "projects", ["creator_id"], name: "index_projects_on_owner_id", using: :btree
   add_index "projects", ["last_activity_at"], name: "index_projects_on_last_activity_at", using: :btree
   add_index "projects", ["last_pushed_at"], name: "index_projects_on_last_pushed_at", using: :btree
   add_index "projects", ["namespace_id"], name: "index_projects_on_namespace_id", using: :btree

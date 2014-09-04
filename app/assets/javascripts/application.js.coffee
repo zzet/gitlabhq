@@ -16,6 +16,7 @@
 #= require jquery.scrollTo
 #= require jquery.blockUI
 #= require jquery.customSelect.min
+#= require jquery-friendly_id
 #= require turbolinks
 #= require jquery.turbolinks
 #= require bootstrap

@@ -12,7 +12,7 @@ class SystemHooksService
   end
 
   def async_execute_hook(hook, data)
-    Sidekiq::Client.enqueue(SystemHookWorker, hook.id, data)
+    Resque.enqueue(SystemHookWorker, hook.id, data)
   end
 
   def build_event_data(model, event)

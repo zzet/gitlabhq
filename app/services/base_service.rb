@@ -20,13 +20,13 @@ class BaseService
   def receive_delayed_notifications
     notifications = Event::Subscription::Notification.delayed
     notifications.each do |notification|
-      Sidekiq::Client.enqueue_to(:mail_notifications, MailNotificationWorker, notification.id)
+      Resque.enqueue(MailNotificationWorker, notification.id)
     end
   end
 
   def reindex_with_elastic(klass, id, action = :update)
     begin
-      Elastic::BaseIndexer.perform_async(action, klass.name, id)
+      Resque.enqueue(Elastic::BaseIndexer, action, klass.name, id)
     rescue
     end
   end

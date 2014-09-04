@@ -55,7 +55,7 @@ class Event::Subscription::Notification < ActiveRecord::Base
   def async_send_notification
     begin
       unless notification_state == :delayed
-        Sidekiq::Client.enqueue_to(:mail_notifications, MailNotificationWorker, self.id)
+        Resque.enqueue(MailNotificationWorker, self.id)
       end
     rescue
     end

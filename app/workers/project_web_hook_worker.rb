@@ -1,9 +1,7 @@
 class ProjectWebHookWorker
-  include Sidekiq::Worker
+  @queue = :project_web_hook
 
-  sidekiq_options queue: :project_web_hook
-
-  def perform(hook_id, data)
+  def self.perform(hook_id, data)
     WebHook.find(hook_id).execute data
   end
 end

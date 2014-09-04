@@ -38,6 +38,7 @@ gem "browser"
 gem 'elasticsearch-model',  github: 'elasticsearch/elasticsearch-rails',  ref: '88b6597e47c9f45024b603faeddb0a85b47e1fce'
 gem 'elasticsearch-rails',  github: 'elasticsearch/elasticsearch-rails'
 gem 'elasticsearch-git', github: 'zzet/elasticsearch-git', ref: 'a3fb57b303ad8b8c629b301ca009cd7d486089fb'
+gem 'jquery-friendly_id-rails'
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
@@ -96,7 +97,7 @@ gem "six"
 gem "seed-fu"
 
 # Markdown to HTML
-gem "redcarpet",     "~> 2.2.2"
+gem "redcarpet",     "~> 3.1.2"
 gem "github-markup"
 gem "org-ruby" # For rendering .org files
 
@@ -128,8 +129,15 @@ gem "acts-as-taggable-on"
 # Background jobs
 gem 'slim'
 gem 'sinatra', require: nil
-gem 'sidekiq', '~> 3.0.1'
-gem 'sidetiq', github: 'tobiassvn/sidetiq'
+
+# Resque 2.x
+# gem "resque", "~> 2.0.0.pre.1", github: "resque/resque"
+# gem 'resque-web', github: 'resque/resque-web', branch: "resque-2", require: 'resque_web'
+# Resque 1.25
+gem "resque"
+gem 'resque-scheduler'
+gem 'resque-web', require: 'resque_web'
+gem 'resque-multi-job-forks'
 
 # HTTP requests
 gem "httparty"
