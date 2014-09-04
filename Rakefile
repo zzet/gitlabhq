@@ -5,3 +5,5 @@
 require File.expand_path('../config/application', __FILE__)
 
 Gitlab::Application.load_tasks
+require 'resque/tasks'
+require 'resque/scheduler/tasks'

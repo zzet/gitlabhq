@@ -99,6 +99,23 @@ class DashboardController < ApplicationController
     @teams = current_user.teams
   end
 
+  def groups
+    @groups = case params[:scope]
+                when 'personal' then
+                  current_user.personal_groups
+                when 'created' then
+                  current_user.created_groups
+                when 'joined' then
+                  current_user.groups.where.not(id: current_user.created_groups.pluck(:id))
+                when 'owned' then
+                  current_user.owned_groups
+                else
+                  current_user.authorized_groups
+                end
+
+    @groups = @groups.page(params[:page]).per(30)
+  end
+
 
   def merge_requests
     @merge_requests = MergeRequestsFinder.new.execute(current_user, params)

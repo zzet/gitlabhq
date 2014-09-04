@@ -37,6 +37,18 @@ module DashboardHelper
     path
   end
 
+  def groups_dashboard_filter_path(options={})
+    exist_opts = {
+      scope: params[:scope],
+    }
+
+    options = exist_opts.merge(options)
+
+    path = request.path
+    path << "?#{options.to_param}"
+    path
+  end
+
   def teams_dashboard_filter_path(options={})
     exist_opts = {
       sort: params[:sort],

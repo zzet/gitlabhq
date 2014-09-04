@@ -238,13 +238,17 @@ class SearchService < BaseService
                'namespaces.path as namespace_path',
                'projects.id'].join(","))
 
-    projects_meta_data.map do |meta|
-      {
-        name: meta[2] + ' / ' + meta[0],
-        path: meta[3] + ' / ' + meta[1],
-        count: terms[meta[4]]
-      }
-    end.sort { |x, y| y[:count] <=> x[:count] }
+    if projects_meta_data.any?
+      projects_meta_data.map do |meta|
+        {
+          name: meta[2] + ' / ' + meta[0],
+          path: meta[3] + ' / ' + meta[1],
+          count: terms[meta[4]]
+        }
+      end.sort { |x, y| y[:count] <=> x[:count] }
+    else
+      []
+    end
   end
 
   def namespaces(terms)
@@ -254,8 +258,14 @@ class SearchService < BaseService
       memo
     end
 
-    Namespace.find(grouped_terms.keys).map do |namespace|
-      { namespace: namespace, count: grouped_terms[namespace.id] }
-    end.sort { |x, y| y[:count] <=> x[:count] }
+    namespaces_meta_data = Namespace.find(grouped_terms.keys)
+
+    if namespaces_meta_data.any?
+      namespaces_meta_data.map do |namespace|
+        { namespace: namespace, count: grouped_terms[namespace.id] }
+      end.sort { |x, y| y[:count] <=> x[:count] }
+    else
+      []
+    end
   end
 end
