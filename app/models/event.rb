@@ -116,7 +116,7 @@ class Event < ActiveRecord::Base
       teams_ids = user.only_authorized_teams_ids
     end
 
-    project_related = [Push, Note, MergeRequest]
+    # project_related = [Push, Note, MergeRequest]
     where(
         table[:parent_event_id].eq(nil).and(
             table[:target_type].eq(Project).and(table[:target_id].in(projects_ids))
@@ -129,8 +129,10 @@ class Event < ActiveRecord::Base
             .or(table[:first_domain_type].eq(Team).and(table[:first_domain_id].in(teams_ids)))
             .or(table[:second_domain_type].eq(Team).and(table[:second_domain_id].in(teams_ids)))
         )
-        .or(table[:target_type].eq(Project).and(table[:target_id]
-              .in(projects_ids)).and(table[:source_type].in(project_related)))
+        .or(table[:target_type].eq(Project).and(table[:target_id].in(projects_ids)).
+            and(table[:source_type].in([Push, MergeRequest]).
+                or(table[:source_type].eq(Note).and(table[:source_id].in(
+                  Arel.sql(Note.where(system: false, project_id: projects_ids).select(:id).to_sql))))))
     )
 
   end
