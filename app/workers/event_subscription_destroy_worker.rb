@@ -8,7 +8,7 @@ class EventSubscriptionDestroyWorker
       # If User subscribed to ptoject while assigned team or group (!!!)
       if [:deleted].include?(action.to_sym)
         Event::Subscription.by_target(data[:source]).each do |subscription|
-          Sidekiq::Client.enqueue_to(:mail_notifications, EventSubscriptionDestroyWorker, subscription.id)
+          Resque.enqueue(EventSubscriptionDestroyWorker, subscription.id)
         end
       end
     rescue
@@ -16,15 +16,13 @@ class EventSubscriptionDestroyWorker
     end
   end
 
-  include Sidekiq::Worker
+  @queue = :mail_notifications
 
-  sidekiq_options queue: :mail_notifications
-
-  def perform(subscription_id)
+  def self.perform(subscription_id)
     subscription = Event::Subscription.find_by(id: subscription_id)
     if subscription
       if Event::Subscription::Notification.where(subscription_id: subscription, notification_state: [:new, :delayed]).any?
-        Sidekiq::Client.enqueue_to(:mail_notifications, EventSubscriptionDestroyWorker, subscription_id)
+        Resque.enqueue(EventSubscriptionDestroyWorker, subscription_id)
       else
         subscription.destroy
       end

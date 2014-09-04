@@ -50,19 +50,11 @@ class Key < ActiveRecord::Base
   end
 
   def add_to_shell
-    GitlabShellWorker.perform_async(
-      :add_key,
-      shell_id,
-      key
-    )
+    Resque.enqueue(GitlabShellWorker, :add_key, shell_id, key)
   end
 
   def remove_from_shell
-    GitlabShellWorker.perform_async(
-      :remove_key,
-      shell_id,
-      key,
-    )
+    Resque.enqueue(GitlabShellWorker, :remove_key, shell_id, key)
   end
 
   private

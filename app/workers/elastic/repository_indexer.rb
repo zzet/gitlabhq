@@ -1,8 +1,7 @@
 class Elastic::RepositoryIndexer
-  include Sidekiq::Worker
-  sidekiq_options queue: 'elasticsearch', retry: false, backtrace: true
+  @queue = :elasticsearch
 
-  def perform(record_id, options={})
+  def self.perform(record_id, options={})
     push = Push.find(record_id)
     repo = push.project.repository
 

@@ -1,8 +1,11 @@
 class RepositoryImportWorker
-  include Sidekiq::Worker
   include Gitlab::ShellAdapter
 
-  sidekiq_options queue: :gitlab_shell
+  @queue = :gitlab_shell
+
+  def self.perform(project_id)
+    RepositoryImportWorker.new.perform(project_id)
+  end
 
   def perform(project_id)
     project = Project.find(project_id)

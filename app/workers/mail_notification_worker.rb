@@ -1,9 +1,7 @@
 class MailNotificationWorker
-  include Sidekiq::Worker
+  @queue = :mail_notifications
 
-  sidekiq_options queue: :mail_notifications
-
-  def perform(notification)
+  def self.perform(notification)
     notification = Event::Subscription::Notification.find(notification)
     NotificationService.process_notification(notification)
   end

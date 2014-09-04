@@ -1,15 +1,15 @@
 %h3.page-title Background Jobs
-%p.light GitLab uses #{link_to "sidekiq", "http://sidekiq.org/"} library for async job processing
+%p.light GitLab uses #{link_to "resque", "http://resquework.org/"} library for async job processing
 
 %hr
 
 .panel.panel-default
-  .panel-heading Sidekiq running processes
+  .panel-heading Resque running processes
   .panel-body
-    - if @sidekiq_processes.empty?
+    - if @resque.empty?
       %h4.cred
         %i.icon-warning-sign
-        There are no running sidekiq processes. Please restart GitLab
+        There are no running resque processes. Please restart GitLab
     - else
       %table.table
         %thead
@@ -21,8 +21,8 @@
           %th START
           %th COMMAND
         %tbody
-          - @sidekiq_processes.each do |process|
-            - next unless process.match(/(sidekiq \d+\.\d+\.\d+.+$)/)
+          - @resque.each do |process|
+            - next unless process.match(/(resque \d+\.\d+\.\d+.+$)/)
             - data = process.strip.split(' ')
             %tr
               %td= Settings.gitlab.user
@@ -30,15 +30,6 @@
                 %td= data.shift
               %td= data.join(' ')
 
-      .clearfix
-        %p
-          %i.icon-exclamation-sign
-          If '[25 of 25 busy]' is shown, restart GitLab with 'sudo service gitlab reload'.
-        %p
-          %i.icon-exclamation-sign
-          If more than one sidekiq process is listed, stop GitLab, kill the remaining sidekiq processes (sudo pkill -u #{Settings.gitlab.user} -f sidekiq) and restart GitLab.
-
-
 
 .panel.panel-default
-  %iframe{src: sidekiq_path, width: '100%', height: 900, style: "border: none"}
+  %iframe{src: resque_web_path, width: '100%', height: 900, style: "border: none"}

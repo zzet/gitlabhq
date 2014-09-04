@@ -47,10 +47,10 @@ module ApplicationSearch
       }
     }
 
-    after_commit lambda { Elastic::BaseIndexer.perform_async(:index,  self.class.to_s, self.id) }, on: :create
-    after_commit lambda { Elastic::BaseIndexer.perform_async(:update, self.class.to_s, self.id) }, on: :update
-    after_commit lambda { Elastic::BaseIndexer.perform_async(:delete, self.class.to_s, self.id) }, on: :destroy
-    after_touch  lambda { Elastic::BaseIndexer.perform_async(:update, self.class.to_s, self.id) }
+    after_commit lambda { Resque.enqueue(Elastic::BaseIndexer, :index,  self.class.to_s, self.id) }, on: :create
+    after_commit lambda { Resque.enqueue(Elastic::BaseIndexer, :update, self.class.to_s, self.id) }, on: :update
+    after_commit lambda { Resque.enqueue(Elastic::BaseIndexer, :delete, self.class.to_s, self.id) }, on: :destroy
+    after_touch  lambda { Resque.enqueue(Elastic::BaseIndexer, :update, self.class.to_s, self.id) }
   end
 
    module ClassMethods

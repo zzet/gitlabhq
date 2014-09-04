@@ -129,8 +129,15 @@ gem "acts-as-taggable-on"
 # Background jobs
 gem 'slim'
 gem 'sinatra', require: nil
-gem 'sidekiq', '~> 3.0.1'
-gem 'sidetiq', github: 'tobiassvn/sidetiq'
+
+# Resque 2.x
+# gem "resque", "~> 2.0.0.pre.1", github: "resque/resque"
+# gem 'resque-web', github: 'resque/resque-web', branch: "resque-2", require: 'resque_web'
+# Resque 1.25
+gem "resque"
+gem 'resque-scheduler'
+gem 'resque-web', require: 'resque_web'
+gem 'resque-multi-job-forks'
 
 # HTTP requests
 gem "httparty"
