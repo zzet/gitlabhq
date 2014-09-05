@@ -25,7 +25,7 @@ class CiBuildResultWorker
     end
   end
 
-  def fill_build_data(build, parser, data = nil)
+  def self.fill_build_data(build, parser, data = nil)
     case parser.status
     when "aborted"
       build.to_abort
