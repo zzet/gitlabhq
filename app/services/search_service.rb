@@ -188,8 +188,8 @@ class SearchService < BaseService
     begin
       res = Repository.search(query, options: opt, page: page)
 
-      res[:blobs][:projects] = project_filter(res[:blobs][:repositories])
-      res[:blobs][:commits] = project_filter(res[:commits][:repositories])
+      res[:blobs][:projects] = project_filter(res[:blobs][:repositories]) || []
+      res[:blobs][:commits]  = project_filter(res[:commits][:repositories]) || []
 
       res
     rescue Exception => e
