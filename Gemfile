@@ -37,7 +37,7 @@ gem "browser"
 # Search
 gem 'elasticsearch-model',  github: 'elasticsearch/elasticsearch-rails',  ref: '88b6597e47c9f45024b603faeddb0a85b47e1fce'
 gem 'elasticsearch-rails',  github: 'elasticsearch/elasticsearch-rails'
-gem 'elasticsearch-git', github: 'zzet/elasticsearch-git', ref: 'a3fb57b303ad8b8c629b301ca009cd7d486089fb'
+gem 'elasticsearch-git', github: 'zzet/elasticsearch-git', ref: '7065da063f31d2f0a2b7c6d237ed39fb704b4772'
 gem 'jquery-friendly_id-rails'
 
 # Extracting information from a git repository
